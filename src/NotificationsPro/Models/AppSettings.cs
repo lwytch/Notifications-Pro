@@ -27,9 +27,9 @@ public class AppSettings
     public double AnimationDurationMs { get; set; } = 300;
     public bool NotificationsPaused { get; set; } = false;
 
-    // Position & Size
-    public double OverlayLeft { get; set; } = double.NaN;
-    public double OverlayTop { get; set; } = double.NaN;
+    // Position & Size (null = not yet positioned, use default)
+    public double? OverlayLeft { get; set; }
+    public double? OverlayTop { get; set; }
     public double OverlayWidth { get; set; } = 380;
     public double OverlayMaxHeight { get; set; } = 600;
     public int MonitorIndex { get; set; } = 0;

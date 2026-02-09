@@ -7,11 +7,12 @@ namespace NotificationsPro.Services;
 
 public class SettingsManager
 {
-    private static readonly string SettingsDir = Path.Combine(
+    private static readonly string DefaultSettingsDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "NotificationsPro");
 
-    private static readonly string SettingsPath = Path.Combine(SettingsDir, "settings.json");
+    private readonly string _settingsDir;
+    private readonly string _settingsPath;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -23,13 +24,24 @@ public class SettingsManager
 
     public event Action? SettingsChanged;
 
+    public SettingsManager() : this(DefaultSettingsDir) { }
+
+    /// <summary>
+    /// Constructor accepting a custom settings directory (used for testing).
+    /// </summary>
+    public SettingsManager(string settingsDir)
+    {
+        _settingsDir = settingsDir;
+        _settingsPath = Path.Combine(settingsDir, "settings.json");
+    }
+
     public void Load()
     {
         try
         {
-            if (File.Exists(SettingsPath))
+            if (File.Exists(_settingsPath))
             {
-                var json = File.ReadAllText(SettingsPath);
+                var json = File.ReadAllText(_settingsPath);
                 var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
                 if (loaded != null)
                     Settings = loaded;
@@ -47,9 +59,9 @@ public class SettingsManager
     {
         try
         {
-            Directory.CreateDirectory(SettingsDir);
+            Directory.CreateDirectory(_settingsDir);
             var json = JsonSerializer.Serialize(Settings, JsonOptions);
-            File.WriteAllText(SettingsPath, json);
+            File.WriteAllText(_settingsPath, json);
         }
         catch
         {

@@ -1,15 +1,30 @@
+using System.IO;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 
 namespace NotificationsPro.Tests;
 
-public class SettingsManagerTests
+public class SettingsManagerTests : IDisposable
 {
+    private readonly string _tempDir;
+
+    public SettingsManagerTests()
+    {
+        _tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProTest_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(_tempDir);
+    }
+
+    public void Dispose()
+    {
+        try { Directory.Delete(_tempDir, true); } catch { }
+    }
+
+    private SettingsManager CreateManager() => new SettingsManager(_tempDir);
+
     [Fact]
     public void Load_ReturnsDefaultsWhenNoFile()
     {
-        var sm = new SettingsManager();
-        // Load without a file existing — should return defaults
+        var sm = CreateManager();
         sm.Load();
 
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
@@ -17,6 +32,23 @@ public class SettingsManagerTests
         Assert.Equal(0.92, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
         Assert.Equal(3, sm.Settings.MaxVisibleNotifications);
+    }
+
+    [Fact]
+    public void SaveAndLoad_RoundTrips()
+    {
+        var sm = CreateManager();
+        sm.Settings.FontSize = 22;
+        sm.Settings.FontFamily = "Consolas";
+        sm.Settings.BackgroundOpacity = 0.5;
+        sm.Save();
+
+        var sm2 = CreateManager();
+        sm2.Load();
+
+        Assert.Equal(22, sm2.Settings.FontSize);
+        Assert.Equal("Consolas", sm2.Settings.FontFamily);
+        Assert.Equal(0.5, sm2.Settings.BackgroundOpacity);
     }
 
     [Fact]
@@ -66,7 +98,7 @@ public class SettingsManagerTests
     [Fact]
     public void ResetToDefaults_RestoresDefaultValues()
     {
-        var sm = new SettingsManager();
+        var sm = CreateManager();
         sm.Settings.FontSize = 99;
         sm.Settings.FontFamily = "Impact";
         sm.Settings.BackgroundOpacity = 0.1;
@@ -81,7 +113,7 @@ public class SettingsManagerTests
     [Fact]
     public void Apply_UpdatesSettings()
     {
-        var sm = new SettingsManager();
+        var sm = CreateManager();
         var updated = new AppSettings { FontSize = 22, FontFamily = "Consolas" };
 
         sm.Apply(updated);
@@ -93,7 +125,7 @@ public class SettingsManagerTests
     [Fact]
     public void Apply_RaisesSettingsChanged()
     {
-        var sm = new SettingsManager();
+        var sm = CreateManager();
         bool eventFired = false;
         sm.SettingsChanged += () => eventFired = true;
 
@@ -103,9 +135,21 @@ public class SettingsManagerTests
     }
 
     [Fact]
+    public void Load_HandlesCorruptedFile()
+    {
+        File.WriteAllText(Path.Combine(_tempDir, "settings.json"), "NOT VALID JSON {{{");
+
+        var sm = CreateManager();
+        sm.Load();
+
+        // Should fall back to defaults
+        Assert.Equal("Segoe UI", sm.Settings.FontFamily);
+        Assert.Equal(14, sm.Settings.FontSize);
+    }
+
+    [Fact]
     public void Settings_NeverContainNotificationContent()
     {
-        // Verify the AppSettings model has no fields that could hold notification content
         var props = typeof(AppSettings).GetProperties();
         var propNames = props.Select(p => p.Name).ToList();
 

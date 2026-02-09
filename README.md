@@ -75,14 +75,21 @@ Changes are saved automatically.
 
 This file contains only UI preferences (fonts, colors, layout). See `settings.example.json` for the default values.
 
-## Notification Capture Limitations
+## Notification Capture
 
-Currently using mock/preview notifications (Milestone 1). Real notification capture via `UserNotificationListener` API is planned for Milestone 2.
+Notifications Pro uses the `UserNotificationListener` API to capture Windows toast notifications in real time. On first launch, Windows will prompt you to grant notification access.
 
-Known limitations of the `UserNotificationListener` API:
+**If you denied permission or need to re-enable:**
+1. Open Windows Settings > System > Notifications
+2. Scroll down to "Notification access" or "Notification listener"
+3. Enable access for Notifications Pro
+
+### Known Limitations
 - Requires user permission grant on first run
 - Some system-level notifications may not be accessible
 - Apps that opt out of notification mirroring won't be captured
+- Notifications dismissed before they can be read are skipped
+- Uses a configurable display duration rather than the system toast duration
 
 ## Running Tests
 ```bash

@@ -17,12 +17,16 @@ App.xaml.cs (Entry Point)
 └── TrayIcon (NotifyIcon)   System tray with dark-themed context menu
 ```
 
-## Notification Capture (Milestone 2)
+## Notification Capture
 
-Will use `Windows.UI.Notifications.Management.UserNotificationListener` API:
-- User-level permission (no admin required)
+Uses `Windows.UI.Notifications.Management.UserNotificationListener` API:
+- User-level permission (no admin required) — prompts on first run
 - Sanctioned Microsoft API for reading toast notifications
-- Polls or subscribes for new notifications as they arrive
+- Subscribes to `NotificationChanged` event for real-time detection
+- On each event, calls `GetNotificationsAsync()` and diffs against seen IDs
+- Seen IDs (`HashSet<uint>`) are system-generated, contain no notification content
+- Set is trimmed at 5000 entries to prevent unbounded growth
+- On startup, existing notifications are seeded as "seen" (not displayed)
 - Some system notifications may not be captured (documented limitation)
 
 ## Overlay Rendering

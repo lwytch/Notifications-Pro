@@ -5,11 +5,12 @@
         Title="Notifications Pro Overlay"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent" ShowInTaskbar="False"
-        ResizeMode="CanResizeWithGrip"
-        SizeToContent="Height"
+        ResizeMode="NoResize"
         Topmost="{Binding AlwaysOnTop}"
         Width="{Binding OverlayWidth, Mode=TwoWay}"
-        MaxHeight="{Binding OverlayMaxHeight}">
+        Height="400"
+        MaxHeight="{Binding OverlayMaxHeight}"
+        MinHeight="100" MinWidth="200">
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
@@ -50,9 +51,6 @@
                 <Border.RenderTransform>
                     <TranslateTransform X="0"/>
                 </Border.RenderTransform>
-                <Border.Effect>
-                    <DropShadowEffect ShadowDepth="2" BlurRadius="12" Opacity="0.25" Color="#000000"/>
-                </Border.Effect>
 
                 <StackPanel>
                     <!-- Title -->
@@ -101,9 +99,10 @@
         </DataTemplate>
     </Window.Resources>
 
-    <!-- Main content -->
-    <Grid Margin="4">
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <!-- Main content: near-transparent background for layered window hit testing -->
+    <Grid Margin="4" Background="#10000000">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                      PanningMode="None">
             <StackPanel>
                 <!-- Notification items -->
                 <ItemsControl ItemsSource="{Binding Notifications}"

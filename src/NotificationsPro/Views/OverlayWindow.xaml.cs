@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Interop;
 using NotificationsPro.Helpers;
 using NotificationsPro.Services;
@@ -12,7 +11,10 @@ public partial class OverlayWindow : Window
 {
     private readonly SettingsManager _settingsManager;
 
-    // Win32 constants for click-through
+    // Win32 messages
+    private const int WM_NCHITTEST = 0x0084;
+    private const int WM_NCLBUTTONDBLCLK = 0x00A3;
+    private const int HTCAPTION = 2;
     private const int GWL_EXSTYLE = -20;
     private const int WS_EX_TRANSPARENT = 0x00000020;
 
@@ -28,16 +30,46 @@ public partial class OverlayWindow : Window
         DataContext = viewModel;
         _settingsManager = settingsManager;
 
+        // SourceInitialized fires when the HWND is created — the EARLIEST point
+        // we can install the Win32 hook. Loaded fires AFTER the window is shown.
+        SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
         LocationChanged += OnLocationChanged;
+    }
+
+    private void OnSourceInitialized(object? sender, EventArgs e)
+    {
+        // Install WndProc hook at the earliest possible moment
+        var hwndSource = PresentationSource.FromVisual(this) as HwndSource;
+        hwndSource?.AddHook(WndProc);
+    }
+
+    /// <summary>
+    /// Win32 message hook. Returns HTCAPTION for all hit tests, which tells
+    /// Windows the entire window is a title bar — Windows handles drag natively.
+    /// </summary>
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        switch (msg)
+        {
+            case WM_NCHITTEST:
+                handled = true;
+                return (IntPtr)HTCAPTION;
+
+            case WM_NCLBUTTONDBLCLK:
+                // Prevent maximize on double-click
+                handled = true;
+                return IntPtr.Zero;
+        }
+
+        return IntPtr.Zero;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         var settings = _settingsManager.Settings;
 
-        // Position the window
-        if (double.IsNaN(settings.OverlayLeft) || double.IsNaN(settings.OverlayTop))
+        if (settings.OverlayLeft == null || settings.OverlayTop == null)
         {
             var workArea = SystemParameters.WorkArea;
             var pos = SnapHelper.GetDefaultPosition(Width, ActualHeight, workArea);
@@ -46,8 +78,8 @@ public partial class OverlayWindow : Window
         }
         else
         {
-            Left = settings.OverlayLeft;
-            Top = settings.OverlayTop;
+            Left = settings.OverlayLeft.Value;
+            Top = settings.OverlayTop.Value;
         }
 
         UpdateClickThrough(settings.ClickThrough);
@@ -74,12 +106,6 @@ public partial class OverlayWindow : Window
             SetWindowLong(hwnd, GWL_EXSTYLE, style & ~WS_EX_TRANSPARENT);
     }
 
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseLeftButtonDown(e);
-        DragMove();
-    }
-
     private void OnLocationChanged(object? sender, EventArgs e)
     {
         if (_settingsManager.Settings.SnapToEdges)
@@ -98,7 +124,6 @@ public partial class OverlayWindow : Window
             }
         }
 
-        // Save position
         _settingsManager.Settings.OverlayLeft = Left;
         _settingsManager.Settings.OverlayTop = Top;
     }

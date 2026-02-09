@@ -1,6 +1,27 @@
 # Changelog
 
-## Milestone 1 — Core App Skeleton (In Progress)
+## Milestone 2 — Real Notification Capture
+
+### Added
+- NotificationListener service using UserNotificationListener API
+- Auto-permission request on first launch (Windows prompts user)
+- Real-time notification detection via NotificationChanged event
+- Toast text extraction (title + body) forwarded to QueueManager
+- Startup seeding: existing notifications marked as seen (not displayed)
+- Seen ID trimming at 5000 entries to prevent unbounded memory growth
+- Status indicator in tray context menu (shows listener state)
+- Tray icon tooltip updates to reflect access status
+
+### Changed
+- Target framework updated to net8.0-windows10.0.19041.0 for WinRT API access
+- SettingsManager now accepts custom path (testable with isolated temp directories)
+- OverlayLeft/OverlayTop changed from double.NaN to nullable double for JSON compatibility
+
+### Fixed
+- Settings save silently failing due to double.NaN serialization
+- SettingsManager tests now isolated from user's real settings file
+
+## Milestone 1 — Core App Skeleton
 
 ### Added
 - .NET 8 WPF solution structure
