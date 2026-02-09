@@ -1,0 +1,46 @@
+# Project-specific
+initial.md
+settings.json
+
+# Build output
+bin/
+obj/
+publish/
+AppPackages/
+
+# IDE / Editor
+.vs/
+.vscode/
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+
+# Rider
+.idea/
+*.sln.iml
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs / Dumps
+logs/
+dumps/
+*.log
+*.dmp
+
+# Publish profiles
+Properties/PublishProfiles/
+
+# Local settings overrides
+appsettings.*.json
+!appsettings.json

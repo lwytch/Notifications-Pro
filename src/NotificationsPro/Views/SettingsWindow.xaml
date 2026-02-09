@@ -1,0 +1,376 @@
+<Window x:Class="NotificationsPro.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:NotificationsPro.Converters"
+        Title="Notifications Pro — Settings"
+        Width="560" Height="640" MinWidth="480" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource WindowBgBrush}"
+        ResizeMode="CanResize">
+
+    <Window.Resources>
+        <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
+
+        <!-- Section header style -->
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+            <Setter Property="Margin" Value="0,20,0,12"/>
+        </Style>
+
+        <!-- Setting label -->
+        <Style x:Key="SettingLabel" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Setting description -->
+        <Style x:Key="SettingDesc" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,2,0,16"/>
+        </Style>
+
+        <!-- Value display next to slider -->
+        <Style x:Key="SliderValue" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="36"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Padding="24,20" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1">
+            <StackPanel>
+                <TextBlock Text="Settings" FontFamily="{StaticResource UIFont}"
+                           FontSize="20" FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                <TextBlock Text="Customize how notifications appear on your screen"
+                           FontFamily="{StaticResource UIFont}" FontSize="12"
+                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Tabs -->
+        <TabControl Grid.Row="1" Style="{StaticResource SettingsTabControl}" Margin="24,0">
+
+            <!-- ═══ APPEARANCE TAB ═══ -->
+            <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <!-- TYPOGRAPHY section -->
+                        <TextBlock Text="TYPOGRAPHY" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Font Family" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableFonts}"
+                                  SelectedItem="{Binding FontFamily}"
+                                  ToolTip="The typeface used for notification text"
+                                  Margin="0,4,0,0"/>
+                        <TextBlock Text="Typeface used for all notification text in the overlay"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Font Size" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding FontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="10" Maximum="32" Value="{Binding FontSize}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Controls text size — larger values improve readability"/>
+                        </DockPanel>
+                        <TextBlock Text="Larger sizes make notification text easier to read at a glance"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Font Weight" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableFontWeights}"
+                                  SelectedItem="{Binding FontWeight}"
+                                  ToolTip="How bold or light the notification body text appears"
+                                  Margin="0,4,0,0"/>
+                        <TextBlock Text="Controls the thickness of notification body text"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Line Spacing" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}"
+                                       Text="{Binding LineSpacing, StringFormat='{}{0:0.0}'}"/>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="1.0" Maximum="2.5" Value="{Binding LineSpacing}"
+                                    TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                    ToolTip="Space between lines of text — increase for readability"/>
+                        </DockPanel>
+                        <TextBlock Text="More spacing makes dense notifications easier to scan"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <!-- COLORS section -->
+                        <TextBlock Text="COLORS" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Title Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding TitleColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding TitleColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for notification titles (e.g. #FFFFFF)"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Color of the notification title text" Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Body Text Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding TextColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for notification body text (e.g. #E4E4EF)"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Color of the notification body content" Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Background Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding BackgroundColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding BackgroundColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for the notification card background"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Background of each notification card" Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Accent Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding AccentColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding AccentColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for the left accent stripe on notification cards"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Colored stripe on the left edge of each notification card"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Background Opacity" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}"
+                                       Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"/>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0.1" Maximum="1.0" Value="{Binding BackgroundOpacity}"
+                                    TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                    ToolTip="How transparent the notification background appears"/>
+                        </DockPanel>
+                        <TextBlock Text="Lower values make cards more transparent so you can see through them"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <!-- SHAPE section -->
+                        <TextBlock Text="SHAPE" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Corner Radius" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding CornerRadius, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0" Maximum="24" Value="{Binding CornerRadius}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Roundness of notification card corners"/>
+                        </DockPanel>
+                        <TextBlock Text="0 for sharp corners, higher values for rounder cards"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Padding" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding Padding, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="4" Maximum="32" Value="{Binding Padding}"
+                                    TickFrequency="2" IsSnapToTickEnabled="True"
+                                    ToolTip="Internal spacing between card edge and text"/>
+                        </DockPanel>
+                        <TextBlock Text="Space between the card edge and the notification text"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ BEHAVIOR TAB ═══ -->
+            <TabItem Header="Behavior" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <TextBlock Text="TIMING" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Notification Duration" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding NotificationDuration, StringFormat='{}{0:0}'}"/><Run Text="s"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="2" Maximum="30" Value="{Binding NotificationDuration}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="How long each notification stays visible before fading out"/>
+                        </DockPanel>
+                        <TextBlock Text="Seconds each notification remains on screen before auto-dismissing"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AlwaysOnTop}"
+                                          ToolTip="Keep the overlay above all other windows"/>
+                            <TextBlock Text="Always on Top" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="When enabled, the overlay floats above all other windows including full-screen apps"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ClickThrough}"
+                                          ToolTip="Allow mouse clicks to pass through the overlay"/>
+                            <TextBlock Text="Click-Through Mode" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Mouse clicks pass through the overlay so you can interact with windows behind it. Disable to drag/resize the overlay."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="ANIMATIONS" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AnimationsEnabled}"
+                                          ToolTip="Enable or disable slide and fade animations"/>
+                            <TextBlock Text="Enable Animations" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Smooth slide-in and fade-out transitions for notifications"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Animation Speed" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding AnimationDurationMs, StringFormat='{}{0:0}'}"/><Run Text="ms"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="100" Maximum="800" Value="{Binding AnimationDurationMs}"
+                                    TickFrequency="50" IsSnapToTickEnabled="True"
+                                    ToolTip="Duration of slide/fade animations in milliseconds"/>
+                        </DockPanel>
+                        <TextBlock Text="Lower values feel snappier, higher values feel smoother"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ POSITION TAB ═══ -->
+            <TabItem Header="Position" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <TextBlock Text="SIZE" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Overlay Width" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OverlayWidth, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="250" Maximum="800" Value="{Binding OverlayWidth}"
+                                    TickFrequency="10" IsSnapToTickEnabled="True"
+                                    ToolTip="Width of the overlay window in pixels"/>
+                        </DockPanel>
+                        <TextBlock Text="Wider overlays show more text per line, reducing wrapping"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Max Overlay Height" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OverlayMaxHeight, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="200" Maximum="1200" Value="{Binding OverlayMaxHeight}"
+                                    TickFrequency="50" IsSnapToTickEnabled="True"
+                                    ToolTip="Maximum height the overlay can grow to before scrolling"/>
+                        </DockPanel>
+                        <TextBlock Text="The overlay expands vertically as needed up to this limit, then scrolls"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SnapToEdges}"
+                                          ToolTip="Overlay snaps to screen edges when dragged nearby"/>
+                            <TextBlock Text="Snap to Screen Edges" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="The overlay automatically aligns to screen edges when dragged close to them"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Snap Distance" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding SnapDistance, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="5" Maximum="50" Value="{Binding SnapDistance}"
+                                    TickFrequency="5" IsSnapToTickEnabled="True"
+                                    ToolTip="How close to a screen edge before the overlay snaps"/>
+                        </DockPanel>
+                        <TextBlock Text="How close (in pixels) the overlay needs to be before it snaps into place"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- Footer with preview button -->
+        <Border Grid.Row="2" Padding="24,16" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Reset to Defaults" Style="{StaticResource SecondaryButton}"
+                            Command="{Binding ResetToDefaultsCommand}" Margin="0,0,8,0"
+                            ToolTip="Restore all settings to their original values"/>
+                    <Button Content="Send Test Notification" Style="{StaticResource PrimaryButton}"
+                            Command="{Binding PreviewNotificationCommand}"
+                            ToolTip="Shows a sample notification in the overlay so you can preview your current style settings"/>
+                </StackPanel>
+                <TextBlock Text="Changes are saved automatically" VerticalAlignment="Center"
+                           FontFamily="{StaticResource UIFont}" FontSize="11"
+                           Foreground="{StaticResource TextMutedBrush}"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
