@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Automation;
@@ -8,7 +9,7 @@ using Windows.UI.Notifications.Management;
 namespace NotificationsPro.Services;
 
 /// <summary>
-/// Captures Windows toast notifications and forwards title + body text to QueueManager.
+/// Captures Windows toast notifications and forwards app/title/body text to QueueManager.
 ///
 /// Strategy:
 ///   1. Try the WinRT UserNotificationListener API (works for packaged/privileged apps)
@@ -32,7 +33,12 @@ public class NotificationListener
     // Accessibility fallback
     private IntPtr _winEventHook;
     private WinEventDelegate? _winEventDelegate; // prevent GC collection
+    private DispatcherTimer? _accessibilityStatusTimer;
+    private readonly object _accessibilityGate = new();
+    private readonly Dictionary<IntPtr, DateTime> _recentAccessibilityCandidates = new();
     private bool _usingAccessibility;
+    private int _accessibilityEventCount;
+    private int _accessibilityCandidateCount;
 
     // Shared state
     private bool _isRunning;
@@ -63,12 +69,17 @@ public class NotificationListener
     [DllImport("user32.dll")]
     private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT { public int Left, Top, Right, Bottom; }
 
     private const uint EVENT_OBJECT_SHOW = 0x8002;
+    private const uint EVENT_OBJECT_NAMECHANGE = 0x800C;
     private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
     private const uint WINEVENT_SKIPOWNPROCESS = 0x0002;
+    private static readonly TimeSpan AccessibilityDebounceWindow = TimeSpan.FromMilliseconds(350);
 
     public NotificationListener(QueueManager queueManager, Dispatcher dispatcher)
     {
@@ -216,15 +227,15 @@ public class NotificationListener
             if (toastBinding == null) return;
 
             var textElements = toastBinding.GetTextElements();
-            var texts = textElements.Select(t => t.Text).ToList();
-            if (texts.Count == 0) return;
+            var texts = textElements
+                .Select(t => NormalizeText(t.Text))
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
-            var title = texts[0] ?? string.Empty;
-            var body = texts.Count > 1
-                ? string.Join("\n", texts.Skip(1).Where(t => !string.IsNullOrEmpty(t)))
-                : string.Empty;
-
-            _queueManager.AddNotification(title, body);
+            var appName = NormalizeText(notification.AppInfo?.DisplayInfo?.DisplayName ?? string.Empty);
+            var fields = BuildNotificationFields(texts, appName, assumeLeadingAppNameWhenUnknown: false);
+            _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
         }
         catch { }
     }
@@ -250,45 +261,46 @@ public class NotificationListener
         // The WPF dispatcher thread qualifies.
         _winEventDelegate = OnWinEvent;
         _winEventHook = SetWinEventHook(
-            EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW,
+            EVENT_OBJECT_SHOW, EVENT_OBJECT_NAMECHANGE,
             IntPtr.Zero, _winEventDelegate,
             0, 0, // all processes, all threads
             WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
 
         if (_winEventHook != IntPtr.Zero)
         {
-            StatusMessage = "Listening via accessibility mode";
+            StartAccessibilityStatusTimer();
+            UpdateAccessibilityStatus("Listening via accessibility mode");
         }
         else
         {
             StatusMessage = "Failed to start accessibility listener";
+            StatusChanged?.Invoke();
         }
-        StatusChanged?.Invoke();
     }
 
     private void OnWinEvent(IntPtr hWinEventHook, uint eventType, IntPtr hwnd,
         int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
     {
         if (!_isRunning || hwnd == IntPtr.Zero) return;
+        Interlocked.Increment(ref _accessibilityEventCount);
 
-        // Only care about window-level show events (idObject == 0 == OBJID_WINDOW)
-        if (idObject != 0) return;
+        var classNameBuilder = new StringBuilder(256);
+        if (GetClassName(hwnd, classNameBuilder, classNameBuilder.Capacity) > 0)
+            _lastAccessibilityClassName = classNameBuilder.ToString();
 
-        // Quick class name check — fast Win32 call, no COM overhead
-        var sb = new StringBuilder(256);
-        GetClassName(hwnd, sb, sb.Capacity);
-        var className = sb.ToString();
+        // Toast hosting windows live under ShellExperienceHost / StartMenuExperienceHost.
+        if (!IsShellHostWindow(hwnd)) return;
 
-        // Toast notifications use CoreWindow on Windows 10/11
-        if (className != "Windows.UI.Core.CoreWindow") return;
-
-        // Check window size — toasts are small, full UWP apps are large
+        // Keep a size-based filter to avoid scanning large host windows.
         if (!GetWindowRect(hwnd, out var rect)) return;
         var width = rect.Right - rect.Left;
         var height = rect.Bottom - rect.Top;
-        if (width > 600 || height > 500 || width < 50 || height < 30) return;
+        if (width > 800 || height > 700 || width < 80 || height < 40) return;
 
-        // Likely a toast — extract text on a background thread to avoid blocking UI
+        if (!ShouldProcessAccessibilityCandidate(hwnd)) return;
+        Interlocked.Increment(ref _accessibilityCandidateCount);
+
+        // Extract text on a background thread to avoid blocking UI.
         var capturedHwnd = hwnd;
         _ = Task.Run(() => ExtractToastViaAutomation(capturedHwnd));
     }
@@ -308,36 +320,162 @@ public class NotificationListener
                 AutomationElement.ControlTypeProperty, ControlType.Text);
             var textElements = element.FindAll(TreeScope.Descendants, textCondition);
 
-            if (textElements.Count < 2) return; // Need at least app name + title
-
             var texts = new List<string>();
             foreach (AutomationElement textEl in textElements)
             {
-                var text = textEl.Current.Name;
-                if (!string.IsNullOrEmpty(text))
+                var text = NormalizeText(textEl.Current.Name);
+                if (!string.IsNullOrWhiteSpace(text) && !IsIgnoredUiAutomationText(text))
                     texts.Add(text);
             }
 
-            if (texts.Count < 2) return;
-
-            // Typical structure: [0]=app name, [1]=title, [2+]=body
-            var title = texts[1];
-            var body = texts.Count > 2
-                ? string.Join("\n", texts.Skip(2))
-                : string.Empty;
+            if (texts.Count == 0) return;
+            texts = texts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            var fields = BuildNotificationFields(texts, appName: string.Empty, assumeLeadingAppNameWhenUnknown: true);
 
             _dispatcher.InvokeAsync(() =>
             {
-                _queueManager.AddNotification(title, body);
+                _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
                 _capturedCount++;
-                StatusMessage = $"Accessibility mode — {_capturedCount} captured";
-                StatusChanged?.Invoke();
+                UpdateAccessibilityStatus();
             });
         }
         catch
         {
             // Automation element may have been disposed — skip
         }
+    }
+
+    private static bool IsShellHostWindow(IntPtr hwnd)
+    {
+        _ = GetWindowThreadProcessId(hwnd, out var processId);
+        if (processId == 0) return false;
+
+        try
+        {
+            using var process = Process.GetProcessById((int)processId);
+            return process.ProcessName.Equals("ShellExperienceHost", StringComparison.OrdinalIgnoreCase)
+                || process.ProcessName.Equals("StartMenuExperienceHost", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool ShouldProcessAccessibilityCandidate(IntPtr hwnd)
+    {
+        var now = DateTime.UtcNow;
+        lock (_accessibilityGate)
+        {
+            if (_recentAccessibilityCandidates.TryGetValue(hwnd, out var lastSeen) &&
+                now - lastSeen < AccessibilityDebounceWindow)
+            {
+                return false;
+            }
+
+            _recentAccessibilityCandidates[hwnd] = now;
+
+            if (_recentAccessibilityCandidates.Count > 256)
+            {
+                var staleCutoff = now - TimeSpan.FromMinutes(1);
+                var staleHandles = _recentAccessibilityCandidates
+                    .Where(kvp => kvp.Value < staleCutoff)
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+
+                foreach (var staleHandle in staleHandles)
+                    _recentAccessibilityCandidates.Remove(staleHandle);
+            }
+        }
+
+        return true;
+    }
+
+    private void StartAccessibilityStatusTimer()
+    {
+        _accessibilityStatusTimer?.Stop();
+        _accessibilityStatusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        _accessibilityStatusTimer.Tick += OnAccessibilityStatusTick;
+        _accessibilityStatusTimer.Start();
+    }
+
+    private void OnAccessibilityStatusTick(object? sender, EventArgs e)
+    {
+        if (!_usingAccessibility || !_isRunning) return;
+        UpdateAccessibilityStatus();
+    }
+
+    private void UpdateAccessibilityStatus(string? prefix = null)
+    {
+        var classHint = string.Empty;
+        if (_lastAccessibilityClassName != null)
+            classHint = $", last class {_lastAccessibilityClassName}";
+
+        var suffix = $"{_capturedCount} captured, {_accessibilityCandidateCount} candidates, {_accessibilityEventCount} events{classHint}";
+        StatusMessage = string.IsNullOrWhiteSpace(prefix)
+            ? $"Accessibility mode — {suffix}"
+            : $"{prefix} — {suffix}";
+        StatusChanged?.Invoke();
+    }
+
+    private string? _lastAccessibilityClassName;
+
+    private static string NormalizeText(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+        var normalized = value
+            .Replace("\r", " ", StringComparison.Ordinal)
+            .Replace("\n", " ", StringComparison.Ordinal)
+            .Replace("\t", " ", StringComparison.Ordinal)
+            .Trim();
+        return normalized;
+    }
+
+    private static bool IsIgnoredUiAutomationText(string text)
+    {
+        return text.Equals("Dismiss", StringComparison.OrdinalIgnoreCase)
+            || text.Equals("Close", StringComparison.OrdinalIgnoreCase)
+            || text.Equals("Notification", StringComparison.OrdinalIgnoreCase)
+            || text.Equals("Notification center", StringComparison.OrdinalIgnoreCase)
+            || text.Equals("Clear all notifications", StringComparison.OrdinalIgnoreCase)
+            || text.Equals("Do not disturb", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static (string AppName, string Title, string Body) BuildNotificationFields(
+        IReadOnlyList<string> texts, string appName, bool assumeLeadingAppNameWhenUnknown)
+    {
+        var normalizedAppName = NormalizeText(appName);
+        var parts = texts
+            .Select(NormalizeText)
+            .Where(t => !string.IsNullOrWhiteSpace(t))
+            .ToList();
+
+        if (parts.Count == 0)
+            return (normalizedAppName, string.Empty, string.Empty);
+
+        if (!string.IsNullOrWhiteSpace(normalizedAppName)
+            && parts.Count > 1
+            && parts[0].Equals(normalizedAppName, StringComparison.OrdinalIgnoreCase))
+        {
+            parts.RemoveAt(0);
+        }
+        else if (string.IsNullOrWhiteSpace(normalizedAppName)
+                 && assumeLeadingAppNameWhenUnknown
+                 && parts.Count >= 3)
+        {
+            normalizedAppName = parts[0];
+            parts.RemoveAt(0);
+        }
+
+        if (parts.Count == 0)
+            return (normalizedAppName, string.Empty, string.Empty);
+
+        var title = parts[0];
+        var body = parts.Count > 1
+            ? string.Join("\n", parts.Skip(1))
+            : string.Empty;
+
+        return (normalizedAppName, title, body);
     }
 
     // ========================
@@ -349,6 +487,8 @@ public class NotificationListener
         Stop();
         _pollCount = 0;
         _capturedCount = 0;
+        _accessibilityCandidateCount = 0;
+        _accessibilityEventCount = 0;
         await InitializeAsync();
     }
 
@@ -357,6 +497,13 @@ public class NotificationListener
         _isRunning = false;
         _pollTimer?.Stop();
         _pollTimer = null;
+
+        if (_accessibilityStatusTimer != null)
+        {
+            _accessibilityStatusTimer.Tick -= OnAccessibilityStatusTick;
+            _accessibilityStatusTimer.Stop();
+            _accessibilityStatusTimer = null;
+        }
 
         if (_listener != null)
             _listener.NotificationChanged -= OnNotificationChanged;
@@ -368,5 +515,10 @@ public class NotificationListener
         }
 
         _seenIds.Clear();
+        lock (_accessibilityGate)
+        {
+            _recentAccessibilityCandidates.Clear();
+        }
+        _usingAccessibility = false;
     }
 }

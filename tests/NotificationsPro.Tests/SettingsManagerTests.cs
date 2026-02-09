@@ -32,6 +32,10 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(0.92, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
         Assert.Equal(3, sm.Settings.MaxVisibleNotifications);
+        Assert.True(sm.Settings.ShowAppName);
+        Assert.True(sm.Settings.ShowNotificationTitle);
+        Assert.True(sm.Settings.ShowNotificationBody);
+        Assert.False(sm.Settings.SingleLineMode);
     }
 
     [Fact]
@@ -62,6 +66,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(1.5, settings.LineSpacing);
         Assert.Equal("#E4E4EF", settings.TextColor);
         Assert.Equal("#FFFFFF", settings.TitleColor);
+        Assert.Equal("#B8B8CC", settings.AppNameColor);
         Assert.Equal("#1E1E2E", settings.BackgroundColor);
         Assert.Equal(0.92, settings.BackgroundOpacity);
         Assert.Equal(12, settings.CornerRadius);
@@ -70,12 +75,18 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("#7C5CFC", settings.AccentColor);
         Assert.Equal(5, settings.NotificationDuration);
         Assert.Equal(3, settings.MaxVisibleNotifications);
+        Assert.True(settings.ShowAppName);
+        Assert.True(settings.ShowNotificationTitle);
+        Assert.True(settings.ShowNotificationBody);
+        Assert.False(settings.SingleLineMode);
         Assert.True(settings.AlwaysOnTop);
         Assert.False(settings.ClickThrough);
         Assert.True(settings.AnimationsEnabled);
+        Assert.False(settings.FadeOnlyAnimation);
         Assert.Equal(300, settings.AnimationDurationMs);
         Assert.Equal(380, settings.OverlayWidth);
         Assert.Equal(600, settings.OverlayMaxHeight);
+        Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
         Assert.True(settings.OverlayVisible);

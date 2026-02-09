@@ -46,6 +46,37 @@
             <Setter Property="MinWidth" Value="36"/>
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
+
+        <Style x:Key="ColorPickButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource SurfaceLightBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfaceHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -58,14 +89,23 @@
         <!-- Header -->
         <Border Grid.Row="0" Padding="24,20" BorderBrush="{StaticResource BorderBrush}"
                 BorderThickness="0,0,0,1">
-            <StackPanel>
-                <TextBlock Text="Settings" FontFamily="{StaticResource UIFont}"
-                           FontSize="20" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextPrimaryBrush}"/>
-                <TextBlock Text="Customize how notifications appear on your screen"
-                           FontFamily="{StaticResource UIFont}" FontSize="12"
-                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
-            </StackPanel>
+            <DockPanel LastChildFill="True">
+                <Border Width="36" Height="36" CornerRadius="10"
+                        Background="{StaticResource SurfaceLightBrush}"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                        Margin="0,0,12,0">
+                    <Image Source="{Binding TrayIconImage}" Width="22" Height="22"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel>
+                    <TextBlock Text="Settings" FontFamily="{StaticResource UIFont}"
+                               FontSize="20" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Customize how notifications appear on your screen"
+                               FontFamily="{StaticResource UIFont}" FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </DockPanel>
         </Border>
 
         <!-- Tabs -->
@@ -95,7 +135,7 @@
                                 <Run Text="{Binding FontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="10" Maximum="32" Value="{Binding FontSize}"
+                                    Minimum="10" Maximum="56" Value="{Binding FontSize}"
                                     TickFrequency="1" IsSnapToTickEnabled="True"
                                     ToolTip="Controls text size — larger values improve readability"/>
                         </DockPanel>
@@ -133,6 +173,10 @@
                                     Background="{Binding TitleColor, Converter={StaticResource ColorToBrush}}"
                                     BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                                     Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="TitleColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for notification title text"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding TitleColor, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Hex color for notification titles (e.g. #FFFFFF)"
@@ -140,12 +184,34 @@
                         </DockPanel>
                         <TextBlock Text="Color of the notification title text" Style="{StaticResource SettingDesc}"/>
 
+                        <TextBlock Text="App Name Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding AppNameColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="AppNameColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for app-name text"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding AppNameColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for source app names (e.g. #B8B8CC)"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Color used for the source app line (Teams, Slack, Outlook, etc.)"
+                                   Style="{StaticResource SettingDesc}"/>
+
                         <TextBlock Text="Body Text Color" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
                             <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
                                     Background="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
                                     BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                                     Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="TextColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for notification body text"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding TextColor, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Hex color for notification body text (e.g. #E4E4EF)"
@@ -159,6 +225,10 @@
                                     Background="{Binding BackgroundColor, Converter={StaticResource ColorToBrush}}"
                                     BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                                     Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="BackgroundColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for card background"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding BackgroundColor, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Hex color for the notification card background"
@@ -172,6 +242,10 @@
                                     Background="{Binding AccentColor, Converter={StaticResource ColorToBrush}}"
                                     BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                                     Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="AccentColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for accent stripe"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding AccentColor, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Hex color for the left accent stripe on notification cards"
@@ -245,6 +319,57 @@
                         <TextBlock Text="Seconds each notification remains on screen before auto-dismissing"
                                    Style="{StaticResource SettingDesc}"/>
 
+                        <TextBlock Text="Visible Notifications" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding MaxVisibleNotifications, StringFormat='{}{0:0}'}"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="1" Maximum="8" Value="{Binding MaxVisibleNotifications}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Maximum number of notification cards shown at once"/>
+                        </DockPanel>
+                        <TextBlock Text="Lower counts reduce visual noise; higher counts keep more context visible"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="CONTENT" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowAppName}"
+                                          ToolTip="Display the source app name on each card"/>
+                            <TextBlock Text="Show App Name" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Useful when multiple apps notify at once and you need source context quickly"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowNotificationTitle}"
+                                          ToolTip="Display the notification title line"/>
+                            <TextBlock Text="Show Title" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Primary headline line from each notification"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowNotificationBody}"
+                                          ToolTip="Display the notification body content"/>
+                            <TextBlock Text="Show Body Text" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Long-form notification content; automatically kept on if all fields are turned off"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SingleLineMode}"
+                                          ToolTip="Render each notification as a single horizontal banner line"/>
+                            <TextBlock Text="Single-Line Banner Mode" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Compacts notifications into one line per card. Best with a wider overlay."
+                                   Style="{StaticResource SettingDesc}"/>
+
                         <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
 
                         <DockPanel Margin="0,0,0,4">
@@ -276,17 +401,26 @@
                         <TextBlock Text="Smooth slide-in and fade-out transitions for notifications"
                                    Style="{StaticResource SettingDesc}"/>
 
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding FadeOnlyAnimation}"
+                                          ToolTip="Use fade transitions only (no side movement)"/>
+                            <TextBlock Text="Fade-Only Animation" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Useful if motion is distracting or you prefer a calmer transition style"
+                                   Style="{StaticResource SettingDesc}"/>
+
                         <TextBlock Text="Animation Speed" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
                                 <Run Text="{Binding AnimationDurationMs, StringFormat='{}{0:0}'}"/><Run Text="ms"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="100" Maximum="800" Value="{Binding AnimationDurationMs}"
-                                    TickFrequency="50" IsSnapToTickEnabled="True"
+                                    Minimum="0" Maximum="1200" Value="{Binding AnimationDurationMs}"
+                                    TickFrequency="25" IsSnapToTickEnabled="True"
                                     ToolTip="Duration of slide/fade animations in milliseconds"/>
                         </DockPanel>
-                        <TextBlock Text="Lower values feel snappier, higher values feel smoother"
+                        <TextBlock Text="0 means instant transitions; higher values feel smoother"
                                    Style="{StaticResource SettingDesc}"/>
 
                     </StackPanel>
@@ -306,11 +440,20 @@
                                 <Run Text="{Binding OverlayWidth, StringFormat='{}{0:0}'}"/><Run Text="px"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="250" Maximum="800" Value="{Binding OverlayWidth}"
+                                    Minimum="220" Maximum="1400" Value="{Binding OverlayWidth}"
                                     TickFrequency="10" IsSnapToTickEnabled="True"
                                     ToolTip="Width of the overlay window in pixels"/>
                         </DockPanel>
-                        <TextBlock Text="Wider overlays show more text per line, reducing wrapping"
+                        <TextBlock Text="Wider overlays show more text per line and work best with single-line mode"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AllowManualResize}"
+                                          ToolTip="Allow drag-resizing from left/right edges of the overlay"/>
+                            <TextBlock Text="Allow Manual Resize" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="When enabled, drag the left or right edge of the overlay to resize quickly"
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="Max Overlay Height" Style="{StaticResource SettingLabel}"/>

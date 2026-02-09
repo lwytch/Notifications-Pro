@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 
@@ -13,13 +14,22 @@ public class SettingsViewModel : BaseViewModel
     private readonly QueueManager _queueManager;
     private readonly DispatcherTimer _saveDebounce;
 
-    private static readonly string[] PreviewTitles =
+    private static readonly string[] PreviewApps =
     {
         "Microsoft Teams",
         "Slack",
         "Outlook Mail",
         "Windows Security",
         "Discord"
+    };
+
+    private static readonly string[] PreviewTitles =
+    {
+        "Sarah sent a message",
+        "Design review updated",
+        "Q2 planning reminder",
+        "Scan completed",
+        "GameNight starts soon"
     };
 
     private static readonly string[] PreviewBodies =
@@ -52,6 +62,9 @@ public class SettingsViewModel : BaseViewModel
     private string _titleColor = "#FFFFFF";
     public string TitleColor { get => _titleColor; set { if (SetProperty(ref _titleColor, value)) QueueSave(); } }
 
+    private string _appNameColor = "#B8B8CC";
+    public string AppNameColor { get => _appNameColor; set { if (SetProperty(ref _appNameColor, value)) QueueSave(); } }
+
     private string _backgroundColor = "#1E1E2E";
     public string BackgroundColor { get => _backgroundColor; set { if (SetProperty(ref _backgroundColor, value)) QueueSave(); } }
 
@@ -80,6 +93,21 @@ public class SettingsViewModel : BaseViewModel
     private double _notificationDuration = 5;
     public double NotificationDuration { get => _notificationDuration; set { if (SetProperty(ref _notificationDuration, value)) QueueSave(); } }
 
+    private int _maxVisibleNotifications = 3;
+    public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, value)) QueueSave(); } }
+
+    private bool _showAppName = true;
+    public bool ShowAppName { get => _showAppName; set { if (SetProperty(ref _showAppName, value)) QueueSave(); } }
+
+    private bool _showNotificationTitle = true;
+    public bool ShowNotificationTitle { get => _showNotificationTitle; set { if (SetProperty(ref _showNotificationTitle, value)) QueueSave(); } }
+
+    private bool _showNotificationBody = true;
+    public bool ShowNotificationBody { get => _showNotificationBody; set { if (SetProperty(ref _showNotificationBody, value)) QueueSave(); } }
+
+    private bool _singleLineMode;
+    public bool SingleLineMode { get => _singleLineMode; set { if (SetProperty(ref _singleLineMode, value)) QueueSave(); } }
+
     private bool _alwaysOnTop = true;
     public bool AlwaysOnTop { get => _alwaysOnTop; set { if (SetProperty(ref _alwaysOnTop, value)) QueueSave(); } }
 
@@ -88,6 +116,9 @@ public class SettingsViewModel : BaseViewModel
 
     private bool _animationsEnabled = true;
     public bool AnimationsEnabled { get => _animationsEnabled; set { if (SetProperty(ref _animationsEnabled, value)) QueueSave(); } }
+
+    private bool _fadeOnlyAnimation;
+    public bool FadeOnlyAnimation { get => _fadeOnlyAnimation; set { if (SetProperty(ref _fadeOnlyAnimation, value)) QueueSave(); } }
 
     private double _animationDurationMs = 300;
     public double AnimationDurationMs { get => _animationDurationMs; set { if (SetProperty(ref _animationDurationMs, value)) QueueSave(); } }
@@ -98,6 +129,9 @@ public class SettingsViewModel : BaseViewModel
 
     private double _overlayMaxHeight = 600;
     public double OverlayMaxHeight { get => _overlayMaxHeight; set { if (SetProperty(ref _overlayMaxHeight, value)) QueueSave(); } }
+
+    private bool _allowManualResize = true;
+    public bool AllowManualResize { get => _allowManualResize; set { if (SetProperty(ref _allowManualResize, value)) QueueSave(); } }
 
     private bool _snapToEdges = true;
     public bool SnapToEdges { get => _snapToEdges; set { if (SetProperty(ref _snapToEdges, value)) QueueSave(); } }
@@ -115,6 +149,7 @@ public class SettingsViewModel : BaseViewModel
     // Commands
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
+    public ImageSource TrayIconImage { get; }
 
     public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
     {
@@ -135,6 +170,7 @@ public class SettingsViewModel : BaseViewModel
 
         PreviewNotificationCommand = new RelayCommand(SendPreviewNotification);
         ResetToDefaultsCommand = new RelayCommand(ResetToDefaults);
+        TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
         LoadFromSettings();
     }
@@ -148,6 +184,7 @@ public class SettingsViewModel : BaseViewModel
         _lineSpacing = s.LineSpacing;
         _textColor = s.TextColor;
         _titleColor = s.TitleColor;
+        _appNameColor = s.AppNameColor;
         _backgroundColor = s.BackgroundColor;
         _backgroundOpacity = s.BackgroundOpacity;
         _cornerRadius = s.CornerRadius;
@@ -157,12 +194,19 @@ public class SettingsViewModel : BaseViewModel
         _borderThickness = s.BorderThickness;
         _accentColor = s.AccentColor;
         _notificationDuration = s.NotificationDuration;
+        _maxVisibleNotifications = s.MaxVisibleNotifications;
+        _showAppName = s.ShowAppName;
+        _showNotificationTitle = s.ShowNotificationTitle;
+        _showNotificationBody = s.ShowNotificationBody;
+        _singleLineMode = s.SingleLineMode;
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
         _animationsEnabled = s.AnimationsEnabled;
+        _fadeOnlyAnimation = s.FadeOnlyAnimation;
         _animationDurationMs = s.AnimationDurationMs;
         _overlayWidth = s.OverlayWidth;
         _overlayMaxHeight = s.OverlayMaxHeight;
+        _allowManualResize = s.AllowManualResize;
         _snapToEdges = s.SnapToEdges;
         _snapDistance = s.SnapDistance;
     }
@@ -175,6 +219,14 @@ public class SettingsViewModel : BaseViewModel
 
     private void SaveSettings()
     {
+        var showAppName = ShowAppName;
+        var showTitle = ShowNotificationTitle;
+        var showBody = ShowNotificationBody;
+
+        // Keep cards meaningful if all display fields are toggled off.
+        if (!showAppName && !showTitle && !showBody)
+            showBody = true;
+
         var s = new AppSettings
         {
             FontFamily = FontFamily,
@@ -183,6 +235,7 @@ public class SettingsViewModel : BaseViewModel
             LineSpacing = LineSpacing,
             TextColor = TextColor,
             TitleColor = TitleColor,
+            AppNameColor = AppNameColor,
             BackgroundColor = BackgroundColor,
             BackgroundOpacity = BackgroundOpacity,
             CornerRadius = CornerRadius,
@@ -192,12 +245,19 @@ public class SettingsViewModel : BaseViewModel
             BorderThickness = BorderThickness,
             AccentColor = AccentColor,
             NotificationDuration = NotificationDuration,
+            MaxVisibleNotifications = Math.Max(1, MaxVisibleNotifications),
+            ShowAppName = showAppName,
+            ShowNotificationTitle = showTitle,
+            ShowNotificationBody = showBody,
+            SingleLineMode = SingleLineMode,
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
             AnimationsEnabled = AnimationsEnabled,
-            AnimationDurationMs = AnimationDurationMs,
+            FadeOnlyAnimation = FadeOnlyAnimation,
+            AnimationDurationMs = Math.Max(0, AnimationDurationMs),
             OverlayWidth = OverlayWidth,
             OverlayMaxHeight = OverlayMaxHeight,
+            AllowManualResize = AllowManualResize,
             SnapToEdges = SnapToEdges,
             SnapDistance = SnapDistance,
             // Preserve position from current settings
@@ -213,11 +273,12 @@ public class SettingsViewModel : BaseViewModel
 
     private void SendPreviewNotification()
     {
+        var appName = PreviewApps[_previewIndex % PreviewApps.Length];
         var title = PreviewTitles[_previewIndex % PreviewTitles.Length];
         var body = PreviewBodies[_previewIndex % PreviewBodies.Length];
         _previewIndex++;
 
-        _queueManager.AddNotification(title, body);
+        _queueManager.AddNotification(appName, title, body);
     }
 
     private void ResetToDefaults()

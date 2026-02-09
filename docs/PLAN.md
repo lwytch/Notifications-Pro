@@ -33,12 +33,23 @@
 - [x] Diagnostic status messages (captured count, system count, poll number)
 - [x] "Grant Notification Access" always visible in tray menu
 - [x] "Retry Access Check" works even when access already granted
+- [x] Accessibility fallback hardened for Win11 (broader events + shell host detection + live diagnostics)
 - [ ] Align timing with system toast duration when available (deferred — using configurable duration)
 
 ### Milestone 3: Full Customization + Multi-Monitor
 - [ ] Multi-monitor support (select monitor, move via tray menu)
 - [ ] Per-monitor DPI awareness
 - [ ] Click-through toggle (Win32 WS_EX_TRANSPARENT)
+- [x] Tray quick toggle for click-through recovery (avoid drag lockout)
+- [x] Notification content controls (show/hide app name, title, body)
+- [x] Configurable max visible notifications (1-8)
+- [x] Overlay auto-size polish (removes ghost backdrop panel and stray scrollbar)
+- [x] One-line banner mode (compact per-notification display)
+- [x] App-name color customization (separate from title/body colors)
+- [x] Built-in color picker buttons in Settings UI
+- [x] Manual edge resize support (left/right drag handles)
+- [x] Animation style controls (fade-only + extended speed range)
+- [x] Tray icon preview shown in Settings header
 - [ ] Edge snapping on all monitors
 - [ ] Border toggle and customization
 - [ ] Start with Windows toggle
@@ -52,7 +63,7 @@
 - [ ] README finalization with screenshots placeholders
 
 ## Current Focus
-Milestone 2 bug fixes complete. Ready to move to Milestone 3 — full customization, snapping, multi-monitor handling, click-through.
+Milestone 3 customization pass is underway. Next up: multi-monitor support, per-monitor DPI handling, and startup/launch polish.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 4) to fully resolve.

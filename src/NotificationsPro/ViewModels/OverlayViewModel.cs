@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
@@ -32,6 +33,9 @@ public class OverlayViewModel : BaseViewModel
     private string _titleColor = "#FFFFFF";
     public string TitleColor { get => _titleColor; set => SetProperty(ref _titleColor, value); }
 
+    private string _appNameColor = "#B8B8CC";
+    public string AppNameColor { get => _appNameColor; set => SetProperty(ref _appNameColor, value); }
+
     private string _backgroundColor = "#1E1E2E";
     public string BackgroundColor { get => _backgroundColor; set => SetProperty(ref _backgroundColor, value); }
 
@@ -60,15 +64,82 @@ public class OverlayViewModel : BaseViewModel
     public bool AlwaysOnTop { get => _alwaysOnTop; set => SetProperty(ref _alwaysOnTop, value); }
 
     private bool _animationsEnabled = true;
-    public bool AnimationsEnabled { get => _animationsEnabled; set => SetProperty(ref _animationsEnabled, value); }
+    public bool AnimationsEnabled
+    {
+        get => _animationsEnabled;
+        set
+        {
+            if (!SetProperty(ref _animationsEnabled, value)) return;
+            OnPropertyChanged(nameof(EnterOffset));
+            OnPropertyChanged(nameof(ExitOffset));
+            OnPropertyChanged(nameof(EntryMotionDuration));
+            OnPropertyChanged(nameof(EntryFadeDuration));
+            OnPropertyChanged(nameof(ExitMotionDuration));
+            OnPropertyChanged(nameof(ExitFadeDuration));
+        }
+    }
+
+    private bool _fadeOnlyAnimation;
+    public bool FadeOnlyAnimation
+    {
+        get => _fadeOnlyAnimation;
+        set
+        {
+            if (!SetProperty(ref _fadeOnlyAnimation, value)) return;
+            OnPropertyChanged(nameof(EnterOffset));
+            OnPropertyChanged(nameof(ExitOffset));
+        }
+    }
+
+    private double _animationDurationMs = 300;
+    public double AnimationDurationMs
+    {
+        get => _animationDurationMs;
+        set
+        {
+            if (!SetProperty(ref _animationDurationMs, value)) return;
+            OnPropertyChanged(nameof(EntryMotionDuration));
+            OnPropertyChanged(nameof(EntryFadeDuration));
+            OnPropertyChanged(nameof(ExitMotionDuration));
+            OnPropertyChanged(nameof(ExitFadeDuration));
+        }
+    }
 
     private double _overlayWidth = 380;
-    public double OverlayWidth { get => _overlayWidth; set => SetProperty(ref _overlayWidth, value); }
+    public double OverlayWidth
+    {
+        get => _overlayWidth;
+        set
+        {
+            if (!SetProperty(ref _overlayWidth, value)) return;
+            OnPropertyChanged(nameof(EnterOffset));
+        }
+    }
 
     private double _overlayMaxHeight = 600;
     public double OverlayMaxHeight { get => _overlayMaxHeight; set => SetProperty(ref _overlayMaxHeight, value); }
 
+    private bool _showAppName = true;
+    public bool ShowAppName { get => _showAppName; set => SetProperty(ref _showAppName, value); }
+
+    private bool _showNotificationTitle = true;
+    public bool ShowNotificationTitle { get => _showNotificationTitle; set => SetProperty(ref _showNotificationTitle, value); }
+
+    private bool _showNotificationBody = true;
+    public bool ShowNotificationBody { get => _showNotificationBody; set => SetProperty(ref _showNotificationBody, value); }
+
+    private bool _singleLineMode;
+    public bool SingleLineMode { get => _singleLineMode; set => SetProperty(ref _singleLineMode, value); }
+
     public double TitleFontSize => FontSize + 2;
+    public double TitleLineHeight => TitleFontSize * LineSpacing;
+    public double BodyLineHeight => FontSize * LineSpacing;
+    public double EnterOffset => AnimationsEnabled && !FadeOnlyAnimation ? -(OverlayWidth + 40) : 0;
+    public double ExitOffset => AnimationsEnabled && !FadeOnlyAnimation ? 50 : 0;
+    public Duration EntryMotionDuration => DurationFor(AnimationDurationMs);
+    public Duration EntryFadeDuration => DurationFor(AnimationDurationMs * 0.75);
+    public Duration ExitMotionDuration => DurationFor(AnimationDurationMs);
+    public Duration ExitFadeDuration => DurationFor(AnimationDurationMs);
 
     public OverlayViewModel(QueueManager queueManager, SettingsManager settingsManager)
     {
@@ -87,6 +158,7 @@ public class OverlayViewModel : BaseViewModel
         LineSpacing = s.LineSpacing;
         TextColor = s.TextColor;
         TitleColor = s.TitleColor;
+        AppNameColor = s.AppNameColor;
         BackgroundColor = s.BackgroundColor;
         BackgroundOpacity = s.BackgroundOpacity;
         CornerRadius = s.CornerRadius;
@@ -97,8 +169,29 @@ public class OverlayViewModel : BaseViewModel
         AccentColor = s.AccentColor;
         AlwaysOnTop = s.AlwaysOnTop;
         AnimationsEnabled = s.AnimationsEnabled;
+        FadeOnlyAnimation = s.FadeOnlyAnimation;
+        AnimationDurationMs = s.AnimationDurationMs;
         OverlayWidth = s.OverlayWidth;
         OverlayMaxHeight = s.OverlayMaxHeight;
+        ShowAppName = s.ShowAppName;
+        ShowNotificationTitle = s.ShowNotificationTitle;
+        ShowNotificationBody = s.ShowNotificationBody;
+        SingleLineMode = s.SingleLineMode;
         OnPropertyChanged(nameof(TitleFontSize));
+        OnPropertyChanged(nameof(TitleLineHeight));
+        OnPropertyChanged(nameof(BodyLineHeight));
+        OnPropertyChanged(nameof(EnterOffset));
+        OnPropertyChanged(nameof(ExitOffset));
+        OnPropertyChanged(nameof(EntryMotionDuration));
+        OnPropertyChanged(nameof(EntryFadeDuration));
+        OnPropertyChanged(nameof(ExitMotionDuration));
+        OnPropertyChanged(nameof(ExitFadeDuration));
+    }
+
+    private static Duration DurationFor(double ms)
+    {
+        if (ms <= 0)
+            return new Duration(TimeSpan.Zero);
+        return new Duration(TimeSpan.FromMilliseconds(ms));
     }
 }

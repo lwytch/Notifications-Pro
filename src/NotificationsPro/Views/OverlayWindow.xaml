@@ -5,28 +5,33 @@
         Title="Notifications Pro Overlay"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent" ShowInTaskbar="False"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
+        SizeToContent="Height"
         Topmost="{Binding AlwaysOnTop}"
         Width="{Binding OverlayWidth, Mode=TwoWay}"
-        Height="400"
         MaxHeight="{Binding OverlayMaxHeight}"
-        MinHeight="100" MinWidth="200">
+        MinHeight="1" MinWidth="200">
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
         <converters:ColorToOpacityBrushConverter x:Key="ColorToOpacityBrush"/>
+        <converters:NotificationTextVisibilityConverter x:Key="NotificationTextVisibility"/>
+        <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- Slide-in storyboard -->
         <Storyboard x:Key="SlideIn">
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                             From="-420" To="0" Duration="0:0:0.35">
+                             From="{Binding DataContext.EnterOffset, RelativeSource={RelativeSource AncestorType=Window}}"
+                             To="0"
+                             Duration="{Binding DataContext.EntryMotionDuration, RelativeSource={RelativeSource AncestorType=Window}}">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0" To="1" Duration="0:0:0.25"/>
+                             From="0" To="1"
+                             Duration="{Binding DataContext.EntryFadeDuration, RelativeSource={RelativeSource AncestorType=Window}}"/>
         </Storyboard>
 
         <!-- Notification card template -->
@@ -52,41 +57,149 @@
                     <TranslateTransform X="0"/>
                 </Border.RenderTransform>
 
-                <StackPanel>
-                    <!-- Title -->
-                    <TextBlock Text="{Binding Title}"
-                               FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                               FontSize="{Binding DataContext.TitleFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                               FontWeight="SemiBold"
-                               Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                               TextWrapping="Wrap" Margin="0,0,0,4"/>
-                    <!-- Body -->
-                    <TextBlock Text="{Binding Body}"
-                               FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                               FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                               FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                               Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                               TextWrapping="Wrap"
-                               Visibility="{Binding Body.Length, Converter={StaticResource BoolToVis}}"/>
-                </StackPanel>
+                <Grid>
+                    <StackPanel x:Name="StackedContent">
+                        <!-- App name -->
+                        <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,4"
+                                   LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <TextBlock.Text>
+                                <Binding Path="AppName"/>
+                            </TextBlock.Text>
+                            <TextBlock.Visibility>
+                                <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
+                                    <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="AppName"/>
+                                </MultiBinding>
+                            </TextBlock.Visibility>
+                        </TextBlock>
+
+                        <!-- Title -->
+                        <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.TitleFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,4"
+                                   LineHeight="{Binding DataContext.TitleLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <TextBlock.Text>
+                                <Binding Path="Title"/>
+                            </TextBlock.Text>
+                            <TextBlock.Visibility>
+                                <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
+                                    <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="Title"/>
+                                </MultiBinding>
+                            </TextBlock.Visibility>
+                        </TextBlock>
+
+                        <!-- Body -->
+                        <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   TextWrapping="Wrap"
+                                   LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <TextBlock.Text>
+                                <Binding Path="Body"/>
+                            </TextBlock.Text>
+                            <TextBlock.Visibility>
+                                <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
+                                    <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="Body"/>
+                                </MultiBinding>
+                            </TextBlock.Visibility>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- One-line banner mode -->
+                    <Grid x:Name="SingleLineContent" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock x:Name="SingleLineApp"
+                                   Grid.Column="0"
+                                   MaxWidth="200"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Text>
+                                <Binding Path="AppName"/>
+                            </TextBlock.Text>
+                            <TextBlock.Visibility>
+                                <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
+                                    <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="AppName"/>
+                                </MultiBinding>
+                            </TextBlock.Visibility>
+                        </TextBlock>
+
+                        <TextBlock x:Name="SingleLineBody"
+                                   Grid.Column="1"
+                                   Margin="8,0,0,0"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource NotificationOneLineContent}">
+                                    <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="Title"/>
+                                    <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="Body"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.ShowAppName, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                            <Setter Property="Margin" Value="0,0,0,0"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AppName}" Value="">
+                                            <Setter Property="Margin" Value="0,0,0,0"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Grid>
             </Border>
 
             <DataTemplate.Triggers>
                 <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                     <BeginStoryboard Storyboard="{StaticResource SlideIn}"/>
                 </EventTrigger>
+                <DataTrigger Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter TargetName="StackedContent" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="SingleLineContent" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>
                             <Storyboard>
                                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 To="0" Duration="0:0:0.3">
+                                                 To="0"
+                                                 Duration="{Binding DataContext.ExitFadeDuration, RelativeSource={RelativeSource AncestorType=Window}}">
                                     <DoubleAnimation.EasingFunction>
                                         <CubicEase EasingMode="EaseIn"/>
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
                                 <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                                                 To="50" Duration="0:0:0.3">
+                                                 To="{Binding DataContext.ExitOffset, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                 Duration="{Binding DataContext.ExitMotionDuration, RelativeSource={RelativeSource AncestorType=Window}}">
                                     <DoubleAnimation.EasingFunction>
                                         <CubicEase EasingMode="EaseIn"/>
                                     </DoubleAnimation.EasingFunction>
@@ -99,10 +212,11 @@
         </DataTemplate>
     </Window.Resources>
 
-    <!-- Main content: near-transparent background for layered window hit testing -->
-    <Grid Margin="4" Background="#10000000">
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                      PanningMode="None">
+    <!-- Main content: tiny alpha preserves drag hit-testing without a visible panel -->
+    <Grid Margin="4" Background="#01000000">
+        <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled"
+                      PanningMode="None"
+                      MaxHeight="{Binding OverlayMaxHeight}">
             <StackPanel>
                 <!-- Notification items -->
                 <ItemsControl ItemsSource="{Binding Notifications}"

@@ -1,5 +1,6 @@
 using NotificationsPro.Models;
 using NotificationsPro.Services;
+using System.IO;
 
 namespace NotificationsPro.Tests;
 
@@ -23,6 +24,17 @@ public class QueueManagerTests
         Assert.Single(queue.VisibleNotifications);
         Assert.Equal("Title", queue.VisibleNotifications[0].Title);
         Assert.Equal("Body", queue.VisibleNotifications[0].Body);
+    }
+
+    [Fact]
+    public void AddNotification_WithAppName_StoresSourceApp()
+    {
+        var queue = new QueueManager(CreateSettings());
+        queue.AddNotification("Slack", "Mention", "Alex mentioned you in #design");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal("Slack", queue.VisibleNotifications[0].AppName);
+        Assert.Equal("Mention", queue.VisibleNotifications[0].Title);
     }
 
     [Fact]
@@ -169,5 +181,35 @@ public class QueueManagerTests
 
         Assert.Single(queue.VisibleNotifications);
         Assert.Equal(1, queue.OverflowCount);
+    }
+
+    [Fact]
+    public void SettingsChange_TrimsVisibleNotificationsToNewLimit()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProQueue_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var settings = new SettingsManager(tempDir);
+            settings.Settings.MaxVisibleNotifications = 3;
+            settings.Settings.AnimationDurationMs = 0;
+            var queue = new QueueManager(settings);
+
+            queue.AddNotification("A", "1");
+            queue.AddNotification("B", "2");
+            queue.AddNotification("C", "3");
+
+            var updated = settings.Settings.Clone();
+            updated.MaxVisibleNotifications = 1;
+            settings.Apply(updated);
+
+            Assert.Single(queue.VisibleNotifications);
+            Assert.Equal("C", queue.VisibleNotifications[0].Title);
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, true); } catch { }
+        }
     }
 }

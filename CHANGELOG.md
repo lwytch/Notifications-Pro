@@ -1,5 +1,35 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Tray menu toggle for click-through mode ("Disable Click-Through (Allow Dragging)")
+- Click-through state surfaced in tray tooltip for faster troubleshooting
+- Behavior settings for:
+  - max visible notifications (1-8)
+  - per-field display toggles (app name, title, body)
+- In-memory notification model now carries source app name separately from title/body for richer card layout
+- One-line banner mode toggle for compact, long-strip notification cards
+- Settings color picker buttons for title/body/app/background/accent colors
+- Dedicated app-name color setting (separate from notification title/body colors)
+- Settings header now shows the app's tray icon for stronger visual identity
+- Optional manual overlay edge resize (left/right) with persisted width
+
+### Changed
+- Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
+- Overlay drag path now retries HWND hook attach on load and keeps a WPF `DragMove` fallback if hook attachment is unavailable
+- Overlay cards now apply configured line spacing to both title and body text for readability
+- WinRT + accessibility text shaping now separates app name from content more reliably before rendering
+- Font size range increased (up to 56px) for accessibility
+- Animation controls expanded with fade-only mode and a wider speed range (0-1200ms)
+
+### Fixed
+- Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
+- Accessibility mode diagnostics now report captured/candidate/event counters to show whether shell events are being seen
+- Notification body text visibility bug (body was bound through a boolean converter incorrectly)
+- Faint transparent panel under cards and persistent tiny scrollbar artifacts in the overlay
+- Expiry removal now respects animation disablement (instant removal when animations are off)
+
 ## Milestone 2 — Real Notification Capture
 
 ### Added

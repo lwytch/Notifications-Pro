@@ -25,6 +25,7 @@ public partial class App : Application
 
     private WinForms.ToolStripMenuItem? _showHideItem;
     private WinForms.ToolStripMenuItem? _pauseResumeItem;
+    private WinForms.ToolStripMenuItem? _clickThroughItem;
     private WinForms.ToolStripMenuItem? _statusItem;
     private WinForms.ToolStripMenuItem? _grantAccessItem;
 
@@ -68,6 +69,7 @@ public partial class App : Application
 
         _showHideItem = new WinForms.ToolStripMenuItem("Hide Overlay", null, (_, _) => ToggleOverlay());
         _pauseResumeItem = new WinForms.ToolStripMenuItem("Pause Notifications", null, (_, _) => TogglePause());
+        _clickThroughItem = new WinForms.ToolStripMenuItem("Enable Click-Through", null, (_, _) => ToggleClickThrough());
 
         var contextMenu = new WinForms.ContextMenuStrip();
         contextMenu.BackColor = Drawing.Color.FromArgb(30, 30, 46);
@@ -91,6 +93,7 @@ public partial class App : Application
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add(_showHideItem);
         contextMenu.Items.Add(_pauseResumeItem);
+        contextMenu.Items.Add(_clickThroughItem);
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Settings...", null, (_, _) => ShowSettings());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
@@ -105,6 +108,7 @@ public partial class App : Application
         };
 
         _trayIcon.DoubleClick += (_, _) => ShowSettings();
+        UpdateMenuLabels();
     }
 
     private void ShowOverlay()
@@ -143,6 +147,16 @@ public partial class App : Application
         UpdateMenuLabels();
     }
 
+    private void ToggleClickThrough()
+    {
+        if (_settingsManager == null) return;
+
+        var updated = _settingsManager.Settings.Clone();
+        updated.ClickThrough = !updated.ClickThrough;
+        _settingsManager.Apply(updated);
+        UpdateMenuLabels();
+    }
+
     private void UpdateMenuLabels()
     {
         if (_showHideItem != null)
@@ -150,6 +164,13 @@ public partial class App : Application
 
         if (_pauseResumeItem != null)
             _pauseResumeItem.Text = _queueManager?.IsPaused == true ? "Resume Notifications" : "Pause Notifications";
+
+        if (_clickThroughItem != null)
+        {
+            _clickThroughItem.Text = _settingsManager?.Settings.ClickThrough == true
+                ? "Disable Click-Through (Allow Dragging)"
+                : "Enable Click-Through (Clicks Pass Through)";
+        }
     }
 
     private void ShowSettings()
@@ -185,10 +206,15 @@ public partial class App : Application
             {
                 // Show diagnostic status in tooltip (visible on hover)
                 // NotifyIcon.Text max is 127 chars
-                var tooltip = $"Notifications Pro\n{_notificationListener.StatusMessage}";
+                var clickThroughSuffix = _settingsManager?.Settings.ClickThrough == true
+                    ? " | click-through ON"
+                    : string.Empty;
+                var tooltip = $"Notifications Pro\n{_notificationListener.StatusMessage}{clickThroughSuffix}";
                 if (tooltip.Length > 127) tooltip = tooltip[..127];
                 _trayIcon.Text = tooltip;
             }
+
+            UpdateMenuLabels();
         });
     }
 

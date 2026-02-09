@@ -9,6 +9,7 @@ public class AppSettings
     public double LineSpacing { get; set; } = 1.5;
     public string TextColor { get; set; } = "#E4E4EF";
     public string TitleColor { get; set; } = "#FFFFFF";
+    public string AppNameColor { get; set; } = "#B8B8CC";
     public string BackgroundColor { get; set; } = "#1E1E2E";
     public double BackgroundOpacity { get; set; } = 0.92;
     public double CornerRadius { get; set; } = 12;
@@ -21,9 +22,14 @@ public class AppSettings
     // Behavior
     public double NotificationDuration { get; set; } = 5;
     public int MaxVisibleNotifications { get; set; } = 3;
+    public bool ShowAppName { get; set; } = true;
+    public bool ShowNotificationTitle { get; set; } = true;
+    public bool ShowNotificationBody { get; set; } = true;
+    public bool SingleLineMode { get; set; } = false;
     public bool AlwaysOnTop { get; set; } = true;
     public bool ClickThrough { get; set; } = false;
     public bool AnimationsEnabled { get; set; } = true;
+    public bool FadeOnlyAnimation { get; set; } = false;
     public double AnimationDurationMs { get; set; } = 300;
     public bool NotificationsPaused { get; set; } = false;
 
@@ -32,6 +38,7 @@ public class AppSettings
     public double? OverlayTop { get; set; }
     public double OverlayWidth { get; set; } = 380;
     public double OverlayMaxHeight { get; set; } = 600;
+    public bool AllowManualResize { get; set; } = true;
     public int MonitorIndex { get; set; } = 0;
     public bool SnapToEdges { get; set; } = true;
     public double SnapDistance { get; set; } = 20;

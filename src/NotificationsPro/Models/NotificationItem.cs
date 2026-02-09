@@ -9,6 +9,7 @@ namespace NotificationsPro.Models;
 /// </summary>
 public class NotificationItem : INotifyPropertyChanged
 {
+    public string AppName { get; }
     public string Title { get; }
     public string Body { get; }
     public DateTime ReceivedAt { get; }
@@ -20,16 +21,24 @@ public class NotificationItem : INotifyPropertyChanged
         set { _isExpiring = value; OnPropertyChanged(); }
     }
 
-    public NotificationItem(string title, string body)
+    public NotificationItem(string appName, string title, string body)
     {
+        AppName = appName ?? string.Empty;
         Title = title ?? string.Empty;
         Body = body ?? string.Empty;
         ReceivedAt = DateTime.Now;
     }
 
-    public bool IsDuplicateOf(string title, string body, TimeSpan window)
+    public NotificationItem(string title, string body)
+        : this(string.Empty, title, body)
     {
-        return Title == title && Body == body
+    }
+
+    public bool IsDuplicateOf(string appName, string title, string body, TimeSpan window)
+    {
+        return AppName == appName
+            && Title == title
+            && Body == body
             && (DateTime.Now - ReceivedAt) < window;
     }
 
