@@ -14,6 +14,7 @@
 - Turning one-line mode off now automatically re-enables stacked line limiting to avoid oversized cards and early scrollbar pressure
 - Overlay supports manual left/right edge resizing (when enabled)
 - Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
+- Max Overlay Height control now supports high-resolution values up to 4320px (8K-class)
 - Stacked mode now supports full multi-line word wrap with optional truncation toggle
 - Long wrapped content now remains accessible via auto vertical scrolling when it exceeds max overlay height
 - Overlay applies monitor-aware effective max height to avoid off-screen clipping
@@ -35,6 +36,7 @@
   - fade-only animation toggle and wider animation speed range (0-1200ms)
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Position tab includes quick preset buttons for top/side placement
+- Position tab now includes overlay-height presets for 1080p/2K/4K/8K targets
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
@@ -111,6 +113,7 @@ dotnet test
 - [ ] At max font sizes, overlay scrollbar remains usable and no cards are clipped off-screen
 - [ ] Overlay can be resized from left/right edges when manual resize is enabled
 - [ ] While right-aligned, width changes keep right edge snapped to the monitor edge
+- [ ] Max Overlay Height can be set beyond 1200px and preset buttons apply 1080p/2K/4K/8K values
 - [ ] Changing font size does not reset manually resized overlay width in single-line mode
 - [ ] Fade-only animation option removes horizontal motion
 - [ ] Toggle switches animate smoothly

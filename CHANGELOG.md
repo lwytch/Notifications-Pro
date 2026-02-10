@@ -22,6 +22,7 @@
 - Single-line wrapped banner "Max Lines" setting to control card height/density
 - Single-line "Auto Full-Width Banner" toggle for near edge-to-edge monitor-width banners
 - Position preset buttons (top/side anchors) in Settings > Position
+- Overlay-height preset buttons for 1080p, 2K, 4K, and 8K display classes
 
 ### Changed
 - Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
@@ -37,6 +38,7 @@
 - One-line banner text shaping now prioritizes preserving title context before body preview
 - Visible notifications range increased from 1-8 to 1-40
 - Preview/test action now applies pending settings immediately before enqueuing preview cards
+- Max Overlay Height range increased from 1200px to 4320px for high-resolution displays
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu

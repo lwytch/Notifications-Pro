@@ -11,6 +11,9 @@ namespace NotificationsPro.ViewModels;
 
 public class SettingsViewModel : BaseViewModel
 {
+    public const double OverlayMaxHeightMin = 200;
+    public const double OverlayMaxHeightMax = 4320;
+
     private readonly SettingsManager _settingsManager;
     private readonly QueueManager _queueManager;
     private readonly DispatcherTimer _saveDebounce;
@@ -174,7 +177,16 @@ public class SettingsViewModel : BaseViewModel
     }
 
     private double _overlayMaxHeight = 600;
-    public double OverlayMaxHeight { get => _overlayMaxHeight; set { if (SetProperty(ref _overlayMaxHeight, value)) QueueSave(); } }
+    public double OverlayMaxHeight
+    {
+        get => _overlayMaxHeight;
+        set
+        {
+            var clamped = Math.Clamp(value, OverlayMaxHeightMin, OverlayMaxHeightMax);
+            if (SetProperty(ref _overlayMaxHeight, clamped))
+                QueueSave();
+        }
+    }
 
     private bool _allowManualResize = true;
     public bool AllowManualResize { get => _allowManualResize; set { if (SetProperty(ref _allowManualResize, value)) QueueSave(); } }
@@ -196,6 +208,7 @@ public class SettingsViewModel : BaseViewModel
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
     public ICommand MoveOverlayPresetCommand { get; }
+    public ICommand SetOverlayHeightPresetCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
@@ -218,6 +231,7 @@ public class SettingsViewModel : BaseViewModel
         PreviewNotificationCommand = new RelayCommand(SendPreviewNotification);
         ResetToDefaultsCommand = new RelayCommand(ResetToDefaults);
         MoveOverlayPresetCommand = new RelayCommand(MoveOverlayPreset);
+        SetOverlayHeightPresetCommand = new RelayCommand(SetOverlayHeightPreset);
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
         LoadFromSettings();
@@ -261,7 +275,7 @@ public class SettingsViewModel : BaseViewModel
         _fadeOnlyAnimation = s.FadeOnlyAnimation;
         _animationDurationMs = s.AnimationDurationMs;
         _overlayWidth = s.OverlayWidth;
-        _overlayMaxHeight = s.OverlayMaxHeight;
+        _overlayMaxHeight = Math.Clamp(s.OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax);
         _allowManualResize = s.AllowManualResize;
         _snapToEdges = s.SnapToEdges;
         _snapDistance = s.SnapDistance;
@@ -363,7 +377,7 @@ public class SettingsViewModel : BaseViewModel
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
             OverlayWidth = resolvedOverlayWidth,
             LastManualOverlayWidth = Math.Max(220, nextLastManualWidth),
-            OverlayMaxHeight = OverlayMaxHeight,
+            OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),
             AllowManualResize = AllowManualResize,
             SnapToEdges = SnapToEdges,
             SnapDistance = SnapDistance,
@@ -485,6 +499,26 @@ public class SettingsViewModel : BaseViewModel
     private static Rect ToRect(System.Drawing.Rectangle rect)
     {
         return new Rect(rect.Left, rect.Top, rect.Width, rect.Height);
+    }
+
+    private void SetOverlayHeightPreset(object? parameter)
+    {
+        if (parameter is not string preset || string.IsNullOrWhiteSpace(preset))
+            return;
+
+        var targetHeight = preset.Trim().ToLowerInvariant() switch
+        {
+            "1080p" => 1080d,
+            "2k" => 1440d,
+            "4k" => 2160d,
+            "8k" => 4320d,
+            _ => 0d
+        };
+
+        if (targetHeight <= 0)
+            return;
+
+        OverlayMaxHeight = targetHeight;
     }
 
     private void ResetToDefaults()

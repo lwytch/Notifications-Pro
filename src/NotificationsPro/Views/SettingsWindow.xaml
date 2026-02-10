@@ -558,13 +558,27 @@
                                 <Run Text="{Binding OverlayMaxHeight, StringFormat='{}{0:0}'}"/><Run Text="px"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="200" Maximum="1200" Value="{Binding OverlayMaxHeight}"
-                                    TickFrequency="50" IsSnapToTickEnabled="True"
+                                    Minimum="200" Maximum="4320" Value="{Binding OverlayMaxHeight}"
+                                    TickFrequency="10" IsSnapToTickEnabled="True"
                                     ToolTip="Maximum height the overlay can grow to before scrolling"/>
                         </DockPanel>
                         <TextBlock Text="The overlay expands vertically as needed up to this limit, then scrolls"
                                    Style="{StaticResource SettingDesc}"/>
-                        <TextBlock Text="If long stacked notifications appear cut off, increase this value or scroll within the overlay."
+                        <TextBlock Text="If long stacked notifications appear cut off, increase this value or scroll within the overlay. Effective height is still clamped to your active monitor's work area."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Height Presets" Style="{StaticResource SettingLabel}"/>
+                        <WrapPanel Margin="0,4,0,8" ItemWidth="88">
+                            <Button Content="1080p" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="1080p"/>
+                            <Button Content="2K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="2k"/>
+                            <Button Content="4K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="4k"/>
+                            <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="8k"/>
+                        </WrapPanel>
+                        <TextBlock Text="Quickly set max-height targets for common display classes."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>

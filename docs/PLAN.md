@@ -63,6 +63,8 @@
 - [x] Tray quick toggle for Always on Top
 - [x] Edge snapping on all monitors
 - [x] Position presets in Settings (top/side placement shortcuts)
+- [x] Max overlay height now supports high-resolution ranges up to 8K-class displays
+- [x] Overlay-height presets added (1080p / 2K / 4K / 8K)
 - [ ] Border toggle and customization
 - [ ] Start with Windows toggle
 - [ ] Hotkey support (optional)
