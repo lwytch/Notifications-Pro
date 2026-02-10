@@ -48,6 +48,8 @@
 - [x] Optional wrapped text in one-line mode (prevents truncation on smaller monitors)
 - [x] One-line wrapped banner max-lines control (balance readability vs density)
 - [x] Optional auto full-width behavior in one-line mode
+- [x] One-line mode now honors app/title/body text color choices in both compact and wrapped banners
+- [x] Returning from one-line mode now restores stacked line-limiting defaults for denser card flow
 - [x] Stacked order control (newest-on-top vs newest-on-bottom)
 - [x] App-name color customization (separate from title/body colors)
 - [x] Built-in color picker buttons in Settings UI

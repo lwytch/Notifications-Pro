@@ -55,6 +55,8 @@
 - Overlay now constrains internal scroll region to effective monitor-aware max height, preventing bottom card clipping
 - Single-line full-width mode now preserves and restores manual width state when toggled off
 - Preview/test notifications now generate unique content to avoid dedup hiding expected card counts
+- Single-line text color regression where title/app segments could ignore configured color choices
+- Stacked-mode density regression when leaving single-line mode with wrapped content (oversized cards + premature scrollbar)
 
 ## Milestone 2 — Real Notification Capture
 

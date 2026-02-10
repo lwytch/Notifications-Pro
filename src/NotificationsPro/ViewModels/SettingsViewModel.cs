@@ -281,6 +281,13 @@ public class SettingsViewModel : BaseViewModel
         var showAppName = ShowAppName;
         var showTitle = ShowNotificationTitle;
         var showBody = ShowNotificationBody;
+        var isLeavingSingleLineMode = previousSettings.SingleLineMode && !SingleLineMode;
+        var resolvedLimitTextLines = LimitTextLines;
+
+        // Keep stacked cards dense when returning from single-line mode to avoid
+        // carrying over wrapped banner readability settings into stacked layout.
+        if (isLeavingSingleLineMode && !resolvedLimitTextLines)
+            resolvedLimitTextLines = true;
 
         // Keep cards meaningful if all display fields are toggled off.
         if (!showAppName && !showTitle && !showBody)
@@ -312,6 +319,12 @@ public class SettingsViewModel : BaseViewModel
             OnPropertyChanged(nameof(OverlayWidth));
         }
 
+        if (resolvedLimitTextLines != _limitTextLines)
+        {
+            _limitTextLines = resolvedLimitTextLines;
+            OnPropertyChanged(nameof(LimitTextLines));
+        }
+
         var s = new AppSettings
         {
             FontFamily = FontFamily,
@@ -334,7 +347,7 @@ public class SettingsViewModel : BaseViewModel
             ShowAppName = showAppName,
             ShowNotificationTitle = showTitle,
             ShowNotificationBody = showBody,
-            LimitTextLines = LimitTextLines,
+            LimitTextLines = resolvedLimitTextLines,
             MaxAppNameLines = Math.Max(1, MaxAppNameLines),
             MaxTitleLines = Math.Max(1, MaxTitleLines),
             MaxBodyLines = Math.Max(1, MaxBodyLines),

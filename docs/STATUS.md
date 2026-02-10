@@ -9,7 +9,9 @@
 - One-line mode supports optional wrapped text to avoid truncation on smaller monitors
 - One-line mode supports optional auto full-width behavior per monitor
 - One-line mode includes a wrapped-banner max-lines control to keep more cards visible at large font sizes
+- One-line mode now renders app/title/body segments with their configured colors (instead of flattening to a single text color)
 - Overlay supports stacked order control (newest on top or newest on bottom)
+- Turning one-line mode off now automatically re-enables stacked line limiting to avoid oversized cards and early scrollbar pressure
 - Overlay supports manual left/right edge resizing (when enabled)
 - Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
 - Stacked mode now supports full multi-line word wrap with optional truncation toggle
@@ -56,7 +58,7 @@
   - surfaces live diagnostics (captured/candidate/event counters + last class seen)
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
-- 33 unit tests covering QueueManager, SettingsManager (with round-trip and corruption), and SnapHelper
+- 38 unit tests covering QueueManager, SettingsManager (with round-trip and corruption), SnapHelper, and one-line text shaping
 
 ## What Doesn't Work Yet
 - Multi-monitor selection (Milestone 3)

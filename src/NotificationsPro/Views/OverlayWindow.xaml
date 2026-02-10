@@ -188,16 +188,27 @@
                                        FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                        FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                        FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                        VerticalAlignment="Center">
-                                <TextBlock.Text>
-                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}">
-                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                        <Binding Path="Title"/>
-                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                        <Binding Path="Body"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
+                                <Run Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                    <Run.Text>
+                                        <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:title">
+                                            <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                            <Binding Path="Title"/>
+                                            <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                            <Binding Path="Body"/>
+                                        </MultiBinding>
+                                    </Run.Text>
+                                </Run>
+                                <Run Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                    <Run.Text>
+                                        <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:body">
+                                            <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                            <Binding Path="Title"/>
+                                            <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                            <Binding Path="Body"/>
+                                        </MultiBinding>
+                                    </Run.Text>
+                                </Run>
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -220,20 +231,45 @@
                                    FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.SingleLineWrappedMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="full">
-                                    <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    <Binding Path="AppName"/>
-                                    <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    <Binding Path="Title"/>
-                                    <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    <Binding Path="Body"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
+                            <Run Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                <Run.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:app;full">
+                                        <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="AppName"/>
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
+                                    </MultiBinding>
+                                </Run.Text>
+                            </Run>
+                            <Run Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                <Run.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:title;full">
+                                        <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="AppName"/>
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
+                                    </MultiBinding>
+                                </Run.Text>
+                            </Run>
+                            <Run Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                <Run.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:body;full">
+                                        <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="AppName"/>
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
+                                    </MultiBinding>
+                                </Run.Text>
+                            </Run>
                         </TextBlock>
                     </Grid>
                 </Grid>
