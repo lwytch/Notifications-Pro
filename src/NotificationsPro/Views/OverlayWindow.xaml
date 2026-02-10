@@ -22,16 +22,13 @@
         <!-- Slide-in storyboard -->
         <Storyboard x:Key="SlideIn">
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                             From="{Binding DataContext.EnterOffset, RelativeSource={RelativeSource AncestorType=Window}}"
-                             To="0"
-                             Duration="{Binding DataContext.EntryMotionDuration, RelativeSource={RelativeSource AncestorType=Window}}">
+                             From="-420" To="0" Duration="0:0:0.35">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0" To="1"
-                             Duration="{Binding DataContext.EntryFadeDuration, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                             From="0" To="1" Duration="0:0:0.25"/>
         </Storyboard>
 
         <!-- Notification card template -->
@@ -191,15 +188,13 @@
                         <BeginStoryboard>
                             <Storyboard>
                                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                 To="0"
-                                                 Duration="{Binding DataContext.ExitFadeDuration, RelativeSource={RelativeSource AncestorType=Window}}">
+                                                 To="0" Duration="0:0:0.3">
                                     <DoubleAnimation.EasingFunction>
                                         <CubicEase EasingMode="EaseIn"/>
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
                                 <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                                                 To="{Binding DataContext.ExitOffset, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                 Duration="{Binding DataContext.ExitMotionDuration, RelativeSource={RelativeSource AncestorType=Window}}">
+                                                 To="50" Duration="0:0:0.3">
                                     <DoubleAnimation.EasingFunction>
                                         <CubicEase EasingMode="EaseIn"/>
                                     </DoubleAnimation.EasingFunction>
