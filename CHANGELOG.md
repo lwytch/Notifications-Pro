@@ -14,6 +14,8 @@
 - Dedicated app-name color setting (separate from notification title/body colors)
 - Settings header now shows the app's tray icon for stronger visual identity
 - Optional manual overlay edge resize (left/right) with persisted width
+- Per-field stacked-mode line count controls (app name, title, body)
+- Tray quick toggle for Always on Top
 
 ### Changed
 - Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
@@ -22,6 +24,7 @@
 - WinRT + accessibility text shaping now separates app name from content more reliably before rendering
 - Font size range increased (up to 56px) for accessibility
 - Animation controls expanded with fade-only mode and a wider speed range (0-1200ms)
+- Settings save path now preserves live manually-resized overlay width unless width control was explicitly changed
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
@@ -29,6 +32,7 @@
 - Notification body text visibility bug (body was bound through a boolean converter incorrectly)
 - Faint transparent panel under cards and persistent tiny scrollbar artifacts in the overlay
 - Expiry removal now respects animation disablement (instant removal when animations are off)
+- Single-line mode regression where changing font size could revert overlay width
 
 ## Milestone 2 — Real Notification Capture
 

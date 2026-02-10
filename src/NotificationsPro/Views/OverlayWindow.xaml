@@ -62,6 +62,9 @@
                                    FontWeight="SemiBold"
                                    Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxHeight="{Binding DataContext.AppNameMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   ClipToBounds="True"
                                    Margin="0,0,0,4"
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
                             <TextBlock.Text>
@@ -81,6 +84,9 @@
                                    FontWeight="SemiBold"
                                    Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxHeight="{Binding DataContext.TitleMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   ClipToBounds="True"
                                    Margin="0,0,0,4"
                                    LineHeight="{Binding DataContext.TitleLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
                             <TextBlock.Text>
@@ -100,6 +106,9 @@
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxHeight="{Binding DataContext.BodyMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   ClipToBounds="True"
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
                             <TextBlock.Text>
                                 <Binding Path="Body"/>

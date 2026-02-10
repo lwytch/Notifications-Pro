@@ -25,6 +25,9 @@ public class AppSettings
     public bool ShowAppName { get; set; } = true;
     public bool ShowNotificationTitle { get; set; } = true;
     public bool ShowNotificationBody { get; set; } = true;
+    public int MaxAppNameLines { get; set; } = 2;
+    public int MaxTitleLines { get; set; } = 2;
+    public int MaxBodyLines { get; set; } = 4;
     public bool SingleLineMode { get; set; } = false;
     public bool AlwaysOnTop { get; set; } = true;
     public bool ClickThrough { get; set; } = false;

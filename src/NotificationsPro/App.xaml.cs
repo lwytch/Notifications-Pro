@@ -26,6 +26,7 @@ public partial class App : Application
     private WinForms.ToolStripMenuItem? _showHideItem;
     private WinForms.ToolStripMenuItem? _pauseResumeItem;
     private WinForms.ToolStripMenuItem? _clickThroughItem;
+    private WinForms.ToolStripMenuItem? _alwaysOnTopItem;
     private WinForms.ToolStripMenuItem? _statusItem;
     private WinForms.ToolStripMenuItem? _grantAccessItem;
 
@@ -70,6 +71,7 @@ public partial class App : Application
         _showHideItem = new WinForms.ToolStripMenuItem("Hide Overlay", null, (_, _) => ToggleOverlay());
         _pauseResumeItem = new WinForms.ToolStripMenuItem("Pause Notifications", null, (_, _) => TogglePause());
         _clickThroughItem = new WinForms.ToolStripMenuItem("Enable Click-Through", null, (_, _) => ToggleClickThrough());
+        _alwaysOnTopItem = new WinForms.ToolStripMenuItem("Disable Always on Top", null, (_, _) => ToggleAlwaysOnTop());
 
         var contextMenu = new WinForms.ContextMenuStrip();
         contextMenu.BackColor = Drawing.Color.FromArgb(30, 30, 46);
@@ -93,6 +95,7 @@ public partial class App : Application
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add(_showHideItem);
         contextMenu.Items.Add(_pauseResumeItem);
+        contextMenu.Items.Add(_alwaysOnTopItem);
         contextMenu.Items.Add(_clickThroughItem);
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Settings...", null, (_, _) => ShowSettings());
@@ -157,6 +160,16 @@ public partial class App : Application
         UpdateMenuLabels();
     }
 
+    private void ToggleAlwaysOnTop()
+    {
+        if (_settingsManager == null) return;
+
+        var updated = _settingsManager.Settings.Clone();
+        updated.AlwaysOnTop = !updated.AlwaysOnTop;
+        _settingsManager.Apply(updated);
+        UpdateMenuLabels();
+    }
+
     private void UpdateMenuLabels()
     {
         if (_showHideItem != null)
@@ -170,6 +183,13 @@ public partial class App : Application
             _clickThroughItem.Text = _settingsManager?.Settings.ClickThrough == true
                 ? "Disable Click-Through (Allow Dragging)"
                 : "Enable Click-Through (Clicks Pass Through)";
+        }
+
+        if (_alwaysOnTopItem != null)
+        {
+            _alwaysOnTopItem.Text = _settingsManager?.Settings.AlwaysOnTop == true
+                ? "Disable Always on Top"
+                : "Enable Always on Top";
         }
     }
 

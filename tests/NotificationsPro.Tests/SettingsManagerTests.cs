@@ -35,6 +35,9 @@ public class SettingsManagerTests : IDisposable
         Assert.True(sm.Settings.ShowAppName);
         Assert.True(sm.Settings.ShowNotificationTitle);
         Assert.True(sm.Settings.ShowNotificationBody);
+        Assert.Equal(2, sm.Settings.MaxAppNameLines);
+        Assert.Equal(2, sm.Settings.MaxTitleLines);
+        Assert.Equal(4, sm.Settings.MaxBodyLines);
         Assert.False(sm.Settings.SingleLineMode);
     }
 
@@ -78,6 +81,9 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.ShowAppName);
         Assert.True(settings.ShowNotificationTitle);
         Assert.True(settings.ShowNotificationBody);
+        Assert.Equal(2, settings.MaxAppNameLines);
+        Assert.Equal(2, settings.MaxTitleLines);
+        Assert.Equal(4, settings.MaxBodyLines);
         Assert.False(settings.SingleLineMode);
         Assert.True(settings.AlwaysOnTop);
         Assert.False(settings.ClickThrough);

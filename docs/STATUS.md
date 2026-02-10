@@ -7,16 +7,19 @@
 - Overlay size now fits visible cards (no persistent faint backdrop below cards)
 - Overlay supports optional one-line banner mode for compact layouts
 - Overlay supports manual left/right edge resizing (when enabled)
+- Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
 - Settings window: three tabs (Appearance, Behavior, Position) with premium dark theme
 - Settings header now includes the same app icon used in the system tray
 - Behavior tab includes:
   - configurable visible card count (1-8)
   - content field toggles (show app name, title, body)
+  - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
   - fade-only animation toggle and wider animation speed range (0-1200ms)
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
+- Tray menu includes quick toggles for click-through and always-on-top states
 - QueueManager: configurable max visible count, overflow count, deduplication, expiry timers
 - SettingsManager: load/save to %AppData%\NotificationsPro\settings.json (isolated temp dirs for tests)
 - Preview/test notification button sends mock notifications to the overlay
@@ -73,6 +76,7 @@ dotnet test
 - [ ] Sending 4+ test notifications shows "+N more" overflow indicator
 - [ ] "Visible Notifications" slider changes how many cards persist on screen
 - [ ] "Show App Name / Show Title / Show Body Text" toggles update cards immediately
+- [ ] App/Title/Body line-count sliders constrain stacked card text height
 - [ ] "Single-Line Banner Mode" compacts each notification into one line
 - [ ] App Name Color applies independently from title/body text colors
 - [ ] "Pick" buttons open a color chooser and update hex values
@@ -81,6 +85,7 @@ dotnet test
 - [ ] Background opacity slider changes overlay transparency
 - [ ] Overlay no longer shows a faint empty panel under cards
 - [ ] Overlay can be resized from left/right edges when manual resize is enabled
+- [ ] Changing font size does not reset manually resized overlay width in single-line mode
 - [ ] Fade-only animation option removes horizontal motion
 - [ ] Toggle switches animate smoothly
 - [ ] "Hide Overlay" / "Show Overlay" toggles the overlay window

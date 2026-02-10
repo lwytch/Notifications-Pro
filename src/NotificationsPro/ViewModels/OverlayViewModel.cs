@@ -128,12 +128,48 @@ public class OverlayViewModel : BaseViewModel
     private bool _showNotificationBody = true;
     public bool ShowNotificationBody { get => _showNotificationBody; set => SetProperty(ref _showNotificationBody, value); }
 
+    private int _maxAppNameLines = 2;
+    public int MaxAppNameLines
+    {
+        get => _maxAppNameLines;
+        set
+        {
+            if (!SetProperty(ref _maxAppNameLines, Math.Max(1, value))) return;
+            OnPropertyChanged(nameof(AppNameMaxHeight));
+        }
+    }
+
+    private int _maxTitleLines = 2;
+    public int MaxTitleLines
+    {
+        get => _maxTitleLines;
+        set
+        {
+            if (!SetProperty(ref _maxTitleLines, Math.Max(1, value))) return;
+            OnPropertyChanged(nameof(TitleMaxHeight));
+        }
+    }
+
+    private int _maxBodyLines = 4;
+    public int MaxBodyLines
+    {
+        get => _maxBodyLines;
+        set
+        {
+            if (!SetProperty(ref _maxBodyLines, Math.Max(1, value))) return;
+            OnPropertyChanged(nameof(BodyMaxHeight));
+        }
+    }
+
     private bool _singleLineMode;
     public bool SingleLineMode { get => _singleLineMode; set => SetProperty(ref _singleLineMode, value); }
 
     public double TitleFontSize => FontSize + 2;
     public double TitleLineHeight => TitleFontSize * LineSpacing;
     public double BodyLineHeight => FontSize * LineSpacing;
+    public double AppNameMaxHeight => Math.Max(4, MaxAppNameLines * BodyLineHeight);
+    public double TitleMaxHeight => Math.Max(4, MaxTitleLines * TitleLineHeight);
+    public double BodyMaxHeight => Math.Max(4, MaxBodyLines * BodyLineHeight);
     public double EnterOffset => AnimationsEnabled && !FadeOnlyAnimation ? -(OverlayWidth + 40) : 0;
     public double ExitOffset => AnimationsEnabled && !FadeOnlyAnimation ? 50 : 0;
     public Duration EntryMotionDuration => DurationFor(AnimationDurationMs);
@@ -176,10 +212,16 @@ public class OverlayViewModel : BaseViewModel
         ShowAppName = s.ShowAppName;
         ShowNotificationTitle = s.ShowNotificationTitle;
         ShowNotificationBody = s.ShowNotificationBody;
+        MaxAppNameLines = s.MaxAppNameLines;
+        MaxTitleLines = s.MaxTitleLines;
+        MaxBodyLines = s.MaxBodyLines;
         SingleLineMode = s.SingleLineMode;
         OnPropertyChanged(nameof(TitleFontSize));
         OnPropertyChanged(nameof(TitleLineHeight));
         OnPropertyChanged(nameof(BodyLineHeight));
+        OnPropertyChanged(nameof(AppNameMaxHeight));
+        OnPropertyChanged(nameof(TitleMaxHeight));
+        OnPropertyChanged(nameof(BodyMaxHeight));
         OnPropertyChanged(nameof(EnterOffset));
         OnPropertyChanged(nameof(ExitOffset));
         OnPropertyChanged(nameof(EntryMotionDuration));

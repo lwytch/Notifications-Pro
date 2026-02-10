@@ -13,6 +13,7 @@ public class SettingsViewModel : BaseViewModel
     private readonly SettingsManager _settingsManager;
     private readonly QueueManager _queueManager;
     private readonly DispatcherTimer _saveDebounce;
+    private bool _overlayWidthDirty;
 
     private static readonly string[] PreviewApps =
     {
@@ -105,6 +106,15 @@ public class SettingsViewModel : BaseViewModel
     private bool _showNotificationBody = true;
     public bool ShowNotificationBody { get => _showNotificationBody; set { if (SetProperty(ref _showNotificationBody, value)) QueueSave(); } }
 
+    private int _maxAppNameLines = 2;
+    public int MaxAppNameLines { get => _maxAppNameLines; set { if (SetProperty(ref _maxAppNameLines, Math.Max(1, value))) QueueSave(); } }
+
+    private int _maxTitleLines = 2;
+    public int MaxTitleLines { get => _maxTitleLines; set { if (SetProperty(ref _maxTitleLines, Math.Max(1, value))) QueueSave(); } }
+
+    private int _maxBodyLines = 4;
+    public int MaxBodyLines { get => _maxBodyLines; set { if (SetProperty(ref _maxBodyLines, Math.Max(1, value))) QueueSave(); } }
+
     private bool _singleLineMode;
     public bool SingleLineMode { get => _singleLineMode; set { if (SetProperty(ref _singleLineMode, value)) QueueSave(); } }
 
@@ -125,7 +135,16 @@ public class SettingsViewModel : BaseViewModel
 
     // Position
     private double _overlayWidth = 380;
-    public double OverlayWidth { get => _overlayWidth; set { if (SetProperty(ref _overlayWidth, value)) QueueSave(); } }
+    public double OverlayWidth
+    {
+        get => _overlayWidth;
+        set
+        {
+            if (!SetProperty(ref _overlayWidth, value)) return;
+            _overlayWidthDirty = true;
+            QueueSave();
+        }
+    }
 
     private double _overlayMaxHeight = 600;
     public double OverlayMaxHeight { get => _overlayMaxHeight; set { if (SetProperty(ref _overlayMaxHeight, value)) QueueSave(); } }
@@ -198,6 +217,9 @@ public class SettingsViewModel : BaseViewModel
         _showAppName = s.ShowAppName;
         _showNotificationTitle = s.ShowNotificationTitle;
         _showNotificationBody = s.ShowNotificationBody;
+        _maxAppNameLines = s.MaxAppNameLines;
+        _maxTitleLines = s.MaxTitleLines;
+        _maxBodyLines = s.MaxBodyLines;
         _singleLineMode = s.SingleLineMode;
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
@@ -209,6 +231,7 @@ public class SettingsViewModel : BaseViewModel
         _allowManualResize = s.AllowManualResize;
         _snapToEdges = s.SnapToEdges;
         _snapDistance = s.SnapDistance;
+        _overlayWidthDirty = false;
     }
 
     private void QueueSave()
@@ -226,6 +249,17 @@ public class SettingsViewModel : BaseViewModel
         // Keep cards meaningful if all display fields are toggled off.
         if (!showAppName && !showTitle && !showBody)
             showBody = true;
+
+        // Preserve a live manually-resized width unless the width control was explicitly adjusted.
+        var resolvedOverlayWidth = _overlayWidthDirty
+            ? OverlayWidth
+            : _settingsManager.Settings.OverlayWidth;
+
+        if (Math.Abs(resolvedOverlayWidth - _overlayWidth) > 0.5)
+        {
+            _overlayWidth = resolvedOverlayWidth;
+            OnPropertyChanged(nameof(OverlayWidth));
+        }
 
         var s = new AppSettings
         {
@@ -249,13 +283,16 @@ public class SettingsViewModel : BaseViewModel
             ShowAppName = showAppName,
             ShowNotificationTitle = showTitle,
             ShowNotificationBody = showBody,
+            MaxAppNameLines = Math.Max(1, MaxAppNameLines),
+            MaxTitleLines = Math.Max(1, MaxTitleLines),
+            MaxBodyLines = Math.Max(1, MaxBodyLines),
             SingleLineMode = SingleLineMode,
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
             AnimationsEnabled = AnimationsEnabled,
             FadeOnlyAnimation = FadeOnlyAnimation,
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
-            OverlayWidth = OverlayWidth,
+            OverlayWidth = resolvedOverlayWidth,
             OverlayMaxHeight = OverlayMaxHeight,
             AllowManualResize = AllowManualResize,
             SnapToEdges = SnapToEdges,
@@ -269,6 +306,7 @@ public class SettingsViewModel : BaseViewModel
         };
 
         _settingsManager.Apply(s);
+        _overlayWidthDirty = false;
     }
 
     private void SendPreviewNotification()
