@@ -24,6 +24,7 @@
   "MaxTitleLines": 2,
   "MaxBodyLines": 4,
   "SingleLineMode": false,
+  "NewestOnTop": true,
   "AlwaysOnTop": true,
   "ClickThrough": false,
   "AnimationsEnabled": true,

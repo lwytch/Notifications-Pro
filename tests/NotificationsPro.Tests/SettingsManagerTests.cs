@@ -40,6 +40,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2, sm.Settings.MaxTitleLines);
         Assert.Equal(4, sm.Settings.MaxBodyLines);
         Assert.False(sm.Settings.SingleLineMode);
+        Assert.True(sm.Settings.NewestOnTop);
     }
 
     [Fact]
@@ -87,6 +88,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2, settings.MaxTitleLines);
         Assert.Equal(4, settings.MaxBodyLines);
         Assert.False(settings.SingleLineMode);
+        Assert.True(settings.NewestOnTop);
         Assert.True(settings.AlwaysOnTop);
         Assert.False(settings.ClickThrough);
         Assert.True(settings.AnimationsEnabled);

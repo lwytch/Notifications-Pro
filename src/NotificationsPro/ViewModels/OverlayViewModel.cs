@@ -178,7 +178,19 @@ public class OverlayViewModel : BaseViewModel
     }
 
     private bool _singleLineMode;
-    public bool SingleLineMode { get => _singleLineMode; set => SetProperty(ref _singleLineMode, value); }
+    public bool SingleLineMode
+    {
+        get => _singleLineMode;
+        set
+        {
+            if (!SetProperty(ref _singleLineMode, value)) return;
+            OnPropertyChanged(nameof(StackedContentVisibility));
+            OnPropertyChanged(nameof(SingleLineContentVisibility));
+        }
+    }
+
+    public Visibility StackedContentVisibility => SingleLineMode ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility SingleLineContentVisibility => SingleLineMode ? Visibility.Visible : Visibility.Collapsed;
 
     public double TitleFontSize => FontSize + 2;
     public double TitleLineHeight => TitleFontSize * LineSpacing;
@@ -245,6 +257,8 @@ public class OverlayViewModel : BaseViewModel
         OnPropertyChanged(nameof(AppNameEffectiveMaxHeight));
         OnPropertyChanged(nameof(TitleEffectiveMaxHeight));
         OnPropertyChanged(nameof(BodyEffectiveMaxHeight));
+        OnPropertyChanged(nameof(StackedContentVisibility));
+        OnPropertyChanged(nameof(SingleLineContentVisibility));
         OnPropertyChanged(nameof(EnterOffset));
         OnPropertyChanged(nameof(ExitOffset));
         OnPropertyChanged(nameof(EntryMotionDuration));

@@ -120,6 +120,20 @@ public class QueueManagerTests
     }
 
     [Fact]
+    public void AddNotification_NewestOnBottom_WhenConfigured()
+    {
+        var settings = CreateSettings();
+        settings.Settings.NewestOnTop = false;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("First", "1");
+        queue.AddNotification("Second", "2");
+
+        Assert.Equal("First", queue.VisibleNotifications[0].Title);
+        Assert.Equal("Second", queue.VisibleNotifications[1].Title);
+    }
+
+    [Fact]
     public void AddNotification_SkipsWhenPaused()
     {
         var queue = new QueueManager(CreateSettings());
@@ -206,6 +220,37 @@ public class QueueManagerTests
 
             Assert.Single(queue.VisibleNotifications);
             Assert.Equal("C", queue.VisibleNotifications[0].Title);
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, true); } catch { }
+        }
+    }
+
+    [Fact]
+    public void SettingsChange_ReordersVisibleNotificationsForBottomMode()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProQueue_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var settings = new SettingsManager(tempDir);
+            settings.Settings.MaxVisibleNotifications = 3;
+            settings.Settings.AnimationDurationMs = 0;
+            var queue = new QueueManager(settings);
+
+            queue.AddNotification("First", "1");
+            queue.AddNotification("Second", "2");
+            queue.AddNotification("Third", "3");
+
+            var updated = settings.Settings.Clone();
+            updated.NewestOnTop = false;
+            settings.Apply(updated);
+
+            Assert.Equal("First", queue.VisibleNotifications[0].Title);
+            Assert.Equal("Second", queue.VisibleNotifications[1].Title);
+            Assert.Equal("Third", queue.VisibleNotifications[2].Title);
         }
         finally
         {

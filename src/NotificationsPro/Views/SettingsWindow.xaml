@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
+        Icon="{Binding TrayIconImage}"
         Width="560" Height="640" MinWidth="480" MinHeight="500"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBgBrush}"
@@ -362,16 +363,15 @@
                         <TextBlock Text="Long-form notification content; automatically kept on if all fields are turned off"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <StackPanel>
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SingleLineMode}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
+                        <StackPanel Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
+                            <DockPanel Margin="0,0,0,4">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding NewestOnTop}"
+                                              ToolTip="When on, newest notifications appear first at the top. Turn off for chronological top-to-bottom flow."/>
+                                <TextBlock Text="Newest on Top" Style="{StaticResource SettingLabel}"/>
+                            </DockPanel>
+                            <TextBlock Text="Turn off to let new notifications appear underneath older ones."
+                                       Style="{StaticResource SettingDesc}"/>
 
                             <DockPanel Margin="0,0,0,4">
                                 <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"

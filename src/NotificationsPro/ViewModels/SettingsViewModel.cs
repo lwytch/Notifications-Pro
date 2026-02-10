@@ -119,7 +119,21 @@ public class SettingsViewModel : BaseViewModel
     public int MaxBodyLines { get => _maxBodyLines; set { if (SetProperty(ref _maxBodyLines, Math.Max(1, value))) QueueSave(); } }
 
     private bool _singleLineMode;
-    public bool SingleLineMode { get => _singleLineMode; set { if (SetProperty(ref _singleLineMode, value)) QueueSave(); } }
+    public bool SingleLineMode
+    {
+        get => _singleLineMode;
+        set
+        {
+            if (!SetProperty(ref _singleLineMode, value)) return;
+            OnPropertyChanged(nameof(IsStackedLayout));
+            QueueSave();
+        }
+    }
+
+    private bool _newestOnTop = true;
+    public bool NewestOnTop { get => _newestOnTop; set { if (SetProperty(ref _newestOnTop, value)) QueueSave(); } }
+
+    public bool IsStackedLayout => !SingleLineMode;
 
     private bool _alwaysOnTop = true;
     public bool AlwaysOnTop { get => _alwaysOnTop; set { if (SetProperty(ref _alwaysOnTop, value)) QueueSave(); } }
@@ -225,6 +239,7 @@ public class SettingsViewModel : BaseViewModel
         _maxTitleLines = s.MaxTitleLines;
         _maxBodyLines = s.MaxBodyLines;
         _singleLineMode = s.SingleLineMode;
+        _newestOnTop = s.NewestOnTop;
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
         _animationsEnabled = s.AnimationsEnabled;
@@ -236,6 +251,7 @@ public class SettingsViewModel : BaseViewModel
         _snapToEdges = s.SnapToEdges;
         _snapDistance = s.SnapDistance;
         _overlayWidthDirty = false;
+        OnPropertyChanged(nameof(IsStackedLayout));
     }
 
     private void QueueSave()
@@ -292,6 +308,7 @@ public class SettingsViewModel : BaseViewModel
             MaxTitleLines = Math.Max(1, MaxTitleLines),
             MaxBodyLines = Math.Max(1, MaxBodyLines),
             SingleLineMode = SingleLineMode,
+            NewestOnTop = NewestOnTop,
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
             AnimationsEnabled = AnimationsEnabled,

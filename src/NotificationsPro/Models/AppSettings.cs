@@ -30,6 +30,7 @@ public class AppSettings
     public int MaxTitleLines { get; set; } = 2;
     public int MaxBodyLines { get; set; } = 4;
     public bool SingleLineMode { get; set; } = false;
+    public bool NewestOnTop { get; set; } = true;
     public bool AlwaysOnTop { get; set; } = true;
     public bool ClickThrough { get; set; } = false;
     public bool AnimationsEnabled { get; set; } = true;

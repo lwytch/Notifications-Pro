@@ -55,7 +55,8 @@
                 </Border.RenderTransform>
 
                 <Grid>
-                    <StackPanel x:Name="StackedContent">
+                    <StackPanel x:Name="StackedContent"
+                                Visibility="{Binding DataContext.StackedContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
                         <!-- App name -->
                         <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -150,7 +151,8 @@
                     </StackPanel>
 
                     <!-- One-line banner mode -->
-                    <Grid x:Name="SingleLineContent" Visibility="Collapsed">
+                    <Grid x:Name="SingleLineContent"
+                          Visibility="{Binding DataContext.SingleLineContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -158,8 +160,7 @@
 
                         <TextBlock x:Name="SingleLineApp"
                                    Grid.Column="0"
-                                   MaxWidth="200"
-                                   TextTrimming="CharacterEllipsis"
+                                   TextTrimming="None"
                                    FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="SemiBold"
@@ -215,10 +216,6 @@
                 <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                     <BeginStoryboard Storyboard="{StaticResource SlideIn}"/>
                 </EventTrigger>
-                <DataTrigger Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                    <Setter TargetName="StackedContent" Property="Visibility" Value="Collapsed"/>
-                    <Setter TargetName="SingleLineContent" Property="Visibility" Value="Visible"/>
-                </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>

@@ -23,6 +23,7 @@ public partial class OverlayWindow : Window
     // Win32 messages
     private const int WM_NCHITTEST = 0x0084;
     private const int WM_NCLBUTTONDBLCLK = 0x00A3;
+    private const int HTTRANSPARENT = -1;
     private const int HTCAPTION = 2;
     private const int HTLEFT = 10;
     private const int HTRIGHT = 11;
@@ -79,8 +80,13 @@ public partial class OverlayWindow : Window
         switch (msg)
         {
             case WM_NCHITTEST:
+                if (_settingsManager.Settings.ClickThrough)
+                {
+                    handled = true;
+                    return (IntPtr)HTTRANSPARENT;
+                }
+
                 if (_settingsManager.Settings.AllowManualResize
-                    && !_settingsManager.Settings.ClickThrough
                     && TryGetResizeHitTest(lParam, out var resizeHit))
                 {
                     handled = true;
@@ -147,6 +153,9 @@ public partial class OverlayWindow : Window
         Dispatcher.Invoke(() =>
         {
             UpdateClickThrough(_settingsManager.Settings.ClickThrough);
+            InvalidateMeasure();
+            InvalidateArrange();
+            UpdateLayout();
         });
     }
 
@@ -202,15 +211,37 @@ public partial class OverlayWindow : Window
         var workArea = GetCurrentWorkArea();
         var targetLeft = Left;
         var targetTop = Top;
+        var threshold = Math.Max(8, _settingsManager.Settings.SnapDistance + 4);
+        var previousWidth = ResolveDimension(e.PreviousSize.Width, ActualWidth, MinWidth, 380);
+        var previousHeight = ResolveDimension(e.PreviousSize.Height, ActualHeight, MinHeight, 120);
+        var rightGapBefore = workArea.Right - (Left + previousWidth);
+        var bottomGapBefore = workArea.Bottom - (Top + previousHeight);
+        var shouldAnchorRight = _anchorToRightEdge || Math.Abs(rightGapBefore) <= threshold;
+        var shouldAnchorBottom = _anchorToBottomEdge || Math.Abs(bottomGapBefore) <= threshold;
 
-        if (_anchorToRightEdge)
-            targetLeft = workArea.Right - _rightEdgeOffset - ActualWidth;
+        if (shouldAnchorRight)
+        {
+            var rightOffset = Math.Max(0, rightGapBefore);
+            targetLeft = workArea.Right - rightOffset - ActualWidth;
+        }
 
-        if (_anchorToBottomEdge)
-            targetTop = workArea.Bottom - _bottomEdgeOffset - ActualHeight;
+        if (shouldAnchorBottom)
+        {
+            var bottomOffset = Math.Max(0, bottomGapBefore);
+            targetTop = workArea.Bottom - bottomOffset - ActualHeight;
+        }
 
         targetLeft = ClampToWorkAreaX(targetLeft, workArea);
         targetTop = ClampToWorkAreaY(targetTop, workArea);
+
+        if (_settingsManager.Settings.SnapToEdges)
+        {
+            var snapped = SnapHelper.SnapToEdges(
+                targetLeft, targetTop, ActualWidth, ActualHeight,
+                workArea, _settingsManager.Settings.SnapDistance);
+            targetLeft = snapped.X;
+            targetTop = snapped.Y;
+        }
 
         if (Math.Abs(targetLeft - Left) > 0.5 || Math.Abs(targetTop - Top) > 0.5)
         {
@@ -223,6 +254,7 @@ public partial class OverlayWindow : Window
         _settingsManager.Settings.OverlayLeft = Left;
         _settingsManager.Settings.OverlayTop = Top;
         _settingsManager.Settings.MonitorIndex = GetCurrentMonitorIndex();
+        UpdateEdgeAnchors();
     }
 
     private void UpdateEdgeAnchors()

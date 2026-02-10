@@ -74,8 +74,10 @@ public class QueueManager : BaseViewModel
         }
 
         var item = new NotificationItem(appName, title, body);
-        // Insert at position 0 so newest appears at the top
-        _visibleNotifications.Insert(0, item);
+        if (_settingsManager.Settings.NewestOnTop)
+            _visibleNotifications.Insert(0, item);
+        else
+            _visibleNotifications.Add(item);
         StartExpiryTimer(item);
     }
 
@@ -140,17 +142,41 @@ public class QueueManager : BaseViewModel
 
     private void OnSettingsChanged()
     {
+        ReorderByConfiguredDirection();
+
         var maxVisible = Math.Max(1, _settingsManager.Settings.MaxVisibleNotifications);
         while (_visibleNotifications.Count > maxVisible)
         {
-            var oldest = _visibleNotifications[_visibleNotifications.Count - 1];
+            var oldestIndex = _settingsManager.Settings.NewestOnTop
+                ? _visibleNotifications.Count - 1
+                : 0;
+            var oldest = _visibleNotifications[oldestIndex];
             if (_expiryTimers.TryGetValue(oldest, out var timer))
             {
                 timer.Stop();
                 _expiryTimers.Remove(oldest);
             }
 
-            _visibleNotifications.RemoveAt(_visibleNotifications.Count - 1);
+            _visibleNotifications.RemoveAt(oldestIndex);
         }
+    }
+
+    private void ReorderByConfiguredDirection()
+    {
+        if (_visibleNotifications.Count < 2)
+            return;
+
+        var newestOnTop = _settingsManager.Settings.NewestOnTop;
+        var currentlyNewestOnTop = _visibleNotifications[0].ReceivedAt >= _visibleNotifications[^1].ReceivedAt;
+        if (newestOnTop == currentlyNewestOnTop)
+            return;
+
+        var reordered = newestOnTop
+            ? _visibleNotifications.OrderByDescending(n => n.ReceivedAt).ToList()
+            : _visibleNotifications.OrderBy(n => n.ReceivedAt).ToList();
+
+        _visibleNotifications.Clear();
+        foreach (var notification in reordered)
+            _visibleNotifications.Add(notification);
     }
 }

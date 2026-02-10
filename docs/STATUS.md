@@ -6,20 +6,25 @@
 - Overlay window: transparent, always-on-top (configurable), draggable, slide-in animations
 - Overlay size now fits visible cards (no persistent faint backdrop below cards)
 - Overlay supports optional one-line banner mode for compact layouts
+- Overlay supports stacked order control (newest on top or newest on bottom)
 - Overlay supports manual left/right edge resizing (when enabled)
 - Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
 - Stacked mode now supports full multi-line word wrap with optional truncation toggle
 - Long wrapped content now remains accessible via auto vertical scrolling when it exceeds max overlay height
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
+- Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
+- Click-through hit testing now returns transparent hit results so mouse input passes through consistently
 - Settings window: three tabs (Appearance, Behavior, Position) with premium dark theme
 - Settings header now includes the same app icon used in the system tray
+- Settings window now uses the app tray icon in the title-bar icon slot
 - Behavior tab includes:
   - configurable visible card count (1-8)
   - content field toggles (show app name, title, body)
   - full-wrap stacked mode toggle (disable line clamping/truncation)
   - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
+  - stacked-order toggle (newest at top vs newest at bottom)
   - fade-only animation toggle and wider animation speed range (0-1200ms)
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Appearance tab includes color picker buttons and separate app-name color customization
@@ -45,11 +50,10 @@
   - surfaces live diagnostics (captured/candidate/event counters + last class seen)
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
-- 31 unit tests covering QueueManager, SettingsManager (with round-trip and corruption), and SnapHelper
+- 33 unit tests covering QueueManager, SettingsManager (with round-trip and corruption), and SnapHelper
 
 ## What Doesn't Work Yet
 - Multi-monitor selection (Milestone 3)
-- Click-through mode (code exists but needs testing)
 - Installer/packaging (Milestone 4)
 - Toast duration alignment (using configurable duration instead)
 
@@ -85,6 +89,7 @@ dotnet test
 - [ ] App/Title/Body line-count sliders constrain stacked card text height
 - [ ] "Single-Line Banner Mode" compacts each notification into one line
 - [ ] Stacked-mode controls hide when single-line mode is enabled
+- [ ] "Newest on Top" toggle changes stacked order immediately
 - [ ] App Name Color applies independently from title/body text colors
 - [ ] "Pick" buttons open a color chooser and update hex values
 - [ ] Font size slider changes overlay text size in real time
@@ -93,6 +98,7 @@ dotnet test
 - [ ] Overlay no longer shows a faint empty panel under cards
 - [ ] Very long stacked notifications can be scrolled when they exceed Max Overlay Height
 - [ ] Overlay can be resized from left/right edges when manual resize is enabled
+- [ ] While right-aligned, width changes keep right edge snapped to the monitor edge
 - [ ] Changing font size does not reset manually resized overlay width in single-line mode
 - [ ] Fade-only animation option removes horizontal motion
 - [ ] Toggle switches animate smoothly
@@ -100,6 +106,7 @@ dotnet test
 - [ ] "Pause Notifications" / "Resume Notifications" pauses/resumes
 - [ ] Overlay is draggable by clicking and dragging
 - [ ] Overlay snaps to screen edges on primary and secondary monitors
+- [ ] Click-through mode allows clicking through the overlay to underlying apps
 - [ ] "Reset to Defaults" restores all settings
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart

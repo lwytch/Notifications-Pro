@@ -17,6 +17,7 @@
 - Per-field stacked-mode line count controls (app name, title, body)
 - Tray quick toggle for Always on Top
 - Stacked-mode "Limit Text Lines (Truncate)" toggle for full wrapped text when disabled
+- Stacked-order toggle so notifications can flow newest-on-top or newest-on-bottom
 
 ### Changed
 - Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
@@ -28,6 +29,8 @@
 - Settings save path now preserves live manually-resized overlay width unless width control was explicitly changed
 - Overlay snapping/clamping now uses the active monitor work area instead of primary-only metrics
 - Overlay scroll behavior now auto-shows vertical scrolling only when content exceeds Max Overlay Height
+- Settings window now uses the same generated tray icon in the window title-bar icon slot
+- One-line banner text shaping now prioritizes preserving title context before body preview
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
@@ -39,6 +42,8 @@
 - Stacked-mode readability issue where users could remain effectively constrained to one-line cards after leaving single-line mode
 - Snap-to-edge behavior failing on secondary monitors
 - Long stacked notifications appearing cut off because overflow had no visible scroll affordance
+- Click-through mode intercepting mouse hit-tests instead of fully passing through
+- Right-edge anchoring during width changes could drift off the monitor edge in banner mode
 
 ## Milestone 2 — Real Notification Capture
 

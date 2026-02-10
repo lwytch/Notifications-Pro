@@ -39,12 +39,13 @@
 ### Milestone 3: Full Customization + Multi-Monitor
 - [ ] Multi-monitor support (select monitor, move via tray menu)
 - [ ] Per-monitor DPI awareness
-- [ ] Click-through toggle (Win32 WS_EX_TRANSPARENT)
+- [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)
 - [x] Tray quick toggle for click-through recovery (avoid drag lockout)
 - [x] Notification content controls (show/hide app name, title, body)
 - [x] Configurable max visible notifications (1-8)
 - [x] Overlay auto-size polish (removes ghost backdrop panel and stray scrollbar)
 - [x] One-line banner mode (compact per-notification display)
+- [x] Stacked order control (newest-on-top vs newest-on-bottom)
 - [x] App-name color customization (separate from title/body colors)
 - [x] Built-in color picker buttons in Settings UI
 - [x] Manual edge resize support (left/right drag handles)
