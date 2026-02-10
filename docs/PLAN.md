@@ -52,6 +52,7 @@
 - [x] Tray icon preview shown in Settings header
 - [x] Per-field line count controls (app/title/body)
 - [x] Full-wrap stacked mode option (disable truncation / line clamps)
+- [x] Long-content overflow affordance (scroll when stacked cards exceed max overlay height)
 - [x] Preserve live manual width when changing unrelated settings
 - [x] Tray quick toggle for Always on Top
 - [x] Edge snapping on all monitors

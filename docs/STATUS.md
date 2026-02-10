@@ -9,6 +9,7 @@
 - Overlay supports manual left/right edge resizing (when enabled)
 - Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
 - Stacked mode now supports full multi-line word wrap with optional truncation toggle
+- Long wrapped content now remains accessible via auto vertical scrolling when it exceeds max overlay height
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Settings window: three tabs (Appearance, Behavior, Position) with premium dark theme
@@ -20,6 +21,7 @@
   - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
   - fade-only animation toggle and wider animation speed range (0-1200ms)
+  - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
@@ -82,12 +84,14 @@ dotnet test
 - [ ] "Limit Text Lines (Truncate)" off shows full multi-line wrapped text in stacked mode
 - [ ] App/Title/Body line-count sliders constrain stacked card text height
 - [ ] "Single-Line Banner Mode" compacts each notification into one line
+- [ ] Stacked-mode controls hide when single-line mode is enabled
 - [ ] App Name Color applies independently from title/body text colors
 - [ ] "Pick" buttons open a color chooser and update hex values
 - [ ] Font size slider changes overlay text size in real time
 - [ ] Font size can be increased to larger accessibility values (up to 56px)
 - [ ] Background opacity slider changes overlay transparency
 - [ ] Overlay no longer shows a faint empty panel under cards
+- [ ] Very long stacked notifications can be scrolled when they exceed Max Overlay Height
 - [ ] Overlay can be resized from left/right edges when manual resize is enabled
 - [ ] Changing font size does not reset manually resized overlay width in single-line mode
 - [ ] Fade-only animation option removes horizontal motion

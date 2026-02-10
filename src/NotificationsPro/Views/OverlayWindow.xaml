@@ -245,7 +245,7 @@
 
     <!-- Main content: tiny alpha preserves drag hit-testing without a visible panel -->
     <Grid Margin="4" Background="#01000000">
-        <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled"
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       PanningMode="None"
                       MaxHeight="{Binding OverlayMaxHeight}">
             <StackPanel>

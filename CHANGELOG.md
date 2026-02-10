@@ -27,6 +27,7 @@
 - Animation controls expanded with fade-only mode and a wider speed range (0-1200ms)
 - Settings save path now preserves live manually-resized overlay width unless width control was explicitly changed
 - Overlay snapping/clamping now uses the active monitor work area instead of primary-only metrics
+- Overlay scroll behavior now auto-shows vertical scrolling only when content exceeds Max Overlay Height
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
@@ -37,6 +38,7 @@
 - Single-line mode regression where changing font size could revert overlay width
 - Stacked-mode readability issue where users could remain effectively constrained to one-line cards after leaving single-line mode
 - Snap-to-edge behavior failing on secondary monitors
+- Long stacked notifications appearing cut off because overflow had no visible scroll affordance
 
 ## Milestone 2 — Real Notification Capture
 
