@@ -6,7 +6,7 @@
 - Tray menu toggle for click-through mode ("Disable Click-Through (Allow Dragging)")
 - Click-through state surfaced in tray tooltip for faster troubleshooting
 - Behavior settings for:
-  - max visible notifications (1-8)
+  - max visible notifications (1-40)
   - per-field display toggles (app name, title, body)
 - In-memory notification model now carries source app name separately from title/body for richer card layout
 - One-line banner mode toggle for compact, long-strip notification cards
@@ -18,6 +18,10 @@
 - Tray quick toggle for Always on Top
 - Stacked-mode "Limit Text Lines (Truncate)" toggle for full wrapped text when disabled
 - Stacked-order toggle so notifications can flow newest-on-top or newest-on-bottom
+- Single-line "Wrap Banner Text" toggle for preserving long banner text on smaller screens
+- Single-line wrapped banner "Max Lines" setting to control card height/density
+- Single-line "Auto Full-Width Banner" toggle for near edge-to-edge monitor-width banners
+- Position preset buttons (top/side anchors) in Settings > Position
 
 ### Changed
 - Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
@@ -31,6 +35,8 @@
 - Overlay scroll behavior now auto-shows vertical scrolling only when content exceeds Max Overlay Height
 - Settings window now uses the same generated tray icon in the window title-bar icon slot
 - One-line banner text shaping now prioritizes preserving title context before body preview
+- Visible notifications range increased from 1-8 to 1-40
+- Preview/test action now applies pending settings immediately before enqueuing preview cards
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
@@ -44,6 +50,11 @@
 - Long stacked notifications appearing cut off because overflow had no visible scroll affordance
 - Click-through mode intercepting mouse hit-tests instead of fully passing through
 - Right-edge anchoring during width changes could drift off the monitor edge in banner mode
+- Overlay max-height behavior now clamps against monitor work area to avoid off-screen clipped cards
+- Overlay scrollbar usability at large font sizes improved (wider scrollbar + explicit content scrolling)
+- Overlay now constrains internal scroll region to effective monitor-aware max height, preventing bottom card clipping
+- Single-line full-width mode now preserves and restores manual width state when toggled off
+- Preview/test notifications now generate unique content to avoid dedup hiding expected card counts
 
 ## Milestone 2 — Real Notification Capture
 

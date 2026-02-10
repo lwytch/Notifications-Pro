@@ -15,26 +15,49 @@ public class NotificationOneLineContentConverter : IMultiValueConverter
         if (values.Length < 4)
             return string.Empty;
 
-        var showTitle = values[0] is bool titleEnabled && titleEnabled;
-        var title = values[1]?.ToString()?.Trim() ?? string.Empty;
-        var showBody = values[2] is bool bodyEnabled && bodyEnabled;
-        var body = values[3]?.ToString()?.Trim() ?? string.Empty;
+        var index = 0;
+        var includeApp = false;
+        var showApp = false;
+        var app = string.Empty;
 
-        if (showTitle && !string.IsNullOrWhiteSpace(title))
+        // Extended mode optionally includes app name values first.
+        if (values.Length >= 6)
         {
-            if (!showBody || string.IsNullOrWhiteSpace(body))
-                return title;
-
-            var compactBody = body.Length > BodyPreviewLength
-                ? body[..BodyPreviewLength].TrimEnd() + "..."
-                : body;
-            return $"{title} - {compactBody}";
+            includeApp = true;
+            showApp = values[0] is bool appEnabled && appEnabled;
+            app = values[1]?.ToString()?.Trim() ?? string.Empty;
+            index = 2;
         }
 
-        if (showBody && !string.IsNullOrWhiteSpace(body))
-            return body;
+        var showTitle = values[index] is bool titleEnabled && titleEnabled;
+        var title = values[index + 1]?.ToString()?.Trim() ?? string.Empty;
+        var showBody = values[index + 2] is bool bodyEnabled && bodyEnabled;
+        var body = values[index + 3]?.ToString()?.Trim() ?? string.Empty;
+        var compactBody = !string.Equals(parameter?.ToString(), "full", StringComparison.OrdinalIgnoreCase);
+        if (values.Length > index + 4 && values[index + 4] is bool explicitCompact)
+            compactBody = explicitCompact;
 
-        return string.Empty;
+        var parts = new List<string>(3);
+
+        if (includeApp && showApp && !string.IsNullOrWhiteSpace(app))
+            parts.Add(app);
+
+        if (showTitle && !string.IsNullOrWhiteSpace(title))
+            parts.Add(title);
+
+        if (showBody && !string.IsNullOrWhiteSpace(body))
+        {
+            if (compactBody)
+            {
+                body = body.Length > BodyPreviewLength
+                    ? body[..BodyPreviewLength].TrimEnd() + "..."
+                    : body;
+            }
+
+            parts.Add(body);
+        }
+
+        return string.Join(" - ", parts);
     }
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

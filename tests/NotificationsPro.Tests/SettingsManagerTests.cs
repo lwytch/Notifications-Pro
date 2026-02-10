@@ -40,6 +40,9 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2, sm.Settings.MaxTitleLines);
         Assert.Equal(4, sm.Settings.MaxBodyLines);
         Assert.False(sm.Settings.SingleLineMode);
+        Assert.False(sm.Settings.SingleLineWrapText);
+        Assert.Equal(3, sm.Settings.SingleLineMaxLines);
+        Assert.False(sm.Settings.SingleLineAutoFullWidth);
         Assert.True(sm.Settings.NewestOnTop);
     }
 
@@ -88,6 +91,9 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2, settings.MaxTitleLines);
         Assert.Equal(4, settings.MaxBodyLines);
         Assert.False(settings.SingleLineMode);
+        Assert.False(settings.SingleLineWrapText);
+        Assert.Equal(3, settings.SingleLineMaxLines);
+        Assert.False(settings.SingleLineAutoFullWidth);
         Assert.True(settings.NewestOnTop);
         Assert.True(settings.AlwaysOnTop);
         Assert.False(settings.ClickThrough);
@@ -95,6 +101,7 @@ public class SettingsManagerTests : IDisposable
         Assert.False(settings.FadeOnlyAnimation);
         Assert.Equal(300, settings.AnimationDurationMs);
         Assert.Equal(380, settings.OverlayWidth);
+        Assert.Equal(380, settings.LastManualOverlayWidth);
         Assert.Equal(600, settings.OverlayMaxHeight);
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);

@@ -30,6 +30,9 @@ public class AppSettings
     public int MaxTitleLines { get; set; } = 2;
     public int MaxBodyLines { get; set; } = 4;
     public bool SingleLineMode { get; set; } = false;
+    public bool SingleLineWrapText { get; set; } = false;
+    public int SingleLineMaxLines { get; set; } = 3;
+    public bool SingleLineAutoFullWidth { get; set; } = false;
     public bool NewestOnTop { get; set; } = true;
     public bool AlwaysOnTop { get; set; } = true;
     public bool ClickThrough { get; set; } = false;
@@ -42,6 +45,7 @@ public class AppSettings
     public double? OverlayLeft { get; set; }
     public double? OverlayTop { get; set; }
     public double OverlayWidth { get; set; } = 380;
+    public double LastManualOverlayWidth { get; set; } = 380;
     public double OverlayMaxHeight { get; set; } = 600;
     public bool AllowManualResize { get; set; } = true;
     public int MonitorIndex { get; set; } = 0;

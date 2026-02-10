@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using NotificationsPro.Helpers;
+using NotificationsPro.Models;
 using NotificationsPro.Services;
 using NotificationsPro.ViewModels;
 using Drawing = System.Drawing;
@@ -30,6 +31,8 @@ public partial class OverlayWindow : Window
     private const int GWL_EXSTYLE = -20;
     private const int WS_EX_TRANSPARENT = 0x00000020;
     private const double ResizeBorderThickness = 8;
+    private const double OverlayMargin = 16;
+    private const double OuterContentMargin = 8;
 
     [DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hwnd, int nIndex);
@@ -125,6 +128,8 @@ public partial class OverlayWindow : Window
             Top = settings.OverlayTop.Value;
         }
 
+        ApplyEffectiveMaxHeight(settings);
+        TryApplySingleLineAutoFullWidth(settings);
         ClampToCurrentWorkArea();
         UpdateEdgeAnchors();
         UpdateClickThrough(settings.ClickThrough);
@@ -152,7 +157,13 @@ public partial class OverlayWindow : Window
     {
         Dispatcher.Invoke(() =>
         {
-            UpdateClickThrough(_settingsManager.Settings.ClickThrough);
+            var settings = _settingsManager.Settings;
+            UpdateClickThrough(settings.ClickThrough);
+            ApplyEffectiveMaxHeight(settings);
+            TryApplySingleLineAutoFullWidth(settings);
+            TryApplyStoredPosition(settings);
+            ClampToCurrentWorkArea();
+            UpdateEdgeAnchors();
             InvalidateMeasure();
             InvalidateArrange();
             UpdateLayout();
@@ -176,6 +187,8 @@ public partial class OverlayWindow : Window
         if (_isInternalMove)
             return;
 
+        var previousMonitor = _settingsManager.Settings.MonitorIndex;
+
         if (_settingsManager.Settings.SnapToEdges)
         {
             var workArea = GetCurrentWorkArea();
@@ -197,7 +210,16 @@ public partial class OverlayWindow : Window
         UpdateEdgeAnchors();
         _settingsManager.Settings.OverlayLeft = Left;
         _settingsManager.Settings.OverlayTop = Top;
-        _settingsManager.Settings.MonitorIndex = GetCurrentMonitorIndex();
+        var currentMonitor = GetCurrentMonitorIndex();
+        _settingsManager.Settings.MonitorIndex = currentMonitor;
+
+        if (currentMonitor != previousMonitor)
+        {
+            ApplyEffectiveMaxHeight(_settingsManager.Settings);
+            TryApplySingleLineAutoFullWidth(_settingsManager.Settings);
+            ClampToCurrentWorkArea();
+            UpdateEdgeAnchors();
+        }
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -206,7 +228,11 @@ public partial class OverlayWindow : Window
             return;
 
         if (ActualWidth > 0)
+        {
             _settingsManager.Settings.OverlayWidth = ActualWidth;
+            if (!(_settingsManager.Settings.SingleLineMode && _settingsManager.Settings.SingleLineAutoFullWidth))
+                _settingsManager.Settings.LastManualOverlayWidth = ActualWidth;
+        }
 
         var workArea = GetCurrentWorkArea();
         var targetLeft = Left;
@@ -429,5 +455,59 @@ public partial class OverlayWindow : Window
             return fallback;
 
         return (int)Math.Round(value);
+    }
+
+    private void ApplyEffectiveMaxHeight(AppSettings settings)
+    {
+        var workArea = GetCurrentWorkArea();
+        var userMax = Math.Max(120, settings.OverlayMaxHeight);
+        var effectiveMax = Math.Min(userMax, Math.Max(120, workArea.Height - (OverlayMargin * 2)));
+        var scrollViewerMax = Math.Max(120, effectiveMax - OuterContentMargin);
+
+        if (Math.Abs(MaxHeight - effectiveMax) > 0.5)
+            MaxHeight = effectiveMax;
+
+        if (Math.Abs(NotificationScrollViewer.MaxHeight - scrollViewerMax) > 0.5)
+            NotificationScrollViewer.MaxHeight = scrollViewerMax;
+    }
+
+    private void TryApplyStoredPosition(AppSettings settings)
+    {
+        if (settings.OverlayLeft is not double targetLeft || settings.OverlayTop is not double targetTop)
+            return;
+
+        if (Math.Abs(targetLeft - Left) <= 0.5 && Math.Abs(targetTop - Top) <= 0.5)
+            return;
+
+        _isInternalMove = true;
+        Left = targetLeft;
+        Top = targetTop;
+        _isInternalMove = false;
+    }
+
+    private void TryApplySingleLineAutoFullWidth(AppSettings settings)
+    {
+        if (!settings.SingleLineMode || !settings.SingleLineAutoFullWidth)
+            return;
+
+        if (settings.LastManualOverlayWidth <= 0)
+            settings.LastManualOverlayWidth = Math.Max(MinWidth, settings.OverlayWidth);
+
+        var workArea = GetCurrentWorkArea();
+        var targetWidth = Math.Max(MinWidth, workArea.Width - (OverlayMargin * 2));
+        var targetLeft = workArea.Left + OverlayMargin;
+
+        var widthChanged = Math.Abs(targetWidth - Width) > 0.5;
+        var leftChanged = Math.Abs(targetLeft - Left) > 0.5;
+        if (!widthChanged && !leftChanged)
+            return;
+
+        _isInternalMove = true;
+        Width = targetWidth;
+        Left = targetLeft;
+        _isInternalMove = false;
+
+        settings.OverlayWidth = targetWidth;
+        settings.OverlayLeft = targetLeft;
     }
 }

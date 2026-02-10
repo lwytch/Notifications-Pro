@@ -6,11 +6,15 @@
 - Overlay window: transparent, always-on-top (configurable), draggable, slide-in animations
 - Overlay size now fits visible cards (no persistent faint backdrop below cards)
 - Overlay supports optional one-line banner mode for compact layouts
+- One-line mode supports optional wrapped text to avoid truncation on smaller monitors
+- One-line mode supports optional auto full-width behavior per monitor
+- One-line mode includes a wrapped-banner max-lines control to keep more cards visible at large font sizes
 - Overlay supports stacked order control (newest on top or newest on bottom)
 - Overlay supports manual left/right edge resizing (when enabled)
 - Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
 - Stacked mode now supports full multi-line word wrap with optional truncation toggle
 - Long wrapped content now remains accessible via auto vertical scrolling when it exceeds max overlay height
+- Overlay applies monitor-aware effective max height to avoid off-screen clipping
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
@@ -19,14 +23,16 @@
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Behavior tab includes:
-  - configurable visible card count (1-8)
+  - configurable visible card count (1-40)
   - content field toggles (show app name, title, body)
   - full-wrap stacked mode toggle (disable line clamping/truncation)
   - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
+  - single-line wrap toggle, wrapped-banner max-lines control, and auto full-width toggle
   - stacked-order toggle (newest at top vs newest at bottom)
   - fade-only animation toggle and wider animation speed range (0-1200ms)
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
+- Position tab includes quick preset buttons for top/side placement
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
@@ -88,6 +94,9 @@ dotnet test
 - [ ] "Limit Text Lines (Truncate)" off shows full multi-line wrapped text in stacked mode
 - [ ] App/Title/Body line-count sliders constrain stacked card text height
 - [ ] "Single-Line Banner Mode" compacts each notification into one line
+- [ ] In single-line mode, "Wrap Banner Text" preserves long content without truncating critical text
+- [ ] In single-line mode, "Banner Max Lines" controls wrapped card height and visible card density
+- [ ] In single-line mode, "Auto Full-Width Banner" expands to near monitor width automatically
 - [ ] Stacked-mode controls hide when single-line mode is enabled
 - [ ] "Newest on Top" toggle changes stacked order immediately
 - [ ] App Name Color applies independently from title/body text colors
@@ -97,6 +106,7 @@ dotnet test
 - [ ] Background opacity slider changes overlay transparency
 - [ ] Overlay no longer shows a faint empty panel under cards
 - [ ] Very long stacked notifications can be scrolled when they exceed Max Overlay Height
+- [ ] At max font sizes, overlay scrollbar remains usable and no cards are clipped off-screen
 - [ ] Overlay can be resized from left/right edges when manual resize is enabled
 - [ ] While right-aligned, width changes keep right edge snapped to the monitor edge
 - [ ] Changing font size does not reset manually resized overlay width in single-line mode
@@ -107,6 +117,7 @@ dotnet test
 - [ ] Overlay is draggable by clicking and dragging
 - [ ] Overlay snaps to screen edges on primary and secondary monitors
 - [ ] Click-through mode allows clicking through the overlay to underlying apps
+- [ ] Position preset buttons move overlay to expected top/side anchors
 - [ ] "Reset to Defaults" restores all settings
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart

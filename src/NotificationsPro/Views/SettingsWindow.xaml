@@ -327,7 +327,7 @@
                                 <Run Text="{Binding MaxVisibleNotifications, StringFormat='{}{0:0}'}"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="1" Maximum="8" Value="{Binding MaxVisibleNotifications}"
+                                    Minimum="1" Maximum="40" Value="{Binding MaxVisibleNotifications}"
                                     TickFrequency="1" IsSnapToTickEnabled="True"
                                     ToolTip="Maximum number of notification cards shown at once"/>
                         </DockPanel>
@@ -432,6 +432,39 @@
                         </DockPanel>
                         <TextBlock Text="Compacts notifications into one line per card. Turn off for stacked multi-line cards."
                                    Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding SingleLineMode, Converter={StaticResource BoolToVis}}">
+                            <DockPanel Margin="0,0,0,4">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding SingleLineWrapText}"
+                                              ToolTip="Allow one-line banner content to wrap instead of truncating"/>
+                                <TextBlock Text="Wrap Banner Text" Style="{StaticResource SettingLabel}"/>
+                            </DockPanel>
+                            <TextBlock Text="Useful on smaller monitors: preserves content by wrapping onto additional lines."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Banner Max Lines" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding SingleLineMaxLines, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="12" Value="{Binding SingleLineMaxLines}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Maximum wrapped lines per banner card in single-line mode"/>
+                            </DockPanel>
+                            <TextBlock Text="Lower values keep more cards visible at once; higher values show more text per card."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <DockPanel Margin="0,0,0,4">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding SingleLineAutoFullWidth}"
+                                              ToolTip="Automatically expand banner width to near full monitor width"/>
+                                <TextBlock Text="Auto Full-Width Banner" Style="{StaticResource SettingLabel}"/>
+                            </DockPanel>
+                            <TextBlock Text="When enabled, single-line mode spans almost the full monitor width automatically."
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
 
                         <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
 
@@ -557,6 +590,22 @@
                         </DockPanel>
                         <TextBlock Text="How close (in pixels) the overlay needs to be before it snaps into place"
                                    Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Move overlay to common screen positions"
+                                   Style="{StaticResource SettingDesc}"/>
+                        <WrapPanel Margin="0,0,0,8" ItemWidth="120">
+                            <Button Content="Top Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-left"/>
+                            <Button Content="Top Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-center"/>
+                            <Button Content="Top Right" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-right"/>
+                            <Button Content="Middle Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-left"/>
+                            <Button Content="Middle Right" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-right"/>
+                        </WrapPanel>
 
                     </StackPanel>
                 </ScrollViewer>

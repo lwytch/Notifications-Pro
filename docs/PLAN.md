@@ -42,9 +42,12 @@
 - [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)
 - [x] Tray quick toggle for click-through recovery (avoid drag lockout)
 - [x] Notification content controls (show/hide app name, title, body)
-- [x] Configurable max visible notifications (1-8)
+- [x] Configurable max visible notifications (1-40)
 - [x] Overlay auto-size polish (removes ghost backdrop panel and stray scrollbar)
 - [x] One-line banner mode (compact per-notification display)
+- [x] Optional wrapped text in one-line mode (prevents truncation on smaller monitors)
+- [x] One-line wrapped banner max-lines control (balance readability vs density)
+- [x] Optional auto full-width behavior in one-line mode
 - [x] Stacked order control (newest-on-top vs newest-on-bottom)
 - [x] App-name color customization (separate from title/body colors)
 - [x] Built-in color picker buttons in Settings UI
@@ -57,6 +60,7 @@
 - [x] Preserve live manual width when changing unrelated settings
 - [x] Tray quick toggle for Always on Top
 - [x] Edge snapping on all monitors
+- [x] Position presets in Settings (top/side placement shortcuts)
 - [ ] Border toggle and customization
 - [ ] Start with Windows toggle
 - [ ] Hotkey support (optional)

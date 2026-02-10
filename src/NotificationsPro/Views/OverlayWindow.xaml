@@ -153,60 +153,87 @@
                     <!-- One-line banner mode -->
                     <Grid x:Name="SingleLineContent"
                           Visibility="{Binding DataContext.SingleLineContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                        <Grid x:Name="SingleLineCompactBlock"
+                              Visibility="{Binding DataContext.SingleLineCompactVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="SingleLineApp"
-                                   Grid.Column="0"
-                                   TextTrimming="None"
-                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontWeight="SemiBold"
-                                   Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                   VerticalAlignment="Center">
-                            <TextBlock.Text>
-                                <Binding Path="AppName"/>
-                            </TextBlock.Text>
-                            <TextBlock.Visibility>
-                                <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
-                                    <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                            <TextBlock x:Name="SingleLineApp"
+                                       Grid.Column="0"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="None"
+                                       FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                       VerticalAlignment="Center">
+                                <TextBlock.Text>
                                     <Binding Path="AppName"/>
-                                </MultiBinding>
-                            </TextBlock.Visibility>
-                        </TextBlock>
+                                </TextBlock.Text>
+                                <TextBlock.Visibility>
+                                    <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
+                                        <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="AppName"/>
+                                    </MultiBinding>
+                                </TextBlock.Visibility>
+                            </TextBlock>
 
-                        <TextBlock x:Name="SingleLineBody"
-                                   Grid.Column="1"
-                                   Margin="8,0,0,0"
-                                   TextWrapping="NoWrap"
-                                   TextTrimming="CharacterEllipsis"
+                            <TextBlock x:Name="SingleLineBody"
+                                       Grid.Column="1"
+                                       Margin="8,0,0,0"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"
+                                       FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                       VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}">
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.ShowAppName, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                                <Setter Property="Margin" Value="0,0,0,0"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding AppName}" Value="">
+                                                <Setter Property="Margin" Value="0,0,0,0"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+
+                        <TextBlock x:Name="SingleLineWrappedText"
+                                   Visibility="{Binding DataContext.SingleLineWrappedVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="None"
                                    FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                   VerticalAlignment="Center">
+                                   LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   MaxHeight="{Binding DataContext.SingleLineWrappedMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   ClipToBounds="True">
                             <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource NotificationOneLineContent}">
+                                <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="full">
+                                    <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="AppName"/>
                                     <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
                                     <Binding Path="Title"/>
                                     <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
                                     <Binding Path="Body"/>
                                 </MultiBinding>
                             </TextBlock.Text>
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataContext.ShowAppName, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
-                                            <Setter Property="Margin" Value="0,0,0,0"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding AppName}" Value="">
-                                            <Setter Property="Margin" Value="0,0,0,0"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
                         </TextBlock>
                     </Grid>
                 </Grid>
@@ -242,9 +269,16 @@
 
     <!-- Main content: tiny alpha preserves drag hit-testing without a visible panel -->
     <Grid Margin="4" Background="#01000000">
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+        <ScrollViewer x:Name="NotificationScrollViewer"
+                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                      CanContentScroll="False"
                       PanningMode="None"
-                      MaxHeight="{Binding OverlayMaxHeight}">
+                      MaxHeight="600">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar">
+                    <Setter Property="Width" Value="14"/>
+                </Style>
+            </ScrollViewer.Resources>
             <StackPanel>
                 <!-- Notification items -->
                 <ItemsControl ItemsSource="{Binding Notifications}"

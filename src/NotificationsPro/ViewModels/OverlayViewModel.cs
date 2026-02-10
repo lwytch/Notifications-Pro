@@ -189,8 +189,36 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
+    private bool _singleLineWrapText;
+    public bool SingleLineWrapText
+    {
+        get => _singleLineWrapText;
+        set
+        {
+            if (!SetProperty(ref _singleLineWrapText, value)) return;
+            OnPropertyChanged(nameof(SingleLineCompactVisibility));
+            OnPropertyChanged(nameof(SingleLineWrappedVisibility));
+        }
+    }
+
+    private int _singleLineMaxLines = 3;
+    public int SingleLineMaxLines
+    {
+        get => _singleLineMaxLines;
+        set
+        {
+            if (!SetProperty(ref _singleLineMaxLines, Math.Max(1, value))) return;
+            OnPropertyChanged(nameof(SingleLineWrappedMaxHeight));
+        }
+    }
+
+    private bool _singleLineAutoFullWidth;
+    public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set => SetProperty(ref _singleLineAutoFullWidth, value); }
+
     public Visibility StackedContentVisibility => SingleLineMode ? Visibility.Collapsed : Visibility.Visible;
     public Visibility SingleLineContentVisibility => SingleLineMode ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility SingleLineCompactVisibility => SingleLineWrapText ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility SingleLineWrappedVisibility => SingleLineWrapText ? Visibility.Visible : Visibility.Collapsed;
 
     public double TitleFontSize => FontSize + 2;
     public double TitleLineHeight => TitleFontSize * LineSpacing;
@@ -201,6 +229,7 @@ public class OverlayViewModel : BaseViewModel
     public double AppNameEffectiveMaxHeight => LimitTextLines ? AppNameMaxHeight : double.PositiveInfinity;
     public double TitleEffectiveMaxHeight => LimitTextLines ? TitleMaxHeight : double.PositiveInfinity;
     public double BodyEffectiveMaxHeight => LimitTextLines ? BodyMaxHeight : double.PositiveInfinity;
+    public double SingleLineWrappedMaxHeight => Math.Max(4, SingleLineMaxLines * BodyLineHeight);
     public double EnterOffset => AnimationsEnabled && !FadeOnlyAnimation ? -(OverlayWidth + 40) : 0;
     public double ExitOffset => AnimationsEnabled && !FadeOnlyAnimation ? 50 : 0;
     public Duration EntryMotionDuration => DurationFor(AnimationDurationMs);
@@ -248,6 +277,9 @@ public class OverlayViewModel : BaseViewModel
         MaxTitleLines = s.MaxTitleLines;
         MaxBodyLines = s.MaxBodyLines;
         SingleLineMode = s.SingleLineMode;
+        SingleLineWrapText = s.SingleLineWrapText;
+        SingleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
+        SingleLineAutoFullWidth = s.SingleLineAutoFullWidth;
         OnPropertyChanged(nameof(TitleFontSize));
         OnPropertyChanged(nameof(TitleLineHeight));
         OnPropertyChanged(nameof(BodyLineHeight));
@@ -257,8 +289,11 @@ public class OverlayViewModel : BaseViewModel
         OnPropertyChanged(nameof(AppNameEffectiveMaxHeight));
         OnPropertyChanged(nameof(TitleEffectiveMaxHeight));
         OnPropertyChanged(nameof(BodyEffectiveMaxHeight));
+        OnPropertyChanged(nameof(SingleLineWrappedMaxHeight));
         OnPropertyChanged(nameof(StackedContentVisibility));
         OnPropertyChanged(nameof(SingleLineContentVisibility));
+        OnPropertyChanged(nameof(SingleLineCompactVisibility));
+        OnPropertyChanged(nameof(SingleLineWrappedVisibility));
         OnPropertyChanged(nameof(EnterOffset));
         OnPropertyChanged(nameof(ExitOffset));
         OnPropertyChanged(nameof(EntryMotionDuration));

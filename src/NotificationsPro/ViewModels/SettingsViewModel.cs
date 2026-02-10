@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
+using WinForms = System.Windows.Forms;
 
 namespace NotificationsPro.ViewModels;
 
@@ -95,7 +96,7 @@ public class SettingsViewModel : BaseViewModel
     public double NotificationDuration { get => _notificationDuration; set { if (SetProperty(ref _notificationDuration, value)) QueueSave(); } }
 
     private int _maxVisibleNotifications = 3;
-    public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, value)) QueueSave(); } }
+    public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, Math.Max(1, value))) QueueSave(); } }
 
     private bool _showAppName = true;
     public bool ShowAppName { get => _showAppName; set { if (SetProperty(ref _showAppName, value)) QueueSave(); } }
@@ -129,6 +130,15 @@ public class SettingsViewModel : BaseViewModel
             QueueSave();
         }
     }
+
+    private bool _singleLineWrapText;
+    public bool SingleLineWrapText { get => _singleLineWrapText; set { if (SetProperty(ref _singleLineWrapText, value)) QueueSave(); } }
+
+    private int _singleLineMaxLines = 3;
+    public int SingleLineMaxLines { get => _singleLineMaxLines; set { if (SetProperty(ref _singleLineMaxLines, Math.Max(1, value))) QueueSave(); } }
+
+    private bool _singleLineAutoFullWidth;
+    public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set { if (SetProperty(ref _singleLineAutoFullWidth, value)) QueueSave(); } }
 
     private bool _newestOnTop = true;
     public bool NewestOnTop { get => _newestOnTop; set { if (SetProperty(ref _newestOnTop, value)) QueueSave(); } }
@@ -185,6 +195,7 @@ public class SettingsViewModel : BaseViewModel
     // Commands
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
+    public ICommand MoveOverlayPresetCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
@@ -206,6 +217,7 @@ public class SettingsViewModel : BaseViewModel
 
         PreviewNotificationCommand = new RelayCommand(SendPreviewNotification);
         ResetToDefaultsCommand = new RelayCommand(ResetToDefaults);
+        MoveOverlayPresetCommand = new RelayCommand(MoveOverlayPreset);
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
         LoadFromSettings();
@@ -230,7 +242,7 @@ public class SettingsViewModel : BaseViewModel
         _borderThickness = s.BorderThickness;
         _accentColor = s.AccentColor;
         _notificationDuration = s.NotificationDuration;
-        _maxVisibleNotifications = s.MaxVisibleNotifications;
+        _maxVisibleNotifications = Math.Max(1, s.MaxVisibleNotifications);
         _showAppName = s.ShowAppName;
         _showNotificationTitle = s.ShowNotificationTitle;
         _showNotificationBody = s.ShowNotificationBody;
@@ -239,6 +251,9 @@ public class SettingsViewModel : BaseViewModel
         _maxTitleLines = s.MaxTitleLines;
         _maxBodyLines = s.MaxBodyLines;
         _singleLineMode = s.SingleLineMode;
+        _singleLineWrapText = s.SingleLineWrapText;
+        _singleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
+        _singleLineAutoFullWidth = s.SingleLineAutoFullWidth;
         _newestOnTop = s.NewestOnTop;
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
@@ -262,6 +277,7 @@ public class SettingsViewModel : BaseViewModel
 
     private void SaveSettings()
     {
+        var previousSettings = _settingsManager.Settings;
         var showAppName = ShowAppName;
         var showTitle = ShowNotificationTitle;
         var showBody = ShowNotificationBody;
@@ -271,9 +287,24 @@ public class SettingsViewModel : BaseViewModel
             showBody = true;
 
         // Preserve a live manually-resized width unless the width control was explicitly adjusted.
+        var previousAutoFullWidth = previousSettings.SingleLineMode && previousSettings.SingleLineAutoFullWidth;
+        var nextAutoFullWidth = SingleLineMode && SingleLineAutoFullWidth;
+        var savedManualWidth = Math.Max(220,
+            previousSettings.LastManualOverlayWidth > 0
+                ? previousSettings.LastManualOverlayWidth
+                : previousSettings.OverlayWidth);
+
         var resolvedOverlayWidth = _overlayWidthDirty
             ? OverlayWidth
-            : _settingsManager.Settings.OverlayWidth;
+            : previousSettings.OverlayWidth;
+
+        if (previousAutoFullWidth && !nextAutoFullWidth)
+            resolvedOverlayWidth = savedManualWidth;
+
+        resolvedOverlayWidth = Math.Max(220, resolvedOverlayWidth);
+        var nextLastManualWidth = nextAutoFullWidth
+            ? savedManualWidth
+            : resolvedOverlayWidth;
 
         if (Math.Abs(resolvedOverlayWidth - _overlayWidth) > 0.5)
         {
@@ -299,7 +330,7 @@ public class SettingsViewModel : BaseViewModel
             BorderThickness = BorderThickness,
             AccentColor = AccentColor,
             NotificationDuration = NotificationDuration,
-            MaxVisibleNotifications = Math.Max(1, MaxVisibleNotifications),
+            MaxVisibleNotifications = Math.Clamp(MaxVisibleNotifications, 1, 40),
             ShowAppName = showAppName,
             ShowNotificationTitle = showTitle,
             ShowNotificationBody = showBody,
@@ -308,6 +339,9 @@ public class SettingsViewModel : BaseViewModel
             MaxTitleLines = Math.Max(1, MaxTitleLines),
             MaxBodyLines = Math.Max(1, MaxBodyLines),
             SingleLineMode = SingleLineMode,
+            SingleLineWrapText = SingleLineWrapText,
+            SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
+            SingleLineAutoFullWidth = SingleLineAutoFullWidth,
             NewestOnTop = NewestOnTop,
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
@@ -315,16 +349,17 @@ public class SettingsViewModel : BaseViewModel
             FadeOnlyAnimation = FadeOnlyAnimation,
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
             OverlayWidth = resolvedOverlayWidth,
+            LastManualOverlayWidth = Math.Max(220, nextLastManualWidth),
             OverlayMaxHeight = OverlayMaxHeight,
             AllowManualResize = AllowManualResize,
             SnapToEdges = SnapToEdges,
             SnapDistance = SnapDistance,
             // Preserve position from current settings
-            OverlayLeft = _settingsManager.Settings.OverlayLeft,
-            OverlayTop = _settingsManager.Settings.OverlayTop,
-            MonitorIndex = _settingsManager.Settings.MonitorIndex,
-            OverlayVisible = _settingsManager.Settings.OverlayVisible,
-            NotificationsPaused = _settingsManager.Settings.NotificationsPaused,
+            OverlayLeft = previousSettings.OverlayLeft,
+            OverlayTop = previousSettings.OverlayTop,
+            MonitorIndex = previousSettings.MonitorIndex,
+            OverlayVisible = previousSettings.OverlayVisible,
+            NotificationsPaused = previousSettings.NotificationsPaused,
         };
 
         _settingsManager.Apply(s);
@@ -333,12 +368,110 @@ public class SettingsViewModel : BaseViewModel
 
     private void SendPreviewNotification()
     {
-        var appName = PreviewApps[_previewIndex % PreviewApps.Length];
-        var title = PreviewTitles[_previewIndex % PreviewTitles.Length];
-        var body = PreviewBodies[_previewIndex % PreviewBodies.Length];
+        // Ensure behavior changes (like max visible count) apply before preview enqueue.
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var cycleIndex = _previewIndex % PreviewApps.Length;
+        var sequence = _previewIndex + 1;
+        var appName = PreviewApps[cycleIndex];
+        var title = $"{PreviewTitles[cycleIndex]} #{sequence}";
+        var body = $"{PreviewBodies[cycleIndex]} [Preview {sequence}]";
         _previewIndex++;
 
         _queueManager.AddNotification(appName, title, body);
+    }
+
+    private void MoveOverlayPreset(object? parameter)
+    {
+        if (parameter is not string preset || string.IsNullOrWhiteSpace(preset))
+            return;
+
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var updated = _settingsManager.Settings.Clone();
+        var workArea = GetWorkAreaForMonitor(updated.MonitorIndex);
+        const double margin = 16;
+
+        var targetWidth = Math.Max(220, updated.OverlayWidth);
+        if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
+            targetWidth = Math.Max(220, workArea.Width - (margin * 2));
+
+        var fallbackHeight = Math.Min(360, workArea.Height - (margin * 2));
+        var targetTop = workArea.Top + margin;
+        var targetLeft = workArea.Left + margin;
+
+        switch (preset.Trim().ToLowerInvariant())
+        {
+            case "top-left":
+                targetLeft = workArea.Left + margin;
+                targetTop = workArea.Top + margin;
+                break;
+            case "top-center":
+                targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
+                targetTop = workArea.Top + margin;
+                break;
+            case "top-right":
+                targetLeft = workArea.Right - targetWidth - margin;
+                targetTop = workArea.Top + margin;
+                break;
+            case "middle-left":
+                targetLeft = workArea.Left + margin;
+                targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                break;
+            case "middle-right":
+                targetLeft = workArea.Right - targetWidth - margin;
+                targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                break;
+            default:
+                return;
+        }
+
+        var minLeft = workArea.Left;
+        var maxLeft = workArea.Right - targetWidth;
+        if (maxLeft < minLeft)
+            maxLeft = minLeft;
+
+        var minTop = workArea.Top;
+        var maxTop = workArea.Bottom - fallbackHeight;
+        if (maxTop < minTop)
+            maxTop = minTop;
+
+        targetLeft = Math.Max(minLeft, Math.Min(targetLeft, maxLeft));
+        targetTop = Math.Max(minTop, Math.Min(targetTop, maxTop));
+
+        updated.OverlayWidth = targetWidth;
+        if (!(updated.SingleLineMode && updated.SingleLineAutoFullWidth))
+            updated.LastManualOverlayWidth = targetWidth;
+        updated.OverlayLeft = targetLeft;
+        updated.OverlayTop = targetTop;
+        _settingsManager.Apply(updated);
+
+        if (Math.Abs(_overlayWidth - targetWidth) > 0.5)
+        {
+            _overlayWidth = targetWidth;
+            OnPropertyChanged(nameof(OverlayWidth));
+        }
+
+        _overlayWidthDirty = false;
+    }
+
+    private static Rect GetWorkAreaForMonitor(int monitorIndex)
+    {
+        var screens = WinForms.Screen.AllScreens;
+        if (screens.Length == 0)
+            return SystemParameters.WorkArea;
+
+        if (monitorIndex < 0 || monitorIndex >= screens.Length)
+            return ToRect(WinForms.Screen.PrimaryScreen?.WorkingArea ?? screens[0].WorkingArea);
+
+        return ToRect(screens[monitorIndex].WorkingArea);
+    }
+
+    private static Rect ToRect(System.Drawing.Rectangle rect)
+    {
+        return new Rect(rect.Left, rect.Top, rect.Width, rect.Height);
     }
 
     private void ResetToDefaults()
