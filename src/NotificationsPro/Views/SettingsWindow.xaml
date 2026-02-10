@@ -10,6 +10,7 @@
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- Section header style -->
         <Style x:Key="SectionHeader" TargetType="TextBlock">
@@ -361,44 +362,55 @@
                         <TextBlock Text="Long-form notification content; automatically kept on if all fields are turned off"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="App Name Max Lines" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding MaxAppNameLines, StringFormat='{}{0:0}'}"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="1" Maximum="4" Value="{Binding MaxAppNameLines}"
-                                    TickFrequency="1" IsSnapToTickEnabled="True"
-                                    ToolTip="Maximum displayed lines for app-name text in stacked mode"/>
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding LimitTextLines}"
+                                          ToolTip="Limit text height and truncate long notifications with ellipsis"/>
+                            <TextBlock Text="Limit Text Lines (Truncate)" Style="{StaticResource SettingLabel}"/>
                         </DockPanel>
-                        <TextBlock Text="Limit source app text height before truncation in multi-line mode"
+                        <TextBlock Text="Turn this off for full multi-line word wrap with no truncation in stacked mode"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="Title Max Lines" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding MaxTitleLines, StringFormat='{}{0:0}'}"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="1" Maximum="6" Value="{Binding MaxTitleLines}"
-                                    TickFrequency="1" IsSnapToTickEnabled="True"
-                                    ToolTip="Maximum displayed lines for notification titles in stacked mode"/>
-                        </DockPanel>
-                        <TextBlock Text="Keeps title cards compact while still showing key context"
-                                   Style="{StaticResource SettingDesc}"/>
+                        <StackPanel Visibility="{Binding LimitTextLines, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="App Name Max Lines" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding MaxAppNameLines, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="4" Value="{Binding MaxAppNameLines}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Maximum displayed lines for app-name text in stacked mode"/>
+                            </DockPanel>
+                            <TextBlock Text="Limit source app text height before truncation in stacked mode"
+                                       Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="Body Max Lines" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding MaxBodyLines, StringFormat='{}{0:0}'}"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="1" Maximum="10" Value="{Binding MaxBodyLines}"
-                                    TickFrequency="1" IsSnapToTickEnabled="True"
-                                    ToolTip="Maximum displayed lines for notification body text in stacked mode"/>
-                        </DockPanel>
-                        <TextBlock Text="Controls how much message text is shown before truncating with ellipsis"
-                                   Style="{StaticResource SettingDesc}"/>
+                            <TextBlock Text="Title Max Lines" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding MaxTitleLines, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="6" Value="{Binding MaxTitleLines}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Maximum displayed lines for notification titles in stacked mode"/>
+                            </DockPanel>
+                            <TextBlock Text="Keeps title cards compact while still showing key context"
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Body Max Lines" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding MaxBodyLines, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="10" Value="{Binding MaxBodyLines}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Maximum displayed lines for notification body text in stacked mode"/>
+                            </DockPanel>
+                            <TextBlock Text="Controls how much message text is shown before truncating with ellipsis"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"

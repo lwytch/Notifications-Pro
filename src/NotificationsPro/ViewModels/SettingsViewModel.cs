@@ -106,6 +106,9 @@ public class SettingsViewModel : BaseViewModel
     private bool _showNotificationBody = true;
     public bool ShowNotificationBody { get => _showNotificationBody; set { if (SetProperty(ref _showNotificationBody, value)) QueueSave(); } }
 
+    private bool _limitTextLines;
+    public bool LimitTextLines { get => _limitTextLines; set { if (SetProperty(ref _limitTextLines, value)) QueueSave(); } }
+
     private int _maxAppNameLines = 2;
     public int MaxAppNameLines { get => _maxAppNameLines; set { if (SetProperty(ref _maxAppNameLines, Math.Max(1, value))) QueueSave(); } }
 
@@ -217,6 +220,7 @@ public class SettingsViewModel : BaseViewModel
         _showAppName = s.ShowAppName;
         _showNotificationTitle = s.ShowNotificationTitle;
         _showNotificationBody = s.ShowNotificationBody;
+        _limitTextLines = s.LimitTextLines;
         _maxAppNameLines = s.MaxAppNameLines;
         _maxTitleLines = s.MaxTitleLines;
         _maxBodyLines = s.MaxBodyLines;
@@ -283,6 +287,7 @@ public class SettingsViewModel : BaseViewModel
             ShowAppName = showAppName,
             ShowNotificationTitle = showTitle,
             ShowNotificationBody = showBody,
+            LimitTextLines = LimitTextLines,
             MaxAppNameLines = Math.Max(1, MaxAppNameLines),
             MaxTitleLines = Math.Max(1, MaxTitleLines),
             MaxBodyLines = Math.Max(1, MaxBodyLines),

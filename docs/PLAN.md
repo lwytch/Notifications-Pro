@@ -51,9 +51,10 @@
 - [x] Animation style controls (fade-only + extended speed range)
 - [x] Tray icon preview shown in Settings header
 - [x] Per-field line count controls (app/title/body)
+- [x] Full-wrap stacked mode option (disable truncation / line clamps)
 - [x] Preserve live manual width when changing unrelated settings
 - [x] Tray quick toggle for Always on Top
-- [ ] Edge snapping on all monitors
+- [x] Edge snapping on all monitors
 - [ ] Border toggle and customization
 - [ ] Start with Windows toggle
 - [ ] Hotkey support (optional)

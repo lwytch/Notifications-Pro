@@ -25,6 +25,7 @@ public class AppSettings
     public bool ShowAppName { get; set; } = true;
     public bool ShowNotificationTitle { get; set; } = true;
     public bool ShowNotificationBody { get; set; } = true;
+    public bool LimitTextLines { get; set; } = false;
     public int MaxAppNameLines { get; set; } = 2;
     public int MaxTitleLines { get; set; } = 2;
     public int MaxBodyLines { get; set; } = 4;

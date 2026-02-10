@@ -8,12 +8,15 @@
 - Overlay supports optional one-line banner mode for compact layouts
 - Overlay supports manual left/right edge resizing (when enabled)
 - Overlay width now preserves live manual resize when changing unrelated settings (e.g., font size)
+- Stacked mode now supports full multi-line word wrap with optional truncation toggle
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
+- Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Settings window: three tabs (Appearance, Behavior, Position) with premium dark theme
 - Settings header now includes the same app icon used in the system tray
 - Behavior tab includes:
   - configurable visible card count (1-8)
   - content field toggles (show app name, title, body)
+  - full-wrap stacked mode toggle (disable line clamping/truncation)
   - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
   - fade-only animation toggle and wider animation speed range (0-1200ms)
@@ -76,6 +79,7 @@ dotnet test
 - [ ] Sending 4+ test notifications shows "+N more" overflow indicator
 - [ ] "Visible Notifications" slider changes how many cards persist on screen
 - [ ] "Show App Name / Show Title / Show Body Text" toggles update cards immediately
+- [ ] "Limit Text Lines (Truncate)" off shows full multi-line wrapped text in stacked mode
 - [ ] App/Title/Body line-count sliders constrain stacked card text height
 - [ ] "Single-Line Banner Mode" compacts each notification into one line
 - [ ] App Name Color applies independently from title/body text colors
@@ -91,7 +95,7 @@ dotnet test
 - [ ] "Hide Overlay" / "Show Overlay" toggles the overlay window
 - [ ] "Pause Notifications" / "Resume Notifications" pauses/resumes
 - [ ] Overlay is draggable by clicking and dragging
-- [ ] Overlay snaps to screen edges
+- [ ] Overlay snaps to screen edges on primary and secondary monitors
 - [ ] "Reset to Defaults" restores all settings
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart

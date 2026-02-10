@@ -128,6 +128,19 @@ public class OverlayViewModel : BaseViewModel
     private bool _showNotificationBody = true;
     public bool ShowNotificationBody { get => _showNotificationBody; set => SetProperty(ref _showNotificationBody, value); }
 
+    private bool _limitTextLines;
+    public bool LimitTextLines
+    {
+        get => _limitTextLines;
+        set
+        {
+            if (!SetProperty(ref _limitTextLines, value)) return;
+            OnPropertyChanged(nameof(AppNameEffectiveMaxHeight));
+            OnPropertyChanged(nameof(TitleEffectiveMaxHeight));
+            OnPropertyChanged(nameof(BodyEffectiveMaxHeight));
+        }
+    }
+
     private int _maxAppNameLines = 2;
     public int MaxAppNameLines
     {
@@ -136,6 +149,7 @@ public class OverlayViewModel : BaseViewModel
         {
             if (!SetProperty(ref _maxAppNameLines, Math.Max(1, value))) return;
             OnPropertyChanged(nameof(AppNameMaxHeight));
+            OnPropertyChanged(nameof(AppNameEffectiveMaxHeight));
         }
     }
 
@@ -147,6 +161,7 @@ public class OverlayViewModel : BaseViewModel
         {
             if (!SetProperty(ref _maxTitleLines, Math.Max(1, value))) return;
             OnPropertyChanged(nameof(TitleMaxHeight));
+            OnPropertyChanged(nameof(TitleEffectiveMaxHeight));
         }
     }
 
@@ -158,6 +173,7 @@ public class OverlayViewModel : BaseViewModel
         {
             if (!SetProperty(ref _maxBodyLines, Math.Max(1, value))) return;
             OnPropertyChanged(nameof(BodyMaxHeight));
+            OnPropertyChanged(nameof(BodyEffectiveMaxHeight));
         }
     }
 
@@ -170,6 +186,9 @@ public class OverlayViewModel : BaseViewModel
     public double AppNameMaxHeight => Math.Max(4, MaxAppNameLines * BodyLineHeight);
     public double TitleMaxHeight => Math.Max(4, MaxTitleLines * TitleLineHeight);
     public double BodyMaxHeight => Math.Max(4, MaxBodyLines * BodyLineHeight);
+    public double AppNameEffectiveMaxHeight => LimitTextLines ? AppNameMaxHeight : double.PositiveInfinity;
+    public double TitleEffectiveMaxHeight => LimitTextLines ? TitleMaxHeight : double.PositiveInfinity;
+    public double BodyEffectiveMaxHeight => LimitTextLines ? BodyMaxHeight : double.PositiveInfinity;
     public double EnterOffset => AnimationsEnabled && !FadeOnlyAnimation ? -(OverlayWidth + 40) : 0;
     public double ExitOffset => AnimationsEnabled && !FadeOnlyAnimation ? 50 : 0;
     public Duration EntryMotionDuration => DurationFor(AnimationDurationMs);
@@ -212,6 +231,7 @@ public class OverlayViewModel : BaseViewModel
         ShowAppName = s.ShowAppName;
         ShowNotificationTitle = s.ShowNotificationTitle;
         ShowNotificationBody = s.ShowNotificationBody;
+        LimitTextLines = s.LimitTextLines;
         MaxAppNameLines = s.MaxAppNameLines;
         MaxTitleLines = s.MaxTitleLines;
         MaxBodyLines = s.MaxBodyLines;
@@ -222,6 +242,9 @@ public class OverlayViewModel : BaseViewModel
         OnPropertyChanged(nameof(AppNameMaxHeight));
         OnPropertyChanged(nameof(TitleMaxHeight));
         OnPropertyChanged(nameof(BodyMaxHeight));
+        OnPropertyChanged(nameof(AppNameEffectiveMaxHeight));
+        OnPropertyChanged(nameof(TitleEffectiveMaxHeight));
+        OnPropertyChanged(nameof(BodyEffectiveMaxHeight));
         OnPropertyChanged(nameof(EnterOffset));
         OnPropertyChanged(nameof(ExitOffset));
         OnPropertyChanged(nameof(EntryMotionDuration));

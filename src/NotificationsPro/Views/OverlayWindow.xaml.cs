@@ -4,6 +4,8 @@ using System.Windows.Interop;
 using NotificationsPro.Helpers;
 using NotificationsPro.Services;
 using NotificationsPro.ViewModels;
+using Drawing = System.Drawing;
+using WinForms = System.Windows.Forms;
 
 namespace NotificationsPro.Views;
 
@@ -106,7 +108,7 @@ public partial class OverlayWindow : Window
 
         if (settings.OverlayLeft == null || settings.OverlayTop == null)
         {
-            var workArea = SystemParameters.WorkArea;
+            var workArea = GetWorkAreaForMonitorIndex(settings.MonitorIndex);
             var pos = SnapHelper.GetDefaultPosition(Width, ActualHeight, workArea);
             Left = pos.X;
             Top = pos.Y;
@@ -117,6 +119,7 @@ public partial class OverlayWindow : Window
             Top = settings.OverlayTop.Value;
         }
 
+        ClampToCurrentWorkArea();
         UpdateEdgeAnchors();
         UpdateClickThrough(settings.ClickThrough);
         _settingsManager.SettingsChanged += OnSettingsChanged;
@@ -166,7 +169,7 @@ public partial class OverlayWindow : Window
 
         if (_settingsManager.Settings.SnapToEdges)
         {
-            var workArea = SystemParameters.WorkArea;
+            var workArea = GetCurrentWorkArea();
             var snapped = SnapHelper.SnapToEdges(
                 Left, Top, ActualWidth, ActualHeight,
                 workArea, _settingsManager.Settings.SnapDistance);
@@ -185,6 +188,7 @@ public partial class OverlayWindow : Window
         UpdateEdgeAnchors();
         _settingsManager.Settings.OverlayLeft = Left;
         _settingsManager.Settings.OverlayTop = Top;
+        _settingsManager.Settings.MonitorIndex = GetCurrentMonitorIndex();
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -195,7 +199,7 @@ public partial class OverlayWindow : Window
         if (ActualWidth > 0)
             _settingsManager.Settings.OverlayWidth = ActualWidth;
 
-        var workArea = SystemParameters.WorkArea;
+        var workArea = GetCurrentWorkArea();
         var targetLeft = Left;
         var targetTop = Top;
 
@@ -205,8 +209,8 @@ public partial class OverlayWindow : Window
         if (_anchorToBottomEdge)
             targetTop = workArea.Bottom - _bottomEdgeOffset - ActualHeight;
 
-        targetLeft = Math.Max(workArea.Left, Math.Min(targetLeft, workArea.Right - ActualWidth));
-        targetTop = Math.Max(workArea.Top, Math.Min(targetTop, workArea.Bottom - ActualHeight));
+        targetLeft = ClampToWorkAreaX(targetLeft, workArea);
+        targetTop = ClampToWorkAreaY(targetTop, workArea);
 
         if (Math.Abs(targetLeft - Left) > 0.5 || Math.Abs(targetTop - Top) > 0.5)
         {
@@ -218,11 +222,12 @@ public partial class OverlayWindow : Window
 
         _settingsManager.Settings.OverlayLeft = Left;
         _settingsManager.Settings.OverlayTop = Top;
+        _settingsManager.Settings.MonitorIndex = GetCurrentMonitorIndex();
     }
 
     private void UpdateEdgeAnchors()
     {
-        var workArea = SystemParameters.WorkArea;
+        var workArea = GetCurrentWorkArea();
         var threshold = Math.Max(8, _settingsManager.Settings.SnapDistance + 4);
 
         var rightGap = workArea.Right - (Left + ActualWidth);
@@ -279,5 +284,118 @@ public partial class OverlayWindow : Window
         }
 
         return false;
+    }
+
+    private Rect GetCurrentWorkArea()
+    {
+        var width = ResolveDimension(ActualWidth, Width, MinWidth, 380);
+        var height = ResolveDimension(ActualHeight, Height, MinHeight, 120);
+        return GetWorkAreaForBounds(Left, Top, width, height);
+    }
+
+    private static Rect GetWorkAreaForMonitorIndex(int index)
+    {
+        var screens = WinForms.Screen.AllScreens;
+        if (screens.Length == 0)
+            return SystemParameters.WorkArea;
+
+        if (index < 0 || index >= screens.Length)
+            return ToRect(WinForms.Screen.PrimaryScreen?.WorkingArea ?? screens[0].WorkingArea);
+
+        return ToRect(screens[index].WorkingArea);
+    }
+
+    private static Rect GetWorkAreaForBounds(double left, double top, double width, double height)
+    {
+        var safeWidth = Math.Max(1, (int)Math.Round(width));
+        var safeHeight = Math.Max(1, (int)Math.Round(height));
+        var rect = new Drawing.Rectangle(
+            SafeRoundToInt(left),
+            SafeRoundToInt(top),
+            safeWidth,
+            safeHeight);
+        var screen = WinForms.Screen.FromRectangle(rect);
+        return ToRect(screen.WorkingArea);
+    }
+
+    private int GetCurrentMonitorIndex()
+    {
+        var width = ResolveDimension(ActualWidth, Width, MinWidth, 380);
+        var height = ResolveDimension(ActualHeight, Height, MinHeight, 120);
+        var safeWidth = Math.Max(1, (int)Math.Round(width));
+        var safeHeight = Math.Max(1, (int)Math.Round(height));
+        var rect = new Drawing.Rectangle(
+            SafeRoundToInt(Left),
+            SafeRoundToInt(Top),
+            safeWidth,
+            safeHeight);
+
+        var current = WinForms.Screen.FromRectangle(rect);
+        var screens = WinForms.Screen.AllScreens;
+        for (var i = 0; i < screens.Length; i++)
+        {
+            if (screens[i].DeviceName == current.DeviceName)
+                return i;
+        }
+
+        return 0;
+    }
+
+    private void ClampToCurrentWorkArea()
+    {
+        var workArea = GetCurrentWorkArea();
+        var targetLeft = ClampToWorkAreaX(Left, workArea);
+        var targetTop = ClampToWorkAreaY(Top, workArea);
+
+        if (Math.Abs(targetLeft - Left) <= 0.5 && Math.Abs(targetTop - Top) <= 0.5)
+            return;
+
+        _isInternalMove = true;
+        Left = targetLeft;
+        Top = targetTop;
+        _isInternalMove = false;
+    }
+
+    private double ClampToWorkAreaX(double left, Rect workArea)
+    {
+        var maxLeft = workArea.Right - ActualWidth;
+        if (maxLeft < workArea.Left)
+            maxLeft = workArea.Left;
+        return Math.Max(workArea.Left, Math.Min(left, maxLeft));
+    }
+
+    private double ClampToWorkAreaY(double top, Rect workArea)
+    {
+        var maxTop = workArea.Bottom - ActualHeight;
+        if (maxTop < workArea.Top)
+            maxTop = workArea.Top;
+        return Math.Max(workArea.Top, Math.Min(top, maxTop));
+    }
+
+    private static Rect ToRect(Drawing.Rectangle rect)
+    {
+        return new Rect(rect.Left, rect.Top, rect.Width, rect.Height);
+    }
+
+    private static double ResolveDimension(double actual, double configured, double minimum, double fallback)
+    {
+        if (actual > 0 && !double.IsNaN(actual))
+            return actual;
+
+        if (!double.IsNaN(configured) && configured > 0)
+            return Math.Max(configured, minimum > 0 ? minimum : 1);
+
+        if (!double.IsNaN(minimum) && minimum > 0)
+            return minimum;
+
+        return fallback;
+    }
+
+    private static int SafeRoundToInt(double value, int fallback = 0)
+    {
+        if (double.IsNaN(value) || double.IsInfinity(value))
+            return fallback;
+
+        return (int)Math.Round(value);
     }
 }

@@ -16,6 +16,7 @@
 - Optional manual overlay edge resize (left/right) with persisted width
 - Per-field stacked-mode line count controls (app name, title, body)
 - Tray quick toggle for Always on Top
+- Stacked-mode "Limit Text Lines (Truncate)" toggle for full wrapped text when disabled
 
 ### Changed
 - Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
@@ -25,6 +26,7 @@
 - Font size range increased (up to 56px) for accessibility
 - Animation controls expanded with fade-only mode and a wider speed range (0-1200ms)
 - Settings save path now preserves live manually-resized overlay width unless width control was explicitly changed
+- Overlay snapping/clamping now uses the active monitor work area instead of primary-only metrics
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
@@ -33,6 +35,8 @@
 - Faint transparent panel under cards and persistent tiny scrollbar artifacts in the overlay
 - Expiry removal now respects animation disablement (instant removal when animations are off)
 - Single-line mode regression where changing font size could revert overlay width
+- Stacked-mode readability issue where users could remain effectively constrained to one-line cards after leaving single-line mode
+- Snap-to-edge behavior failing on secondary monitors
 
 ## Milestone 2 — Real Notification Capture
 

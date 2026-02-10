@@ -19,6 +19,7 @@
   "ShowAppName": true,
   "ShowNotificationTitle": true,
   "ShowNotificationBody": true,
+  "LimitTextLines": false,
   "MaxAppNameLines": 2,
   "MaxTitleLines": 2,
   "MaxBodyLines": 4,
