@@ -22,6 +22,7 @@
 - Single-line wrapped banner "Max Lines" setting to control card height/density
 - Single-line "Auto Full-Width Banner" toggle for near edge-to-edge monitor-width banners
 - Position preset buttons (top/side anchors) in Settings > Position
+- Overlay-width preset buttons for 1080p, 2K, 4K, and 8K display classes
 - Overlay-height preset buttons for 1080p, 2K, 4K, and 8K display classes
 
 ### Changed
@@ -39,6 +40,7 @@
 - Visible notifications range increased from 1-8 to 1-40
 - Preview/test action now applies pending settings immediately before enqueuing preview cards
 - Max Overlay Height range increased from 1200px to 4320px for high-resolution displays
+- Overlay Width range increased from 1400px to 7680px for high-resolution displays
 
 ### Fixed
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu

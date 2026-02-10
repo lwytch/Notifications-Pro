@@ -536,11 +536,24 @@
                                 <Run Text="{Binding OverlayWidth, StringFormat='{}{0:0}'}"/><Run Text="px"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="220" Maximum="1400" Value="{Binding OverlayWidth}"
-                                    TickFrequency="10" IsSnapToTickEnabled="True"
+                                    Minimum="220" Maximum="7680" Value="{Binding OverlayWidth}"
+                                    TickFrequency="20" IsSnapToTickEnabled="True"
                                     ToolTip="Width of the overlay window in pixels"/>
                         </DockPanel>
                         <TextBlock Text="Wider overlays show more text per line and work best with single-line mode"
+                                   Style="{StaticResource SettingDesc}"/>
+                        <TextBlock Text="Width Presets" Style="{StaticResource SettingLabel}"/>
+                        <WrapPanel Margin="0,4,0,8" ItemWidth="88">
+                            <Button Content="1080p" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="1080p"/>
+                            <Button Content="2K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="2k"/>
+                            <Button Content="4K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="4k"/>
+                            <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="8k"/>
+                        </WrapPanel>
+                        <TextBlock Text="Quickly set width targets for common display classes."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <DockPanel Margin="0,0,0,4">

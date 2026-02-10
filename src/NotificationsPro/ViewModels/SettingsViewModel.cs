@@ -11,6 +11,8 @@ namespace NotificationsPro.ViewModels;
 
 public class SettingsViewModel : BaseViewModel
 {
+    public const double OverlayWidthMin = 220;
+    public const double OverlayWidthMax = 7680;
     public const double OverlayMaxHeightMin = 200;
     public const double OverlayMaxHeightMax = 4320;
 
@@ -170,7 +172,8 @@ public class SettingsViewModel : BaseViewModel
         get => _overlayWidth;
         set
         {
-            if (!SetProperty(ref _overlayWidth, value)) return;
+            var clamped = Math.Clamp(value, OverlayWidthMin, OverlayWidthMax);
+            if (!SetProperty(ref _overlayWidth, clamped)) return;
             _overlayWidthDirty = true;
             QueueSave();
         }
@@ -208,6 +211,7 @@ public class SettingsViewModel : BaseViewModel
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
     public ICommand MoveOverlayPresetCommand { get; }
+    public ICommand SetOverlayWidthPresetCommand { get; }
     public ICommand SetOverlayHeightPresetCommand { get; }
     public ImageSource TrayIconImage { get; }
 
@@ -231,6 +235,7 @@ public class SettingsViewModel : BaseViewModel
         PreviewNotificationCommand = new RelayCommand(SendPreviewNotification);
         ResetToDefaultsCommand = new RelayCommand(ResetToDefaults);
         MoveOverlayPresetCommand = new RelayCommand(MoveOverlayPreset);
+        SetOverlayWidthPresetCommand = new RelayCommand(SetOverlayWidthPreset);
         SetOverlayHeightPresetCommand = new RelayCommand(SetOverlayHeightPreset);
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
@@ -274,7 +279,7 @@ public class SettingsViewModel : BaseViewModel
         _animationsEnabled = s.AnimationsEnabled;
         _fadeOnlyAnimation = s.FadeOnlyAnimation;
         _animationDurationMs = s.AnimationDurationMs;
-        _overlayWidth = s.OverlayWidth;
+        _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
         _overlayMaxHeight = Math.Clamp(s.OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax);
         _allowManualResize = s.AllowManualResize;
         _snapToEdges = s.SnapToEdges;
@@ -310,10 +315,12 @@ public class SettingsViewModel : BaseViewModel
         // Preserve a live manually-resized width unless the width control was explicitly adjusted.
         var previousAutoFullWidth = previousSettings.SingleLineMode && previousSettings.SingleLineAutoFullWidth;
         var nextAutoFullWidth = SingleLineMode && SingleLineAutoFullWidth;
-        var savedManualWidth = Math.Max(220,
+        var savedManualWidth = Math.Clamp(
             previousSettings.LastManualOverlayWidth > 0
                 ? previousSettings.LastManualOverlayWidth
-                : previousSettings.OverlayWidth);
+                : previousSettings.OverlayWidth,
+            OverlayWidthMin,
+            OverlayWidthMax);
 
         var resolvedOverlayWidth = _overlayWidthDirty
             ? OverlayWidth
@@ -322,7 +329,7 @@ public class SettingsViewModel : BaseViewModel
         if (previousAutoFullWidth && !nextAutoFullWidth)
             resolvedOverlayWidth = savedManualWidth;
 
-        resolvedOverlayWidth = Math.Max(220, resolvedOverlayWidth);
+        resolvedOverlayWidth = Math.Clamp(resolvedOverlayWidth, OverlayWidthMin, OverlayWidthMax);
         var nextLastManualWidth = nextAutoFullWidth
             ? savedManualWidth
             : resolvedOverlayWidth;
@@ -376,7 +383,7 @@ public class SettingsViewModel : BaseViewModel
             FadeOnlyAnimation = FadeOnlyAnimation,
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
             OverlayWidth = resolvedOverlayWidth,
-            LastManualOverlayWidth = Math.Max(220, nextLastManualWidth),
+            LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
             OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),
             AllowManualResize = AllowManualResize,
             SnapToEdges = SnapToEdges,
@@ -421,9 +428,9 @@ public class SettingsViewModel : BaseViewModel
         var workArea = GetWorkAreaForMonitor(updated.MonitorIndex);
         const double margin = 16;
 
-        var targetWidth = Math.Max(220, updated.OverlayWidth);
+        var targetWidth = Math.Clamp(updated.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
         if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
-            targetWidth = Math.Max(220, workArea.Width - (margin * 2));
+            targetWidth = Math.Clamp(workArea.Width - (margin * 2), OverlayWidthMin, OverlayWidthMax);
 
         var fallbackHeight = Math.Min(360, workArea.Height - (margin * 2));
         var targetTop = workArea.Top + margin;
@@ -519,6 +526,26 @@ public class SettingsViewModel : BaseViewModel
             return;
 
         OverlayMaxHeight = targetHeight;
+    }
+
+    private void SetOverlayWidthPreset(object? parameter)
+    {
+        if (parameter is not string preset || string.IsNullOrWhiteSpace(preset))
+            return;
+
+        var targetWidth = preset.Trim().ToLowerInvariant() switch
+        {
+            "1080p" => 1920d,
+            "2k" => 2560d,
+            "4k" => 3840d,
+            "8k" => 7680d,
+            _ => 0d
+        };
+
+        if (targetWidth <= 0)
+            return;
+
+        OverlayWidth = targetWidth;
     }
 
     private void ResetToDefaults()
