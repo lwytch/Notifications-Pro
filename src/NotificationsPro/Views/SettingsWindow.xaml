@@ -131,7 +131,7 @@
                         <TextBlock Text="Typeface used for all notification text in the overlay"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="Font Size" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Body Font Size" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
                                 <Run Text="{Binding FontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
@@ -139,19 +139,65 @@
                             <Slider Style="{StaticResource SettingsSlider}"
                                     Minimum="10" Maximum="56" Value="{Binding FontSize}"
                                     TickFrequency="1" IsSnapToTickEnabled="True"
-                                    ToolTip="Controls text size — larger values improve readability"/>
+                                    ToolTip="Controls body text size"/>
                         </DockPanel>
-                        <TextBlock Text="Larger sizes make notification text easier to read at a glance"
+                        <TextBlock Text="Size of the notification body text"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="Font Weight" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Body Font Weight" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
                                   ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                   ItemsSource="{Binding AvailableFontWeights}"
                                   SelectedItem="{Binding FontWeight}"
                                   ToolTip="How bold or light the notification body text appears"
                                   Margin="0,4,0,0"/>
-                        <TextBlock Text="Controls the thickness of notification body text"
+                        <TextBlock Text="Thickness of the notification body text"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="App Name Font Size" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding AppNameFontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="10" Maximum="56" Value="{Binding AppNameFontSize}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Controls the size of app name text"/>
+                        </DockPanel>
+                        <TextBlock Text="Size of the source app name line (Teams, Slack, etc.)"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="App Name Font Weight" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableFontWeights}"
+                                  SelectedItem="{Binding AppNameFontWeight}"
+                                  ToolTip="How bold the app name text appears"
+                                  Margin="0,4,0,0"/>
+                        <TextBlock Text="Thickness of the source app name text"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Title Font Size" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding TitleFontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="10" Maximum="56" Value="{Binding TitleFontSize}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Controls the size of notification title text"/>
+                        </DockPanel>
+                        <TextBlock Text="Size of the notification title line"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Title Font Weight" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableFontWeights}"
+                                  SelectedItem="{Binding TitleFontWeight}"
+                                  ToolTip="How bold the title text appears"
+                                  Margin="0,4,0,0"/>
+                        <TextBlock Text="Thickness of the notification title text"
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="Line Spacing" Style="{StaticResource SettingLabel}"/>
@@ -297,6 +343,98 @@
                         <TextBlock Text="Space between the card edge and the notification text"
                                    Style="{StaticResource SettingDesc}"/>
 
+                        <TextBlock Text="Card Gap" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding CardGap, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0" Maximum="24" Value="{Binding CardGap}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Vertical spacing between notification cards"/>
+                        </DockPanel>
+                        <TextBlock Text="Vertical space between each notification card"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Outer Margin" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OuterMargin, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0" Maximum="24" Value="{Binding OuterMargin}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Margin around the card area within the overlay"/>
+                        </DockPanel>
+                        <TextBlock Text="Space around the entire card area inside the overlay window"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="ACCENT STRIPE" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowAccent}"
+                                          ToolTip="Show or hide the colored accent stripe on the left edge of cards"/>
+                            <TextBlock Text="Show Accent Stripe" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Colored bar on the left edge of each notification card"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Accent Thickness" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding AccentThickness, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="1" Maximum="8" Value="{Binding AccentThickness}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Width of the accent stripe on each card"/>
+                        </DockPanel>
+                        <TextBlock Text="Width of the left accent stripe in pixels"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="CARD BORDER" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowBorder}"
+                                          ToolTip="Show or hide a border around each notification card"/>
+                            <TextBlock Text="Show Card Border" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Adds a subtle border around each notification card"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Border Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding BorderColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="BorderColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for card border"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding BorderColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for the card border (e.g. #363650)"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Color of the border around notification cards"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Border Thickness" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding BorderThickness, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="1" Maximum="4" Value="{Binding BorderThickness}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Thickness of the card border"/>
+                        </DockPanel>
+                        <TextBlock Text="Width of the border around each card in pixels"
+                                   Style="{StaticResource SettingDesc}"/>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -361,6 +499,15 @@
                             <TextBlock Text="Show Body Text" Style="{StaticResource SettingLabel}"/>
                         </DockPanel>
                         <TextBlock Text="Long-form notification content; automatically kept on if all fields are turned off"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowTimestamp}"
+                                          ToolTip="Show a relative timestamp on each notification card"/>
+                            <TextBlock Text="Show Timestamp" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Displays how long ago each notification arrived (e.g. '2m ago')"
                                    Style="{StaticResource SettingDesc}"/>
 
                         <StackPanel Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
@@ -506,6 +653,16 @@
                         <TextBlock Text="Useful if motion is distracting or you prefer a calmer transition style"
                                    Style="{StaticResource SettingDesc}"/>
 
+                        <TextBlock Text="Slide-In Direction" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableSlideDirections}"
+                                  SelectedItem="{Binding SlideInDirection}"
+                                  ToolTip="Which direction cards slide in from"
+                                  Margin="0,4,0,0"/>
+                        <TextBlock Text="Direction notifications slide in from (overridden when fade-only is enabled)"
+                                   Style="{StaticResource SettingDesc}"/>
+
                         <TextBlock Text="Animation Speed" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
@@ -517,6 +674,30 @@
                                     ToolTip="Duration of slide/fade animations in milliseconds"/>
                         </DockPanel>
                         <TextBlock Text="0 means instant transitions; higher values feel smoother"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="DEDUPLICATION" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding DeduplicationEnabled}"
+                                          ToolTip="Skip duplicate notifications that arrive within the dedup window"/>
+                            <TextBlock Text="Deduplicate Notifications" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Suppresses identical notifications that arrive in quick succession"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Dedup Window" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding DeduplicationWindowSeconds, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0.5" Maximum="10" Value="{Binding DeduplicationWindowSeconds}"
+                                    TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                    ToolTip="Time window for considering notifications as duplicates"/>
+                        </DockPanel>
+                        <TextBlock Text="How long (in seconds) to consider identical notifications as duplicates"
                                    Style="{StaticResource SettingDesc}"/>
 
                     </StackPanel>

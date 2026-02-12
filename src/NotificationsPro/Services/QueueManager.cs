@@ -17,8 +17,6 @@ public class QueueManager : BaseViewModel
     private readonly ObservableCollection<NotificationItem> _visibleNotifications = new();
     private readonly Dictionary<NotificationItem, DispatcherTimer> _expiryTimers = new();
 
-    private static readonly TimeSpan DeduplicateWindow = TimeSpan.FromSeconds(2);
-
     public ReadOnlyObservableCollection<NotificationItem> VisibleNotifications { get; }
 
     private int _overflowCount;
@@ -58,10 +56,14 @@ public class QueueManager : BaseViewModel
             return;
 
         // Deduplicate: skip if an identical notification arrived within the window
-        foreach (var existing in _visibleNotifications)
+        if (_settingsManager.Settings.DeduplicationEnabled)
         {
-            if (existing.IsDuplicateOf(appName, title, body, DeduplicateWindow))
-                return;
+            var deduplicateWindow = TimeSpan.FromSeconds(_settingsManager.Settings.DeduplicationWindowSeconds);
+            foreach (var existing in _visibleNotifications)
+            {
+                if (existing.IsDuplicateOf(appName, title, body, deduplicateWindow))
+                    return;
+            }
         }
 
         int maxVisible = Math.Max(1, _settingsManager.Settings.MaxVisibleNotifications);
@@ -123,6 +125,32 @@ public class QueueManager : BaseViewModel
 
         if (OverflowCount > 0)
             OverflowCount--;
+    }
+
+    public void DismissNotification(NotificationItem item)
+    {
+        if (_expiryTimers.TryGetValue(item, out var timer))
+        {
+            timer.Stop();
+            _expiryTimers.Remove(item);
+        }
+
+        _visibleNotifications.Remove(item);
+
+        if (OverflowCount > 0)
+            OverflowCount--;
+    }
+
+    public void PauseAllTimers()
+    {
+        foreach (var timer in _expiryTimers.Values)
+            timer.Stop();
+    }
+
+    public void ResumeAllTimers()
+    {
+        foreach (var timer in _expiryTimers.Values)
+            timer.Start();
     }
 
     public void ClearAll()

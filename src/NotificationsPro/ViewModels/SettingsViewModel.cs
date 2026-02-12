@@ -50,19 +50,35 @@ public class SettingsViewModel : BaseViewModel
 
     private int _previewIndex;
 
-    // Appearance
+    // Typography — shared
     private string _fontFamily = "Segoe UI";
     public string FontFamily { get => _fontFamily; set { if (SetProperty(ref _fontFamily, value)) QueueSave(); } }
 
+    private double _lineSpacing = 1.5;
+    public double LineSpacing { get => _lineSpacing; set { if (SetProperty(ref _lineSpacing, value)) QueueSave(); } }
+
+    // Typography — body
     private double _fontSize = 14;
     public double FontSize { get => _fontSize; set { if (SetProperty(ref _fontSize, value)) QueueSave(); } }
 
     private string _fontWeight = "Normal";
     public string FontWeight { get => _fontWeight; set { if (SetProperty(ref _fontWeight, value)) QueueSave(); } }
 
-    private double _lineSpacing = 1.5;
-    public double LineSpacing { get => _lineSpacing; set { if (SetProperty(ref _lineSpacing, value)) QueueSave(); } }
+    // Typography — app name
+    private double _appNameFontSize = 14;
+    public double AppNameFontSize { get => _appNameFontSize; set { if (SetProperty(ref _appNameFontSize, value)) QueueSave(); } }
 
+    private string _appNameFontWeight = "SemiBold";
+    public string AppNameFontWeight { get => _appNameFontWeight; set { if (SetProperty(ref _appNameFontWeight, value)) QueueSave(); } }
+
+    // Typography — title
+    private double _titleFontSize = 16;
+    public double TitleFontSize { get => _titleFontSize; set { if (SetProperty(ref _titleFontSize, value)) QueueSave(); } }
+
+    private string _titleFontWeight = "SemiBold";
+    public string TitleFontWeight { get => _titleFontWeight; set { if (SetProperty(ref _titleFontWeight, value)) QueueSave(); } }
+
+    // Colors
     private string _textColor = "#E4E4EF";
     public string TextColor { get => _textColor; set { if (SetProperty(ref _textColor, value)) QueueSave(); } }
 
@@ -78,23 +94,36 @@ public class SettingsViewModel : BaseViewModel
     private double _backgroundOpacity = 0.92;
     public double BackgroundOpacity { get => _backgroundOpacity; set { if (SetProperty(ref _backgroundOpacity, value)) QueueSave(); } }
 
+    private string _accentColor = "#7C5CFC";
+    public string AccentColor { get => _accentColor; set { if (SetProperty(ref _accentColor, value)) QueueSave(); } }
+
+    // Card shape
     private double _cornerRadius = 12;
     public double CornerRadius { get => _cornerRadius; set { if (SetProperty(ref _cornerRadius, value)) QueueSave(); } }
 
     private double _padding = 16;
     public double Padding { get => _padding; set { if (SetProperty(ref _padding, value)) QueueSave(); } }
 
-    private bool _showBorder = true;
+    private double _cardGap = 8;
+    public double CardGap { get => _cardGap; set { if (SetProperty(ref _cardGap, value)) QueueSave(); } }
+
+    private double _outerMargin = 4;
+    public double OuterMargin { get => _outerMargin; set { if (SetProperty(ref _outerMargin, value)) QueueSave(); } }
+
+    private bool _showAccent = true;
+    public bool ShowAccent { get => _showAccent; set { if (SetProperty(ref _showAccent, value)) QueueSave(); } }
+
+    private double _accentThickness = 3;
+    public double AccentThickness { get => _accentThickness; set { if (SetProperty(ref _accentThickness, value)) QueueSave(); } }
+
+    private bool _showBorder;
     public bool ShowBorder { get => _showBorder; set { if (SetProperty(ref _showBorder, value)) QueueSave(); } }
 
-    private string _borderColor = "#7C5CFC";
+    private string _borderColor = "#363650";
     public string BorderColor { get => _borderColor; set { if (SetProperty(ref _borderColor, value)) QueueSave(); } }
 
     private double _borderThickness = 1;
     public double BorderThickness { get => _borderThickness; set { if (SetProperty(ref _borderThickness, value)) QueueSave(); } }
-
-    private string _accentColor = "#7C5CFC";
-    public string AccentColor { get => _accentColor; set { if (SetProperty(ref _accentColor, value)) QueueSave(); } }
 
     // Behavior
     private double _notificationDuration = 5;
@@ -145,6 +174,9 @@ public class SettingsViewModel : BaseViewModel
     private bool _singleLineAutoFullWidth;
     public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set { if (SetProperty(ref _singleLineAutoFullWidth, value)) QueueSave(); } }
 
+    private bool _showTimestamp;
+    public bool ShowTimestamp { get => _showTimestamp; set { if (SetProperty(ref _showTimestamp, value)) QueueSave(); } }
+
     private bool _newestOnTop = true;
     public bool NewestOnTop { get => _newestOnTop; set { if (SetProperty(ref _newestOnTop, value)) QueueSave(); } }
 
@@ -162,8 +194,18 @@ public class SettingsViewModel : BaseViewModel
     private bool _fadeOnlyAnimation;
     public bool FadeOnlyAnimation { get => _fadeOnlyAnimation; set { if (SetProperty(ref _fadeOnlyAnimation, value)) QueueSave(); } }
 
+    private string _slideInDirection = "Left";
+    public string SlideInDirection { get => _slideInDirection; set { if (SetProperty(ref _slideInDirection, value)) QueueSave(); } }
+
     private double _animationDurationMs = 300;
     public double AnimationDurationMs { get => _animationDurationMs; set { if (SetProperty(ref _animationDurationMs, value)) QueueSave(); } }
+
+    // Deduplication
+    private bool _deduplicationEnabled = true;
+    public bool DeduplicationEnabled { get => _deduplicationEnabled; set { if (SetProperty(ref _deduplicationEnabled, value)) QueueSave(); } }
+
+    private double _deduplicationWindowSeconds = 2;
+    public double DeduplicationWindowSeconds { get => _deduplicationWindowSeconds; set { if (SetProperty(ref _deduplicationWindowSeconds, value)) QueueSave(); } }
 
     // Position
     private double _overlayWidth = 380;
@@ -207,6 +249,11 @@ public class SettingsViewModel : BaseViewModel
         "Thin", "Light", "Normal", "Medium", "SemiBold", "Bold"
     };
 
+    public List<string> AvailableSlideDirections { get; } = new()
+    {
+        "Left", "Right", "Top", "Bottom"
+    };
+
     // Commands
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
@@ -248,18 +295,26 @@ public class SettingsViewModel : BaseViewModel
         _fontFamily = s.FontFamily;
         _fontSize = s.FontSize;
         _fontWeight = s.FontWeight;
+        _appNameFontSize = s.AppNameFontSize;
+        _appNameFontWeight = s.AppNameFontWeight;
+        _titleFontSize = s.TitleFontSize;
+        _titleFontWeight = s.TitleFontWeight;
         _lineSpacing = s.LineSpacing;
         _textColor = s.TextColor;
         _titleColor = s.TitleColor;
         _appNameColor = s.AppNameColor;
         _backgroundColor = s.BackgroundColor;
         _backgroundOpacity = s.BackgroundOpacity;
+        _accentColor = s.AccentColor;
         _cornerRadius = s.CornerRadius;
         _padding = s.Padding;
+        _cardGap = s.CardGap;
+        _outerMargin = s.OuterMargin;
+        _showAccent = s.ShowAccent;
+        _accentThickness = s.AccentThickness;
         _showBorder = s.ShowBorder;
         _borderColor = s.BorderColor;
         _borderThickness = s.BorderThickness;
-        _accentColor = s.AccentColor;
         _notificationDuration = s.NotificationDuration;
         _maxVisibleNotifications = Math.Max(1, s.MaxVisibleNotifications);
         _showAppName = s.ShowAppName;
@@ -273,12 +328,16 @@ public class SettingsViewModel : BaseViewModel
         _singleLineWrapText = s.SingleLineWrapText;
         _singleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
         _singleLineAutoFullWidth = s.SingleLineAutoFullWidth;
+        _showTimestamp = s.ShowTimestamp;
         _newestOnTop = s.NewestOnTop;
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
         _animationsEnabled = s.AnimationsEnabled;
         _fadeOnlyAnimation = s.FadeOnlyAnimation;
+        _slideInDirection = s.SlideInDirection;
         _animationDurationMs = s.AnimationDurationMs;
+        _deduplicationEnabled = s.DeduplicationEnabled;
+        _deduplicationWindowSeconds = s.DeduplicationWindowSeconds;
         _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
         _overlayMaxHeight = Math.Clamp(s.OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax);
         _allowManualResize = s.AllowManualResize;
@@ -351,6 +410,10 @@ public class SettingsViewModel : BaseViewModel
             FontFamily = FontFamily,
             FontSize = FontSize,
             FontWeight = FontWeight,
+            AppNameFontSize = AppNameFontSize,
+            AppNameFontWeight = AppNameFontWeight,
+            TitleFontSize = TitleFontSize,
+            TitleFontWeight = TitleFontWeight,
             LineSpacing = LineSpacing,
             TextColor = TextColor,
             TitleColor = TitleColor,
@@ -359,6 +422,10 @@ public class SettingsViewModel : BaseViewModel
             BackgroundOpacity = BackgroundOpacity,
             CornerRadius = CornerRadius,
             Padding = Padding,
+            CardGap = CardGap,
+            OuterMargin = OuterMargin,
+            ShowAccent = ShowAccent,
+            AccentThickness = AccentThickness,
             ShowBorder = ShowBorder,
             BorderColor = BorderColor,
             BorderThickness = BorderThickness,
@@ -376,12 +443,16 @@ public class SettingsViewModel : BaseViewModel
             SingleLineWrapText = SingleLineWrapText,
             SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
             SingleLineAutoFullWidth = SingleLineAutoFullWidth,
+            ShowTimestamp = ShowTimestamp,
             NewestOnTop = NewestOnTop,
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
             AnimationsEnabled = AnimationsEnabled,
             FadeOnlyAnimation = FadeOnlyAnimation,
+            SlideInDirection = SlideInDirection,
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
+            DeduplicationEnabled = DeduplicationEnabled,
+            DeduplicationWindowSeconds = DeduplicationWindowSeconds,
             OverlayWidth = resolvedOverlayWidth,
             LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
             OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),

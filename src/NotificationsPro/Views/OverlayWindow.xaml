@@ -19,54 +19,43 @@
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <!-- Slide-in storyboard -->
-        <Storyboard x:Key="SlideIn">
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                             From="-420" To="0" Duration="0:0:0.35">
-                <DoubleAnimation.EasingFunction>
-                    <CubicEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0" To="1" Duration="0:0:0.25"/>
-        </Storyboard>
-
         <!-- Notification card template -->
         <DataTemplate x:Key="NotificationCardTemplate">
-            <Border x:Name="Card" Margin="0,0,0,8" CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Padding="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Opacity="1">
-                <Border.Background>
-                    <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
-                        <Binding Path="DataContext.BackgroundColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                        <Binding Path="DataContext.BackgroundOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                    </MultiBinding>
-                </Border.Background>
-                <Border.BorderBrush>
-                    <Binding Path="DataContext.AccentColor"
-                             RelativeSource="{RelativeSource AncestorType=Window}"
-                             Converter="{StaticResource ColorToBrush}"/>
-                </Border.BorderBrush>
-                <Border.BorderThickness>
-                    <Thickness Left="3" Top="0" Right="0" Bottom="0"/>
-                </Border.BorderThickness>
+            <Border x:Name="Card"
+                    Margin="{Binding DataContext.CardMargin, RelativeSource={RelativeSource AncestorType=Window}}"
+                    CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                    BorderBrush="{Binding DataContext.BorderColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                    BorderThickness="{Binding DataContext.CardBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Opacity="1"
+                    Loaded="OnCardLoaded">
                 <Border.RenderTransform>
                     <TranslateTransform X="0"/>
                 </Border.RenderTransform>
+
+                <Border CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                        Padding="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
+                        BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                        BorderThickness="{Binding DataContext.AccentBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}">
+                    <Border.Background>
+                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                            <Binding Path="DataContext.BackgroundColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                            <Binding Path="DataContext.BackgroundOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                        </MultiBinding>
+                    </Border.Background>
 
                 <Grid>
                     <StackPanel x:Name="StackedContent"
                                 Visibility="{Binding DataContext.StackedContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
                         <!-- App name -->
                         <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontWeight="SemiBold"
+                                   FontSize="{Binding DataContext.AppNameFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="{Binding DataContext.AppNameFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
                                    MaxHeight="{Binding DataContext.AppNameEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
-                                   LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
+                                   LineHeight="{Binding DataContext.AppNameLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="None"/>
@@ -91,7 +80,7 @@
                         <!-- Title -->
                         <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.TitleFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontWeight="SemiBold"
+                                   FontWeight="{Binding DataContext.TitleFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
                                    MaxHeight="{Binding DataContext.TitleEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -148,6 +137,15 @@
                                 </MultiBinding>
                             </TextBlock.Visibility>
                         </TextBlock>
+
+                        <!-- Timestamp -->
+                        <TextBlock Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Text="{Binding RelativeTimeText}"
+                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="11"
+                                   Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   Opacity="0.7"
+                                   Margin="0,4,0,0"/>
                     </StackPanel>
 
                     <!-- One-line banner mode -->
@@ -165,8 +163,8 @@
                                        TextWrapping="NoWrap"
                                        TextTrimming="None"
                                        FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontWeight="SemiBold"
+                                       FontSize="{Binding DataContext.AppNameFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontWeight="{Binding DataContext.AppNameFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                        Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                        VerticalAlignment="Center">
                                 <TextBlock.Text>
@@ -273,12 +271,10 @@
                         </TextBlock>
                     </Grid>
                 </Grid>
+                </Border>
             </Border>
 
             <DataTemplate.Triggers>
-                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource SlideIn}"/>
-                </EventTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>
@@ -304,12 +300,12 @@
     </Window.Resources>
 
     <!-- Main content: tiny alpha preserves drag hit-testing without a visible panel -->
-    <Grid Margin="4" Background="#01000000">
+    <Grid Margin="{Binding OuterContentMargin}" Background="#01000000">
         <ScrollViewer x:Name="NotificationScrollViewer"
                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       CanContentScroll="False"
                       PanningMode="None"
-                      MaxHeight="600">
+                      MaxHeight="{Binding OverlayMaxHeight}">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar">
                     <Setter Property="Width" Value="14"/>
@@ -323,13 +319,18 @@
                 <!-- Overflow indicator -->
                 <Border x:Name="OverflowBadge"
                         Visibility="{Binding Queue.HasOverflow, Converter={StaticResource BoolToVis}}"
-                        Margin="0,0,0,4" Padding="12,8" CornerRadius="8"
+                        Margin="0,0,0,4" Padding="12,8"
+                        CornerRadius="{Binding CornerRadius}"
                         HorizontalAlignment="Left">
                     <Border.Background>
-                        <SolidColorBrush Color="#1E1E2E" Opacity="0.8"/>
+                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                            <Binding Path="BackgroundColor"/>
+                            <Binding Path="BackgroundOpacity"/>
+                        </MultiBinding>
                     </Border.Background>
-                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"
-                               FontFamily="Segoe UI">
+                    <TextBlock Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                               FontSize="{Binding FontSize}"
+                               FontFamily="{Binding FontFamily}">
                         <Run Text="+"/><Run Text="{Binding Queue.OverflowCount, Mode=OneWay}"/>
                         <Run Text="more"/>
                     </TextBlock>

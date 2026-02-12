@@ -38,9 +38,13 @@
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Position tab includes quick preset buttons for top/side placement
 - Position tab now includes overlay-width and overlay-height presets for 1080p/2K/4K/8K targets
+- Appearance tab includes per-field typography controls (font size + weight for app name, title, body independently)
+- Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
+- Overflow badge now inherits card theme (background color, text color, font, corner radius)
+- Deduplication is now configurable (on/off toggle + adjustable time window) via Behavior tab
 - QueueManager: configurable max visible count, overflow count, deduplication, expiry timers
 - SettingsManager: load/save to %AppData%\NotificationsPro\settings.json (isolated temp dirs for tests)
 - Preview/test notification button sends mock notifications to the overlay
@@ -61,11 +65,20 @@
   - surfaces live diagnostics (captured/candidate/event counters + last class seen)
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
+- Slide-in direction configurable (Left, Right, Top, Bottom) via Settings > Behavior > Animations
+- **Card interaction (Milestone 4)**:
+  - Click to dismiss — click a notification card to immediately remove it
+  - Hover to pause — mouse over the overlay pauses all expiry timers, resume on mouse leave
+  - Right-click context menu on cards: Dismiss, Copy Text, Clear All
+  - Context menu themed to match overlay colors
+  - "Clear All Notifications" in tray menu
+  - Optional relative timestamps on cards ("just now", "2m ago", etc.) refreshed every 15s
+  - Show Timestamp toggle in Settings > Behavior > Content
 - 38 unit tests covering QueueManager, SettingsManager (with round-trip and corruption), SnapHelper, and one-line text shaping
 
 ## What Doesn't Work Yet
-- Multi-monitor selection (Milestone 3)
-- Installer/packaging (Milestone 4)
+- Multi-monitor selection (Milestone 9)
+- Installer/packaging (Milestone 11)
 - Toast duration alignment (using configurable duration instead)
 
 ## Known Issues / Troubleshooting
@@ -128,6 +141,13 @@ dotnet test
 - [ ] "Reset to Defaults" restores all settings
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart
+- [ ] Notification slides in from each configured direction (Left/Right/Top/Bottom)
+- [ ] Click a notification card to dismiss it instantly
+- [ ] Hover over overlay pauses all expiry timers; moving away resumes them
+- [ ] Right-click a card shows context menu (Dismiss, Copy Text, Clear All)
+- [ ] "Copy Text" copies card app/title/body to clipboard
+- [ ] "Clear All Notifications" in tray menu removes all visible cards
+- [ ] "Show Timestamp" toggle displays relative time on each stacked card
 
 ## Known Limitations
 - Multi-monitor support not yet implemented

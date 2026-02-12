@@ -39,30 +39,30 @@
 ### Milestone 3: Customization Polish
 **Status: In Progress**
 
-Per-field typography (currently one global font size, title hardcoded +2, app name/title weight hardcoded SemiBold):
-- [ ] Per-field font size — independent sliders for App Name, Title, and Body
-- [ ] Per-field font weight — independent dropdowns for App Name, Title, and Body
+Per-field typography:
+- [x] Per-field font size — independent sliders for App Name, Title, and Body
+- [x] Per-field font weight — independent dropdowns for App Name, Title, and Body
 
-Card shape & layout (hardcoded values in overlay XAML with no UI controls):
-- [ ] Border toggle + color picker + thickness slider (model exists in AppSettings, UI missing)
-- [ ] Accent stripe thickness slider (hardcoded 3px left border)
-- [ ] Accent stripe toggle (ability to disable independently)
-- [ ] Card gap / spacing between cards (hardcoded 8px margin)
-- [ ] Outer content margin around card area (hardcoded 4px)
+Card shape & layout:
+- [x] Border toggle + color picker + thickness slider (wired to UI)
+- [x] Accent stripe thickness slider (configurable, was hardcoded 3px)
+- [x] Accent stripe toggle (ability to disable independently)
+- [x] Card gap / spacing between cards (configurable, was hardcoded 8px)
+- [x] Outer content margin around card area (configurable, was hardcoded 4px)
 
-Overflow badge consistency (currently ignores card theme entirely):
-- [ ] Overflow badge inherits card colors (background, text, font, corner radius)
+Overflow badge consistency:
+- [x] Overflow badge inherits card colors (background, text, font, corner radius)
 
-Deduplication controls (hardcoded 2s window, no toggle):
-- [ ] Deduplication on/off toggle
-- [ ] Deduplication window duration slider
+Deduplication controls:
+- [x] Deduplication on/off toggle
+- [x] Deduplication window duration slider
 
 Animation refinement:
-- [ ] Slide-in direction (left / right / top / bottom — currently always from left)
+- [x] Slide-in direction (left / right / top / bottom — configurable via Settings > Behavior > Animations)
 
 Settings UI reorganization (Behavior tab has 6 concerns in one panel):
-- [ ] Split Behavior tab — move content/display controls to a separate tab from timing/window/animation
-- [ ] Ensure logical grouping: Typography, Colors, Card Shape, Content/Display, Behavior, Position
+- [ ] Split Behavior tab — move content/display controls to a separate tab from timing/window/animation (deferred)
+- [ ] Ensure logical grouping: Typography, Colors, Card Shape, Content/Display, Behavior, Position (deferred)
 
 Previously completed (Milestone 3):
 - [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)
@@ -95,24 +95,22 @@ Previously completed (Milestone 3):
 - [x] Overlay-width presets added (1080p / 2K / 4K / 8K)
 
 ### Milestone 4: Card Interaction
-**Status: Not Started**
-
-The overlay cards are currently non-interactive — they appear, expire, and disappear with no user control.
+**Status: Complete**
 
 Core interaction:
-- [ ] Click to dismiss — click a card to immediately remove it
-- [ ] Hover to pause expiry timer — mouse over the overlay pauses all countdowns, resume on mouse leave
-- [ ] Dismiss all — small "Clear" button on the overlay and/or tray menu item (`QueueManager.ClearAll()` exists, needs UI)
-- [ ] Copy notification text — click or keyboard shortcut to copy card text to clipboard
+- [x] Click to dismiss — click a card to immediately remove it (via WM_NCLBUTTONUP with drag detection)
+- [x] Hover to pause expiry timer — mouse over the overlay pauses all countdowns, resume on mouse leave (via WM_NCMOUSEMOVE + poll timer)
+- [x] Dismiss all — "Clear All" in right-click context menu and tray menu item
+- [x] Copy notification text — right-click context menu "Copy Text" copies card content to clipboard
 
 Right-click context menu on cards:
-- [ ] Dismiss this notification
+- [x] Dismiss this notification
 - [ ] Mute this app (quick per-app suppress, ties into Milestone 5 filtering)
-- [ ] Copy text to clipboard
+- [x] Copy text to clipboard
 
 Timestamps:
-- [ ] Optional relative timestamps on cards ("just now", "2m ago") — `NotificationItem.ReceivedAt` already exists
-- [ ] Show/hide timestamp toggle in settings
+- [x] Optional relative timestamps on cards ("just now", "2m ago") — refreshed every 15s
+- [x] Show/hide timestamp toggle in settings (Behavior > Content)
 
 ### Milestone 5: Filtering & Smart Control
 **Status: Not Started**
@@ -249,7 +247,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 3 customization polish: per-field typography, card layout controls, border UI, and settings reorganization.
+Milestone 4 card interaction complete. Next: Milestone 5 filtering & smart control, or Milestone 6 themes & profiles.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

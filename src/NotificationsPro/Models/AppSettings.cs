@@ -2,22 +2,34 @@ namespace NotificationsPro.Models;
 
 public class AppSettings
 {
-    // Appearance
+    // Appearance — Typography
     public string FontFamily { get; set; } = "Segoe UI";
     public double FontSize { get; set; } = 14;
     public string FontWeight { get; set; } = "Normal";
+    public double AppNameFontSize { get; set; } = 14;
+    public string AppNameFontWeight { get; set; } = "SemiBold";
+    public double TitleFontSize { get; set; } = 16;
+    public string TitleFontWeight { get; set; } = "SemiBold";
     public double LineSpacing { get; set; } = 1.5;
+
+    // Appearance — Colors
     public string TextColor { get; set; } = "#E4E4EF";
     public string TitleColor { get; set; } = "#FFFFFF";
     public string AppNameColor { get; set; } = "#B8B8CC";
     public string BackgroundColor { get; set; } = "#1E1E2E";
     public double BackgroundOpacity { get; set; } = 0.92;
+    public string AccentColor { get; set; } = "#7C5CFC";
+
+    // Appearance — Card Shape
     public double CornerRadius { get; set; } = 12;
     public double Padding { get; set; } = 16;
-    public bool ShowBorder { get; set; } = true;
-    public string BorderColor { get; set; } = "#7C5CFC";
+    public double CardGap { get; set; } = 8;
+    public double OuterMargin { get; set; } = 4;
+    public bool ShowAccent { get; set; } = true;
+    public double AccentThickness { get; set; } = 3;
+    public bool ShowBorder { get; set; } = false;
+    public string BorderColor { get; set; } = "#363650";
     public double BorderThickness { get; set; } = 1;
-    public string AccentColor { get; set; } = "#7C5CFC";
 
     // Behavior
     public double NotificationDuration { get; set; } = 5;
@@ -33,13 +45,17 @@ public class AppSettings
     public bool SingleLineWrapText { get; set; } = false;
     public int SingleLineMaxLines { get; set; } = 3;
     public bool SingleLineAutoFullWidth { get; set; } = false;
+    public bool ShowTimestamp { get; set; } = false;
     public bool NewestOnTop { get; set; } = true;
     public bool AlwaysOnTop { get; set; } = true;
     public bool ClickThrough { get; set; } = false;
     public bool AnimationsEnabled { get; set; } = true;
     public bool FadeOnlyAnimation { get; set; } = false;
+    public string SlideInDirection { get; set; } = "Left";
     public double AnimationDurationMs { get; set; } = 300;
     public bool NotificationsPaused { get; set; } = false;
+    public bool DeduplicationEnabled { get; set; } = true;
+    public double DeduplicationWindowSeconds { get; set; } = 2;
 
     // Position & Size (null = not yet positioned, use default)
     public double? OverlayLeft { get; set; }

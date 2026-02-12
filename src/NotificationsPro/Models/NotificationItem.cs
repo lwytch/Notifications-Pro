@@ -21,6 +21,20 @@ public class NotificationItem : INotifyPropertyChanged
         set { _isExpiring = value; OnPropertyChanged(); }
     }
 
+    public string RelativeTimeText
+    {
+        get
+        {
+            var elapsed = DateTime.Now - ReceivedAt;
+            if (elapsed.TotalSeconds < 10) return "just now";
+            if (elapsed.TotalSeconds < 60) return $"{(int)elapsed.TotalSeconds}s ago";
+            if (elapsed.TotalMinutes < 60) return $"{(int)elapsed.TotalMinutes}m ago";
+            return $"{(int)elapsed.TotalHours}h ago";
+        }
+    }
+
+    public void NotifyTimestampChanged() => OnPropertyChanged(nameof(RelativeTimeText));
+
     public NotificationItem(string appName, string title, string body)
     {
         AppName = appName ?? string.Empty;

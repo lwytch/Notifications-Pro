@@ -98,6 +98,8 @@ public partial class App : Application
         contextMenu.Items.Add(_alwaysOnTopItem);
         contextMenu.Items.Add(_clickThroughItem);
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
+        contextMenu.Items.Add("Clear All Notifications", null, (_, _) => _queueManager?.ClearAll());
+        contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Settings...", null, (_, _) => ShowSettings());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Quit", null, (_, _) => QuitApp());

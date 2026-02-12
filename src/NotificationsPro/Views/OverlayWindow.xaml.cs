@@ -1,6 +1,11 @@
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
@@ -20,10 +25,18 @@ public partial class OverlayWindow : Window
     private bool _anchorToBottomEdge;
     private double _rightEdgeOffset = 16;
     private double _bottomEdgeOffset = 16;
+    private bool _ncMouseDownTracked;
+    private bool _dragOccurredSinceMouseDown;
+    private bool _isHoveringOverlay;
+    private DispatcherTimer? _hoverCheckTimer;
 
     // Win32 messages
     private const int WM_NCHITTEST = 0x0084;
+    private const int WM_NCLBUTTONDOWN = 0x00A1;
+    private const int WM_NCLBUTTONUP = 0x00A2;
     private const int WM_NCLBUTTONDBLCLK = 0x00A3;
+    private const int WM_NCRBUTTONUP = 0x00A5;
+    private const int WM_NCMOUSEMOVE = 0x00A0;
     private const int HTTRANSPARENT = -1;
     private const int HTCAPTION = 2;
     private const int HTLEFT = 10;
@@ -103,6 +116,41 @@ public partial class OverlayWindow : Window
                 // Prevent maximize on double-click
                 handled = true;
                 return IntPtr.Zero;
+
+            case WM_NCLBUTTONDOWN:
+                _ncMouseDownTracked = true;
+                _dragOccurredSinceMouseDown = false;
+                break;
+
+            case WM_NCLBUTTONUP:
+                if (_ncMouseDownTracked && !_dragOccurredSinceMouseDown)
+                {
+                    var clickItem = FindNotificationAtScreenPoint(lParam);
+                    if (clickItem != null && DataContext is OverlayViewModel clickVm)
+                    {
+                        clickVm.Queue.DismissNotification(clickItem);
+                        handled = true;
+                        _ncMouseDownTracked = false;
+                        return IntPtr.Zero;
+                    }
+                }
+                _ncMouseDownTracked = false;
+                break;
+
+            case WM_NCRBUTTONUP:
+                ShowCardContextMenu(lParam);
+                handled = true;
+                return IntPtr.Zero;
+
+            case WM_NCMOUSEMOVE:
+                if (!_isHoveringOverlay)
+                {
+                    _isHoveringOverlay = true;
+                    if (DataContext is OverlayViewModel hoverVm)
+                        hoverVm.Queue.PauseAllTimers();
+                }
+                ResetHoverCheckTimer();
+                break;
         }
 
         return IntPtr.Zero;
@@ -186,6 +234,9 @@ public partial class OverlayWindow : Window
     {
         if (_isInternalMove)
             return;
+
+        if (_ncMouseDownTracked)
+            _dragOccurredSinceMouseDown = true;
 
         var previousMonitor = _settingsManager.Settings.MonitorIndex;
 
@@ -301,8 +352,156 @@ public partial class OverlayWindow : Window
             _bottomEdgeOffset = Math.Max(0, bottomGap);
     }
 
+    private void OnCardLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Border card) return;
+        if (DataContext is not OverlayViewModel vm) return;
+        if (!vm.AnimationsEnabled) return;
+
+        var transform = card.RenderTransform as TranslateTransform;
+        if (transform == null) return;
+
+        var durationMs = vm.AnimationDurationMs;
+        var fadeOnly = vm.FadeOnlyAnimation;
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+
+        // Fade in
+        var fadeDuration = new Duration(TimeSpan.FromMilliseconds(durationMs * 0.75));
+        card.BeginAnimation(UIElement.OpacityProperty,
+            new DoubleAnimation(0, 1, fadeDuration));
+
+        if (fadeOnly) return;
+
+        // Slide in from configured direction
+        var motionDuration = new Duration(TimeSpan.FromMilliseconds(durationMs));
+        var direction = vm.SlideInDirection;
+
+        switch (direction)
+        {
+            case "Right":
+                transform.BeginAnimation(TranslateTransform.XProperty,
+                    new DoubleAnimation(vm.OverlayWidth + 40, 0, motionDuration) { EasingFunction = easing });
+                break;
+            case "Top":
+                transform.BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation(-200, 0, motionDuration) { EasingFunction = easing });
+                break;
+            case "Bottom":
+                transform.BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation(200, 0, motionDuration) { EasingFunction = easing });
+                break;
+            default: // "Left"
+                transform.BeginAnimation(TranslateTransform.XProperty,
+                    new DoubleAnimation(-(vm.OverlayWidth + 40), 0, motionDuration) { EasingFunction = easing });
+                break;
+        }
+    }
+
+    private NotificationItem? FindNotificationAtScreenPoint(IntPtr lParam)
+    {
+        var screenX = unchecked((short)(lParam.ToInt64() & 0xFFFF));
+        var screenY = unchecked((short)((lParam.ToInt64() >> 16) & 0xFFFF));
+        var point = PointFromScreen(new System.Windows.Point(screenX, screenY));
+
+        var result = VisualTreeHelper.HitTest(this, point);
+        if (result?.VisualHit == null) return null;
+
+        DependencyObject? current = result.VisualHit;
+        while (current != null)
+        {
+            if (current is FrameworkElement fe && fe.DataContext is NotificationItem item)
+                return item;
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return null;
+    }
+
+    private void ShowCardContextMenu(IntPtr lParam)
+    {
+        var item = FindNotificationAtScreenPoint(lParam);
+        var screenX = unchecked((short)(lParam.ToInt64() & 0xFFFF));
+        var screenY = unchecked((short)((lParam.ToInt64() >> 16) & 0xFFFF));
+        var point = PointFromScreen(new System.Windows.Point(screenX, screenY));
+
+        var menu = new ContextMenu();
+
+        if (DataContext is OverlayViewModel themeVm)
+        {
+            try
+            {
+                menu.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(themeVm.BackgroundColor));
+                menu.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(themeVm.TextColor));
+                menu.BorderBrush = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(themeVm.BorderColor));
+            }
+            catch { /* fall back to default styling */ }
+        }
+
+        if (item != null)
+        {
+            var dismissMenuItem = new MenuItem { Header = "Dismiss" };
+            dismissMenuItem.Click += (_, _) =>
+            {
+                if (DataContext is OverlayViewModel dismissVm)
+                    dismissVm.Queue.DismissNotification(item);
+            };
+            menu.Items.Add(dismissMenuItem);
+
+            var copyMenuItem = new MenuItem { Header = "Copy Text" };
+            copyMenuItem.Click += (_, _) =>
+            {
+                var parts = new[] { item.AppName, item.Title, item.Body }
+                    .Where(s => !string.IsNullOrWhiteSpace(s));
+                var text = string.Join("\n", parts);
+                if (!string.IsNullOrEmpty(text))
+                    System.Windows.Clipboard.SetText(text);
+            };
+            menu.Items.Add(copyMenuItem);
+
+            menu.Items.Add(new Separator());
+        }
+
+        var clearMenuItem = new MenuItem { Header = "Clear All" };
+        clearMenuItem.Click += (_, _) =>
+        {
+            if (DataContext is OverlayViewModel clearVm)
+                clearVm.Queue.ClearAll();
+        };
+        menu.Items.Add(clearMenuItem);
+
+        menu.PlacementTarget = this;
+        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.RelativePoint;
+        menu.HorizontalOffset = point.X;
+        menu.VerticalOffset = point.Y;
+        menu.IsOpen = true;
+    }
+
+    private void ResetHoverCheckTimer()
+    {
+        if (_hoverCheckTimer != null) return;
+        _hoverCheckTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        _hoverCheckTimer.Tick += OnHoverCheckTick;
+        _hoverCheckTimer.Start();
+    }
+
+    private void OnHoverCheckTick(object? sender, EventArgs e)
+    {
+        var cursorPos = WinForms.Cursor.Position;
+        var windowRect = new Rect(Left, Top, ActualWidth, ActualHeight);
+        if (!windowRect.Contains(new System.Windows.Point(cursorPos.X, cursorPos.Y)))
+        {
+            _hoverCheckTimer?.Stop();
+            _hoverCheckTimer = null;
+            _isHoveringOverlay = false;
+            if (DataContext is OverlayViewModel vm)
+                vm.Queue.ResumeAllTimers();
+        }
+    }
+
     protected override void OnClosed(EventArgs e)
     {
+        _hoverCheckTimer?.Stop();
+        _hoverCheckTimer = null;
+
         if (_hookInstalled && _hwndSource != null)
         {
             _hwndSource.RemoveHook(WndProc);

@@ -3,6 +3,22 @@
 ## Unreleased
 
 ### Added
+- Slide-in direction setting: notifications can now enter from Left, Right, Top, or Bottom (Behavior > Animations)
+- Click to dismiss: click any notification card to immediately remove it
+- Hover to pause: mouse over the overlay pauses all expiry timers; moving away resumes them
+- Right-click context menu on cards: Dismiss, Copy Text, Clear All
+- Context menu themed to match current overlay colors (background, text, border)
+- "Clear All Notifications" tray menu item to remove all visible cards at once
+- Optional relative timestamps on notification cards ("just now", "2m ago") with 15-second refresh
+- Show Timestamp toggle in Settings > Behavior > Content
+- Per-field font size controls: independent sliders for App Name, Title, and Body text
+- Per-field font weight controls: independent dropdowns for App Name, Title, and Body text
+- Card border controls: toggle, color picker, and thickness slider (Appearance > Card Border)
+- Accent stripe controls: toggle to show/hide and thickness slider (Appearance > Accent Stripe)
+- Card gap slider to control vertical spacing between notification cards
+- Outer margin slider to control spacing around the card area inside the overlay
+- Deduplication controls: on/off toggle and adjustable time window (Behavior > Deduplication)
+- Overflow badge now inherits card theme colors (background, text, font, corner radius)
 - Tray menu toggle for click-through mode ("Disable Click-Through (Allow Dragging)")
 - Click-through state surfaced in tray tooltip for faster troubleshooting
 - Behavior settings for:
@@ -26,6 +42,10 @@
 - Overlay-height preset buttons for 1080p, 2K, 4K, and 8K display classes
 
 ### Changed
+- Existing "Font Size" and "Font Weight" labels renamed to "Body Font Size" and "Body Font Weight" for clarity
+- ShowBorder default changed to false (border is now opt-in)
+- BorderColor default changed from accent purple (#7C5CFC) to subtle dark (#363650)
+- ScrollViewer max height in overlay now bound to OverlayMaxHeight setting (was hardcoded 600px)
 - Accessibility fallback now listens to a broader WinEvent range and uses shell-host + toast-size heuristics instead of strict class/object filters
 - Overlay drag path now retries HWND hook attach on load and keeps a WPF `DragMove` fallback if hook attachment is unavailable
 - Overlay cards now apply configured line spacing to both title and body text for readability
