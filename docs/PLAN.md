@@ -105,7 +105,7 @@ Core interaction:
 
 Right-click context menu on cards:
 - [x] Dismiss this notification
-- [ ] Mute this app (quick per-app suppress, ties into Milestone 5 filtering)
+- [x] Mute this app (quick per-app suppress, ties into Milestone 5 filtering)
 - [x] Copy text to clipboard
 
 Timestamps:
@@ -113,24 +113,25 @@ Timestamps:
 - [x] Show/hide timestamp toggle in settings (Behavior > Content)
 
 ### Milestone 5: Filtering & Smart Control
-**Status: Not Started**
-
-Currently every notification from every app is treated identically with no way to control what shows up.
+**Status: Complete**
 
 Per-app filtering:
-- [ ] Maintain a list of seen app names (names only, no content — privacy safe)
-- [ ] Per-app whitelist / blacklist mode in settings (show only these / hide these)
-- [ ] Quick "Mute this app" from card context menu (Milestone 4)
-- [ ] Quick-mute from tray menu (recent apps list with mute toggles)
+- [x] Maintain a list of seen app names (names only, no content — privacy safe)
+- [x] Per-app mute/unmute in settings Filtering tab (toggle buttons populated from seen apps)
+- [x] Quick "Mute this app" from card context menu
+- [x] Quick-mute from tray menu (recent apps list with mute toggles)
 
 Keyword rules:
-- [ ] Keyword highlighting — highlight notifications containing specific words with a different accent color
-- [ ] Keyword muting — suppress notifications containing specific words
+- [x] Keyword highlighting — highlight notifications containing specific words with a configurable accent color
+- [x] Keyword muting — suppress notifications containing specific words
 
 Scheduling & focus:
-- [ ] Quiet hours / Do Not Disturb schedule — auto-pause between configured hours (e.g. 22:00–08:00)
-- [ ] Focus mode — timed pause from tray menu ("Focus for 30 min") with auto-resume and countdown display
-- [ ] Burst-rate limiting — auto-suppress when N+ notifications arrive within M seconds (protects against notification storms)
+- [x] Quiet hours / Do Not Disturb schedule — auto-pause between configured hours (e.g. 22:00–08:00), handles midnight wrapping
+- [x] Focus mode — timed pause from tray menu (15/30/60 min) with auto-resume and live countdown display
+- [x] Burst-rate limiting — auto-suppress when N+ notifications arrive within M seconds (protects against notification storms)
+
+Settings UI:
+- [x] New Filtering tab in Settings window (per-app mute, keyword highlight/mute, quiet hours, burst limit)
 
 ### Milestone 6: Themes & Profiles
 **Status: Not Started**
@@ -247,7 +248,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 4 card interaction complete. Next: Milestone 5 filtering & smart control, or Milestone 6 themes & profiles.
+Milestone 5 filtering complete. Next: Milestone 6 themes & profiles, or Milestone 7 accessibility.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

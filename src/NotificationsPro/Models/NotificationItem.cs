@@ -33,6 +33,8 @@ public class NotificationItem : INotifyPropertyChanged
         }
     }
 
+    public bool IsHighlighted { get; set; }
+
     public void NotifyTimestampChanged() => OnPropertyChanged(nameof(RelativeTimeText));
 
     public NotificationItem(string appName, string title, string body)

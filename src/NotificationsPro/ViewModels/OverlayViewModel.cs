@@ -62,6 +62,9 @@ public class OverlayViewModel : BaseViewModel
     private string _accentColor = "#7C5CFC";
     public string AccentColor { get => _accentColor; set => SetProperty(ref _accentColor, value); }
 
+    private string _highlightColor = "#FFD700";
+    public string HighlightColor { get => _highlightColor; set => SetProperty(ref _highlightColor, value); }
+
     // Card shape
     private double _cornerRadius = 12;
     public double CornerRadius { get => _cornerRadius; set => SetProperty(ref _cornerRadius, value); }
@@ -384,6 +387,7 @@ public class OverlayViewModel : BaseViewModel
         BackgroundColor = s.BackgroundColor;
         BackgroundOpacity = s.BackgroundOpacity;
         AccentColor = s.AccentColor;
+        HighlightColor = s.HighlightColor;
         CornerRadius = s.CornerRadius;
         Padding = s.Padding;
         CardGap = s.CardGap;

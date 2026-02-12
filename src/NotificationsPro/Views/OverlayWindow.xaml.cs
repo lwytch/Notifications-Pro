@@ -457,6 +457,21 @@ public partial class OverlayWindow : Window
             };
             menu.Items.Add(copyMenuItem);
 
+            if (!string.IsNullOrWhiteSpace(item.AppName))
+            {
+                var isMuted = DataContext is OverlayViewModel muteCheckVm && muteCheckVm.Queue.IsAppMuted(item.AppName);
+                var muteMenuItem = new MenuItem { Header = isMuted ? $"Unmute {item.AppName}" : $"Mute {item.AppName}" };
+                muteMenuItem.Click += (_, _) =>
+                {
+                    if (DataContext is not OverlayViewModel muteVm) return;
+                    if (isMuted)
+                        muteVm.Queue.UnmuteApp(item.AppName);
+                    else
+                        muteVm.Queue.MuteApp(item.AppName);
+                };
+                menu.Items.Add(muteMenuItem);
+            }
+
             menu.Items.Add(new Separator());
         }
 

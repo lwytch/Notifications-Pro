@@ -57,6 +57,22 @@ public class AppSettings
     public bool DeduplicationEnabled { get; set; } = true;
     public double DeduplicationWindowSeconds { get; set; } = 2;
 
+    // Filtering
+    public List<string> MutedApps { get; set; } = new();
+    public List<string> HighlightKeywords { get; set; } = new();
+    public List<string> MuteKeywords { get; set; } = new();
+    public string HighlightColor { get; set; } = "#FFD700";
+
+    // Scheduling
+    public bool QuietHoursEnabled { get; set; } = false;
+    public string QuietHoursStart { get; set; } = "22:00";
+    public string QuietHoursEnd { get; set; } = "08:00";
+
+    // Burst limiting
+    public bool BurstLimitEnabled { get; set; } = false;
+    public int BurstLimitCount { get; set; } = 10;
+    public double BurstLimitWindowSeconds { get; set; } = 5;
+
     // Position & Size (null = not yet positioned, use default)
     public double? OverlayLeft { get; set; }
     public double? OverlayTop { get; set; }
@@ -73,6 +89,10 @@ public class AppSettings
 
     public AppSettings Clone()
     {
-        return (AppSettings)MemberwiseClone();
+        var clone = (AppSettings)MemberwiseClone();
+        clone.MutedApps = new List<string>(MutedApps);
+        clone.HighlightKeywords = new List<string>(HighlightKeywords);
+        clone.MuteKeywords = new List<string>(MuteKeywords);
+        return clone;
     }
 }

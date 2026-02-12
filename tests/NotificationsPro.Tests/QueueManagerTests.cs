@@ -257,4 +257,127 @@ public class QueueManagerTests
             try { Directory.Delete(tempDir, true); } catch { }
         }
     }
+
+    [Fact]
+    public void AddNotification_MutedAppIsSuppressed()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MutedApps.Add("Teams");
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("Teams", "Meeting", "Join now");
+
+        Assert.Empty(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_MuteKeywordSuppresses()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MuteKeywords.Add("spam");
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "This is spam", "body");
+
+        Assert.Empty(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_HighlightKeywordSetsFlag()
+    {
+        var settings = CreateSettings();
+        settings.Settings.HighlightKeywords.Add("urgent");
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Urgent issue", "Fix now");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.True(queue.VisibleNotifications[0].IsHighlighted);
+    }
+
+    [Fact]
+    public void AddNotification_NoHighlightWithoutKeyword()
+    {
+        var settings = CreateSettings();
+        settings.Settings.HighlightKeywords.Add("urgent");
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Normal message", "Nothing special");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.False(queue.VisibleNotifications[0].IsHighlighted);
+    }
+
+    [Fact]
+    public void MuteApp_PreventsNotifications()
+    {
+        var settings = CreateSettings();
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("Slack", "Hey", "World");
+        Assert.Single(queue.VisibleNotifications);
+
+        queue.MuteApp("Slack");
+        queue.AddNotification("Slack", "New", "Message");
+        Assert.Single(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void UnmuteApp_AllowsNotificationsAgain()
+    {
+        var settings = CreateSettings();
+        var queue = new QueueManager(settings);
+
+        queue.MuteApp("Slack");
+        queue.AddNotification("Slack", "Suppressed", "Gone");
+        Assert.Empty(queue.VisibleNotifications);
+
+        queue.UnmuteApp("Slack");
+        queue.AddNotification("Slack", "Allowed", "Back");
+        Assert.Single(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_TracksSeenAppNames()
+    {
+        var queue = new QueueManager(CreateSettings());
+
+        queue.AddNotification("Teams", "Hello", "World");
+        queue.AddNotification("Slack", "Hey", "There");
+
+        Assert.Contains("Teams", queue.SeenAppNames);
+        Assert.Contains("Slack", queue.SeenAppNames);
+    }
+
+    [Fact]
+    public void AddNotification_QuietHoursSuppresses()
+    {
+        var settings = CreateSettings();
+        settings.Settings.QuietHoursEnabled = true;
+        // Set quiet hours to cover all day so the test always triggers
+        settings.Settings.QuietHoursStart = "00:00";
+        settings.Settings.QuietHoursEnd = "23:59";
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Title", "Body");
+
+        Assert.Empty(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_BurstLimitSuppresses()
+    {
+        var settings = CreateSettings();
+        settings.Settings.BurstLimitEnabled = true;
+        settings.Settings.BurstLimitCount = 2;
+        settings.Settings.BurstLimitWindowSeconds = 60;
+        settings.Settings.DeduplicationEnabled = false;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "One", "1");
+        queue.AddNotification("App", "Two", "2");
+        queue.AddNotification("App", "Three", "3"); // should be suppressed by burst
+
+        Assert.Equal(2, queue.VisibleNotifications.Count);
+    }
 }

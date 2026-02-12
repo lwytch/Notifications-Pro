@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -207,6 +208,40 @@ public class SettingsViewModel : BaseViewModel
     private double _deduplicationWindowSeconds = 2;
     public double DeduplicationWindowSeconds { get => _deduplicationWindowSeconds; set { if (SetProperty(ref _deduplicationWindowSeconds, value)) QueueSave(); } }
 
+    // Filtering
+    private string _highlightColor = "#FFD700";
+    public string HighlightColor { get => _highlightColor; set { if (SetProperty(ref _highlightColor, value)) QueueSave(); } }
+
+    private string _newHighlightKeyword = string.Empty;
+    public string NewHighlightKeyword { get => _newHighlightKeyword; set => SetProperty(ref _newHighlightKeyword, value); }
+
+    private string _newMuteKeyword = string.Empty;
+    public string NewMuteKeyword { get => _newMuteKeyword; set => SetProperty(ref _newMuteKeyword, value); }
+
+    public ObservableCollection<string> HighlightKeywords { get; } = new();
+    public ObservableCollection<string> MuteKeywords { get; } = new();
+    public ObservableCollection<MutedAppEntry> MutedAppEntries { get; } = new();
+
+    // Scheduling
+    private bool _quietHoursEnabled;
+    public bool QuietHoursEnabled { get => _quietHoursEnabled; set { if (SetProperty(ref _quietHoursEnabled, value)) QueueSave(); } }
+
+    private string _quietHoursStart = "22:00";
+    public string QuietHoursStart { get => _quietHoursStart; set { if (SetProperty(ref _quietHoursStart, value)) QueueSave(); } }
+
+    private string _quietHoursEnd = "08:00";
+    public string QuietHoursEnd { get => _quietHoursEnd; set { if (SetProperty(ref _quietHoursEnd, value)) QueueSave(); } }
+
+    // Burst limiting
+    private bool _burstLimitEnabled;
+    public bool BurstLimitEnabled { get => _burstLimitEnabled; set { if (SetProperty(ref _burstLimitEnabled, value)) QueueSave(); } }
+
+    private int _burstLimitCount = 10;
+    public int BurstLimitCount { get => _burstLimitCount; set { if (SetProperty(ref _burstLimitCount, Math.Max(1, value))) QueueSave(); } }
+
+    private double _burstLimitWindowSeconds = 5;
+    public double BurstLimitWindowSeconds { get => _burstLimitWindowSeconds; set { if (SetProperty(ref _burstLimitWindowSeconds, value)) QueueSave(); } }
+
     // Position
     private double _overlayWidth = 380;
     public double OverlayWidth
@@ -260,6 +295,11 @@ public class SettingsViewModel : BaseViewModel
     public ICommand MoveOverlayPresetCommand { get; }
     public ICommand SetOverlayWidthPresetCommand { get; }
     public ICommand SetOverlayHeightPresetCommand { get; }
+    public ICommand AddHighlightKeywordCommand { get; }
+    public ICommand RemoveHighlightKeywordCommand { get; }
+    public ICommand AddMuteKeywordCommand { get; }
+    public ICommand RemoveMuteKeywordCommand { get; }
+    public ICommand ToggleMuteAppCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
@@ -284,6 +324,11 @@ public class SettingsViewModel : BaseViewModel
         MoveOverlayPresetCommand = new RelayCommand(MoveOverlayPreset);
         SetOverlayWidthPresetCommand = new RelayCommand(SetOverlayWidthPreset);
         SetOverlayHeightPresetCommand = new RelayCommand(SetOverlayHeightPreset);
+        AddHighlightKeywordCommand = new RelayCommand(_ => AddHighlightKeyword());
+        RemoveHighlightKeywordCommand = new RelayCommand(RemoveHighlightKeyword);
+        AddMuteKeywordCommand = new RelayCommand(_ => AddMuteKeyword());
+        RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
+        ToggleMuteAppCommand = new RelayCommand(ToggleMuteApp);
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
         LoadFromSettings();
@@ -338,6 +383,20 @@ public class SettingsViewModel : BaseViewModel
         _animationDurationMs = s.AnimationDurationMs;
         _deduplicationEnabled = s.DeduplicationEnabled;
         _deduplicationWindowSeconds = s.DeduplicationWindowSeconds;
+        _highlightColor = s.HighlightColor;
+        _quietHoursEnabled = s.QuietHoursEnabled;
+        _quietHoursStart = s.QuietHoursStart;
+        _quietHoursEnd = s.QuietHoursEnd;
+        _burstLimitEnabled = s.BurstLimitEnabled;
+        _burstLimitCount = s.BurstLimitCount;
+        _burstLimitWindowSeconds = s.BurstLimitWindowSeconds;
+
+        HighlightKeywords.Clear();
+        foreach (var kw in s.HighlightKeywords) HighlightKeywords.Add(kw);
+        MuteKeywords.Clear();
+        foreach (var kw in s.MuteKeywords) MuteKeywords.Add(kw);
+        RefreshMutedAppEntries();
+
         _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
         _overlayMaxHeight = Math.Clamp(s.OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax);
         _allowManualResize = s.AllowManualResize;
@@ -453,6 +512,16 @@ public class SettingsViewModel : BaseViewModel
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
             DeduplicationEnabled = DeduplicationEnabled,
             DeduplicationWindowSeconds = DeduplicationWindowSeconds,
+            HighlightColor = HighlightColor,
+            HighlightKeywords = HighlightKeywords.ToList(),
+            MuteKeywords = MuteKeywords.ToList(),
+            MutedApps = _settingsManager.Settings.MutedApps,
+            QuietHoursEnabled = QuietHoursEnabled,
+            QuietHoursStart = QuietHoursStart,
+            QuietHoursEnd = QuietHoursEnd,
+            BurstLimitEnabled = BurstLimitEnabled,
+            BurstLimitCount = Math.Max(1, BurstLimitCount),
+            BurstLimitWindowSeconds = BurstLimitWindowSeconds,
             OverlayWidth = resolvedOverlayWidth,
             LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
             OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),
@@ -628,5 +697,76 @@ public class SettingsViewModel : BaseViewModel
         var props = GetType().GetProperties();
         foreach (var prop in props)
             OnPropertyChanged(prop.Name);
+    }
+
+    private void AddHighlightKeyword()
+    {
+        var kw = NewHighlightKeyword?.Trim();
+        if (string.IsNullOrWhiteSpace(kw)) return;
+        if (!HighlightKeywords.Contains(kw, StringComparer.OrdinalIgnoreCase))
+        {
+            HighlightKeywords.Add(kw);
+            QueueSave();
+        }
+        NewHighlightKeyword = string.Empty;
+    }
+
+    private void RemoveHighlightKeyword(object? parameter)
+    {
+        if (parameter is string kw)
+        {
+            HighlightKeywords.Remove(kw);
+            QueueSave();
+        }
+    }
+
+    private void AddMuteKeyword()
+    {
+        var kw = NewMuteKeyword?.Trim();
+        if (string.IsNullOrWhiteSpace(kw)) return;
+        if (!MuteKeywords.Contains(kw, StringComparer.OrdinalIgnoreCase))
+        {
+            MuteKeywords.Add(kw);
+            QueueSave();
+        }
+        NewMuteKeyword = string.Empty;
+    }
+
+    private void RemoveMuteKeyword(object? parameter)
+    {
+        if (parameter is string kw)
+        {
+            MuteKeywords.Remove(kw);
+            QueueSave();
+        }
+    }
+
+    private void ToggleMuteApp(object? parameter)
+    {
+        if (parameter is not string appName) return;
+        if (_queueManager.IsAppMuted(appName))
+            _queueManager.UnmuteApp(appName);
+        else
+            _queueManager.MuteApp(appName);
+        RefreshMutedAppEntries();
+    }
+
+    public void RefreshMutedAppEntries()
+    {
+        MutedAppEntries.Clear();
+        foreach (var app in _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase))
+            MutedAppEntries.Add(new MutedAppEntry(app, _queueManager.IsAppMuted(app)));
+    }
+}
+
+public class MutedAppEntry
+{
+    public string AppName { get; }
+    public bool IsMuted { get; }
+
+    public MutedAppEntry(string appName, bool isMuted)
+    {
+        AppName = appName;
+        IsMuted = isMuted;
     }
 }

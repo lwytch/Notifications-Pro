@@ -114,6 +114,16 @@ public class SettingsManagerTests : IDisposable
         Assert.False(settings.ShowTimestamp);
         Assert.True(settings.DeduplicationEnabled);
         Assert.Equal(2, settings.DeduplicationWindowSeconds);
+        Assert.Empty(settings.MutedApps);
+        Assert.Empty(settings.HighlightKeywords);
+        Assert.Empty(settings.MuteKeywords);
+        Assert.Equal("#FFD700", settings.HighlightColor);
+        Assert.False(settings.QuietHoursEnabled);
+        Assert.Equal("22:00", settings.QuietHoursStart);
+        Assert.Equal("08:00", settings.QuietHoursEnd);
+        Assert.False(settings.BurstLimitEnabled);
+        Assert.Equal(10, settings.BurstLimitCount);
+        Assert.Equal(5, settings.BurstLimitWindowSeconds);
         Assert.Equal(380, settings.OverlayWidth);
         Assert.Equal(380, settings.LastManualOverlayWidth);
         Assert.Equal(600, settings.OverlayMaxHeight);
@@ -135,6 +145,27 @@ public class SettingsManagerTests : IDisposable
 
         Assert.Equal(20, original.FontSize);
         Assert.Equal("Arial", original.FontFamily);
+    }
+
+    [Fact]
+    public void Clone_DeepCopiesLists()
+    {
+        var original = new AppSettings();
+        original.MutedApps.Add("Teams");
+        original.HighlightKeywords.Add("urgent");
+        original.MuteKeywords.Add("spam");
+
+        var clone = original.Clone();
+        clone.MutedApps.Add("Slack");
+        clone.HighlightKeywords.Add("critical");
+        clone.MuteKeywords.Add("ad");
+
+        Assert.Single(original.MutedApps);
+        Assert.Single(original.HighlightKeywords);
+        Assert.Single(original.MuteKeywords);
+        Assert.Equal(2, clone.MutedApps.Count);
+        Assert.Equal(2, clone.HighlightKeywords.Count);
+        Assert.Equal(2, clone.MuteKeywords.Count);
     }
 
     [Fact]

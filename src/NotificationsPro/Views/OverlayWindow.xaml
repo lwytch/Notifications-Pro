@@ -32,7 +32,8 @@
                     <TranslateTransform X="0"/>
                 </Border.RenderTransform>
 
-                <Border CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                <Border x:Name="AccentBorder"
+                        CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
                         Padding="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
                         BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                         BorderThickness="{Binding DataContext.AccentBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}">
@@ -275,6 +276,11 @@
             </Border>
 
             <DataTemplate.Triggers>
+                <!-- Highlight accent override for keyword-matched notifications -->
+                <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                    <Setter TargetName="AccentBorder" Property="BorderBrush"
+                            Value="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>

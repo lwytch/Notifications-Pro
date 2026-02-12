@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Threading;
 using Application = System.Windows.Application;
 using NotificationsPro.Helpers;
 using NotificationsPro.Services;
@@ -29,6 +31,10 @@ public partial class App : Application
     private WinForms.ToolStripMenuItem? _alwaysOnTopItem;
     private WinForms.ToolStripMenuItem? _statusItem;
     private WinForms.ToolStripMenuItem? _grantAccessItem;
+    private WinForms.ToolStripMenuItem? _focusModeItem;
+    private WinForms.ToolStripMenuItem? _quickMuteItem;
+    private DispatcherTimer? _focusTimer;
+    private DateTime _focusEndTime;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
     // identify them in Privacy > Notifications and grant listener access.
@@ -97,6 +103,22 @@ public partial class App : Application
         contextMenu.Items.Add(_pauseResumeItem);
         contextMenu.Items.Add(_alwaysOnTopItem);
         contextMenu.Items.Add(_clickThroughItem);
+        contextMenu.Items.Add(new WinForms.ToolStripSeparator());
+
+        // Focus mode submenu
+        _focusModeItem = new WinForms.ToolStripMenuItem("Focus Mode");
+        _focusModeItem.DropDownItems.Add("Focus for 15 min", null, (_, _) => StartFocusMode(15));
+        _focusModeItem.DropDownItems.Add("Focus for 30 min", null, (_, _) => StartFocusMode(30));
+        _focusModeItem.DropDownItems.Add("Focus for 60 min", null, (_, _) => StartFocusMode(60));
+        _focusModeItem.DropDownItems.Add(new WinForms.ToolStripSeparator());
+        _focusModeItem.DropDownItems.Add("Cancel Focus", null, (_, _) => CancelFocusMode());
+        contextMenu.Items.Add(_focusModeItem);
+
+        // Quick mute submenu — populated dynamically when opened
+        _quickMuteItem = new WinForms.ToolStripMenuItem("Quick Mute App");
+        contextMenu.Items.Add(_quickMuteItem);
+        contextMenu.Opening += OnTrayMenuOpening;
+
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Clear All Notifications", null, (_, _) => _queueManager?.ClearAll());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
@@ -193,6 +215,9 @@ public partial class App : Application
                 ? "Disable Always on Top"
                 : "Enable Always on Top";
         }
+
+        if (_focusModeItem != null && _focusTimer == null)
+            _focusModeItem.Text = "Focus Mode";
     }
 
     private void ShowSettings()
@@ -251,8 +276,70 @@ public partial class App : Application
         catch { }
     }
 
+    private void StartFocusMode(int minutes)
+    {
+        if (_queueManager == null) return;
+        _queueManager.Pause();
+        _focusEndTime = DateTime.Now.AddMinutes(minutes);
+
+        _focusTimer?.Stop();
+        _focusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _focusTimer.Tick += OnFocusTimerTick;
+        _focusTimer.Start();
+        UpdateMenuLabels();
+    }
+
+    private void CancelFocusMode()
+    {
+        _focusTimer?.Stop();
+        _focusTimer = null;
+        _queueManager?.Resume();
+        UpdateMenuLabels();
+    }
+
+    private void OnFocusTimerTick(object? sender, EventArgs e)
+    {
+        var remaining = _focusEndTime - DateTime.Now;
+        if (remaining <= TimeSpan.Zero)
+        {
+            CancelFocusMode();
+            return;
+        }
+
+        if (_focusModeItem != null)
+            _focusModeItem.Text = $"Focus Mode ({remaining.Minutes}:{remaining.Seconds:D2} left)";
+    }
+
+    private void OnTrayMenuOpening(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (_quickMuteItem == null || _queueManager == null) return;
+
+        _quickMuteItem.DropDownItems.Clear();
+        var apps = _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase).ToList();
+        if (apps.Count == 0)
+        {
+            _quickMuteItem.DropDownItems.Add(new WinForms.ToolStripMenuItem("(no apps seen yet)") { Enabled = false });
+            return;
+        }
+
+        foreach (var app in apps)
+        {
+            var isMuted = _queueManager.IsAppMuted(app);
+            var label = isMuted ? $"Unmute: {app}" : $"Mute: {app}";
+            var capturedApp = app;
+            _quickMuteItem.DropDownItems.Add(label, null, (_, _) =>
+            {
+                if (_queueManager.IsAppMuted(capturedApp))
+                    _queueManager.UnmuteApp(capturedApp);
+                else
+                    _queueManager.MuteApp(capturedApp);
+            });
+        }
+    }
+
     private void QuitApp()
     {
+        _focusTimer?.Stop();
         _notificationListener?.Stop();
         _settingsManager?.Save();
         _trayIcon?.Dispose();

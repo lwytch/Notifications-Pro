@@ -11,6 +11,8 @@
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
+        <converters:BoolToMuteLabelConverter x:Key="BoolToMuteLabel"/>
+        <converters:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- Section header style -->
@@ -699,6 +701,173 @@
                         </DockPanel>
                         <TextBlock Text="How long (in seconds) to consider identical notifications as duplicates"
                                    Style="{StaticResource SettingDesc}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ FILTERING TAB ═══ -->
+            <TabItem Header="Filtering" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <TextBlock Text="PER-APP MUTING" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Apps seen this session appear below. Toggle to mute/unmute."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <ItemsControl ItemsSource="{Binding MutedAppEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0,0,0,6">
+                                        <Button DockPanel.Dock="Right" Content="{Binding IsMuted, Converter={StaticResource BoolToMuteLabel}}"
+                                                Style="{StaticResource SecondaryButton}" MinWidth="72"
+                                                Command="{Binding DataContext.ToggleMuteAppCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding AppName}"/>
+                                        <TextBlock Text="{Binding AppName}" Style="{StaticResource SettingLabel}"
+                                                   VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="No apps seen yet — notifications will populate this list"
+                                   Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
+                                   Visibility="{Binding MutedAppEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
+
+                        <TextBlock Text="KEYWORD HIGHLIGHTING" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Notifications matching these keywords get a colored accent stripe"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Highlight Color" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                    Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="HighlightColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for highlight accent"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding HighlightColor, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Hex color for highlighted notification accent"
+                                     MaxLength="7"/>
+                        </DockPanel>
+                        <TextBlock Text="Accent color used for keyword-matched notification cards"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
+                                    Margin="8,0,0,0" Command="{Binding AddHighlightKeywordCommand}"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding NewHighlightKeyword, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Type a keyword and click Add"/>
+                        </DockPanel>
+                        <ItemsControl ItemsSource="{Binding HighlightKeywords}" Margin="0,4,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0,0,0,4">
+                                        <Button DockPanel.Dock="Right" Content="X" Style="{StaticResource SecondaryButton}"
+                                                MinWidth="28" Padding="6,2"
+                                                Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}"
+                                                   VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="KEYWORD MUTING" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Notifications containing these keywords will be silently suppressed"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
+                                    Margin="8,0,0,0" Command="{Binding AddMuteKeywordCommand}"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding NewMuteKeyword, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Type a keyword and click Add"/>
+                        </DockPanel>
+                        <ItemsControl ItemsSource="{Binding MuteKeywords}" Margin="0,4,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0,0,0,4">
+                                        <Button DockPanel.Dock="Right" Content="X" Style="{StaticResource SecondaryButton}"
+                                                MinWidth="28" Padding="6,2"
+                                                Command="{Binding DataContext.RemoveMuteKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}"
+                                                   VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding QuietHoursEnabled}"
+                                          ToolTip="Automatically suppress notifications during specified hours"/>
+                            <TextBlock Text="Enable Quiet Hours" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Silences all notifications between the start and end times"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding QuietHoursEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Start Time (HH:mm)" Style="{StaticResource SettingLabel}"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding QuietHoursStart, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Time to begin suppressing notifications (24h format)"
+                                     MaxLength="5"/>
+                            <TextBlock Text="e.g. 22:00 for 10 PM" Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="End Time (HH:mm)" Style="{StaticResource SettingLabel}"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding QuietHoursEnd, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Time to stop suppressing notifications (24h format)"
+                                     MaxLength="5"/>
+                            <TextBlock Text="e.g. 08:00 for 8 AM" Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="BURST LIMITING" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding BurstLimitEnabled}"
+                                          ToolTip="Auto-suppress when too many notifications arrive in a short window"/>
+                            <TextBlock Text="Enable Burst Limiting" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Prevents notification storms from flooding the overlay"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding BurstLimitEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Max Notifications" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding BurstLimitCount, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="2" Maximum="50" Value="{Binding BurstLimitCount}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Max notifications allowed within the burst window"/>
+                            </DockPanel>
+                            <TextBlock Text="Number of notifications allowed before suppression kicks in"
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Burst Window" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding BurstLimitWindowSeconds, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="30" Value="{Binding BurstLimitWindowSeconds}"
+                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                        ToolTip="Time window in seconds for burst detection"/>
+                            </DockPanel>
+                            <TextBlock Text="How many seconds to count notifications over"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>

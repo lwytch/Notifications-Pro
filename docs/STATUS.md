@@ -74,7 +74,16 @@
   - "Clear All Notifications" in tray menu
   - Optional relative timestamps on cards ("just now", "2m ago", etc.) refreshed every 15s
   - Show Timestamp toggle in Settings > Behavior > Content
-- 38 unit tests covering QueueManager, SettingsManager (with round-trip and corruption), SnapHelper, and one-line text shaping
+- **Filtering & Smart Control (Milestone 5)**:
+  - Per-app muting — mute/unmute from card context menu, tray Quick Mute submenu, or Filtering settings tab
+  - Keyword highlighting — notifications matching configured keywords get a colored accent stripe
+  - Keyword muting — silently suppress notifications containing configured keywords
+  - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
+  - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
+  - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
+  - New Filtering tab in Settings with per-app toggles, keyword management, quiet hours, burst limit
+  - SeenAppNames tracking (RAM only, never persisted)
+- 48 unit tests covering QueueManager (including filtering), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, and one-line text shaping
 
 ## What Doesn't Work Yet
 - Multi-monitor selection (Milestone 9)
@@ -148,6 +157,15 @@ dotnet test
 - [ ] "Copy Text" copies card app/title/body to clipboard
 - [ ] "Clear All Notifications" in tray menu removes all visible cards
 - [ ] "Show Timestamp" toggle displays relative time on each stacked card
+- [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit sections
+- [ ] Muting an app from card context menu suppresses future notifications from that app
+- [ ] Unmuting an app from Filtering tab restores notifications
+- [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color
+- [ ] Adding a mute keyword suppresses notifications containing that word
+- [ ] Quiet hours toggle suppresses all notifications between configured times
+- [ ] Burst limit toggle suppresses when too many notifications arrive quickly
+- [ ] Focus mode (tray menu) pauses notifications for selected duration with countdown
+- [ ] Quick Mute App submenu in tray menu shows seen apps with mute/unmute toggles
 
 ## Known Limitations
 - Multi-monitor support not yet implemented

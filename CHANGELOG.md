@@ -3,6 +3,18 @@
 ## Unreleased
 
 ### Added
+- **Milestone 5: Filtering & Smart Control**
+- Per-app muting: mute/unmute apps from card context menu, tray Quick Mute submenu, or new Filtering settings tab
+- Keyword highlighting: notifications matching configured keywords get a colored accent stripe (configurable highlight color)
+- Keyword muting: silently suppress notifications containing configured keywords
+- Quiet hours / Do Not Disturb: auto-suppress notifications between configurable start and end times (handles midnight wrapping)
+- Burst rate limiting: auto-suppress when N+ notifications arrive within a configurable time window
+- Focus mode: timed pause from tray menu (15/30/60 min) with live countdown and auto-resume
+- New Filtering tab in Settings with per-app mute toggles, keyword management, quiet hours, burst limit controls
+- Quick Mute App submenu in tray menu populated from seen apps this session
+- "Mute [AppName]" / "Unmute [AppName]" option in card right-click context menu
+- SeenAppNames tracking (RAM only, never persisted — privacy safe)
+- 10 new unit tests covering mute, highlight, keyword, quiet hours, and burst filtering
 - Slide-in direction setting: notifications can now enter from Left, Right, Top, or Bottom (Behavior > Animations)
 - Click to dismiss: click any notification card to immediately remove it
 - Hover to pause: mouse over the overlay pauses all expiry timers; moving away resumes them
