@@ -115,6 +115,99 @@
         <!-- Tabs -->
         <TabControl Grid.Row="1" Style="{StaticResource SettingsTabControl}" Margin="24,0">
 
+            <!-- ═══ THEMES TAB ═══ -->
+            <TabItem Header="Themes" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <TextBlock Text="BUILT-IN THEMES" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="One-click apply sets colors, opacity, shape, and accent at once"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <ItemsControl ItemsSource="{Binding BuiltInThemes}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource SecondaryButton}"
+                                            Margin="0,0,8,8" MinWidth="100" Padding="12,8"
+                                            Command="{Binding DataContext.ApplyThemeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="14" Height="14" CornerRadius="3"
+                                                    Background="{Binding AccentColor, Converter={StaticResource ColorToBrush}}"
+                                                    Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="CUSTOM THEMES" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Save your current look as a named theme"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,4,0,8">
+                            <Button DockPanel.Dock="Right" Content="Save" Style="{StaticResource PrimaryButton}"
+                                    Margin="8,0,0,0" Command="{Binding SaveCustomThemeCommand}"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding NewThemeName, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Enter a name for the custom theme"/>
+                        </DockPanel>
+
+                        <ItemsControl ItemsSource="{Binding CustomThemes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0,0,0,6">
+                                        <Button DockPanel.Dock="Right" Content="X" Style="{StaticResource SecondaryButton}"
+                                                MinWidth="28" Padding="6,2" Margin="4,0,0,0"
+                                                Command="{Binding DataContext.DeleteCustomThemeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding Name}"
+                                                ToolTip="Delete this custom theme"/>
+                                        <Button Style="{StaticResource SecondaryButton}"
+                                                Padding="10,6" HorizontalContentAlignment="Left"
+                                                Command="{Binding DataContext.ApplyThemeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Apply this custom theme">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="14" Height="14" CornerRadius="3"
+                                                        Background="{Binding AccentColor, Converter={StaticResource ColorToBrush}}"
+                                                        Margin="0,0,6,0"/>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="No custom themes saved yet"
+                                   Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
+                                   Visibility="{Binding CustomThemes.Count, Converter={StaticResource ZeroToVisible}}"/>
+
+                        <TextBlock Text="IMPORT / EXPORT" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Share your full settings (all tabs) as a JSON file"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <WrapPanel Margin="0,0,0,8">
+                            <Button Content="Export Settings" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8" Command="{Binding ExportSettingsCommand}"
+                                    ToolTip="Save all current settings to a JSON file"/>
+                            <Button Content="Import Settings" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8" Command="{Binding ImportSettingsCommand}"
+                                    ToolTip="Load settings from a previously exported JSON file"/>
+                        </WrapPanel>
+                        <TextBlock Text="Import replaces all settings including behavior, position, and filtering"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <!-- ═══ APPEARANCE TAB ═══ -->
             <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">

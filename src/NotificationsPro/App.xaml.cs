@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Application = System.Windows.Application;
 using NotificationsPro.Helpers;
+using NotificationsPro.Models;
 using NotificationsPro.Services;
 using NotificationsPro.ViewModels;
 using NotificationsPro.Views;
@@ -33,8 +34,10 @@ public partial class App : Application
     private WinForms.ToolStripMenuItem? _grantAccessItem;
     private WinForms.ToolStripMenuItem? _focusModeItem;
     private WinForms.ToolStripMenuItem? _quickMuteItem;
+    private WinForms.ToolStripMenuItem? _themeSwitchItem;
     private DispatcherTimer? _focusTimer;
     private DateTime _focusEndTime;
+    private ThemeManager? _themeManager;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
     // identify them in Privacy > Notifications and grant listener access.
@@ -52,6 +55,7 @@ public partial class App : Application
 
         _settingsManager = new SettingsManager();
         _settingsManager.Load();
+        _themeManager = new ThemeManager();
 
         _queueManager = new QueueManager(_settingsManager);
 
@@ -117,6 +121,11 @@ public partial class App : Application
         // Quick mute submenu — populated dynamically when opened
         _quickMuteItem = new WinForms.ToolStripMenuItem("Quick Mute App");
         contextMenu.Items.Add(_quickMuteItem);
+
+        // Theme quick-switch submenu — populated dynamically when opened
+        _themeSwitchItem = new WinForms.ToolStripMenuItem("Switch Theme");
+        contextMenu.Items.Add(_themeSwitchItem);
+
         contextMenu.Opening += OnTrayMenuOpening;
 
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
@@ -312,6 +321,12 @@ public partial class App : Application
 
     private void OnTrayMenuOpening(object? sender, System.ComponentModel.CancelEventArgs e)
     {
+        PopulateQuickMuteMenu();
+        PopulateThemeSwitchMenu();
+    }
+
+    private void PopulateQuickMuteMenu()
+    {
         if (_quickMuteItem == null || _queueManager == null) return;
 
         _quickMuteItem.DropDownItems.Clear();
@@ -335,6 +350,38 @@ public partial class App : Application
                     _queueManager.MuteApp(capturedApp);
             });
         }
+    }
+
+    private void PopulateThemeSwitchMenu()
+    {
+        if (_themeSwitchItem == null || _settingsManager == null || _themeManager == null) return;
+
+        _themeSwitchItem.DropDownItems.Clear();
+
+        foreach (var theme in ThemePreset.BuiltInThemes)
+        {
+            var captured = theme;
+            _themeSwitchItem.DropDownItems.Add(theme.Name, null, (_, _) => ApplyThemeFromTray(captured));
+        }
+
+        var customThemes = _themeManager.LoadCustomThemes();
+        if (customThemes.Count > 0)
+        {
+            _themeSwitchItem.DropDownItems.Add(new WinForms.ToolStripSeparator());
+            foreach (var theme in customThemes)
+            {
+                var captured = theme;
+                _themeSwitchItem.DropDownItems.Add(theme.Name, null, (_, _) => ApplyThemeFromTray(captured));
+            }
+        }
+    }
+
+    private void ApplyThemeFromTray(ThemePreset theme)
+    {
+        if (_settingsManager == null) return;
+        var updated = _settingsManager.Settings.Clone();
+        theme.ApplyTo(updated);
+        _settingsManager.Apply(updated);
     }
 
     private void QuitApp()

@@ -3,6 +3,18 @@
 ## Unreleased
 
 ### Added
+- **Milestone 6: Themes & Profiles**
+- 6 built-in theme presets: Dark Purple (default), Dark Neutral, Light, Frosted Glass, High Contrast, Minimal
+- One-click theme apply sets all visual properties (colors, opacity, corner radius, accent, border) at once
+- Custom theme support: save current settings as a named theme, load/switch/delete custom themes
+- Custom themes stored as individual JSON files in %AppData%\NotificationsPro\themes\
+- Export full settings to a shareable JSON file via Save dialog
+- Import settings from a JSON file via Open dialog
+- Theme quick-switch submenu in tray menu (built-in + custom themes, dynamically populated)
+- New Themes tab in Settings window with built-in theme grid, custom theme management, import/export
+- ThemePreset model captures visual-only properties (doesn't overwrite behavior/position/filtering)
+- ThemeManager service for custom theme persistence with file name sanitization
+- 15 new unit tests covering ThemePreset (apply, round-trip, built-in validation) and ThemeManager (save/load/delete, import/export, corruption handling)
 - **Milestone 5: Filtering & Smart Control**
 - Per-app muting: mute/unmute apps from card context menu, tray Quick Mute submenu, or new Filtering settings tab
 - Keyword highlighting: notifications matching configured keywords get a colored accent stripe (configurable highlight color)
@@ -93,6 +105,7 @@
 - Preview/test notifications now generate unique content to avoid dedup hiding expected card counts
 - Single-line text color regression where title/app segments could ignore configured color choices
 - Stacked-mode density regression when leaving single-line mode with wrapped content (oversized cards + premature scrollbar)
+- Startup crash on launch when animating a frozen card `TranslateTransform` from the notification template
 
 ## Milestone 2 — Real Notification Capture
 

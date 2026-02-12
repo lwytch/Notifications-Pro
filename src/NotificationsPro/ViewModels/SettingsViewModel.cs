@@ -300,7 +300,21 @@ public class SettingsViewModel : BaseViewModel
     public ICommand AddMuteKeywordCommand { get; }
     public ICommand RemoveMuteKeywordCommand { get; }
     public ICommand ToggleMuteAppCommand { get; }
+    public ICommand ApplyThemeCommand { get; }
+    public ICommand SaveCustomThemeCommand { get; }
+    public ICommand DeleteCustomThemeCommand { get; }
+    public ICommand ExportSettingsCommand { get; }
+    public ICommand ImportSettingsCommand { get; }
     public ImageSource TrayIconImage { get; }
+
+    // Themes
+    private readonly ThemeManager _themeManager = new();
+
+    private string _newThemeName = string.Empty;
+    public string NewThemeName { get => _newThemeName; set => SetProperty(ref _newThemeName, value); }
+
+    public ObservableCollection<ThemePreset> BuiltInThemes { get; } = new();
+    public ObservableCollection<ThemePreset> CustomThemes { get; } = new();
 
     public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
     {
@@ -329,7 +343,16 @@ public class SettingsViewModel : BaseViewModel
         AddMuteKeywordCommand = new RelayCommand(_ => AddMuteKeyword());
         RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
         ToggleMuteAppCommand = new RelayCommand(ToggleMuteApp);
+        ApplyThemeCommand = new RelayCommand(ApplyTheme);
+        SaveCustomThemeCommand = new RelayCommand(_ => SaveCustomTheme());
+        DeleteCustomThemeCommand = new RelayCommand(DeleteCustomTheme);
+        ExportSettingsCommand = new RelayCommand(_ => ExportSettings());
+        ImportSettingsCommand = new RelayCommand(_ => ImportSettings());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
+
+        foreach (var t in ThemePreset.BuiltInThemes)
+            BuiltInThemes.Add(t);
+        RefreshCustomThemes();
 
         LoadFromSettings();
     }
@@ -757,6 +780,90 @@ public class SettingsViewModel : BaseViewModel
         foreach (var app in _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase))
             MutedAppEntries.Add(new MutedAppEntry(app, _queueManager.IsAppMuted(app)));
     }
+
+    private void ApplyTheme(object? parameter)
+    {
+        if (parameter is not ThemePreset theme) return;
+
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var updated = _settingsManager.Settings.Clone();
+        theme.ApplyTo(updated);
+        _settingsManager.Apply(updated);
+        LoadFromSettings();
+
+        var props = GetType().GetProperties();
+        foreach (var prop in props)
+            OnPropertyChanged(prop.Name);
+    }
+
+    private void SaveCustomTheme()
+    {
+        var name = NewThemeName?.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var theme = ThemePreset.FromSettings(_settingsManager.Settings, name);
+        _themeManager.SaveCustomTheme(theme);
+        NewThemeName = string.Empty;
+        RefreshCustomThemes();
+    }
+
+    private void DeleteCustomTheme(object? parameter)
+    {
+        if (parameter is not string themeName) return;
+        _themeManager.DeleteCustomTheme(themeName);
+        RefreshCustomThemes();
+    }
+
+    private void RefreshCustomThemes()
+    {
+        CustomThemes.Clear();
+        foreach (var t in _themeManager.LoadCustomThemes())
+            CustomThemes.Add(t);
+    }
+
+    private void ExportSettings()
+    {
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json",
+            DefaultExt = ".json",
+            FileName = "NotificationsPro-settings.json"
+        };
+
+        if (dialog.ShowDialog() == true)
+            ThemeManager.ExportSettings(_settingsManager.Settings, dialog.FileName);
+    }
+
+    private void ImportSettings()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json",
+            DefaultExt = ".json"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        var imported = ThemeManager.ImportSettings(dialog.FileName);
+        if (imported == null) return;
+
+        _settingsManager.Apply(imported);
+        LoadFromSettings();
+
+        var props = GetType().GetProperties();
+        foreach (var prop in props)
+            OnPropertyChanged(prop.Name);
+    }
+
+    public ThemeManager GetThemeManager() => _themeManager;
 }
 
 public class MutedAppEntry

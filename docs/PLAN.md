@@ -93,6 +93,7 @@ Previously completed (Milestone 3):
 - [x] Overlay-height presets added (1080p / 2K / 4K / 8K)
 - [x] Max overlay width now supports high-resolution ranges up to 8K-class displays
 - [x] Overlay-width presets added (1080p / 2K / 4K / 8K)
+- [x] Guard card animations against frozen template transforms to prevent startup crashes
 
 ### Milestone 4: Card Interaction
 **Status: Complete**
@@ -134,23 +135,24 @@ Settings UI:
 - [x] New Filtering tab in Settings window (per-app mute, keyword highlight/mute, quiet hours, burst limit)
 
 ### Milestone 6: Themes & Profiles
-**Status: Not Started**
-
-Extensive customization exists but no way to save, switch, or share configurations.
+**Status: Complete**
 
 Built-in theme presets:
-- [ ] Ship 5+ presets: "Dark Purple" (current default), "Dark Neutral", "Light", "Frosted Glass", "High Contrast", "Minimal"
-- [ ] One-click apply sets all colors, opacity, corner radius, and accent at once
-- [ ] Per-field "reset to theme default" micro-button next to each color picker
+- [x] Ship 6 presets: "Dark Purple" (default), "Dark Neutral", "Light", "Frosted Glass", "High Contrast", "Minimal"
+- [x] One-click apply sets all colors, opacity, corner radius, and accent at once
+- [ ] Per-field "reset to theme default" micro-button next to each color picker (deferred)
 
 Custom themes:
-- [ ] Save current settings as a named custom theme
-- [ ] Load / switch between saved themes
-- [ ] Delete custom themes
+- [x] Save current settings as a named custom theme (stored in %AppData%\NotificationsPro\themes\)
+- [x] Load / switch between saved themes
+- [x] Delete custom themes
 
 Import / export:
-- [ ] Export settings as shareable JSON file
-- [ ] Import settings from JSON file
+- [x] Export settings as shareable JSON file
+- [x] Import settings from JSON file
+
+Tray integration:
+- [x] Theme quick-switch submenu in tray menu (built-in + custom themes)
 
 Profiles (stretch):
 - [ ] Named profiles (e.g., "Work", "Gaming", "Streaming") that bundle theme + filter rules + position + behavior
@@ -248,7 +250,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 5 filtering complete. Next: Milestone 6 themes & profiles, or Milestone 7 accessibility.
+Milestone 6 themes complete. Next: Milestone 7 accessibility, or Milestone 8 UX polish.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

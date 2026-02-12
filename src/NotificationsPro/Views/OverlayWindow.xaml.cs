@@ -355,11 +355,9 @@ public partial class OverlayWindow : Window
     private void OnCardLoaded(object sender, RoutedEventArgs e)
     {
         if (sender is not Border card) return;
+        var transform = EnsureMutableCardTransform(card);
         if (DataContext is not OverlayViewModel vm) return;
         if (!vm.AnimationsEnabled) return;
-
-        var transform = card.RenderTransform as TranslateTransform;
-        if (transform == null) return;
 
         var durationMs = vm.AnimationDurationMs;
         var fadeOnly = vm.FadeOnlyAnimation;
@@ -395,6 +393,23 @@ public partial class OverlayWindow : Window
                     new DoubleAnimation(-(vm.OverlayWidth + 40), 0, motionDuration) { EasingFunction = easing });
                 break;
         }
+    }
+
+    private static TranslateTransform EnsureMutableCardTransform(Border card)
+    {
+        if (card.RenderTransform is TranslateTransform existingTransform)
+        {
+            if (!existingTransform.IsFrozen)
+                return existingTransform;
+
+            var clone = existingTransform.CloneCurrentValue();
+            card.RenderTransform = clone;
+            return clone;
+        }
+
+        var newTransform = new TranslateTransform();
+        card.RenderTransform = newTransform;
+        return newTransform;
     }
 
     private NotificationItem? FindNotificationAtScreenPoint(IntPtr lParam)

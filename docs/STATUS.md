@@ -66,6 +66,7 @@
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
 - Slide-in direction configurable (Left, Right, Top, Bottom) via Settings > Behavior > Animations
+- Card load animations now ensure mutable transforms to avoid frozen-transform startup crashes
 - **Card interaction (Milestone 4)**:
   - Click to dismiss — click a notification card to immediately remove it
   - Hover to pause — mouse over the overlay pauses all expiry timers, resume on mouse leave
@@ -83,7 +84,16 @@
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
   - New Filtering tab in Settings with per-app toggles, keyword management, quiet hours, burst limit
   - SeenAppNames tracking (RAM only, never persisted)
-- 48 unit tests covering QueueManager (including filtering), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, and one-line text shaping
+- **Themes & Profiles (Milestone 6)**:
+  - 6 built-in theme presets: Dark Purple, Dark Neutral, Light, Frosted Glass, High Contrast, Minimal
+  - One-click theme apply sets all visual properties (colors, opacity, corner radius, accent, border) at once
+  - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
+  - Load, switch between, and delete custom themes from Settings > Themes tab
+  - Export full settings to a shareable JSON file
+  - Import settings from a JSON file
+  - Theme quick-switch submenu in tray menu (built-in + custom themes)
+  - Themes tab in Settings with built-in theme grid, custom theme management, and import/export buttons
+- 63 unit tests covering QueueManager (including filtering), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, and ThemeManager
 
 ## What Doesn't Work Yet
 - Multi-monitor selection (Milestone 9)
@@ -166,6 +176,12 @@ dotnet test
 - [ ] Burst limit toggle suppresses when too many notifications arrive quickly
 - [ ] Focus mode (tray menu) pauses notifications for selected duration with countdown
 - [ ] Quick Mute App submenu in tray menu shows seen apps with mute/unmute toggles
+- [ ] Themes tab appears in Settings with built-in themes, custom themes, and import/export
+- [ ] Clicking a built-in theme applies its colors/shape to the overlay immediately
+- [ ] Saving a custom theme creates a file and it appears in the custom themes list
+- [ ] Deleting a custom theme removes it from the list and from disk
+- [ ] Export Settings writes a JSON file; Import Settings loads it and applies
+- [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
 
 ## Known Limitations
 - Multi-monitor support not yet implemented
