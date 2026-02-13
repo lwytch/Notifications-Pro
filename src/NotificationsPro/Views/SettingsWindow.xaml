@@ -1051,6 +1051,35 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
+                        <TextBlock Text="MONITOR" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Target Monitor" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Move" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding MoveToMonitorCommand}" Margin="8,0,0,0"
+                                    ToolTip="Move the overlay to the selected monitor"/>
+                            <Button DockPanel.Dock="Right" Content="Refresh" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding RefreshMonitorsCommand}" Margin="8,0,0,0"
+                                    ToolTip="Re-detect connected monitors"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemsSource="{Binding MonitorItems}"
+                                      SelectedIndex="{Binding SelectedMonitorIndex}"
+                                      ToolTip="Select which monitor the overlay should appear on"/>
+                        </DockPanel>
+                        <TextBlock Text="Choose a monitor, then click Move to reposition the overlay. Position presets also use this monitor."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding StartWithWindows}"
+                                          ToolTip="Automatically start Notifications Pro when you sign in to Windows"/>
+                            <TextBlock Text="Start with Windows" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Automatically launch Notifications Pro when you sign in"
+                                   Style="{StaticResource SettingDesc}"/>
+
                         <TextBlock Text="SIZE" Style="{StaticResource SectionHeader}"/>
 
                         <TextBlock Text="Overlay Width" Style="{StaticResource SettingLabel}"/>
@@ -1142,7 +1171,7 @@
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="Move overlay to common screen positions"
+                        <TextBlock Text="Move overlay to common positions on the selected monitor"
                                    Style="{StaticResource SettingDesc}"/>
                         <WrapPanel Margin="0,0,0,8" ItemWidth="120">
                             <Button Content="Top Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"

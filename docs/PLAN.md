@@ -221,15 +221,15 @@ Tray icon enhancements:
 - [x] "Clear All Notifications" in tray menu (already existed from M4)
 
 ### Milestone 9: System Integration & Multi-Monitor
-**Status: Not Started**
+**Status: Complete**
 
-- [ ] Start with Windows toggle (registry `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` or Task Scheduler)
-- [ ] Global hotkeys via `RegisterHotKey` Win32 API (configurable bindings for toggle overlay, dismiss all, toggle DND)
-- [ ] Hotkey configuration UI in settings
-- [ ] Multi-monitor picker in Position tab (ComboBox populated with `Screen.AllScreens` names)
-- [ ] Move overlay to selected monitor with one click
-- [ ] Per-monitor DPI awareness (handle `DpiChanged`, re-constrain position and width)
-- [ ] Monitor-aware position presets (top-left of monitor 2, etc.)
+- [x] Start with Windows toggle (registry `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`)
+- [x] Global hotkeys via `RegisterHotKey` Win32 API (completed in M7)
+- [x] Hotkey configuration UI in settings (completed in M7)
+- [x] Multi-monitor picker in Position tab (ComboBox populated with `Screen.AllScreens` names + resolution)
+- [x] Move overlay to selected monitor with one click
+- [x] Per-monitor DPI awareness (.NET 8 WPF provides per-monitor V2 DPI awareness by default)
+- [x] Monitor-aware position presets (quick position buttons now target the selected monitor)
 
 ### Milestone 10: Streaming & Presentation (Stretch)
 **Status: Not Started**
@@ -252,7 +252,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 8 UX polish complete. Next: Milestone 9 system integration, or Milestone 10 streaming.
+Milestone 9 system integration & multi-monitor complete. Next: Milestone 10 streaming, or Milestone 11 packaging.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

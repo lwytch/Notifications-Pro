@@ -3,6 +3,16 @@
 ## Unreleased
 
 ### Added
+- **Milestone 9: System Integration & Multi-Monitor**
+- Start with Windows toggle — adds/removes registry Run key (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
+- Startup registry state synced on app launch to ensure consistency
+- Multi-monitor picker in Position tab — ComboBox populated with detected monitors (resolution + primary label)
+- "Move" button moves overlay to the selected monitor (top-right position)
+- "Refresh" button re-detects connected monitors without restarting
+- Position presets (top-left, top-center, etc.) now target the selected monitor instead of the current one
+- Monitor section and Startup section added to Settings > Position tab
+- StartupHelper utility for safe registry read/write/delete of Run key
+- 7 new unit tests covering M9 AppSettings defaults, clone, JSON round-trip, StartupHelper, and MonitorInfo
 - **Milestone 8: UX Polish & Settings Enhancements**
 - Inline live preview card in settings window — always-visible sample notification that updates in real-time as you change colors, fonts, and shape
 - Empty overlay ghost card — low-opacity "Waiting for notifications..." placeholder when no cards are visible

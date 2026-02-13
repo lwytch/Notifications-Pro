@@ -58,6 +58,9 @@ public partial class App : Application
         _settingsManager.Load();
         _themeManager = new ThemeManager();
 
+        // Sync startup registry with saved setting
+        SyncStartupRegistryState();
+
         _queueManager = new QueueManager(_settingsManager);
 
         _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager);
@@ -99,6 +102,18 @@ public partial class App : Application
 
         // Initialize notification listener — will prompt for permission on first run
         await _notificationListener.InitializeAsync();
+    }
+
+    private void SyncStartupRegistryState()
+    {
+        if (_settingsManager == null) return;
+        var shouldStart = _settingsManager.Settings.StartWithWindows;
+        var isRegistered = StartupHelper.IsStartupEnabled();
+
+        if (shouldStart && !isRegistered)
+            StartupHelper.EnableStartup();
+        else if (!shouldStart && isRegistered)
+            StartupHelper.DisableStartup();
     }
 
     private void ApplyHighContrastIfNeeded()

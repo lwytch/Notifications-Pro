@@ -282,6 +282,36 @@ public class SettingsViewModel : BaseViewModel
     private string _densityPreset = "Comfortable";
     public string DensityPreset { get => _densityPreset; set => SetProperty(ref _densityPreset, value); }
 
+    // System Integration (M9) — Start with Windows
+    private bool _startWithWindows;
+    public bool StartWithWindows
+    {
+        get => _startWithWindows;
+        set
+        {
+            if (!SetProperty(ref _startWithWindows, value)) return;
+            if (value)
+                StartupHelper.EnableStartup();
+            else
+                StartupHelper.DisableStartup();
+            QueueSave();
+        }
+    }
+
+    // System Integration (M9) — Multi-monitor
+    public ObservableCollection<MonitorInfo> MonitorItems { get; } = new();
+
+    private int _selectedMonitorIndex;
+    public int SelectedMonitorIndex
+    {
+        get => _selectedMonitorIndex;
+        set
+        {
+            if (SetProperty(ref _selectedMonitorIndex, value))
+                QueueSave();
+        }
+    }
+
     // UX Polish (M8) — saved feedback
     private bool _showSavedIndicator;
     public bool ShowSavedIndicator { get => _showSavedIndicator; set => SetProperty(ref _showSavedIndicator, value); }
@@ -357,6 +387,8 @@ public class SettingsViewModel : BaseViewModel
     public ICommand ExportSettingsCommand { get; }
     public ICommand ImportSettingsCommand { get; }
     public ICommand ApplyDensityPresetCommand { get; }
+    public ICommand MoveToMonitorCommand { get; }
+    public ICommand RefreshMonitorsCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     // Themes
@@ -401,6 +433,8 @@ public class SettingsViewModel : BaseViewModel
         ExportSettingsCommand = new RelayCommand(_ => ExportSettings());
         ImportSettingsCommand = new RelayCommand(_ => ImportSettings());
         ApplyDensityPresetCommand = new RelayCommand(ApplyDensityPreset);
+        MoveToMonitorCommand = new RelayCommand(_ => MoveToSelectedMonitor());
+        RefreshMonitorsCommand = new RelayCommand(_ => RefreshMonitors());
         DismissFirstRunTipCommand = new RelayCommand(_ => DismissFirstRunTip());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
@@ -409,6 +443,7 @@ public class SettingsViewModel : BaseViewModel
         RefreshCustomThemes();
 
         LoadFromSettings();
+        RefreshMonitors();
 
         // Show first-run tip if welcome hasn't been shown yet
         if (!_settingsManager.Settings.HasShownWelcome)
@@ -483,6 +518,8 @@ public class SettingsViewModel : BaseViewModel
         _hotkeyDismissAll = s.HotkeyDismissAll;
         _hotkeyToggleDnd = s.HotkeyToggleDnd;
         _densityPreset = s.DensityPreset;
+        _startWithWindows = s.StartWithWindows;
+        _selectedMonitorIndex = s.SelectedMonitorIndex;
 
         HighlightKeywords.Clear();
         foreach (var kw in s.HighlightKeywords) HighlightKeywords.Add(kw);
@@ -639,6 +676,8 @@ public class SettingsViewModel : BaseViewModel
             MonitorIndex = previousSettings.MonitorIndex,
             OverlayVisible = previousSettings.OverlayVisible,
             NotificationsPaused = previousSettings.NotificationsPaused,
+            StartWithWindows = StartWithWindows,
+            SelectedMonitorIndex = SelectedMonitorIndex,
             HasShownWelcome = previousSettings.HasShownWelcome,
             SettingsWindowLeft = previousSettings.SettingsWindowLeft,
             SettingsWindowTop = previousSettings.SettingsWindowTop,
@@ -687,7 +726,10 @@ public class SettingsViewModel : BaseViewModel
         SaveSettings();
 
         var updated = _settingsManager.Settings.Clone();
-        var workArea = GetWorkAreaForMonitor(updated.MonitorIndex);
+        // Use the selected monitor from M9 monitor picker
+        updated.MonitorIndex = SelectedMonitorIndex;
+        updated.SelectedMonitorIndex = SelectedMonitorIndex;
+        var workArea = GetWorkAreaForMonitor(SelectedMonitorIndex);
         const double margin = 16;
 
         var targetWidth = Math.Clamp(updated.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
@@ -1034,7 +1076,78 @@ public class SettingsViewModel : BaseViewModel
         _settingsManager.Save();
     }
 
+    public void RefreshMonitors()
+    {
+        MonitorItems.Clear();
+        var screens = WinForms.Screen.AllScreens;
+        for (var i = 0; i < screens.Length; i++)
+        {
+            var s = screens[i];
+            var label = $"Monitor {i + 1}: {s.Bounds.Width}x{s.Bounds.Height}";
+            if (s.Primary)
+                label += " (Primary)";
+            MonitorItems.Add(new MonitorInfo(i, label, s.Primary));
+        }
+
+        // Clamp selected index to valid range
+        if (_selectedMonitorIndex >= screens.Length)
+        {
+            _selectedMonitorIndex = 0;
+            OnPropertyChanged(nameof(SelectedMonitorIndex));
+        }
+    }
+
+    private void MoveToSelectedMonitor()
+    {
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var updated = _settingsManager.Settings.Clone();
+        updated.MonitorIndex = SelectedMonitorIndex;
+        updated.SelectedMonitorIndex = SelectedMonitorIndex;
+
+        var workArea = GetWorkAreaForMonitor(SelectedMonitorIndex);
+        const double margin = 16;
+
+        var targetWidth = Math.Clamp(updated.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
+        if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
+            targetWidth = Math.Clamp(workArea.Width - (margin * 2), OverlayWidthMin, OverlayWidthMax);
+
+        // Position at top-right of selected monitor
+        updated.OverlayLeft = workArea.Right - targetWidth - margin;
+        updated.OverlayTop = workArea.Top + margin;
+        updated.OverlayWidth = targetWidth;
+        if (!(updated.SingleLineMode && updated.SingleLineAutoFullWidth))
+            updated.LastManualOverlayWidth = targetWidth;
+
+        _settingsManager.Apply(updated);
+
+        if (Math.Abs(_overlayWidth - targetWidth) > 0.5)
+        {
+            _overlayWidth = targetWidth;
+            OnPropertyChanged(nameof(OverlayWidth));
+        }
+
+        _overlayWidthDirty = false;
+    }
+
     public ThemeManager GetThemeManager() => _themeManager;
+}
+
+public class MonitorInfo
+{
+    public int Index { get; }
+    public string DisplayName { get; }
+    public bool IsPrimary { get; }
+
+    public MonitorInfo(int index, string displayName, bool isPrimary)
+    {
+        Index = index;
+        DisplayName = displayName;
+        IsPrimary = isPrimary;
+    }
+
+    public override string ToString() => DisplayName;
 }
 
 public class MutedAppEntry

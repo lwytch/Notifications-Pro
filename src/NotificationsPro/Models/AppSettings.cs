@@ -107,6 +107,10 @@ public class AppSettings
     // Overlay visibility
     public bool OverlayVisible { get; set; } = true;
 
+    // System Integration (M9)
+    public bool StartWithWindows { get; set; } = false;
+    public int SelectedMonitorIndex { get; set; } = 0;
+
     // UX Polish (M8)
     public bool HasShownWelcome { get; set; } = false;
     public double? SettingsWindowLeft { get; set; }

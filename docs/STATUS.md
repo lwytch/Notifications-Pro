@@ -122,10 +122,17 @@
   - Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through)
   - Tray icon dimmed/monochrome when notifications are paused
   - Notification count badge on tray icon (red badge with active card count)
-- 96 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip)
+- **System Integration & Multi-Monitor (Milestone 9)**:
+  - Start with Windows toggle — adds/removes registry Run key automatically
+  - Startup registry state synced on app launch for consistency
+  - Multi-monitor picker in Position tab with detected monitor list (resolution + primary label)
+  - Move overlay to selected monitor with one click
+  - Refresh button to re-detect monitors without restarting
+  - Position presets (top-left, center, etc.) target the selected monitor
+  - Per-monitor DPI awareness handled by .NET 8 WPF per-monitor V2 defaults
+- 103 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo)
 
 ## What Doesn't Work Yet
-- Multi-monitor selection (Milestone 9)
 - Installer/packaging (Milestone 11)
 - Toast duration alignment (using configurable duration instead)
 
@@ -235,8 +242,14 @@ dotnet test
 - [ ] Tray menu toggle items (Pause, Always on Top, Click-Through) show checkmarks
 - [ ] Tray icon dims when notifications are paused
 - [ ] Tray icon shows red count badge when notifications are active
+- [ ] Position tab shows Monitor section with detected monitors ComboBox
+- [ ] Selecting a different monitor and clicking "Move" repositions the overlay on that monitor
+- [ ] "Refresh" button updates the monitor list after connecting/disconnecting a display
+- [ ] Position presets (top-left, top-center, etc.) target the selected monitor
+- [ ] Start with Windows toggle adds a registry Run key for automatic startup
+- [ ] Disabling Start with Windows removes the registry Run key
+- [ ] App launches at Windows startup when the toggle is on
 
 ## Known Limitations
-- Multi-monitor support not yet implemented
 - No installer — run from source or publish manually
 - Unpackaged desktop apps may have limited UserNotificationListener support
