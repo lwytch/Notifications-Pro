@@ -39,6 +39,8 @@ public partial class App : Application
     private DispatcherTimer? _focusTimer;
     private DateTime _focusEndTime;
     private ThemeManager? _themeManager;
+    private DispatcherTimer? _presentationTimer;
+    private bool _presentationDndActive;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
     // identify them in Privacy > Notifications and grant listener access.
@@ -89,6 +91,11 @@ public partial class App : Application
         // Register global hotkeys when overlay window has an HWND
         _settingsManager.SettingsChanged += RefreshHotkeys;
         RefreshHotkeys();
+
+        // Presentation mode: poll for fullscreen apps every 3 seconds
+        _presentationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        _presentationTimer.Tick += OnPresentationTimerTick;
+        _presentationTimer.Start();
 
         // Show first-run balloon tip
         if (!_settingsManager.Settings.HasShownWelcome && _trayIcon != null)
@@ -433,6 +440,34 @@ public partial class App : Application
             _focusModeItem.Text = $"Focus Mode ({remaining.Minutes}:{remaining.Seconds:D2} left)";
     }
 
+    private void OnPresentationTimerTick(object? sender, EventArgs e)
+    {
+        if (_settingsManager == null || _queueManager == null) return;
+        if (!_settingsManager.Settings.PresentationModeEnabled) return;
+
+        var isFullscreen = FullscreenHelper.IsPresentationAppFullscreen(
+            _settingsManager.Settings.PresentationApps);
+
+        if (isFullscreen && !_presentationDndActive)
+        {
+            _presentationDndActive = true;
+            if (!_queueManager.IsPaused)
+            {
+                _queueManager.Pause();
+                UpdateMenuLabels();
+            }
+        }
+        else if (!isFullscreen && _presentationDndActive)
+        {
+            _presentationDndActive = false;
+            if (_queueManager.IsPaused)
+            {
+                _queueManager.Resume();
+                UpdateMenuLabels();
+            }
+        }
+    }
+
     private void OnTrayMenuOpening(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         PopulateQuickMuteMenu();
@@ -500,6 +535,7 @@ public partial class App : Application
 
     private void QuitApp()
     {
+        _presentationTimer?.Stop();
         _focusTimer?.Stop();
         _hotkeyManager?.Dispose();
         _notificationListener?.Stop();

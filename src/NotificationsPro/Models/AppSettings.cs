@@ -107,6 +107,17 @@ public class AppSettings
     // Overlay visibility
     public bool OverlayVisible { get; set; } = true;
 
+    // Streaming & Presentation (M10)
+    public bool ChromaKeyEnabled { get; set; } = false;
+    public string ChromaKeyColor { get; set; } = "#00FF00";
+    public bool ObsFixedWindowMode { get; set; } = false;
+    public double ObsFixedWidth { get; set; } = 400;
+    public double ObsFixedHeight { get; set; } = 600;
+    public bool PresentationModeEnabled { get; set; } = false;
+    public List<string> PresentationApps { get; set; } = new() { "PowerPoint", "Zoom", "Google Meet", "Microsoft Teams" };
+    public bool PerAppTintEnabled { get; set; } = false;
+    public double PerAppTintOpacity { get; set; } = 0.15;
+
     // System Integration (M9)
     public bool StartWithWindows { get; set; } = false;
     public int SelectedMonitorIndex { get; set; } = 0;
@@ -122,6 +133,7 @@ public class AppSettings
         clone.MutedApps = new List<string>(MutedApps);
         clone.HighlightKeywords = new List<string>(HighlightKeywords);
         clone.MuteKeywords = new List<string>(MuteKeywords);
+        clone.PresentationApps = new List<string>(PresentationApps);
         return clone;
     }
 }

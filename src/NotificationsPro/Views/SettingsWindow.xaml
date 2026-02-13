@@ -1189,6 +1189,155 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <!-- ═══ STREAMING TAB ═══ -->
+            <TabItem Header="Streaming" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <TextBlock Text="CHROMA KEY" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ChromaKeyEnabled}"
+                                          ToolTip="Replace the transparent overlay background with a solid chroma key color for OBS/streaming capture"/>
+                            <TextBlock Text="Enable Chroma Key Background" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Replaces the transparent background with a solid color for chroma key capture in OBS or other streaming tools"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding ChromaKeyEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Chroma Key Color" Style="{StaticResource SettingLabel}"/>
+                            <WrapPanel Margin="0,4,0,0">
+                                <Button Content="Green" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                        Tag="ChromaKeyColor" Click="OnPickChromaPreset" CommandParameter="#00FF00"
+                                        ToolTip="Standard green screen (#00FF00)"/>
+                                <Button Content="Blue" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                        Tag="ChromaKeyColor" Click="OnPickChromaPreset" CommandParameter="#0000FF"
+                                        ToolTip="Blue screen (#0000FF)"/>
+                                <Button Content="Magenta" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                        Tag="ChromaKeyColor" Click="OnPickChromaPreset" CommandParameter="#FF00FF"
+                                        ToolTip="Magenta screen (#FF00FF)"/>
+                                <Button Content="Pick..." Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                        Tag="ChromaKeyColor" Click="OnPickColorClick"
+                                        ToolTip="Choose a custom chroma key color"/>
+                            </WrapPanel>
+                            <DockPanel Margin="0,0,0,4">
+                                <Border DockPanel.Dock="Left" Width="24" Height="24" CornerRadius="4" Margin="0,0,8,0"
+                                        Background="{Binding ChromaKeyColor, Converter={StaticResource ColorToBrush}}"/>
+                                <TextBlock Text="{Binding ChromaKeyColor}" Style="{StaticResource SettingLabel}"
+                                           FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Text="Use the same color in your OBS Chroma Key filter to make the background transparent"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="OBS WINDOW CAPTURE" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ObsFixedWindowMode}"
+                                          ToolTip="Set the overlay to a fixed size for consistent OBS window capture"/>
+                            <TextBlock Text="Fixed Window Size" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Locks the overlay to a fixed width and height for consistent capture in OBS window capture mode"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding ObsFixedWindowMode, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Fixed Width" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding ObsFixedWidth, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="200" Maximum="1920" Value="{Binding ObsFixedWidth}"
+                                        TickFrequency="10" IsSnapToTickEnabled="True"
+                                        ToolTip="Fixed overlay width for OBS capture"/>
+                            </DockPanel>
+
+                            <TextBlock Text="Fixed Height" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding ObsFixedHeight, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="200" Maximum="1080" Value="{Binding ObsFixedHeight}"
+                                        TickFrequency="10" IsSnapToTickEnabled="True"
+                                        ToolTip="Fixed overlay height for OBS capture"/>
+                            </DockPanel>
+                            <TextBlock Text="Tip: Enable Chroma Key above, then use OBS Window Capture on the overlay with a Chroma Key filter"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="PRESENTATION MODE" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding PresentationModeEnabled}"
+                                          ToolTip="Auto-pause notifications when a presentation app goes fullscreen"/>
+                            <TextBlock Text="Auto-DND on Fullscreen" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Automatically pauses notifications when a configured app is running fullscreen (PowerPoint, Zoom, etc.)"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding PresentationModeEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Monitored Apps" Style="{StaticResource SettingLabel}"/>
+                            <TextBlock Text="Notifications pause when any of these apps go fullscreen"
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <ItemsControl ItemsSource="{Binding PresentationApps}" Margin="0,0,0,8">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,0,0,4">
+                                            <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
+                                                    Command="{Binding DataContext.RemovePresentationAppCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" Margin="8,0,0,0"/>
+                                            <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <DockPanel Margin="0,0,0,4">
+                                <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding AddPresentationAppCommand}" Margin="8,0,0,0"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding NewPresentationApp, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Process name to monitor (e.g. PowerPoint, Zoom)"/>
+                            </DockPanel>
+                            <TextBlock Text="Enter the process name of apps that should trigger presentation mode"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="PER-APP COLOR TINTING" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding PerAppTintEnabled}"
+                                          ToolTip="Apply a subtle color tint to notification cards based on the source app"/>
+                            <TextBlock Text="Enable Per-App Color Tint" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Adds a subtle color tint to each notification card based on the source app name (Teams = blue, Slack = purple, etc.)"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding PerAppTintEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Tint Intensity" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding PerAppTintOpacity, StringFormat='{}{0:P0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.05" Maximum="0.40" Value="{Binding PerAppTintOpacity}"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        ToolTip="How strongly the app color tints the card background"/>
+                            </DockPanel>
+                            <TextBlock Text="Higher values make the per-app color more visible; lower values are more subtle"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
             <!-- ═══ ACCESSIBILITY TAB ═══ -->
             <TabItem Header="Accessibility" Style="{StaticResource SettingsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">

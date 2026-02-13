@@ -352,6 +352,19 @@ public class OverlayViewModel : BaseViewModel
     public Duration ExitMotionDuration => DurationFor(AnimationDurationMs);
     public Duration ExitFadeDuration => DurationFor(AnimationDurationMs);
 
+    // Streaming (M10)
+    private bool _chromaKeyEnabled;
+    public bool ChromaKeyEnabled { get => _chromaKeyEnabled; set => SetProperty(ref _chromaKeyEnabled, value); }
+
+    private string _chromaKeyColor = "#00FF00";
+    public string ChromaKeyColor { get => _chromaKeyColor; set => SetProperty(ref _chromaKeyColor, value); }
+
+    private bool _perAppTintEnabled;
+    public bool PerAppTintEnabled { get => _perAppTintEnabled; set => SetProperty(ref _perAppTintEnabled, value); }
+
+    private double _perAppTintOpacity = 0.15;
+    public double PerAppTintOpacity { get => _perAppTintOpacity; set => SetProperty(ref _perAppTintOpacity, value); }
+
     // Empty state ghost card visibility
     private Visibility _emptyStateVisibility = Visibility.Visible;
     public Visibility EmptyStateVisibility { get => _emptyStateVisibility; set => SetProperty(ref _emptyStateVisibility, value); }
@@ -450,6 +463,10 @@ public class OverlayViewModel : BaseViewModel
         SingleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
         SingleLineAutoFullWidth = s.SingleLineAutoFullWidth;
         ShowTimestamp = s.ShowTimestamp;
+        ChromaKeyEnabled = s.ChromaKeyEnabled;
+        ChromaKeyColor = s.ChromaKeyColor;
+        PerAppTintEnabled = s.PerAppTintEnabled;
+        PerAppTintOpacity = s.PerAppTintOpacity;
 
         // Notify all computed properties
         OnPropertyChanged(nameof(AppNameLineHeight));

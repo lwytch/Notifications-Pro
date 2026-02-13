@@ -99,6 +99,19 @@ public partial class SettingsWindow : Window
         property.SetValue(DataContext, hex);
     }
 
+    private void OnPickChromaPreset(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string propertyName, CommandParameter: string colorValue }) return;
+        if (DataContext == null) return;
+
+        var property = DataContext.GetType().GetProperty(
+            propertyName,
+            BindingFlags.Instance | BindingFlags.Public);
+        if (property == null || property.PropertyType != typeof(string)) return;
+
+        property.SetValue(DataContext, colorValue);
+    }
+
     private static MediaColor ParseHex(string hex)
     {
         try

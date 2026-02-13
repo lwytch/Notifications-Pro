@@ -231,15 +231,15 @@ Tray icon enhancements:
 - [x] Per-monitor DPI awareness (.NET 8 WPF provides per-monitor V2 DPI awareness by default)
 - [x] Monitor-aware position presets (quick position buttons now target the selected monitor)
 
-### Milestone 10: Streaming & Presentation (Stretch)
-**Status: Not Started**
+### Milestone 10: Streaming & Presentation
+**Status: Complete**
 
 Features for streamers, presenters, and content creators.
 
-- [ ] Chroma key background option — solid green/blue/magenta background for OBS chroma key capture
-- [ ] OBS-friendly fixed window mode — non-transparent, fixed-size window that captures cleanly in OBS window capture
-- [ ] Presentation mode — auto-enable DND when a specific app is fullscreen (PowerPoint, Zoom, etc.)
-- [ ] Per-app color tinting — optional subtle background tint derived from app name hash (e.g., Teams = blue, Slack = purple)
+- [x] Chroma key background option — solid green/blue/magenta background for OBS chroma key capture
+- [x] OBS-friendly fixed window mode — non-transparent, fixed-size window that captures cleanly in OBS window capture
+- [x] Presentation mode — auto-enable DND when a specific app is fullscreen (PowerPoint, Zoom, etc.)
+- [x] Per-app color tinting — optional subtle background tint derived from app name hash (e.g., Teams = blue, Slack = purple)
 
 ### Milestone 11: Packaging & Final Polish
 **Status: Not Started**
@@ -252,7 +252,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 9 system integration & multi-monitor complete. Next: Milestone 10 streaming, or Milestone 11 packaging.
+Milestone 10 streaming & presentation complete. Next: Milestone 11 packaging & final polish.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

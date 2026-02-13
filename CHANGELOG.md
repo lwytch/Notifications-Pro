@@ -3,6 +3,21 @@
 ## Unreleased
 
 ### Added
+- **Milestone 10: Streaming & Presentation**
+- Chroma key background — toggle a solid green/blue/magenta background on the overlay for OBS chroma key capture
+- Chroma key color presets (Green, Blue, Magenta) and custom color picker in Streaming tab
+- OBS-friendly fixed window mode — locks overlay to a fixed width/height for clean OBS window capture
+- OBS fixed width slider (200–7680) and fixed height slider (200–4320)
+- Presentation mode — auto-enables DND when a configured fullscreen app is detected (polls every 3s)
+- Default presentation apps: PowerPoint, Zoom, Google Meet, Microsoft Teams (user-configurable list)
+- Add/remove presentation apps from Streaming tab
+- Per-app color tinting — subtle deterministic background tint per source app using FNV-1a hash (10-color palette)
+- Per-app tint intensity slider (5%–40%)
+- AppTintHelper utility for deterministic app-to-color mapping
+- FullscreenHelper utility using Win32 GetForegroundWindow + GetWindowRect for fullscreen detection
+- AppTintBrushConverter (IMultiValueConverter) for XAML card background blending
+- New Streaming tab in Settings window (between Position and Accessibility)
+- 13 new unit tests covering M10 AppSettings defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper
 - **Milestone 9: System Integration & Multi-Monitor**
 - Start with Windows toggle — adds/removes registry Run key (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
 - Startup registry state synced on app launch to ensure consistency

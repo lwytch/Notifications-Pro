@@ -17,6 +17,7 @@
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
         <converters:ColorToOpacityBrushConverter x:Key="ColorToOpacityBrush"/>
+        <converters:AppTintBrushConverter x:Key="AppTintBrush"/>
         <converters:NotificationTextVisibilityConverter x:Key="NotificationTextVisibility"/>
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -40,7 +41,10 @@
                         BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                         BorderThickness="{Binding DataContext.AccentBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}">
                     <Border.Background>
-                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                        <MultiBinding Converter="{StaticResource AppTintBrush}">
+                            <Binding Path="AppName"/>
+                            <Binding Path="DataContext.PerAppTintEnabled" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                            <Binding Path="DataContext.PerAppTintOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
                             <Binding Path="DataContext.BackgroundColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
                             <Binding Path="DataContext.BackgroundOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
                         </MultiBinding>
@@ -308,7 +312,17 @@
     </Window.Resources>
 
     <!-- Main content: tiny alpha preserves drag hit-testing without a visible panel -->
-    <Grid Margin="{Binding OuterContentMargin}" Background="#01000000">
+    <Grid Margin="{Binding OuterContentMargin}">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="Background" Value="#01000000"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ChromaKeyEnabled}" Value="True">
+                        <Setter Property="Background" Value="{Binding ChromaKeyColor, Converter={StaticResource ColorToBrush}}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <ScrollViewer x:Name="NotificationScrollViewer"
                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       CanContentScroll="False"

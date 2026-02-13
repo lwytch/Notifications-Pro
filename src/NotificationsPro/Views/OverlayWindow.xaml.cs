@@ -207,6 +207,7 @@ public partial class OverlayWindow : Window
         {
             var settings = _settingsManager.Settings;
             UpdateClickThrough(settings.ClickThrough);
+            ApplyObsFixedWindowMode(settings);
             ApplyEffectiveMaxHeight(settings);
             TryApplySingleLineAutoFullWidth(settings);
             TryApplyStoredPosition(settings);
@@ -216,6 +217,21 @@ public partial class OverlayWindow : Window
             InvalidateArrange();
             UpdateLayout();
         });
+    }
+
+    private void ApplyObsFixedWindowMode(AppSettings settings)
+    {
+        if (settings.ObsFixedWindowMode)
+        {
+            SizeToContent = SizeToContent.Manual;
+            Width = Math.Clamp(settings.ObsFixedWidth, 200, 7680);
+            Height = Math.Clamp(settings.ObsFixedHeight, 200, 4320);
+        }
+        else
+        {
+            SizeToContent = SizeToContent.Height;
+            ClearValue(HeightProperty);
+        }
     }
 
     public void UpdateClickThrough(bool enabled)

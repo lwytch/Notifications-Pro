@@ -130,7 +130,15 @@
   - Refresh button to re-detect monitors without restarting
   - Position presets (top-left, center, etc.) target the selected monitor
   - Per-monitor DPI awareness handled by .NET 8 WPF per-monitor V2 defaults
-- 103 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo)
+- **Streaming & Presentation (Milestone 10)**:
+  - Chroma key background — solid green/blue/magenta background for OBS chroma key capture with preset color buttons
+  - OBS-friendly fixed window mode — fixed-size window (width/height sliders) that captures cleanly in OBS window capture
+  - Presentation mode — auto-enable DND when a configured app is fullscreen (polls every 3s via Win32 GetForegroundWindow)
+  - Default presentation apps: PowerPoint, Zoom, Google Meet, Microsoft Teams (user-configurable list)
+  - Per-app color tinting — subtle deterministic background tint derived from app name hash (FNV-1a, 10-color palette)
+  - Per-app tint intensity slider (5%-40%)
+  - New Streaming tab in Settings window with Chroma Key, OBS Window Capture, Presentation Mode, and Per-App Tinting sections
+- 116 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
 
 ## What Doesn't Work Yet
 - Installer/packaging (Milestone 11)
@@ -249,6 +257,21 @@ dotnet test
 - [ ] Start with Windows toggle adds a registry Run key for automatic startup
 - [ ] Disabling Start with Windows removes the registry Run key
 - [ ] App launches at Windows startup when the toggle is on
+- [ ] Streaming tab appears in Settings between Position and Accessibility
+- [ ] Chroma Key toggle turns overlay background solid green
+- [ ] Chroma Key preset buttons (Green/Blue/Magenta) change chroma background color
+- [ ] Custom chroma key color picker works
+- [ ] OBS Fixed Window Mode toggle switches overlay to fixed-size non-auto-sizing window
+- [ ] OBS fixed width/height sliders control overlay dimensions when fixed mode is on
+- [ ] Presentation Mode toggle enables fullscreen app detection
+- [ ] Presentation mode auto-pauses notifications when a configured app goes fullscreen
+- [ ] Presentation mode auto-resumes when the fullscreen app exits
+- [ ] Presentation apps list shows default apps (PowerPoint, Zoom, etc.)
+- [ ] Adding a presentation app via text field and "Add" button works
+- [ ] Removing a presentation app via "Remove" button works
+- [ ] Per-App Color Tinting toggle enables colored card backgrounds based on source app
+- [ ] Tint intensity slider adjusts the blending strength of per-app colors
+- [ ] Different apps produce visually distinct tint colors
 
 ## Known Limitations
 - No installer — run from source or publish manually

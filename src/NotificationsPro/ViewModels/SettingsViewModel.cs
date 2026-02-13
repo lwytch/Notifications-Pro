@@ -282,6 +282,41 @@ public class SettingsViewModel : BaseViewModel
     private string _densityPreset = "Comfortable";
     public string DensityPreset { get => _densityPreset; set => SetProperty(ref _densityPreset, value); }
 
+    // Streaming & Presentation (M10)
+    private bool _chromaKeyEnabled;
+    public bool ChromaKeyEnabled { get => _chromaKeyEnabled; set { if (SetProperty(ref _chromaKeyEnabled, value)) QueueSave(); } }
+
+    private string _chromaKeyColor = "#00FF00";
+    public string ChromaKeyColor { get => _chromaKeyColor; set { if (SetProperty(ref _chromaKeyColor, value)) QueueSave(); } }
+
+    private bool _obsFixedWindowMode;
+    public bool ObsFixedWindowMode { get => _obsFixedWindowMode; set { if (SetProperty(ref _obsFixedWindowMode, value)) QueueSave(); } }
+
+    private double _obsFixedWidth = 400;
+    public double ObsFixedWidth { get => _obsFixedWidth; set { if (SetProperty(ref _obsFixedWidth, Math.Clamp(value, 200, 7680))) QueueSave(); } }
+
+    private double _obsFixedHeight = 600;
+    public double ObsFixedHeight { get => _obsFixedHeight; set { if (SetProperty(ref _obsFixedHeight, Math.Clamp(value, 200, 4320))) QueueSave(); } }
+
+    private bool _presentationModeEnabled;
+    public bool PresentationModeEnabled { get => _presentationModeEnabled; set { if (SetProperty(ref _presentationModeEnabled, value)) QueueSave(); } }
+
+    private string _newPresentationApp = string.Empty;
+    public string NewPresentationApp { get => _newPresentationApp; set => SetProperty(ref _newPresentationApp, value); }
+
+    public ObservableCollection<string> PresentationApps { get; } = new();
+
+    private bool _perAppTintEnabled;
+    public bool PerAppTintEnabled { get => _perAppTintEnabled; set { if (SetProperty(ref _perAppTintEnabled, value)) QueueSave(); } }
+
+    private double _perAppTintOpacity = 0.15;
+    public double PerAppTintOpacity { get => _perAppTintOpacity; set { if (SetProperty(ref _perAppTintOpacity, value)) QueueSave(); } }
+
+    public List<string> AvailableChromaColors { get; } = new()
+    {
+        "#00FF00", "#0000FF", "#FF00FF"
+    };
+
     // System Integration (M9) — Start with Windows
     private bool _startWithWindows;
     public bool StartWithWindows
@@ -389,6 +424,8 @@ public class SettingsViewModel : BaseViewModel
     public ICommand ApplyDensityPresetCommand { get; }
     public ICommand MoveToMonitorCommand { get; }
     public ICommand RefreshMonitorsCommand { get; }
+    public ICommand AddPresentationAppCommand { get; }
+    public ICommand RemovePresentationAppCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     // Themes
@@ -435,6 +472,8 @@ public class SettingsViewModel : BaseViewModel
         ApplyDensityPresetCommand = new RelayCommand(ApplyDensityPreset);
         MoveToMonitorCommand = new RelayCommand(_ => MoveToSelectedMonitor());
         RefreshMonitorsCommand = new RelayCommand(_ => RefreshMonitors());
+        AddPresentationAppCommand = new RelayCommand(_ => AddPresentationApp());
+        RemovePresentationAppCommand = new RelayCommand(RemovePresentationApp);
         DismissFirstRunTipCommand = new RelayCommand(_ => DismissFirstRunTip());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
@@ -518,6 +557,14 @@ public class SettingsViewModel : BaseViewModel
         _hotkeyDismissAll = s.HotkeyDismissAll;
         _hotkeyToggleDnd = s.HotkeyToggleDnd;
         _densityPreset = s.DensityPreset;
+        _chromaKeyEnabled = s.ChromaKeyEnabled;
+        _chromaKeyColor = s.ChromaKeyColor;
+        _obsFixedWindowMode = s.ObsFixedWindowMode;
+        _obsFixedWidth = s.ObsFixedWidth;
+        _obsFixedHeight = s.ObsFixedHeight;
+        _presentationModeEnabled = s.PresentationModeEnabled;
+        _perAppTintEnabled = s.PerAppTintEnabled;
+        _perAppTintOpacity = s.PerAppTintOpacity;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
 
@@ -525,6 +572,8 @@ public class SettingsViewModel : BaseViewModel
         foreach (var kw in s.HighlightKeywords) HighlightKeywords.Add(kw);
         MuteKeywords.Clear();
         foreach (var kw in s.MuteKeywords) MuteKeywords.Add(kw);
+        PresentationApps.Clear();
+        foreach (var app in s.PresentationApps) PresentationApps.Add(app);
         RefreshMutedAppEntries();
 
         _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
@@ -676,6 +725,15 @@ public class SettingsViewModel : BaseViewModel
             MonitorIndex = previousSettings.MonitorIndex,
             OverlayVisible = previousSettings.OverlayVisible,
             NotificationsPaused = previousSettings.NotificationsPaused,
+            ChromaKeyEnabled = ChromaKeyEnabled,
+            ChromaKeyColor = ChromaKeyColor,
+            ObsFixedWindowMode = ObsFixedWindowMode,
+            ObsFixedWidth = ObsFixedWidth,
+            ObsFixedHeight = ObsFixedHeight,
+            PresentationModeEnabled = PresentationModeEnabled,
+            PresentationApps = PresentationApps.ToList(),
+            PerAppTintEnabled = PerAppTintEnabled,
+            PerAppTintOpacity = PerAppTintOpacity,
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
             HasShownWelcome = previousSettings.HasShownWelcome,
@@ -1074,6 +1132,27 @@ public class SettingsViewModel : BaseViewModel
         ShowFirstRunTip = false;
         _settingsManager.Settings.HasShownWelcome = true;
         _settingsManager.Save();
+    }
+
+    private void AddPresentationApp()
+    {
+        var app = NewPresentationApp?.Trim();
+        if (string.IsNullOrWhiteSpace(app)) return;
+        if (!PresentationApps.Contains(app, StringComparer.OrdinalIgnoreCase))
+        {
+            PresentationApps.Add(app);
+            QueueSave();
+        }
+        NewPresentationApp = string.Empty;
+    }
+
+    private void RemovePresentationApp(object? parameter)
+    {
+        if (parameter is string app)
+        {
+            PresentationApps.Remove(app);
+            QueueSave();
+        }
     }
 
     public void RefreshMonitors()
