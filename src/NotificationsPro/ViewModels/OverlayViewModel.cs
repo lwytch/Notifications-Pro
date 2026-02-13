@@ -381,6 +381,27 @@ public class OverlayViewModel : BaseViewModel
         TitleFontSize = s.TitleFontSize;
         TitleFontWeight = s.TitleFontWeight;
         LineSpacing = s.LineSpacing;
+
+        // Apply text scaling from system if enabled
+        if (s.RespectTextScaling)
+        {
+            var scale = SystemParameters.CaretWidth; // Trigger property access
+            try
+            {
+                // Use the DPI-based text scale factor from the registry
+                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Accessibility");
+                if (key?.GetValue("TextScaleFactor") is int scaleFactor && scaleFactor > 100)
+                {
+                    var factor = scaleFactor / 100.0;
+                    FontSize = s.FontSize * factor;
+                    AppNameFontSize = s.AppNameFontSize * factor;
+                    TitleFontSize = s.TitleFontSize * factor;
+                }
+            }
+            catch { /* Registry unavailable — use base sizes */ }
+        }
+
         TextColor = s.TextColor;
         TitleColor = s.TitleColor;
         AppNameColor = s.AppNameColor;
@@ -398,8 +419,12 @@ public class OverlayViewModel : BaseViewModel
         BorderColor = s.BorderColor;
         BorderThickness = s.BorderThickness;
         AlwaysOnTop = s.AlwaysOnTop;
-        AnimationsEnabled = s.AnimationsEnabled;
-        FadeOnlyAnimation = s.FadeOnlyAnimation;
+
+        // Override animations when system "Reduce Motion" is active
+        var reduceMotion = s.RespectReduceMotion && !SystemParameters.ClientAreaAnimation;
+        AnimationsEnabled = reduceMotion ? false : s.AnimationsEnabled;
+        FadeOnlyAnimation = reduceMotion ? true : s.FadeOnlyAnimation;
+
         SlideInDirection = s.SlideInDirection;
         AnimationDurationMs = s.AnimationDurationMs;
         OverlayWidth = s.OverlayWidth;

@@ -73,6 +73,26 @@ public class AppSettings
     public int BurstLimitCount { get; set; } = 10;
     public double BurstLimitWindowSeconds { get; set; } = 5;
 
+    // Accessibility — Timing
+    public bool PersistentNotifications { get; set; } = false;
+    public bool AutoDurationEnabled { get; set; } = false;
+    public double AutoDurationSecondsPerLine { get; set; } = 2.0;
+    public double AutoDurationBaseSeconds { get; set; } = 5.0;
+
+    // Accessibility — System integration
+    public bool RespectReduceMotion { get; set; } = true;
+    public bool RespectHighContrast { get; set; } = true;
+    public bool RespectTextScaling { get; set; } = false;
+
+    // Accessibility — Global hotkeys
+    public bool GlobalHotkeysEnabled { get; set; } = false;
+    public string HotkeyToggleOverlay { get; set; } = "Ctrl+Alt+N";
+    public string HotkeyDismissAll { get; set; } = "Ctrl+Alt+D";
+    public string HotkeyToggleDnd { get; set; } = "Ctrl+Alt+P";
+
+    // Accessibility — Information density
+    public string DensityPreset { get; set; } = "Comfortable";
+
     // Position & Size (null = not yet positioned, use default)
     public double? OverlayLeft { get; set; }
     public double? OverlayTop { get; set; }

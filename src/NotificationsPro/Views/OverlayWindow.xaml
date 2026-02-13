@@ -10,7 +10,9 @@
         Topmost="{Binding AlwaysOnTop}"
         Width="{Binding OverlayWidth, Mode=TwoWay}"
         MaxHeight="{Binding OverlayMaxHeight}"
-        MinHeight="1" MinWidth="200">
+        MinHeight="1" MinWidth="200"
+        AutomationProperties.Name="Notifications Pro Overlay"
+        AutomationProperties.LiveSetting="Assertive">
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>

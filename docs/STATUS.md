@@ -93,7 +93,23 @@
   - Import settings from a JSON file
   - Theme quick-switch submenu in tray menu (built-in + custom themes)
   - Themes tab in Settings with built-in theme grid, custom theme management, and import/export buttons
-- 63 unit tests covering QueueManager (including filtering), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, and ThemeManager
+- **Accessibility & Inclusivity (Milestone 7)**:
+  - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
+  - Auto-duration — longer notifications get more display time based on estimated line count
+  - Extended duration slider max (up to 120s)
+  - Respect Reduce Motion — auto-disables slide animations when Windows "Reduce Motion" is active
+  - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
+  - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
+  - Global hotkeys — system-wide keyboard shortcuts for toggle overlay, dismiss all, toggle DND
+  - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
+  - Information density presets (Compact / Comfortable / Spacious) — one-click font/spacing bundles
+  - Color-Blind Safe built-in theme (Wong palette, WCAG AA compliant)
+  - WCAG 2.1 contrast ratio helpers (ContrastHelper + XAML converters)
+  - Keyboard focus indicators on PrimaryButton, SecondaryButton, ToggleSwitch, Slider, ComboBox
+  - Minimum click target size on toggle switches (44dp)
+  - AutomationProperties on overlay window for screen reader compatibility
+  - New Accessibility tab in Settings window
+- 87 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, and accessibility defaults
 
 ## What Doesn't Work Yet
 - Multi-monitor selection (Milestone 9)
@@ -182,6 +198,19 @@ dotnet test
 - [ ] Deleting a custom theme removes it from the list and from disk
 - [ ] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
+- [ ] Accessibility tab appears in Settings with timing, system integration, hotkeys, and density sections
+- [ ] Persistent Notifications toggle keeps cards visible until manually dismissed
+- [ ] Auto-Duration toggle extends display time for longer notifications
+- [ ] Duration slider now goes up to 120s
+- [ ] Respect Reduce Motion disables slide animations when Windows setting is off
+- [ ] Respect High Contrast auto-applies HC theme when Windows HC mode activates
+- [ ] Respect Text Scaling scales overlay font sizes to match Windows text size
+- [ ] Global Hotkeys toggle + key combo fields register system-wide shortcuts
+- [ ] Ctrl+Alt+N toggles overlay visibility, Ctrl+Alt+D dismisses all, Ctrl+Alt+P toggles DND
+- [ ] Compact/Comfortable/Spacious density presets adjust font sizes, padding, spacing at once
+- [ ] Color-Blind Safe theme appears in built-in theme list and passes WCAG AA
+- [ ] Focus indicators visible when tabbing through settings controls
+- [ ] Toggle switches have minimum 44dp hit area
 
 ## Known Limitations
 - Multi-monitor support not yet implemented

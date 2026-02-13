@@ -118,11 +118,37 @@ public class QueueManager : BaseViewModel
         StartExpiryTimer(item);
     }
 
+    /// <summary>
+    /// Estimate the number of text lines in the notification for auto-duration.
+    /// </summary>
+    internal static int EstimateLineCount(string body)
+    {
+        if (string.IsNullOrWhiteSpace(body)) return 1;
+        var newlines = body.Count(c => c == '\n') + 1;
+        var wrapEstimate = (body.Length + 49) / 50; // ~50 chars per line
+        return Math.Max(newlines, wrapEstimate);
+    }
+
     private void StartExpiryTimer(NotificationItem item)
     {
-        var duration = TimeSpan.FromSeconds(_settingsManager.Settings.NotificationDuration);
-        var animDuration = _settingsManager.Settings.AnimationsEnabled
-            ? TimeSpan.FromMilliseconds(_settingsManager.Settings.AnimationDurationMs)
+        var settings = _settingsManager.Settings;
+
+        // Persistent mode: no expiry timer at all
+        if (settings.PersistentNotifications)
+            return;
+
+        // Calculate effective duration
+        double durationSeconds = settings.NotificationDuration;
+        if (settings.AutoDurationEnabled)
+        {
+            var lines = EstimateLineCount(item.Body);
+            durationSeconds = Math.Max(durationSeconds,
+                settings.AutoDurationBaseSeconds + (lines * settings.AutoDurationSecondsPerLine));
+        }
+
+        var duration = TimeSpan.FromSeconds(durationSeconds);
+        var animDuration = settings.AnimationsEnabled
+            ? TimeSpan.FromMilliseconds(settings.AnimationDurationMs)
             : TimeSpan.Zero;
 
         var timer = new DispatcherTimer { Interval = duration };

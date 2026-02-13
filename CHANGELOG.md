@@ -3,6 +3,25 @@
 ## Unreleased
 
 ### Added
+- **Milestone 7: Accessibility & Inclusivity**
+- Persistent notification mode — notifications stay visible until manually dismissed (no auto-expiry timer)
+- Auto-duration by content length — configurable base seconds + per-line seconds for longer notifications
+- Extended notification duration slider max from 30s to 120s
+- Respect Reduce Motion — auto-disables slide animations when Windows "Reduce Motion" setting is active (on by default)
+- Respect High Contrast — auto-applies built-in High Contrast theme when Windows HC mode activates (on by default)
+- Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size setting
+- Global hotkeys — system-wide keyboard shortcuts via Win32 RegisterHotKey for toggle overlay, dismiss all, toggle DND
+- Hotkey configuration UI with customizable key combo text fields (e.g. Ctrl+Alt+N)
+- Information density presets: Compact (tighter), Comfortable (default), Spacious (larger) — one-click bundles
+- Color-Blind Safe built-in theme using Wong palette (7th built-in theme, WCAG AA compliant)
+- WCAG 2.1 contrast ratio helper (ContrastHelper) with relative luminance, ratio calculation, and level grading
+- WCAG contrast XAML converters (WcagContrastTextConverter, WcagContrastColorConverter) for future inline labels
+- Keyboard focus indicators on PrimaryButton, SecondaryButton, ToggleSwitch, Slider, and ComboBox control templates
+- Minimum 44dp click target size on toggle switches for motor accessibility
+- AutomationProperties on overlay window (Name, LiveSetting=Assertive) for screen reader compatibility
+- New Accessibility tab in Settings window consolidating timing, system integration, hotkeys, and density controls
+- 24 new unit tests covering ContrastHelper, QueueManager persistent/auto-duration, HotkeyManager parsing, accessibility defaults, and Color-Blind Safe theme WCAG compliance
+- InternalsVisibleTo added to project for test access to internal APIs
 - **Milestone 6: Themes & Profiles**
 - 6 built-in theme presets: Dark Purple (default), Dark Neutral, Light, Frosted Glass, High Contrast, Minimal
 - One-click theme apply sets all visual properties (colors, opacity, corner radius, accent, border) at once
@@ -66,6 +85,8 @@
 - Overlay-height preset buttons for 1080p, 2K, 4K, and 8K display classes
 
 ### Changed
+- Built-in theme count increased from 6 to 7 (added Color-Blind Safe)
+- Notification duration slider maximum extended from 30s to 120s for accessibility
 - Existing "Font Size" and "Font Weight" labels renamed to "Body Font Size" and "Body Font Weight" for clarity
 - ShowBorder default changed to false (border is now opt-in)
 - BorderColor default changed from accent purple (#7C5CFC) to subtle dark (#363650)

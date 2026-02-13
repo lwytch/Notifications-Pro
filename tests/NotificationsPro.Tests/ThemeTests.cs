@@ -24,7 +24,7 @@ public class ThemeTests : IDisposable
     [Fact]
     public void BuiltInThemes_HasExpectedCount()
     {
-        Assert.Equal(6, ThemePreset.BuiltInThemes.Length);
+        Assert.Equal(7, ThemePreset.BuiltInThemes.Length);
     }
 
     [Fact]

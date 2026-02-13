@@ -25,6 +25,7 @@ public partial class App : Application
     private SettingsViewModel? _settingsViewModel;
 
     private NotificationListener? _notificationListener;
+    private HotkeyManager? _hotkeyManager;
 
     private WinForms.ToolStripMenuItem? _showHideItem;
     private WinForms.ToolStripMenuItem? _pauseResumeItem;
@@ -67,11 +68,63 @@ public partial class App : Application
 
         SetupTrayIcon();
 
+        // Apply High Contrast theme if active and respected
+        ApplyHighContrastIfNeeded();
+        SystemParameters.StaticPropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SystemParameters.HighContrast))
+                Dispatcher.Invoke(ApplyHighContrastIfNeeded);
+        };
+
         if (_settingsManager.Settings.OverlayVisible)
             ShowOverlay();
 
+        // Register global hotkeys when overlay window has an HWND
+        _settingsManager.SettingsChanged += RefreshHotkeys;
+        RefreshHotkeys();
+
         // Initialize notification listener — will prompt for permission on first run
         await _notificationListener.InitializeAsync();
+    }
+
+    private void ApplyHighContrastIfNeeded()
+    {
+        if (_settingsManager == null) return;
+        if (!_settingsManager.Settings.RespectHighContrast) return;
+        if (!SystemParameters.HighContrast) return;
+
+        // Auto-apply the High Contrast built-in theme
+        var hcTheme = ThemePreset.BuiltInThemes
+            .FirstOrDefault(t => t.Name == "High Contrast");
+        if (hcTheme == null) return;
+
+        var updated = _settingsManager.Settings.Clone();
+        hcTheme.ApplyTo(updated);
+        _settingsManager.Apply(updated);
+    }
+
+    private void RefreshHotkeys()
+    {
+        _hotkeyManager?.Dispose();
+        _hotkeyManager = null;
+
+        if (_settingsManager == null || !_settingsManager.Settings.GlobalHotkeysEnabled)
+            return;
+
+        // Need an HWND from the overlay window
+        var hwnd = _overlayWindow != null && _overlayWindow.IsLoaded
+            ? new System.Windows.Interop.WindowInteropHelper(_overlayWindow).Handle
+            : IntPtr.Zero;
+
+        if (hwnd == IntPtr.Zero) return;
+
+        _hotkeyManager = new HotkeyManager();
+        _hotkeyManager.ToggleOverlayRequested += () => Dispatcher.Invoke(ToggleOverlay);
+        _hotkeyManager.DismissAllRequested += () => Dispatcher.Invoke(() => _queueManager?.ClearAll());
+        _hotkeyManager.ToggleDndRequested += () => Dispatcher.Invoke(TogglePause);
+
+        var s = _settingsManager.Settings;
+        _hotkeyManager.Register(hwnd, s.HotkeyToggleOverlay, s.HotkeyDismissAll, s.HotkeyToggleDnd);
     }
 
     private void SetupTrayIcon()
@@ -156,6 +209,10 @@ public partial class App : Application
         _overlayWindow.Show();
         _settingsManager!.Settings.OverlayVisible = true;
         UpdateMenuLabels();
+
+        // Hotkeys need a valid HWND — try registering now that the window is shown
+        if (_hotkeyManager == null && _settingsManager.Settings.GlobalHotkeysEnabled)
+            RefreshHotkeys();
     }
 
     private void HideOverlay()
@@ -387,6 +444,7 @@ public partial class App : Application
     private void QuitApp()
     {
         _focusTimer?.Stop();
+        _hotkeyManager?.Dispose();
         _notificationListener?.Stop();
         _settingsManager?.Save();
         _trayIcon?.Dispose();

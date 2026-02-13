@@ -9,4 +9,8 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NotificationsPro.Tests"/>
+  </ItemGroup>
+
 </Project>

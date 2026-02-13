@@ -242,6 +242,46 @@ public class SettingsViewModel : BaseViewModel
     private double _burstLimitWindowSeconds = 5;
     public double BurstLimitWindowSeconds { get => _burstLimitWindowSeconds; set { if (SetProperty(ref _burstLimitWindowSeconds, value)) QueueSave(); } }
 
+    // Accessibility — Timing
+    private bool _persistentNotifications;
+    public bool PersistentNotifications { get => _persistentNotifications; set { if (SetProperty(ref _persistentNotifications, value)) QueueSave(); } }
+
+    private bool _autoDurationEnabled;
+    public bool AutoDurationEnabled { get => _autoDurationEnabled; set { if (SetProperty(ref _autoDurationEnabled, value)) QueueSave(); } }
+
+    private double _autoDurationSecondsPerLine = 2.0;
+    public double AutoDurationSecondsPerLine { get => _autoDurationSecondsPerLine; set { if (SetProperty(ref _autoDurationSecondsPerLine, value)) QueueSave(); } }
+
+    private double _autoDurationBaseSeconds = 5.0;
+    public double AutoDurationBaseSeconds { get => _autoDurationBaseSeconds; set { if (SetProperty(ref _autoDurationBaseSeconds, value)) QueueSave(); } }
+
+    // Accessibility — System integration
+    private bool _respectReduceMotion = true;
+    public bool RespectReduceMotion { get => _respectReduceMotion; set { if (SetProperty(ref _respectReduceMotion, value)) QueueSave(); } }
+
+    private bool _respectHighContrast = true;
+    public bool RespectHighContrast { get => _respectHighContrast; set { if (SetProperty(ref _respectHighContrast, value)) QueueSave(); } }
+
+    private bool _respectTextScaling;
+    public bool RespectTextScaling { get => _respectTextScaling; set { if (SetProperty(ref _respectTextScaling, value)) QueueSave(); } }
+
+    // Accessibility — Global hotkeys
+    private bool _globalHotkeysEnabled;
+    public bool GlobalHotkeysEnabled { get => _globalHotkeysEnabled; set { if (SetProperty(ref _globalHotkeysEnabled, value)) QueueSave(); } }
+
+    private string _hotkeyToggleOverlay = "Ctrl+Alt+N";
+    public string HotkeyToggleOverlay { get => _hotkeyToggleOverlay; set { if (SetProperty(ref _hotkeyToggleOverlay, value)) QueueSave(); } }
+
+    private string _hotkeyDismissAll = "Ctrl+Alt+D";
+    public string HotkeyDismissAll { get => _hotkeyDismissAll; set { if (SetProperty(ref _hotkeyDismissAll, value)) QueueSave(); } }
+
+    private string _hotkeyToggleDnd = "Ctrl+Alt+P";
+    public string HotkeyToggleDnd { get => _hotkeyToggleDnd; set { if (SetProperty(ref _hotkeyToggleDnd, value)) QueueSave(); } }
+
+    // Accessibility — Density
+    private string _densityPreset = "Comfortable";
+    public string DensityPreset { get => _densityPreset; set => SetProperty(ref _densityPreset, value); }
+
     // Position
     private double _overlayWidth = 380;
     public double OverlayWidth
@@ -305,6 +345,7 @@ public class SettingsViewModel : BaseViewModel
     public ICommand DeleteCustomThemeCommand { get; }
     public ICommand ExportSettingsCommand { get; }
     public ICommand ImportSettingsCommand { get; }
+    public ICommand ApplyDensityPresetCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     // Themes
@@ -348,6 +389,7 @@ public class SettingsViewModel : BaseViewModel
         DeleteCustomThemeCommand = new RelayCommand(DeleteCustomTheme);
         ExportSettingsCommand = new RelayCommand(_ => ExportSettings());
         ImportSettingsCommand = new RelayCommand(_ => ImportSettings());
+        ApplyDensityPresetCommand = new RelayCommand(ApplyDensityPreset);
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
         foreach (var t in ThemePreset.BuiltInThemes)
@@ -413,6 +455,18 @@ public class SettingsViewModel : BaseViewModel
         _burstLimitEnabled = s.BurstLimitEnabled;
         _burstLimitCount = s.BurstLimitCount;
         _burstLimitWindowSeconds = s.BurstLimitWindowSeconds;
+        _persistentNotifications = s.PersistentNotifications;
+        _autoDurationEnabled = s.AutoDurationEnabled;
+        _autoDurationSecondsPerLine = s.AutoDurationSecondsPerLine;
+        _autoDurationBaseSeconds = s.AutoDurationBaseSeconds;
+        _respectReduceMotion = s.RespectReduceMotion;
+        _respectHighContrast = s.RespectHighContrast;
+        _respectTextScaling = s.RespectTextScaling;
+        _globalHotkeysEnabled = s.GlobalHotkeysEnabled;
+        _hotkeyToggleOverlay = s.HotkeyToggleOverlay;
+        _hotkeyDismissAll = s.HotkeyDismissAll;
+        _hotkeyToggleDnd = s.HotkeyToggleDnd;
+        _densityPreset = s.DensityPreset;
 
         HighlightKeywords.Clear();
         foreach (var kw in s.HighlightKeywords) HighlightKeywords.Add(kw);
@@ -545,6 +599,18 @@ public class SettingsViewModel : BaseViewModel
             BurstLimitEnabled = BurstLimitEnabled,
             BurstLimitCount = Math.Max(1, BurstLimitCount),
             BurstLimitWindowSeconds = BurstLimitWindowSeconds,
+            PersistentNotifications = PersistentNotifications,
+            AutoDurationEnabled = AutoDurationEnabled,
+            AutoDurationSecondsPerLine = AutoDurationSecondsPerLine,
+            AutoDurationBaseSeconds = AutoDurationBaseSeconds,
+            RespectReduceMotion = RespectReduceMotion,
+            RespectHighContrast = RespectHighContrast,
+            RespectTextScaling = RespectTextScaling,
+            GlobalHotkeysEnabled = GlobalHotkeysEnabled,
+            HotkeyToggleOverlay = HotkeyToggleOverlay,
+            HotkeyDismissAll = HotkeyDismissAll,
+            HotkeyToggleDnd = HotkeyToggleDnd,
+            DensityPreset = DensityPreset,
             OverlayWidth = resolvedOverlayWidth,
             LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
             OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),
@@ -861,6 +927,62 @@ public class SettingsViewModel : BaseViewModel
         var props = GetType().GetProperties();
         foreach (var prop in props)
             OnPropertyChanged(prop.Name);
+    }
+
+    private void ApplyDensityPreset(object? parameter)
+    {
+        if (parameter is not string preset || string.IsNullOrWhiteSpace(preset))
+            return;
+
+        switch (preset.Trim())
+        {
+            case "Compact":
+                FontSize = 12;
+                AppNameFontSize = 11;
+                TitleFontSize = 13;
+                Padding = 8;
+                CardGap = 4;
+                OuterMargin = 2;
+                LineSpacing = 1.2;
+                LimitTextLines = true;
+                MaxAppNameLines = 1;
+                MaxTitleLines = 1;
+                MaxBodyLines = 2;
+                break;
+
+            case "Comfortable":
+                FontSize = 14;
+                AppNameFontSize = 14;
+                TitleFontSize = 16;
+                Padding = 16;
+                CardGap = 8;
+                OuterMargin = 4;
+                LineSpacing = 1.5;
+                LimitTextLines = false;
+                MaxAppNameLines = 2;
+                MaxTitleLines = 2;
+                MaxBodyLines = 4;
+                break;
+
+            case "Spacious":
+                FontSize = 16;
+                AppNameFontSize = 16;
+                TitleFontSize = 18;
+                Padding = 24;
+                CardGap = 12;
+                OuterMargin = 8;
+                LineSpacing = 1.8;
+                LimitTextLines = false;
+                MaxAppNameLines = 3;
+                MaxTitleLines = 3;
+                MaxBodyLines = 6;
+                break;
+
+            default:
+                return;
+        }
+
+        DensityPreset = preset.Trim();
     }
 
     public ThemeManager GetThemeManager() => _themeManager;

@@ -137,5 +137,14 @@ public class ThemePreset
             CornerRadius = 6, Padding = 12, CardGap = 4, OuterMargin = 2,
             ShowAccent = false, AccentThickness = 2, ShowBorder = false, BorderThickness = 1,
         },
+        new()
+        {
+            Name = "Color-Blind Safe",
+            TextColor = "#FFFFFF", TitleColor = "#FFFFFF", AppNameColor = "#CCCCCC",
+            BackgroundColor = "#1A1A2E", BackgroundOpacity = 0.95,
+            AccentColor = "#0072B2", HighlightColor = "#E69F00", BorderColor = "#444466",
+            CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
+            ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 1,
+        },
     };
 }
