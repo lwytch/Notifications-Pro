@@ -194,31 +194,31 @@ Cognitive accessibility:
 - [x] New Accessibility tab in Settings window
 
 ### Milestone 8: UX Polish & Settings Enhancements
-**Status: Not Started**
+**Status: Complete**
 
 Professional-grade polish that distinguishes "functional" from "premium".
 
 Live preview:
-- [ ] Inline mini-preview card inside settings window — always-visible sample card that updates in real-time as sliders/pickers change (no need to send test notification or find the overlay)
-- [ ] Preview shows all three fields (app name, title, body) with current style applied
+- [x] Inline mini-preview card inside settings window — always-visible sample card that updates in real-time as sliders/pickers change (no need to send test notification or find the overlay)
+- [x] Preview shows all three fields (app name, title, body) with current style applied
 
 Empty & first-run states:
-- [ ] Empty overlay ghost card — when no notifications visible, show a low-opacity "Waiting for notifications..." placeholder so new users know the overlay is there
-- [ ] First-run tray balloon — `NotifyIcon.ShowBalloonTip()` on first launch: "Notifications Pro is running. Right-click here for settings."
-- [ ] First-run tip bar in settings — dismissable info bar on first open: "Drag the overlay to reposition it."
-- [ ] Track `HasShownWelcome` in AppSettings (UI state, not notification content)
+- [x] Empty overlay ghost card — when no notifications visible, show a low-opacity "Waiting for notifications..." placeholder so new users know the overlay is there
+- [x] First-run tray balloon — `NotifyIcon.ShowBalloonTip()` on first launch: "Notifications Pro is running. Right-click here for settings."
+- [x] First-run tip bar in settings — dismissable info bar on first open: "Drag the overlay to reposition it."
+- [x] Track `HasShownWelcome` in AppSettings (UI state, not notification content)
 
 Settings window polish:
-- [ ] Confirm before "Reset to Defaults" — MessageBox confirmation to prevent accidental resets
-- [ ] "Saved" micro-feedback — brief checkmark fade next to "Changes are saved automatically" on each save
-- [ ] Remember settings window position between opens (save to AppSettings)
-- [ ] Ctrl+T keyboard shortcut to send test notification from settings
+- [x] Confirm before "Reset to Defaults" — MessageBox confirmation to prevent accidental resets
+- [x] "Saved" micro-feedback — brief "Saved" label appears next to "Changes are saved automatically" on each save (1.5s auto-hide)
+- [x] Remember settings window position between opens (save to AppSettings)
+- [x] Ctrl+T keyboard shortcut to send test notification from settings
 
 Tray icon enhancements:
-- [ ] Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through) instead of flipping label text
-- [ ] Tray icon state variants — dimmed/monochrome when paused, indicator when click-through active
-- [ ] Notification count badge on tray icon (active card count)
-- [ ] "Clear All Notifications" in tray menu (calls `QueueManager.ClearAll()`)
+- [x] Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through)
+- [x] Tray icon state variants — dimmed/monochrome when paused
+- [x] Notification count badge on tray icon (active card count, red badge in bottom-right)
+- [x] "Clear All Notifications" in tray menu (already existed from M4)
 
 ### Milestone 9: System Integration & Multi-Monitor
 **Status: Not Started**
@@ -252,7 +252,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 7 accessibility complete. Next: Milestone 8 UX polish, or Milestone 9 system integration.
+Milestone 8 UX polish complete. Next: Milestone 9 system integration, or Milestone 10 streaming.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

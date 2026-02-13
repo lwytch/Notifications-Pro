@@ -11,6 +11,7 @@
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
+        <converters:ColorToOpacityBrushConverter x:Key="ColorToOpacityBrush"/>
         <converters:BoolToMuteLabelConverter x:Key="BoolToMuteLabel"/>
         <converters:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -86,6 +87,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -112,8 +115,85 @@
             </DockPanel>
         </Border>
 
+        <!-- First-run tip bar -->
+        <Border Grid.Row="1" Padding="16,10" Background="#2A2A40"
+                Visibility="{Binding ShowFirstRunTip, Converter={StaticResource BoolToVis}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Got it" Margin="12,0,0,0"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding DismissFirstRunTipCommand}"/>
+                <TextBlock Text="Tip: Drag the overlay window to reposition it. Use Ctrl+T to send a test notification."
+                           FontFamily="{StaticResource UIFont}" FontSize="12"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Live preview card -->
+        <Border Grid.Row="2" Padding="24,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <Border x:Name="PreviewCardOuter" CornerRadius="{Binding CornerRadius}">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush" Value="{Binding BorderColor, Converter={StaticResource ColorToBrush}}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowBorder}" Value="True">
+                                <Setter Property="BorderThickness" Value="{Binding BorderThickness}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Border x:Name="PreviewCardAccent" CornerRadius="{Binding CornerRadius}" Padding="{Binding Padding}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderBrush" Value="{Binding AccentColor, Converter={StaticResource ColorToBrush}}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowAccent}" Value="True">
+                                    <Setter Property="BorderThickness">
+                                        <Setter.Value>
+                                            <Thickness Left="3" Top="0" Right="0" Bottom="0"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Border.Background>
+                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                            <Binding Path="BackgroundColor"/>
+                            <Binding Path="BackgroundOpacity"/>
+                        </MultiBinding>
+                    </Border.Background>
+                    <StackPanel>
+                        <TextBlock Text="Microsoft Teams"
+                                   FontFamily="{Binding FontFamily}"
+                                   FontSize="{Binding AppNameFontSize}"
+                                   FontWeight="{Binding AppNameFontWeight}"
+                                   Foreground="{Binding AppNameColor, Converter={StaticResource ColorToBrush}}"
+                                   Visibility="{Binding ShowAppName, Converter={StaticResource BoolToVis}}"
+                                   Margin="0,0,0,4"/>
+                        <TextBlock Text="Sarah sent a message"
+                                   FontFamily="{Binding FontFamily}"
+                                   FontSize="{Binding TitleFontSize}"
+                                   FontWeight="{Binding TitleFontWeight}"
+                                   Foreground="{Binding TitleColor, Converter={StaticResource ColorToBrush}}"
+                                   Visibility="{Binding ShowNotificationTitle, Converter={StaticResource BoolToVis}}"
+                                   Margin="0,0,0,4"/>
+                        <TextBlock Text="Hey, are you available for a quick call about the project?"
+                                   FontFamily="{Binding FontFamily}"
+                                   FontSize="{Binding FontSize}"
+                                   FontWeight="{Binding FontWeight}"
+                                   Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                                   Visibility="{Binding ShowNotificationBody, Converter={StaticResource BoolToVis}}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Border>
+
         <!-- Tabs -->
-        <TabControl Grid.Row="1" Style="{StaticResource SettingsTabControl}" Margin="24,0">
+        <TabControl Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="24,0">
 
             <!-- ═══ THEMES TAB ═══ -->
             <TabItem Header="Themes" Style="{StaticResource SettingsTabItem}">
@@ -1215,7 +1295,7 @@
         </TabControl>
 
         <!-- Footer with preview button -->
-        <Border Grid.Row="2" Padding="24,16" BorderBrush="{StaticResource BorderBrush}"
+        <Border Grid.Row="4" Padding="24,16" BorderBrush="{StaticResource BorderBrush}"
                 BorderThickness="0,1,0,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
@@ -1224,11 +1304,18 @@
                             ToolTip="Restore all settings to their original values"/>
                     <Button Content="Send Test Notification" Style="{StaticResource PrimaryButton}"
                             Command="{Binding PreviewNotificationCommand}"
-                            ToolTip="Shows a sample notification in the overlay so you can preview your current style settings"/>
+                            ToolTip="Shows a sample notification in the overlay (Ctrl+T)"/>
                 </StackPanel>
-                <TextBlock Text="Changes are saved automatically" VerticalAlignment="Center"
-                           FontFamily="{StaticResource UIFont}" FontSize="11"
-                           Foreground="{StaticResource TextMutedBrush}"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Changes are saved automatically"
+                               FontFamily="{StaticResource UIFont}" FontSize="11"
+                               Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock x:Name="SavedIndicator" Text=" Saved"
+                               FontFamily="{StaticResource UIFont}" FontSize="11"
+                               Foreground="{StaticResource AccentBrush}"
+                               Visibility="{Binding ShowSavedIndicator, Converter={StaticResource BoolToVis}}"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
             </DockPanel>
         </Border>
     </Grid>

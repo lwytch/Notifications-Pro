@@ -352,6 +352,10 @@ public class OverlayViewModel : BaseViewModel
     public Duration ExitMotionDuration => DurationFor(AnimationDurationMs);
     public Duration ExitFadeDuration => DurationFor(AnimationDurationMs);
 
+    // Empty state ghost card visibility
+    private Visibility _emptyStateVisibility = Visibility.Visible;
+    public Visibility EmptyStateVisibility { get => _emptyStateVisibility; set => SetProperty(ref _emptyStateVisibility, value); }
+
     public OverlayViewModel(QueueManager queueManager, SettingsManager settingsManager)
     {
         _queueManager = queueManager;
@@ -359,6 +363,11 @@ public class OverlayViewModel : BaseViewModel
 
         ApplySettings(_settingsManager.Settings);
         _settingsManager.SettingsChanged += () => ApplySettings(_settingsManager.Settings);
+
+        // Track empty state
+        ((System.Collections.Specialized.INotifyCollectionChanged)_queueManager.VisibleNotifications)
+            .CollectionChanged += (_, _) => UpdateEmptyState();
+        UpdateEmptyState();
 
         // Refresh relative timestamps every 15 seconds
         var timestampTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
@@ -468,6 +477,13 @@ public class OverlayViewModel : BaseViewModel
         OnPropertyChanged(nameof(EntryFadeDuration));
         OnPropertyChanged(nameof(ExitMotionDuration));
         OnPropertyChanged(nameof(ExitFadeDuration));
+    }
+
+    private void UpdateEmptyState()
+    {
+        EmptyStateVisibility = _queueManager.VisibleNotifications.Count == 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private static Duration DurationFor(double ms)

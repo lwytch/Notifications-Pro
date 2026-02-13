@@ -3,6 +3,19 @@
 ## Unreleased
 
 ### Added
+- **Milestone 8: UX Polish & Settings Enhancements**
+- Inline live preview card in settings window — always-visible sample notification that updates in real-time as you change colors, fonts, and shape
+- Empty overlay ghost card — low-opacity "Waiting for notifications..." placeholder when no cards are visible
+- First-run tray balloon tip on first launch ("Notifications Pro is running. Right-click the tray icon for settings.")
+- First-run tip bar in settings — dismissable info bar with drag and Ctrl+T hints (tracks HasShownWelcome)
+- Confirm before "Reset to Defaults" — MessageBox confirmation prevents accidental resets
+- "Saved" micro-feedback — brief "Saved" label appears next to "Changes are saved automatically" after each save (1.5s auto-hide)
+- Remember settings window position between opens (SettingsWindowLeft/Top in AppSettings)
+- Ctrl+T keyboard shortcut to send test notification from the settings window
+- Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through) for quick visual state
+- Tray icon dimmed/monochrome variant when notifications are paused
+- Tray icon notification count badge (red badge with active card count in bottom-right)
+- 9 new unit tests covering M8 AppSettings defaults, clone, JSON round-trip, icon variants, and empty queue state
 - **Milestone 7: Accessibility & Inclusivity**
 - Persistent notification mode — notifications stay visible until manually dismissed (no auto-expiry timer)
 - Auto-duration by content length — configurable base seconds + per-line seconds for longer notifications

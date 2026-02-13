@@ -107,6 +107,11 @@ public class AppSettings
     // Overlay visibility
     public bool OverlayVisible { get; set; } = true;
 
+    // UX Polish (M8)
+    public bool HasShownWelcome { get; set; } = false;
+    public double? SettingsWindowLeft { get; set; }
+    public double? SettingsWindowTop { get; set; }
+
     public AppSettings Clone()
     {
         var clone = (AppSettings)MemberwiseClone();

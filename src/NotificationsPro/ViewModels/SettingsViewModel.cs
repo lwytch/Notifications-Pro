@@ -282,6 +282,17 @@ public class SettingsViewModel : BaseViewModel
     private string _densityPreset = "Comfortable";
     public string DensityPreset { get => _densityPreset; set => SetProperty(ref _densityPreset, value); }
 
+    // UX Polish (M8) — saved feedback
+    private bool _showSavedIndicator;
+    public bool ShowSavedIndicator { get => _showSavedIndicator; set => SetProperty(ref _showSavedIndicator, value); }
+    private DispatcherTimer? _savedFeedbackTimer;
+
+    // UX Polish (M8) — first-run tip
+    private bool _showFirstRunTip;
+    public bool ShowFirstRunTip { get => _showFirstRunTip; set => SetProperty(ref _showFirstRunTip, value); }
+
+    public ICommand DismissFirstRunTipCommand { get; }
+
     // Position
     private double _overlayWidth = 380;
     public double OverlayWidth
@@ -390,6 +401,7 @@ public class SettingsViewModel : BaseViewModel
         ExportSettingsCommand = new RelayCommand(_ => ExportSettings());
         ImportSettingsCommand = new RelayCommand(_ => ImportSettings());
         ApplyDensityPresetCommand = new RelayCommand(ApplyDensityPreset);
+        DismissFirstRunTipCommand = new RelayCommand(_ => DismissFirstRunTip());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
         foreach (var t in ThemePreset.BuiltInThemes)
@@ -397,6 +409,10 @@ public class SettingsViewModel : BaseViewModel
         RefreshCustomThemes();
 
         LoadFromSettings();
+
+        // Show first-run tip if welcome hasn't been shown yet
+        if (!_settingsManager.Settings.HasShownWelcome)
+            ShowFirstRunTip = true;
     }
 
     private void LoadFromSettings()
@@ -623,10 +639,27 @@ public class SettingsViewModel : BaseViewModel
             MonitorIndex = previousSettings.MonitorIndex,
             OverlayVisible = previousSettings.OverlayVisible,
             NotificationsPaused = previousSettings.NotificationsPaused,
+            HasShownWelcome = previousSettings.HasShownWelcome,
+            SettingsWindowLeft = previousSettings.SettingsWindowLeft,
+            SettingsWindowTop = previousSettings.SettingsWindowTop,
         };
 
         _settingsManager.Apply(s);
         _overlayWidthDirty = false;
+        ShowSavedFeedback();
+    }
+
+    private void ShowSavedFeedback()
+    {
+        ShowSavedIndicator = true;
+        _savedFeedbackTimer?.Stop();
+        _savedFeedbackTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1500) };
+        _savedFeedbackTimer.Tick += (_, _) =>
+        {
+            _savedFeedbackTimer.Stop();
+            ShowSavedIndicator = false;
+        };
+        _savedFeedbackTimer.Start();
     }
 
     private void SendPreviewNotification()
@@ -779,6 +812,15 @@ public class SettingsViewModel : BaseViewModel
 
     private void ResetToDefaults()
     {
+        var result = System.Windows.MessageBox.Show(
+            "This will reset all settings to their default values. Are you sure?",
+            "Reset to Defaults",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+
         _settingsManager.ResetToDefaults();
         LoadFromSettings();
 
@@ -983,6 +1025,13 @@ public class SettingsViewModel : BaseViewModel
         }
 
         DensityPreset = preset.Trim();
+    }
+
+    private void DismissFirstRunTip()
+    {
+        ShowFirstRunTip = false;
+        _settingsManager.Settings.HasShownWelcome = true;
+        _settingsManager.Save();
     }
 
     public ThemeManager GetThemeManager() => _themeManager;

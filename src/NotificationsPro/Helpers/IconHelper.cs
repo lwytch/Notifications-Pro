@@ -57,6 +57,94 @@ public static class IconHelper
         return source;
     }
 
+    /// <summary>
+    /// Creates a dimmed/muted variant of the tray icon (lower saturation + opacity).
+    /// Used when notifications are paused.
+    /// </summary>
+    public static Drawing.Icon CreateDimmedTrayIcon()
+    {
+        using var bitmap = new Drawing.Bitmap(32, 32);
+        using var g = Drawing.Graphics.FromImage(bitmap);
+        g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias;
+        g.TextRenderingHint = DrawingText.TextRenderingHint.AntiAliasGridFit;
+
+        // Dimmed gray-purple background
+        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(180, 80, 80, 110));
+        FillRoundedRect(g, bgBrush, new Drawing.Rectangle(1, 1, 30, 30), 8);
+
+        using var font = new Drawing.Font("Segoe UI", 15, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Pixel);
+        using var textBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(180, 255, 255, 255));
+        var format = new Drawing.StringFormat
+        {
+            Alignment = Drawing.StringAlignment.Center,
+            LineAlignment = Drawing.StringAlignment.Center
+        };
+        g.DrawString("N", font, textBrush, new Drawing.RectangleF(0, 1, 32, 32), format);
+
+        var hIcon = bitmap.GetHicon();
+        try
+        {
+            using var temporary = Drawing.Icon.FromHandle(hIcon);
+            return (Drawing.Icon)temporary.Clone();
+        }
+        finally
+        {
+            DestroyIcon(hIcon);
+        }
+    }
+
+    /// <summary>
+    /// Creates a tray icon with a notification count badge.
+    /// </summary>
+    public static Drawing.Icon CreateBadgedTrayIcon(int count)
+    {
+        using var bitmap = new Drawing.Bitmap(32, 32);
+        using var g = Drawing.Graphics.FromImage(bitmap);
+        g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias;
+        g.TextRenderingHint = DrawingText.TextRenderingHint.AntiAliasGridFit;
+
+        // Normal purple background
+        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(124, 92, 252));
+        FillRoundedRect(g, bgBrush, new Drawing.Rectangle(1, 1, 30, 30), 8);
+
+        // White "N" letter
+        using var font = new Drawing.Font("Segoe UI", 15, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Pixel);
+        using var textBrush = new Drawing.SolidBrush(Drawing.Color.White);
+        var format = new Drawing.StringFormat
+        {
+            Alignment = Drawing.StringAlignment.Center,
+            LineAlignment = Drawing.StringAlignment.Center
+        };
+        g.DrawString("N", font, textBrush, new Drawing.RectangleF(0, 1, 32, 32), format);
+
+        // Badge circle in bottom-right
+        if (count > 0)
+        {
+            var badgeText = count > 9 ? "9+" : count.ToString();
+            using var badgeBg = new Drawing.SolidBrush(Drawing.Color.FromArgb(255, 80, 80));
+            g.FillEllipse(badgeBg, 18, 18, 13, 13);
+            using var badgeFont = new Drawing.Font("Segoe UI", 8, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Pixel);
+            using var badgeTextBrush = new Drawing.SolidBrush(Drawing.Color.White);
+            var badgeFormat = new Drawing.StringFormat
+            {
+                Alignment = Drawing.StringAlignment.Center,
+                LineAlignment = Drawing.StringAlignment.Center
+            };
+            g.DrawString(badgeText, badgeFont, badgeTextBrush, new Drawing.RectangleF(18, 18, 13, 13), badgeFormat);
+        }
+
+        var hIcon = bitmap.GetHicon();
+        try
+        {
+            using var temporary = Drawing.Icon.FromHandle(hIcon);
+            return (Drawing.Icon)temporary.Clone();
+        }
+        finally
+        {
+            DestroyIcon(hIcon);
+        }
+    }
+
     private static void FillRoundedRect(Drawing.Graphics g, Drawing.Brush brush, Drawing.Rectangle rect, int radius)
     {
         using var path = new Drawing2D.GraphicsPath();

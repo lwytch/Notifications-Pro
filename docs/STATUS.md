@@ -109,7 +109,20 @@
   - Minimum click target size on toggle switches (44dp)
   - AutomationProperties on overlay window for screen reader compatibility
   - New Accessibility tab in Settings window
-- 87 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, and accessibility defaults
+- **UX Polish & Settings Enhancements (Milestone 8)**:
+  - Inline live preview card in settings window — always-visible sample card updates in real-time as you adjust settings
+  - Empty overlay ghost card — low-opacity "Waiting for notifications..." placeholder when no cards are visible
+  - First-run tray balloon tip — "Notifications Pro is running. Right-click the tray icon for settings."
+  - First-run tip bar in settings — dismissable info bar on first open with drag/Ctrl+T hints
+  - HasShownWelcome tracking in AppSettings (UI state, not notification content)
+  - Confirm before "Reset to Defaults" — MessageBox confirmation prevents accidental resets
+  - "Saved" micro-feedback — brief "Saved" label appears next to auto-save text after each save
+  - Remember settings window position between opens
+  - Ctrl+T keyboard shortcut to send test notification from settings
+  - Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through)
+  - Tray icon dimmed/monochrome when notifications are paused
+  - Notification count badge on tray icon (red badge with active card count)
+- 96 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip)
 
 ## What Doesn't Work Yet
 - Multi-monitor selection (Milestone 9)
@@ -211,6 +224,17 @@ dotnet test
 - [ ] Color-Blind Safe theme appears in built-in theme list and passes WCAG AA
 - [ ] Focus indicators visible when tabbing through settings controls
 - [ ] Toggle switches have minimum 44dp hit area
+- [ ] Live preview card in settings updates in real-time as sliders/pickers change
+- [ ] Empty overlay shows "Waiting for notifications..." ghost card when no cards visible
+- [ ] First-run tray balloon appears on first launch
+- [ ] First-run tip bar appears in settings on first open and can be dismissed
+- [ ] "Reset to Defaults" shows a confirmation dialog before resetting
+- [ ] "Saved" label briefly appears next to "Changes are saved automatically" after each save
+- [ ] Settings window position is remembered between opens
+- [ ] Ctrl+T sends a test notification from the settings window
+- [ ] Tray menu toggle items (Pause, Always on Top, Click-Through) show checkmarks
+- [ ] Tray icon dims when notifications are paused
+- [ ] Tray icon shows red count badge when notifications are active
 
 ## Known Limitations
 - Multi-monitor support not yet implemented

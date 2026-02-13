@@ -66,6 +66,10 @@ public partial class App : Application
         _notificationListener = new NotificationListener(_queueManager, Dispatcher);
         _notificationListener.StatusChanged += UpdateStatusItem;
 
+        // Update tray icon badge when notification count changes
+        ((System.Collections.Specialized.INotifyCollectionChanged)_queueManager.VisibleNotifications)
+            .CollectionChanged += (_, _) => Dispatcher.InvokeAsync(UpdateTrayIcon);
+
         SetupTrayIcon();
 
         // Apply High Contrast theme if active and respected
@@ -82,6 +86,16 @@ public partial class App : Application
         // Register global hotkeys when overlay window has an HWND
         _settingsManager.SettingsChanged += RefreshHotkeys;
         RefreshHotkeys();
+
+        // Show first-run balloon tip
+        if (!_settingsManager.Settings.HasShownWelcome && _trayIcon != null)
+        {
+            _trayIcon.ShowBalloonTip(
+                5000,
+                "Notifications Pro",
+                "Notifications Pro is running. Right-click the tray icon for settings.",
+                WinForms.ToolTipIcon.Info);
+        }
 
         // Initialize notification listener — will prompt for permission on first run
         await _notificationListener.InitializeAsync();
@@ -265,25 +279,53 @@ public partial class App : Application
         if (_showHideItem != null)
             _showHideItem.Text = _overlayWindow?.IsVisible == true ? "Hide Overlay" : "Show Overlay";
 
+        var isPaused = _queueManager?.IsPaused == true;
         if (_pauseResumeItem != null)
-            _pauseResumeItem.Text = _queueManager?.IsPaused == true ? "Resume Notifications" : "Pause Notifications";
+        {
+            _pauseResumeItem.Text = isPaused ? "Resume Notifications" : "Pause Notifications";
+            _pauseResumeItem.Checked = isPaused;
+        }
 
         if (_clickThroughItem != null)
         {
-            _clickThroughItem.Text = _settingsManager?.Settings.ClickThrough == true
-                ? "Disable Click-Through (Allow Dragging)"
-                : "Enable Click-Through (Clicks Pass Through)";
+            var isClickThrough = _settingsManager?.Settings.ClickThrough == true;
+            _clickThroughItem.Text = isClickThrough
+                ? "Click-Through (Clicks Pass Through)"
+                : "Click-Through";
+            _clickThroughItem.Checked = isClickThrough;
         }
 
         if (_alwaysOnTopItem != null)
         {
-            _alwaysOnTopItem.Text = _settingsManager?.Settings.AlwaysOnTop == true
-                ? "Disable Always on Top"
-                : "Enable Always on Top";
+            var isOnTop = _settingsManager?.Settings.AlwaysOnTop == true;
+            _alwaysOnTopItem.Text = "Always on Top";
+            _alwaysOnTopItem.Checked = isOnTop;
         }
 
         if (_focusModeItem != null && _focusTimer == null)
             _focusModeItem.Text = "Focus Mode";
+
+        UpdateTrayIcon();
+    }
+
+    private void UpdateTrayIcon()
+    {
+        if (_trayIcon == null) return;
+
+        var isPaused = _queueManager?.IsPaused == true;
+        var visibleCount = _queueManager?.VisibleNotifications.Count ?? 0;
+
+        Drawing.Icon newIcon;
+        if (isPaused)
+            newIcon = IconHelper.CreateDimmedTrayIcon();
+        else if (visibleCount > 0)
+            newIcon = IconHelper.CreateBadgedTrayIcon(visibleCount);
+        else
+            newIcon = IconHelper.CreateTrayIcon();
+
+        var oldIcon = _trayIcon.Icon;
+        _trayIcon.Icon = newIcon;
+        oldIcon?.Dispose();
     }
 
     private void ShowSettings()
@@ -291,7 +333,7 @@ public partial class App : Application
         if (_settingsWindow == null || !_settingsWindow.IsLoaded)
         {
             _settingsViewModel = new SettingsViewModel(_settingsManager!, _queueManager!);
-            _settingsWindow = new SettingsWindow(_settingsViewModel);
+            _settingsWindow = new SettingsWindow(_settingsViewModel, _settingsManager);
             _settingsWindow.Closed += (_, _) => _settingsWindow = null;
         }
 

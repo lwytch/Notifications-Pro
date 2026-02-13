@@ -320,6 +320,26 @@
                 </Style>
             </ScrollViewer.Resources>
             <StackPanel>
+                <!-- Empty state ghost card -->
+                <Border Visibility="{Binding EmptyStateVisibility}"
+                        Margin="{Binding CardMargin}"
+                        CornerRadius="{Binding CornerRadius}"
+                        Opacity="0.35" Padding="{Binding Padding}">
+                    <Border.Background>
+                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                            <Binding Path="BackgroundColor"/>
+                            <Binding Path="BackgroundOpacity"/>
+                        </MultiBinding>
+                    </Border.Background>
+                    <TextBlock Text="Waiting for notifications..."
+                               FontFamily="{Binding FontFamily}"
+                               FontSize="{Binding FontSize}"
+                               Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                               Opacity="0.6"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
                 <!-- Notification items -->
                 <ItemsControl ItemsSource="{Binding Notifications}"
                               ItemTemplate="{StaticResource NotificationCardTemplate}"/>
