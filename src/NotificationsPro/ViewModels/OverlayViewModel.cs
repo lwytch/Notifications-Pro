@@ -399,6 +399,9 @@ public class OverlayViewModel : BaseViewModel
     private double _fullscreenOverlayOpacity = 0.5;
     public double FullscreenOverlayOpacity { get => _fullscreenOverlayOpacity; set => SetProperty(ref _fullscreenOverlayOpacity, value); }
 
+    private string _fullscreenOverlayColor = "#000000";
+    public string FullscreenOverlayColor { get => _fullscreenOverlayColor; set => SetProperty(ref _fullscreenOverlayColor, value); }
+
     // Empty state ghost card visibility
     private Visibility _emptyStateVisibility = Visibility.Visible;
     public Visibility EmptyStateVisibility { get => _emptyStateVisibility; set => SetProperty(ref _emptyStateVisibility, value); }
@@ -510,6 +513,7 @@ public class OverlayViewModel : BaseViewModel
         PerAppTintOpacity = s.PerAppTintOpacity;
         FullscreenOverlayMode = s.FullscreenOverlayMode;
         FullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
+        FullscreenOverlayColor = s.FullscreenOverlayColor;
 
         // Notify all computed properties
         OnPropertyChanged(nameof(AppNameLineHeight));

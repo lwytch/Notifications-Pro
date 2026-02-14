@@ -23,7 +23,7 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: three tabs (Appearance, Behavior, Position) with premium dark theme
+- Settings window: eight tabs (Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with premium dark theme
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Behavior tab includes:
@@ -148,9 +148,13 @@
   - Custom settings window color pickers (background, surface, text, accent, border)
   - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
-  - Settings popup display mode — Window or Popup (floating above taskbar, auto-close option)
-  - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides
-  - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider
+  - Settings popup display mode — Window or Popup (positioned above system tray via Win32 TrayNotifyWnd, auto-close option)
+  - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
+  - Test sound button to preview selected sound
+  - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
+  - Per-app sound and icon assignment UI in Filtering tab
+  - Fullscreen overlay background color picker (in addition to opacity)
+  - Fullscreen overlay section moved from Behavior to Position tab for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
 - 132 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)

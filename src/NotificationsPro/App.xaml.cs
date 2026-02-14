@@ -48,6 +48,19 @@ public partial class App : Application
     private static extern void SetCurrentProcessExplicitAppUserModelID(
         [MarshalAs(UnmanagedType.LPWStr)] string appId);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string? lpszClass, string? lpszWindow);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT { public int Left, Top, Right, Bottom; }
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -370,21 +383,36 @@ public partial class App : Application
             var settings = _settingsManager!.Settings;
             if (settings.SettingsDisplayMode == "Popup")
             {
-                _settingsWindow.WindowStyle = WindowStyle.ToolWindow;
+                _settingsWindow.WindowStyle = WindowStyle.None;
+                _settingsWindow.ResizeMode = ResizeMode.NoResize;
                 _settingsWindow.ShowInTaskbar = false;
                 _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
 
-                // Position above taskbar with 8px gap
-                var primaryScreen = System.Windows.Forms.Screen.PrimaryScreen!;
-                var workArea = primaryScreen.WorkingArea;
-                var screenBounds = primaryScreen.Bounds;
-                var taskbarHeight = screenBounds.Height - workArea.Height;
                 var windowWidth = _settingsWindow.Width;
-                var windowHeight = _settingsWindow.Height;
 
-                // Default: bottom-right, above taskbar
-                _settingsWindow.Left = workArea.Right - windowWidth - 8;
-                _settingsWindow.Top = workArea.Bottom - windowHeight - 8;
+                // Use 70% of primary screen height with padding
+                var primaryScreen = WinForms.Screen.PrimaryScreen ?? WinForms.Screen.AllScreens[0];
+                var workArea = primaryScreen.WorkingArea;
+                var windowHeight = workArea.Height * 0.7;
+                _settingsWindow.Height = windowHeight;
+
+                // Position fixed above the system tray notification area
+                var trayRect = GetTrayNotificationAreaRect();
+                if (trayRect.HasValue)
+                {
+                    var r = trayRect.Value;
+                    _settingsWindow.Left = Math.Max(workArea.Left, r.Right - windowWidth);
+                    _settingsWindow.Top = r.Top - windowHeight - 8;
+                }
+                else
+                {
+                    _settingsWindow.Left = workArea.Right - windowWidth - 8;
+                    _settingsWindow.Top = workArea.Bottom - windowHeight - 8;
+                }
+
+                // Clamp to work area bounds
+                if (_settingsWindow.Top < workArea.Top)
+                    _settingsWindow.Top = workArea.Top;
 
                 if (settings.PopupAutoClose)
                 {
@@ -395,6 +423,25 @@ public partial class App : Application
 
         _settingsWindow.Show();
         _settingsWindow.Activate();
+    }
+
+    /// <summary>
+    /// Finds the screen rectangle of the Windows system tray notification area
+    /// using Win32 window hierarchy: Shell_TrayWnd > TrayNotifyWnd.
+    /// </summary>
+    private static System.Drawing.Rectangle? GetTrayNotificationAreaRect()
+    {
+        var taskbar = FindWindow("Shell_TrayWnd", null);
+        if (taskbar == IntPtr.Zero) return null;
+
+        var trayNotify = FindWindowEx(taskbar, IntPtr.Zero, "TrayNotifyWnd", null);
+        if (trayNotify == IntPtr.Zero) return null;
+
+        if (!GetWindowRect(trayNotify, out var rect)) return null;
+
+        return new System.Drawing.Rectangle(
+            rect.Left, rect.Top,
+            rect.Right - rect.Left, rect.Bottom - rect.Top);
     }
 
     private void OnSettingsWindowDeactivated(object? sender, EventArgs e)

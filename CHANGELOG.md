@@ -22,6 +22,21 @@
 - IconPreset model with built-in WPF geometry paths
 - AppIconConverter for XAML multi-value binding icon resolution
 - Icon size slider (16-48px) and default icon preset selector in Appearance tab
+- Custom sound upload — browse for WAV files, copies to AppData sounds directory
+- Custom icon upload — browse for PNG/JPG/ICO files, copies to AppData icons directory
+- Test Sound button next to default sound selector for preview
+- Per-app sound and icon assignment UI in Filtering tab (dropdown per seen app)
+- Fullscreen overlay background color picker (configurable backdrop color in addition to opacity)
+- Settings popup mode now positions precisely above system tray notification area via Win32 FindWindow/GetWindowRect
+- Popup mode now uses borderless window (no title bar) at 70% screen height, fixed above system tray
+- Fullscreen overlay mode now uses the selected monitor index instead of current window position
+- Fullscreen mode properly saves/restores overlay position and size when toggling
+- Show/hide preview card toggle in settings header
+- New "UI Styling" tab — consolidates settings window theme, display mode, and custom color controls
+- First-run tip bar now respects light mode (uses DynamicResource instead of hardcoded color)
+- Light mode colors improved for better contrast (buttons, borders, text readability)
+- Settings window and theme customization options moved out of Themes and Behavior tabs into dedicated UI Styling tab
+- Fullscreen overlay section moved from Behavior tab to Position tab for better logical grouping
 - 9 settings window color properties on ThemePreset for theme-aware settings window colors
 - Light theme preset includes light settings window colors
 - 16 new unit tests covering M9.5 AppSettings defaults, clone, deep-copy PerAppSounds/PerAppIcons, JSON round-trip, IconPreset, SoundService, QueueManager NotificationAdded event, ThemePreset settings colors

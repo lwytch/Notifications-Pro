@@ -21,9 +21,9 @@ public static class SettingsThemeService
 
     private static readonly string[] LightDefaults =
     {
-        "#F5F5F8", "#FFFFFF", "#E8E8F0", "#DEDEE8",
-        "#222222", "#555555", "#888888",
-        "#5B7FFF", "#D0D0D0"
+        "#F0F0F5", "#FFFFFF", "#E2E2EC", "#D4D4E0",
+        "#1A1A2E", "#4A4A60", "#7A7A90",
+        "#5B5FD6", "#B8B8CC"
     };
 
     /// <summary>

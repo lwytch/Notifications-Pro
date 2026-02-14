@@ -104,6 +104,12 @@
                     <Image Source="{Binding TrayIconImage}" Width="22" Height="22"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <TextBlock Text="Preview" FontFamily="{StaticResource UIFont}" FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding ShowPreviewCard}"
+                                  ToolTip="Show or hide the live preview card"/>
+                </StackPanel>
                 <StackPanel>
                     <TextBlock Text="Settings" FontFamily="{StaticResource UIFont}"
                                FontSize="20" FontWeight="SemiBold"
@@ -116,7 +122,7 @@
         </Border>
 
         <!-- First-run tip bar -->
-        <Border Grid.Row="1" Padding="16,10" Background="#2A2A40"
+        <Border Grid.Row="1" Padding="16,10" Background="{DynamicResource SurfaceLightBrush}"
                 Visibility="{Binding ShowFirstRunTip, Converter={StaticResource BoolToVis}}">
             <DockPanel>
                 <Button DockPanel.Dock="Right" Content="Got it" Margin="12,0,0,0"
@@ -130,7 +136,8 @@
         </Border>
 
         <!-- Live preview card -->
-        <Border Grid.Row="2" Padding="24,12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+        <Border Grid.Row="2" Padding="24,12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                Visibility="{Binding ShowPreviewCard, Converter={StaticResource BoolToVis}}">
             <Border x:Name="PreviewCardOuter" CornerRadius="{Binding CornerRadius}">
                 <Border.Style>
                     <Style TargetType="Border">
@@ -283,67 +290,6 @@
                         </WrapPanel>
                         <TextBlock Text="Import replaces all settings including behavior, position, and filtering"
                                    Style="{StaticResource SettingDesc}"/>
-
-                        <TextBlock Text="SETTINGS WINDOW THEME" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="Controls the color scheme of this settings window (separate from overlay theme)"
-                                   Style="{StaticResource SettingDesc}"/>
-
-                        <TextBlock Text="Theme Mode" Style="{StaticResource SettingLabel}"/>
-                        <ComboBox Style="{StaticResource SettingsComboBox}"
-                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                  ItemsSource="{Binding AvailableSettingsThemeModes}"
-                                  SelectedItem="{Binding SettingsThemeMode}"
-                                  Margin="0,4,0,16"
-                                  ToolTip="Dark uses the default dark palette. Light uses a light palette. System follows your Windows theme."/>
-
-                        <TextBlock Text="Custom settings window colors are only used in Dark mode."
-                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
-
-                        <!-- Settings window color pickers (only effective in Dark mode) -->
-                        <TextBlock Text="Background" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,12">
-                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
-                                    Width="40" Height="28" Margin="8,0,0,0"
-                                    Background="{Binding SettingsWindowBg, Converter={StaticResource ColorToBrush}}"
-                                    Tag="SettingsWindowBg" Click="OnPickColorClick"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowBg, UpdateSourceTrigger=LostFocus}"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Surface" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,12">
-                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
-                                    Width="40" Height="28" Margin="8,0,0,0"
-                                    Background="{Binding SettingsWindowSurface, Converter={StaticResource ColorToBrush}}"
-                                    Tag="SettingsWindowSurface" Click="OnPickColorClick"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurface, UpdateSourceTrigger=LostFocus}"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Text" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,12">
-                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
-                                    Width="40" Height="28" Margin="8,0,0,0"
-                                    Background="{Binding SettingsWindowText, Converter={StaticResource ColorToBrush}}"
-                                    Tag="SettingsWindowText" Click="OnPickColorClick"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowText, UpdateSourceTrigger=LostFocus}"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Accent" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,12">
-                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
-                                    Width="40" Height="28" Margin="8,0,0,0"
-                                    Background="{Binding SettingsWindowAccent, Converter={StaticResource ColorToBrush}}"
-                                    Tag="SettingsWindowAccent" Click="OnPickColorClick"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowAccent, UpdateSourceTrigger=LostFocus}"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Border" Style="{StaticResource SettingLabel}"/>
-                        <DockPanel Margin="0,4,0,12">
-                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
-                                    Width="40" Height="28" Margin="8,0,0,0"
-                                    Background="{Binding SettingsWindowBorder, Converter={StaticResource ColorToBrush}}"
-                                    Tag="SettingsWindowBorder" Click="OnPickColorClick"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowBorder, UpdateSourceTrigger=LostFocus}"/>
-                        </DockPanel>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -704,6 +650,13 @@
                         <TextBlock Text="Choose a built-in icon shape for all notifications. Per-app overrides can be configured in the Filtering tab."
                                    Style="{StaticResource SettingDesc}"/>
 
+                        <Button Content="Browse Custom Icon..." Style="{StaticResource SecondaryButton}"
+                                Margin="0,0,0,4" HorizontalAlignment="Left"
+                                Command="{Binding BrowseCustomIconCommand}"
+                                ToolTip="Import a custom image file as a notification icon"/>
+                        <TextBlock Text="Upload a PNG/JPG/ICO file to use as a custom notification icon"
+                                   Style="{StaticResource SettingDesc}"/>
+
                         <TextBlock Text="OVERLAY SCROLLBAR" Style="{StaticResource SectionHeader}"/>
 
                         <DockPanel Margin="0,4,0,12">
@@ -1005,32 +958,6 @@
                         <TextBlock Text="How long (in seconds) to consider identical notifications as duplicates"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="FULLSCREEN OVERLAY" Style="{StaticResource SectionHeader}"/>
-
-                        <DockPanel Margin="0,0,0,4">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding FullscreenOverlayMode}"
-                                          ToolTip="Expand overlay to fill the entire screen"/>
-                            <TextBlock Text="Fullscreen Mode" Style="{StaticResource SettingLabel}"/>
-                        </DockPanel>
-                        <TextBlock Text="Expands the overlay background to fill your screen. Notifications display on a semi-transparent fullscreen backdrop for dedicated notification monitoring."
-                                   Style="{StaticResource SettingDesc}"/>
-
-                        <StackPanel Visibility="{Binding FullscreenOverlayMode, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Background Opacity" Style="{StaticResource SettingLabel}"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding FullscreenOverlayOpacity, StringFormat='{}{0:P0}'}"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="0.1" Maximum="1.0" Value="{Binding FullscreenOverlayOpacity}"
-                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        ToolTip="How opaque the fullscreen background is"/>
-                            </DockPanel>
-                            <TextBlock Text="Controls how dark/opaque the fullscreen background appears"
-                                       Style="{StaticResource SettingDesc}"/>
-                        </StackPanel>
-
                         <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
 
                         <DockPanel Margin="0,0,0,4">
@@ -1058,33 +985,25 @@
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="Default Sound" Style="{StaticResource SettingLabel}"/>
-                        <ComboBox Style="{StaticResource SettingsComboBox}"
-                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                  ItemsSource="{Binding AvailableSystemSounds}"
-                                  SelectedItem="{Binding DefaultSound}"
-                                  Margin="0,4,0,4"
-                                  ToolTip="System sound to play for all notifications (unless overridden per app)"/>
+                        <DockPanel Margin="0,4,0,4">
+                            <Button DockPanel.Dock="Right" Content="Test" Style="{StaticResource SecondaryButton}"
+                                    Margin="8,0,0,0" Command="{Binding TestSoundCommand}"
+                                    ToolTip="Play the currently selected sound"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableSystemSounds}"
+                                      SelectedItem="{Binding DefaultSound}"
+                                      ToolTip="System sound to play for all notifications (unless overridden per app)"/>
+                        </DockPanel>
                         <TextBlock Text="Choose a system sound or set per-app overrides in the Filtering tab"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="SETTINGS WINDOW" Style="{StaticResource SectionHeader}"/>
-
-                        <TextBlock Text="Display Mode" Style="{StaticResource SettingLabel}"/>
-                        <ComboBox Style="{StaticResource SettingsComboBox}"
-                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                  ItemsSource="{Binding AvailableSettingsDisplayModes}"
-                                  SelectedItem="{Binding SettingsDisplayMode}"
-                                  Margin="0,4,0,4"
-                                  ToolTip="Window mode opens a normal resizable window. Popup mode opens a compact window above the taskbar without a taskbar button."/>
-                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,12"
-                                   Text="Window: normal resizable window. Popup: compact floating panel above the system tray. Changes take effect next time Settings is opened."/>
-
-                        <DockPanel Margin="0,0,0,12">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding PopupAutoClose}"
-                                          ToolTip="Automatically close the popup when you click elsewhere"/>
-                            <TextBlock Text="Auto-Close Popup on Deactivate" Style="{StaticResource SettingLabel}"/>
-                        </DockPanel>
+                        <Button Content="Browse Custom Sound..." Style="{StaticResource SecondaryButton}"
+                                Margin="0,0,0,4" HorizontalAlignment="Left"
+                                Command="{Binding BrowseCustomSoundCommand}"
+                                ToolTip="Import a WAV file as a custom notification sound"/>
+                        <TextBlock Text="Upload a .wav file to use as a custom notification sound"
+                                   Style="{StaticResource SettingDesc}"/>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -1186,6 +1105,48 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <TextBlock Text="PER-APP SOUNDS &amp; ICONS" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Assign individual sounds and icons per app. 'Default' uses the global setting."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <ItemsControl ItemsSource="{Binding PerAppConfigEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="8,6" Margin="0,0,0,6"
+                                            CornerRadius="6" Background="{DynamicResource SurfaceLightBrush}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding AppName}" Style="{StaticResource SettingLabel}"
+                                                       FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Sound:" Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                <ComboBox Grid.Column="1" Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.PerAppSoundOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding Sound}"
+                                                          Margin="0,0,12,0"/>
+                                                <TextBlock Grid.Column="2" Text="Icon:" Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                <ComboBox Grid.Column="3" Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.PerAppIconOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding Icon}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="No apps seen yet — notifications will populate this list"
+                                   Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
+                                   Visibility="{Binding PerAppConfigEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
 
                         <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
 
@@ -1401,6 +1362,50 @@
                             <Button Content="Middle Right" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-right"/>
                         </WrapPanel>
+
+                        <TextBlock Text="FULLSCREEN OVERLAY" Style="{StaticResource SectionHeader}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding FullscreenOverlayMode}"
+                                          ToolTip="Expand overlay to fill the entire screen"/>
+                            <TextBlock Text="Fullscreen Mode" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Expands the overlay background to fill your screen with a configurable backdrop for dedicated notification monitoring."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <StackPanel Visibility="{Binding FullscreenOverlayMode, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Background Color" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
+                                        Background="{Binding FullscreenOverlayColor, Converter={StaticResource ColorToBrush}}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                        Margin="0,0,8,0"/>
+                                <Button DockPanel.Dock="Right" Content="Pick"
+                                        Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                        Tag="FullscreenOverlayColor" Click="OnPickColorClick"
+                                        ToolTip="Pick a background color for fullscreen overlay"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding FullscreenOverlayColor, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Hex color for the fullscreen overlay background"
+                                         MaxLength="7"/>
+                            </DockPanel>
+                            <TextBlock Text="Background color for the fullscreen overlay backdrop"
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Background Opacity" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding FullscreenOverlayOpacity, StringFormat='{}{0:P0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.1" Maximum="1.0" Value="{Binding FullscreenOverlayOpacity}"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        ToolTip="How opaque the fullscreen background is"/>
+                            </DockPanel>
+                            <TextBlock Text="Controls how opaque the fullscreen backdrop appears"
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -1700,6 +1705,109 @@
                                     Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Spacious"
                                     ToolTip="Larger text, generous spacing — easier to read at a distance"/>
                         </WrapPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- ═══ UI STYLING TAB ═══ -->
+            <TabItem Header="UI Styling" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,12,0,12"
+                                   Text="Customize the appearance and behavior of this settings window. These options do not affect the notification overlay."/>
+
+                        <TextBlock Text="DISPLAY MODE" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Window Mode" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableSettingsDisplayModes}"
+                                  SelectedItem="{Binding SettingsDisplayMode}"
+                                  Margin="0,4,0,4"
+                                  ToolTip="Window mode opens a normal resizable window. Popup mode opens a compact panel above the taskbar."/>
+                        <TextBlock Text="Window: standard resizable window. Popup: borderless panel fixed above the system tray. Changes take effect next time Settings is opened."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding PopupAutoClose}"
+                                          ToolTip="Automatically close the popup when you click elsewhere"/>
+                            <TextBlock Text="Auto-Close Popup on Deactivate" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="In Popup mode, automatically closes the settings panel when it loses focus"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="THEME" Style="{StaticResource SectionHeader}"/>
+
+                        <TextBlock Text="Color Scheme" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableSettingsThemeModes}"
+                                  SelectedItem="{Binding SettingsThemeMode}"
+                                  Margin="0,4,0,4"
+                                  ToolTip="Dark uses a dark palette. Light uses a light palette. System follows your Windows theme."/>
+                        <TextBlock Text="Controls the color scheme of this settings window (independent of overlay theme)"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="CUSTOM COLORS" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Fine-tune settings window colors. Only applies in Dark mode."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Background" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowBg, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowBg" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowBg, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Surface" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowSurface, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowSurface" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurface, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Text" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowText, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowText" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowText, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Accent" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowAccent, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowAccent" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowAccent, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Border" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowBorder, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowBorder" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowBorder, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
 
                     </StackPanel>
                 </ScrollViewer>

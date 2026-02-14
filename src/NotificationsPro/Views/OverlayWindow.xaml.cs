@@ -237,6 +237,10 @@ public partial class OverlayWindow : Window
 
     private bool _wasFullscreen;
 
+    private double _preFullscreenLeft;
+    private double _preFullscreenTop;
+    private double _preFullscreenWidth;
+
     private void ApplyFullscreenOverlayMode(AppSettings settings)
     {
         if (settings.FullscreenOverlayMode)
@@ -244,13 +248,15 @@ public partial class OverlayWindow : Window
             // Save previous position for restore if entering fullscreen for the first time
             if (!_wasFullscreen)
             {
-                settings.OverlayLeft = Left;
-                settings.OverlayTop = Top;
+                _preFullscreenLeft = Left;
+                _preFullscreenTop = Top;
+                _preFullscreenWidth = ActualWidth > 0 ? ActualWidth : settings.OverlayWidth;
             }
 
-            var screen = WinForms.Screen.FromPoint(
-                new System.Drawing.Point((int)Left + (int)(Width / 2), (int)Top + (int)(Height / 2)));
-            var workArea = screen.Bounds;
+            // Use the selected monitor index, not the current window position
+            var screens = WinForms.Screen.AllScreens;
+            var idx = Math.Clamp(settings.SelectedMonitorIndex, 0, screens.Length - 1);
+            var workArea = screens[idx].Bounds;
 
             SizeToContent = SizeToContent.Manual;
             Left = workArea.Left;
@@ -258,11 +264,30 @@ public partial class OverlayWindow : Window
             Width = workArea.Width;
             Height = workArea.Height;
             _wasFullscreen = true;
+
+            // Apply fullscreen background color with opacity
+            try
+            {
+                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.FullscreenOverlayColor);
+                color.A = (byte)(settings.FullscreenOverlayOpacity * 255);
+                Background = new SolidColorBrush(color);
+            }
+            catch
+            {
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(
+                    (byte)(settings.FullscreenOverlayOpacity * 255), 0, 0, 0));
+            }
         }
         else if (_wasFullscreen)
         {
             _wasFullscreen = false;
-            // Restore previous size mode
+            Background = System.Windows.Media.Brushes.Transparent;
+            // Restore previous size and position
+            _isInternalMove = true;
+            Width = _preFullscreenWidth;
+            Left = _preFullscreenLeft;
+            Top = _preFullscreenTop;
+            _isInternalMove = false;
             if (!settings.ObsFixedWindowMode)
             {
                 SizeToContent = SizeToContent.Height;

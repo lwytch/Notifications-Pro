@@ -51,6 +51,10 @@ public class SettingsViewModel : BaseViewModel
 
     private int _previewIndex;
 
+    // Preview card visibility (not persisted — session-only toggle)
+    private bool _showPreviewCard = true;
+    public bool ShowPreviewCard { get => _showPreviewCard; set => SetProperty(ref _showPreviewCard, value); }
+
     // Typography — shared
     private string _fontFamily = "Segoe UI";
     public string FontFamily { get => _fontFamily; set { if (SetProperty(ref _fontFamily, value)) QueueSave(); } }
@@ -234,6 +238,9 @@ public class SettingsViewModel : BaseViewModel
 
     public List<string> AvailableIconPresets { get; } = new(Models.IconPreset.PresetNames);
 
+    // Per-app config entries (populated from SeenAppNames)
+    public ObservableCollection<PerAppConfigEntry> PerAppConfigEntries { get; } = new();
+
     // Notification sounds (M9.5)
     private bool _soundEnabled;
     public bool SoundEnabled { get => _soundEnabled; set { if (SetProperty(ref _soundEnabled, value)) QueueSave(); } }
@@ -241,7 +248,11 @@ public class SettingsViewModel : BaseViewModel
     private string _defaultSound = "None";
     public string DefaultSound { get => _defaultSound; set { if (SetProperty(ref _defaultSound, value)) QueueSave(); } }
 
-    public List<string> AvailableSystemSounds { get; } = new(Services.SoundService.SystemSoundNames);
+    public ObservableCollection<string> AvailableSystemSounds { get; } = new(Services.SoundService.SystemSoundNames);
+
+    // Per-app dropdown options include "Default" as a fallback option
+    public List<string> PerAppSoundOptions { get; } = new(new[] { "Default" }.Concat(Services.SoundService.SystemSoundNames));
+    public List<string> PerAppIconOptions { get; } = new(new[] { "Default" }.Concat(Models.IconPreset.PresetNames));
 
     // Toast suppression (M9.5)
     private bool _suppressToastPopups;
@@ -363,6 +374,9 @@ public class SettingsViewModel : BaseViewModel
 
     private double _fullscreenOverlayOpacity = 0.5;
     public double FullscreenOverlayOpacity { get => _fullscreenOverlayOpacity; set { if (SetProperty(ref _fullscreenOverlayOpacity, Math.Clamp(value, 0.1, 1.0))) QueueSave(); } }
+
+    private string _fullscreenOverlayColor = "#000000";
+    public string FullscreenOverlayColor { get => _fullscreenOverlayColor; set { if (SetProperty(ref _fullscreenOverlayColor, value)) QueueSave(); } }
 
     // Settings window theming (M9.5)
     private string _settingsThemeMode = "Dark";
@@ -557,6 +571,9 @@ public class SettingsViewModel : BaseViewModel
     public ICommand RefreshMonitorsCommand { get; }
     public ICommand AddPresentationAppCommand { get; }
     public ICommand RemovePresentationAppCommand { get; }
+    public ICommand TestSoundCommand { get; }
+    public ICommand BrowseCustomSoundCommand { get; }
+    public ICommand BrowseCustomIconCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     // Themes
@@ -605,6 +622,9 @@ public class SettingsViewModel : BaseViewModel
         RefreshMonitorsCommand = new RelayCommand(_ => RefreshMonitors());
         AddPresentationAppCommand = new RelayCommand(_ => AddPresentationApp());
         RemovePresentationAppCommand = new RelayCommand(RemovePresentationApp);
+        TestSoundCommand = new RelayCommand(_ => TestSound());
+        BrowseCustomSoundCommand = new RelayCommand(_ => BrowseCustomSound());
+        BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
         DismissFirstRunTipCommand = new RelayCommand(_ => DismissFirstRunTip());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
@@ -614,6 +634,7 @@ public class SettingsViewModel : BaseViewModel
 
         LoadFromSettings();
         RefreshMonitors();
+        RefreshPerAppConfig();
 
         // Show first-run tip if welcome hasn't been shown yet
         if (!_settingsManager.Settings.HasShownWelcome)
@@ -705,6 +726,7 @@ public class SettingsViewModel : BaseViewModel
         _perAppTintOpacity = s.PerAppTintOpacity;
         _fullscreenOverlayMode = s.FullscreenOverlayMode;
         _fullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
+        _fullscreenOverlayColor = s.FullscreenOverlayColor;
         _settingsDisplayMode = s.SettingsDisplayMode;
         _popupAutoClose = s.PopupAutoClose;
         _settingsThemeMode = s.SettingsThemeMode;
@@ -903,6 +925,7 @@ public class SettingsViewModel : BaseViewModel
             PerAppTintOpacity = PerAppTintOpacity,
             FullscreenOverlayMode = FullscreenOverlayMode,
             FullscreenOverlayOpacity = FullscreenOverlayOpacity,
+            FullscreenOverlayColor = FullscreenOverlayColor,
             SettingsDisplayMode = SettingsDisplayMode,
             PopupAutoClose = PopupAutoClose,
             SettingsThemeMode = SettingsThemeMode,
@@ -1170,6 +1193,38 @@ public class SettingsViewModel : BaseViewModel
             MutedAppEntries.Add(new MutedAppEntry(app, _queueManager.IsAppMuted(app)));
     }
 
+    public void RefreshPerAppConfig()
+    {
+        PerAppConfigEntries.Clear();
+        var s = _settingsManager.Settings;
+        foreach (var app in _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase))
+        {
+            s.PerAppSounds.TryGetValue(app, out var sound);
+            s.PerAppIcons.TryGetValue(app, out var icon);
+            PerAppConfigEntries.Add(new PerAppConfigEntry(app, sound ?? "Default", icon ?? "Default", OnPerAppConfigChanged));
+        }
+    }
+
+    private void OnPerAppConfigChanged(PerAppConfigEntry entry)
+    {
+        var updated = _settingsManager.Settings.Clone();
+
+        // Update per-app sounds
+        if (entry.Sound == "Default" || string.IsNullOrWhiteSpace(entry.Sound))
+            updated.PerAppSounds.Remove(entry.AppName);
+        else
+            updated.PerAppSounds[entry.AppName] = entry.Sound;
+
+        // Update per-app icons
+        if (entry.Icon == "Default" || string.IsNullOrWhiteSpace(entry.Icon))
+            updated.PerAppIcons.Remove(entry.AppName);
+        else
+            updated.PerAppIcons[entry.AppName] = entry.Icon;
+
+        _settingsManager.Apply(updated);
+    }
+
+
     private void ApplyTheme(object? parameter)
     {
         if (parameter is not ThemePreset theme) return;
@@ -1345,6 +1400,70 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
+    private void TestSound()
+    {
+        _saveDebounce.Stop();
+        SaveSettings();
+        Services.SoundService.PlaySound("__test__", _settingsManager.Settings);
+    }
+
+    private void BrowseCustomSound()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Sound files (*.wav)|*.wav",
+            Title = "Choose a custom notification sound"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        // Copy to custom sounds directory
+        Services.SoundService.EnsureSoundsDirExists();
+        var destDir = Services.SoundService.GetCustomSoundsDir();
+        var fileName = System.IO.Path.GetFileName(dialog.FileName);
+        var destPath = System.IO.Path.Combine(destDir, fileName);
+
+        try
+        {
+            System.IO.File.Copy(dialog.FileName, destPath, overwrite: true);
+        }
+        catch { return; }
+
+        // Add to available sounds if not already present
+        var displayName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+        if (!AvailableSystemSounds.Contains(destPath))
+            AvailableSystemSounds.Add(destPath);
+
+        DefaultSound = destPath;
+    }
+
+    private void BrowseCustomIcon()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Image files (*.png;*.jpg;*.jpeg;*.ico;*.bmp)|*.png;*.jpg;*.jpeg;*.ico;*.bmp",
+            Title = "Choose a custom notification icon"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        Services.IconService.EnsureIconsDirExists();
+        var destDir = Services.IconService.GetCustomIconsDir();
+        var fileName = System.IO.Path.GetFileName(dialog.FileName);
+        var destPath = System.IO.Path.Combine(destDir, fileName);
+
+        try
+        {
+            System.IO.File.Copy(dialog.FileName, destPath, overwrite: true);
+        }
+        catch { return; }
+
+        if (!AvailableIconPresets.Contains(destPath))
+            AvailableIconPresets.Add(destPath);
+
+        DefaultIconPreset = destPath;
+    }
+
     public void RefreshMonitors()
     {
         MonitorItems.Clear();
@@ -1428,5 +1547,41 @@ public class MutedAppEntry
     {
         AppName = appName;
         IsMuted = isMuted;
+    }
+}
+
+public class PerAppConfigEntry : BaseViewModel
+{
+    public string AppName { get; }
+    private readonly Action<PerAppConfigEntry>? _onChanged;
+
+    private string _sound;
+    public string Sound
+    {
+        get => _sound;
+        set
+        {
+            if (!SetProperty(ref _sound, value)) return;
+            _onChanged?.Invoke(this);
+        }
+    }
+
+    private string _icon;
+    public string Icon
+    {
+        get => _icon;
+        set
+        {
+            if (!SetProperty(ref _icon, value)) return;
+            _onChanged?.Invoke(this);
+        }
+    }
+
+    public PerAppConfigEntry(string appName, string sound, string icon, Action<PerAppConfigEntry>? onChanged = null)
+    {
+        AppName = appName;
+        _sound = sound;
+        _icon = icon;
+        _onChanged = onChanged;
     }
 }

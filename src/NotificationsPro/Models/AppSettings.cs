@@ -132,6 +132,7 @@ public class AppSettings
     // Fullscreen overlay mode (M9.5)
     public bool FullscreenOverlayMode { get; set; } = false;
     public double FullscreenOverlayOpacity { get; set; } = 0.5;
+    public string FullscreenOverlayColor { get; set; } = "#000000";
 
     // Streaming & Presentation (M10)
     public bool ChromaKeyEnabled { get; set; } = false;
