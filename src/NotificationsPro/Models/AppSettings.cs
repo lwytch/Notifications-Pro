@@ -63,6 +63,20 @@ public class AppSettings
     public List<string> MuteKeywords { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
 
+    // Notification icons (M9.5)
+    public bool ShowNotificationIcons { get; set; } = false;
+    public double IconSize { get; set; } = 24;
+    public string DefaultIconPreset { get; set; } = "None";
+    public Dictionary<string, string> PerAppIcons { get; set; } = new();
+
+    // Notification sounds (M9.5)
+    public bool SoundEnabled { get; set; } = false;
+    public string DefaultSound { get; set; } = "None";
+    public Dictionary<string, string> PerAppSounds { get; set; } = new();
+
+    // Toast suppression (M9.5)
+    public bool SuppressToastPopups { get; set; } = false;
+
     // Scheduling
     public bool QuietHoursEnabled { get; set; } = false;
     public string QuietHoursStart { get; set; } = "22:00";
@@ -72,6 +86,9 @@ public class AppSettings
     public bool BurstLimitEnabled { get; set; } = false;
     public int BurstLimitCount { get; set; } = 10;
     public double BurstLimitWindowSeconds { get; set; } = 5;
+
+    // Accessibility — Master toggle
+    public bool AccessibilityModeEnabled { get; set; } = false;
 
     // Accessibility — Timing
     public bool PersistentNotifications { get; set; } = false;
@@ -104,8 +121,17 @@ public class AppSettings
     public bool SnapToEdges { get; set; } = true;
     public double SnapDistance { get; set; } = 20;
 
+    // Overlay scrollbar (M9.5)
+    public bool OverlayScrollbarVisible { get; set; } = true;
+    public double OverlayScrollbarWidth { get; set; } = 8;
+    public double OverlayScrollbarOpacity { get; set; } = 1.0;
+
     // Overlay visibility
     public bool OverlayVisible { get; set; } = true;
+
+    // Fullscreen overlay mode (M9.5)
+    public bool FullscreenOverlayMode { get; set; } = false;
+    public double FullscreenOverlayOpacity { get; set; } = 0.5;
 
     // Streaming & Presentation (M10)
     public bool ChromaKeyEnabled { get; set; } = false;
@@ -122,6 +148,22 @@ public class AppSettings
     public bool StartWithWindows { get; set; } = false;
     public int SelectedMonitorIndex { get; set; } = 0;
 
+    // Settings window theming (M9.5)
+    public string SettingsThemeMode { get; set; } = "Dark"; // "Dark", "Light", "System"
+    public string SettingsWindowBg { get; set; } = "#151521";
+    public string SettingsWindowSurface { get; set; } = "#1E1E2E";
+    public string SettingsWindowSurfaceLight { get; set; } = "#282840";
+    public string SettingsWindowSurfaceHover { get; set; } = "#343450";
+    public string SettingsWindowText { get; set; } = "#E4E4EF";
+    public string SettingsWindowTextSecondary { get; set; } = "#9898B0";
+    public string SettingsWindowTextMuted { get; set; } = "#6B6B80";
+    public string SettingsWindowAccent { get; set; } = "#7C5CFC";
+    public string SettingsWindowBorder { get; set; } = "#363650";
+
+    // Settings window display mode (M9.5)
+    public string SettingsDisplayMode { get; set; } = "Window"; // "Window" or "Popup"
+    public bool PopupAutoClose { get; set; } = false;
+
     // UX Polish (M8)
     public bool HasShownWelcome { get; set; } = false;
     public double? SettingsWindowLeft { get; set; }
@@ -134,6 +176,8 @@ public class AppSettings
         clone.HighlightKeywords = new List<string>(HighlightKeywords);
         clone.MuteKeywords = new List<string>(MuteKeywords);
         clone.PresentationApps = new List<string>(PresentationApps);
+        clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);
+        clone.PerAppIcons = new Dictionary<string, string>(PerAppIcons);
         return clone;
     }
 }

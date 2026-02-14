@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-Notifications Pro is a Windows tray app (C# .NET + WPF) that mirrors Windows toast notification text into a customizable always-on-top overlay window. Text-only, no images/icons/rich content, no clickable links.
+Notifications Pro is a Windows tray app (C# .NET + WPF) that mirrors Windows toast notification text into a customizable always-on-top overlay window. Optional per-app icons (user-configured, not from notification content). No clickable links.
 
 ## Build / Run / Test Commands
 
@@ -39,9 +39,14 @@ src/NotificationsPro/
   Models/
     AppSettings.cs             # Settings POCO (serialized to JSON, no notification content)
     NotificationItem.cs        # In-memory-only notification data (title, body, timestamp)
+    ThemePreset.cs             # Named visual theme (colors, opacity, shape, accent)
+    IconPreset.cs              # Built-in icon presets (vector geometry paths)
   Services/
     QueueManager.cs            # Queue logic: max 3 visible, overflow count, dedup, expiry
     SettingsManager.cs         # Load/save settings from %AppData%\NotificationsPro\settings.json
+    SettingsThemeService.cs    # Runtime settings window theming (Dark/Light/System)
+    SoundService.cs            # Per-app notification sounds (system + custom WAV)
+    IconService.cs             # Per-app icon resolution (built-in presets + custom images)
   ViewModels/
     BaseViewModel.cs           # INotifyPropertyChanged base class
     RelayCommand.cs            # ICommand implementation
@@ -83,7 +88,7 @@ docs/
 - **WPF bindings**: Use `INotifyPropertyChanged` or `ObservableCollection<T>`. No direct UI manipulation from services.
 - **Dependency injection**: Services (QueueManager, SettingsManager, NotificationListener) should be injectable/mockable for testing.
 - **No clickable links**: URLs in notification text render as plain text only.
-- **Text-only overlay**: Never render images, icons, or rich content.
+- **Overlay icons**: Optional per-app icons (user-configured built-in presets or custom images). Icons are assigned per app name, not per notification. No notification content is used for icon selection.
 
 ## Queue Logic Rules
 

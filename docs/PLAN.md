@@ -241,6 +241,25 @@ Features for streamers, presenters, and content creators.
 - [x] Presentation mode — auto-enable DND when a specific app is fullscreen (PowerPoint, Zoom, etc.)
 - [x] Per-app color tinting — optional subtle background tint derived from app name hash (e.g., Teams = blue, Slack = purple)
 
+### Milestone 9.5: Enhanced Settings, Sounds, Icons & Theming
+**Status: Complete**
+
+Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
+
+- [x] Width text input box (Position tab) for precise pixel overlay width entry
+- [x] Accessibility master toggle + section descriptions in Accessibility tab
+- [x] Fullscreen overlay mode with configurable opacity
+- [x] Settings window dynamic theming (Dark/Light/System mode + custom colors)
+- [x] StaticResource→DynamicResource conversion for live theme switching (Theme.xaml + SettingsWindow.xaml)
+- [x] SettingsThemeService for runtime Application.Resources brush updates
+- [x] Overlay scrollbar controls (show/hide, width 4-20px, opacity)
+- [x] Toast suppression toggle (remove Windows toast after capture, WinRT only, safe on exit)
+- [x] Settings window popup display mode (Window vs Popup above taskbar, auto-close option)
+- [x] Per-app notification sounds (system sounds + custom WAV, per-app overrides)
+- [x] Per-app notification icons (10 built-in vector presets, icon size slider 16-48px, per-app overrides)
+- [x] IconService, SoundService, IconPreset, AppIconConverter
+- [x] 16 new unit tests (M9.5 defaults, clone, deep-copy, JSON round-trip, IconPreset, SoundService, QueueManager NotificationAdded, ThemePreset settings colors)
+
 ### Milestone 11: Packaging & Final Polish
 **Status: Not Started**
 
@@ -252,7 +271,7 @@ Features for streamers, presenters, and content creators.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 10 streaming & presentation complete. Next: Milestone 11 packaging & final polish.
+Milestone 9.5 enhanced settings, sounds, icons & theming complete. Next: Milestone 11 packaging & final polish.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

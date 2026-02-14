@@ -23,6 +23,7 @@ public class NotificationListener
 {
     private readonly QueueManager _queueManager;
     private readonly Dispatcher _dispatcher;
+    private readonly SettingsManager _settingsManager;
 
     // WinRT API
     private UserNotificationListener? _listener;
@@ -81,10 +82,11 @@ public class NotificationListener
     private const uint WINEVENT_SKIPOWNPROCESS = 0x0002;
     private static readonly TimeSpan AccessibilityDebounceWindow = TimeSpan.FromMilliseconds(350);
 
-    public NotificationListener(QueueManager queueManager, Dispatcher dispatcher)
+    public NotificationListener(QueueManager queueManager, Dispatcher dispatcher, SettingsManager settingsManager)
     {
         _queueManager = queueManager;
         _dispatcher = dispatcher;
+        _settingsManager = settingsManager;
     }
 
     // ========================
@@ -236,6 +238,14 @@ public class NotificationListener
             var appName = NormalizeText(notification.AppInfo?.DisplayInfo?.DisplayName ?? string.Empty);
             var fields = BuildNotificationFields(texts, appName, assumeLeadingAppNameWhenUnknown: false);
             _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
+
+            // Suppress the Windows toast popup by removing the notification from the system.
+            // Note: this also removes it from Windows notification center.
+            // Only active while the app is running — no cleanup needed on exit.
+            if (_settingsManager.Settings.SuppressToastPopups && _listener != null)
+            {
+                try { _listener.RemoveNotification(notification.Id); } catch { }
+            }
         }
         catch { }
     }

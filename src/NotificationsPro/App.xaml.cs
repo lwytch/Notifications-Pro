@@ -68,14 +68,23 @@ public partial class App : Application
         _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager);
         _settingsViewModel = new SettingsViewModel(_settingsManager, _queueManager);
 
-        _notificationListener = new NotificationListener(_queueManager, Dispatcher);
+        _notificationListener = new NotificationListener(_queueManager, Dispatcher, _settingsManager);
         _notificationListener.StatusChanged += UpdateStatusItem;
+
+        // Play notification sounds
+        _queueManager.NotificationAdded += appName =>
+            Services.SoundService.PlaySound(appName, _settingsManager.Settings);
 
         // Update tray icon badge when notification count changes
         ((System.Collections.Specialized.INotifyCollectionChanged)_queueManager.VisibleNotifications)
             .CollectionChanged += (_, _) => Dispatcher.InvokeAsync(UpdateTrayIcon);
 
         SetupTrayIcon();
+
+        // Apply settings window theme (Dark/Light/System)
+        Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
+        _settingsManager.SettingsChanged += () =>
+            Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
 
         // Apply High Contrast theme if active and respected
         ApplyHighContrastIfNeeded();
@@ -357,10 +366,44 @@ public partial class App : Application
             _settingsViewModel = new SettingsViewModel(_settingsManager!, _queueManager!);
             _settingsWindow = new SettingsWindow(_settingsViewModel, _settingsManager);
             _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+
+            var settings = _settingsManager!.Settings;
+            if (settings.SettingsDisplayMode == "Popup")
+            {
+                _settingsWindow.WindowStyle = WindowStyle.ToolWindow;
+                _settingsWindow.ShowInTaskbar = false;
+                _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+
+                // Position above taskbar with 8px gap
+                var primaryScreen = System.Windows.Forms.Screen.PrimaryScreen!;
+                var workArea = primaryScreen.WorkingArea;
+                var screenBounds = primaryScreen.Bounds;
+                var taskbarHeight = screenBounds.Height - workArea.Height;
+                var windowWidth = _settingsWindow.Width;
+                var windowHeight = _settingsWindow.Height;
+
+                // Default: bottom-right, above taskbar
+                _settingsWindow.Left = workArea.Right - windowWidth - 8;
+                _settingsWindow.Top = workArea.Bottom - windowHeight - 8;
+
+                if (settings.PopupAutoClose)
+                {
+                    _settingsWindow.Deactivated += OnSettingsWindowDeactivated;
+                }
+            }
         }
 
         _settingsWindow.Show();
         _settingsWindow.Activate();
+    }
+
+    private void OnSettingsWindowDeactivated(object? sender, EventArgs e)
+    {
+        if (_settingsWindow != null && _settingsManager?.Settings.PopupAutoClose == true
+            && _settingsManager.Settings.SettingsDisplayMode == "Popup")
+        {
+            _settingsWindow.Close();
+        }
     }
 
     private void UpdateStatusItem()

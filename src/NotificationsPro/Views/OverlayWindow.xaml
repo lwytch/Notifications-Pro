@@ -20,6 +20,7 @@
         <converters:AppTintBrushConverter x:Key="AppTintBrush"/>
         <converters:NotificationTextVisibilityConverter x:Key="NotificationTextVisibility"/>
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
+        <converters:AppIconConverter x:Key="AppIconConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- Notification card template -->
@@ -51,6 +52,29 @@
                     </Border.Background>
 
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Icon column -->
+                    <Image Grid.Column="0" VerticalAlignment="Top"
+                           Width="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                           Height="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                           Margin="0,0,8,0"
+                           Stretch="Uniform"
+                           Visibility="{Binding DataContext.ShowNotificationIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource AppIconConverter}">
+                                <Binding Path="AppName"/>
+                                <Binding Path="DataContext.IconService" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                <Binding Path="DataContext.CurrentSettings" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+
+                    <!-- Content column -->
+                    <Grid Grid.Column="1">
                     <StackPanel x:Name="StackedContent"
                                 Visibility="{Binding DataContext.StackedContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
                         <!-- App name -->
@@ -277,6 +301,7 @@
                             </Run>
                         </TextBlock>
                     </Grid>
+                    </Grid>
                 </Grid>
                 </Border>
             </Border>
@@ -324,13 +349,15 @@
             </Style>
         </Grid.Style>
         <ScrollViewer x:Name="NotificationScrollViewer"
-                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="{Binding ScrollbarVisibility}"
+                      HorizontalScrollBarVisibility="Disabled"
                       CanContentScroll="False"
                       PanningMode="None"
                       MaxHeight="{Binding OverlayMaxHeight}">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar">
-                    <Setter Property="Width" Value="14"/>
+                    <Setter Property="Width" Value="{Binding DataContext.OverlayScrollbarWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"/>
+                    <Setter Property="Opacity" Value="{Binding DataContext.OverlayScrollbarOpacity, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"/>
                 </Style>
             </ScrollViewer.Resources>
             <StackPanel>

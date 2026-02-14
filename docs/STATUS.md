@@ -138,7 +138,22 @@
   - Per-app color tinting — subtle deterministic background tint derived from app name hash (FNV-1a, 10-color palette)
   - Per-app tint intensity slider (5%-40%)
   - New Streaming tab in Settings window with Chroma Key, OBS Window Capture, Presentation Mode, and Per-App Tinting sections
-- 116 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
+- **Enhanced Settings, Sounds, Icons & Theming (Milestone 9.5)**:
+  - Width text input box in Position tab for precise pixel entry alongside slider
+  - Accessibility master toggle — one-click enable of recommended accessibility bundle
+  - Accessibility tab descriptions explaining each section's purpose
+  - Fullscreen overlay mode — fill-screen background with configurable opacity
+  - Settings window dynamic theming — Dark/Light/System mode selector
+  - SettingsThemeService for runtime DynamicResource brush updates
+  - Custom settings window color pickers (background, surface, text, accent, border)
+  - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
+  - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
+  - Settings popup display mode — Window or Popup (floating above taskbar, auto-close option)
+  - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides
+  - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider
+  - IconService for icon resolution with in-memory cache (privacy safe)
+  - All StaticResource brush references converted to DynamicResource for live theme switching
+- 132 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
 
 ## What Doesn't Work Yet
 - Installer/packaging (Milestone 11)

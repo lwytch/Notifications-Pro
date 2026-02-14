@@ -38,6 +38,12 @@ public class QueueManager : BaseViewModel
 
     public bool HasOverflow => OverflowCount > 0;
 
+    /// <summary>
+    /// Fires after a notification is successfully added (with the app name).
+    /// Used by SoundService to play per-app sounds.
+    /// </summary>
+    public event Action<string>? NotificationAdded;
+
     public QueueManager(SettingsManager settingsManager)
     {
         _settingsManager = settingsManager;
@@ -116,6 +122,7 @@ public class QueueManager : BaseViewModel
         else
             _visibleNotifications.Add(item);
         StartExpiryTimer(item);
+        NotificationAdded?.Invoke(appName);
     }
 
     /// <summary>

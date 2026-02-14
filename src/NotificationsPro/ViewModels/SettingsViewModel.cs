@@ -222,6 +222,31 @@ public class SettingsViewModel : BaseViewModel
     public ObservableCollection<string> MuteKeywords { get; } = new();
     public ObservableCollection<MutedAppEntry> MutedAppEntries { get; } = new();
 
+    // Notification icons (M9.5)
+    private bool _showNotificationIcons;
+    public bool ShowNotificationIcons { get => _showNotificationIcons; set { if (SetProperty(ref _showNotificationIcons, value)) QueueSave(); } }
+
+    private double _iconSize = 24;
+    public double IconSize { get => _iconSize; set { if (SetProperty(ref _iconSize, Math.Clamp(value, 16, 48))) QueueSave(); } }
+
+    private string _defaultIconPreset = "None";
+    public string DefaultIconPreset { get => _defaultIconPreset; set { if (SetProperty(ref _defaultIconPreset, value)) QueueSave(); } }
+
+    public List<string> AvailableIconPresets { get; } = new(Models.IconPreset.PresetNames);
+
+    // Notification sounds (M9.5)
+    private bool _soundEnabled;
+    public bool SoundEnabled { get => _soundEnabled; set { if (SetProperty(ref _soundEnabled, value)) QueueSave(); } }
+
+    private string _defaultSound = "None";
+    public string DefaultSound { get => _defaultSound; set { if (SetProperty(ref _defaultSound, value)) QueueSave(); } }
+
+    public List<string> AvailableSystemSounds { get; } = new(Services.SoundService.SystemSoundNames);
+
+    // Toast suppression (M9.5)
+    private bool _suppressToastPopups;
+    public bool SuppressToastPopups { get => _suppressToastPopups; set { if (SetProperty(ref _suppressToastPopups, value)) QueueSave(); } }
+
     // Scheduling
     private bool _quietHoursEnabled;
     public bool QuietHoursEnabled { get => _quietHoursEnabled; set { if (SetProperty(ref _quietHoursEnabled, value)) QueueSave(); } }
@@ -245,6 +270,21 @@ public class SettingsViewModel : BaseViewModel
     // Accessibility — Timing
     private bool _persistentNotifications;
     public bool PersistentNotifications { get => _persistentNotifications; set { if (SetProperty(ref _persistentNotifications, value)) QueueSave(); } }
+
+    // Accessibility — Master toggle
+    private bool _accessibilityModeEnabled;
+    public bool AccessibilityModeEnabled
+    {
+        get => _accessibilityModeEnabled;
+        set
+        {
+            if (SetProperty(ref _accessibilityModeEnabled, value))
+            {
+                if (value) ApplyAccessibilityDefaults();
+                QueueSave();
+            }
+        }
+    }
 
     private bool _autoDurationEnabled;
     public bool AutoDurationEnabled { get => _autoDurationEnabled; set { if (SetProperty(ref _autoDurationEnabled, value)) QueueSave(); } }
@@ -316,6 +356,87 @@ public class SettingsViewModel : BaseViewModel
     {
         "#00FF00", "#0000FF", "#FF00FF"
     };
+
+    // Fullscreen overlay mode (M9.5)
+    private bool _fullscreenOverlayMode;
+    public bool FullscreenOverlayMode { get => _fullscreenOverlayMode; set { if (SetProperty(ref _fullscreenOverlayMode, value)) QueueSave(); } }
+
+    private double _fullscreenOverlayOpacity = 0.5;
+    public double FullscreenOverlayOpacity { get => _fullscreenOverlayOpacity; set { if (SetProperty(ref _fullscreenOverlayOpacity, Math.Clamp(value, 0.1, 1.0))) QueueSave(); } }
+
+    // Settings window theming (M9.5)
+    private string _settingsThemeMode = "Dark";
+    public string SettingsThemeMode
+    {
+        get => _settingsThemeMode;
+        set
+        {
+            if (!SetProperty(ref _settingsThemeMode, value)) return;
+            QueueSave();
+            ApplySettingsTheme();
+        }
+    }
+
+    private string _settingsWindowBg = "#151521";
+    public string SettingsWindowBg { get => _settingsWindowBg; set { if (SetProperty(ref _settingsWindowBg, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowSurface = "#1E1E2E";
+    public string SettingsWindowSurface { get => _settingsWindowSurface; set { if (SetProperty(ref _settingsWindowSurface, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowSurfaceLight = "#282840";
+    public string SettingsWindowSurfaceLight { get => _settingsWindowSurfaceLight; set { if (SetProperty(ref _settingsWindowSurfaceLight, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowSurfaceHover = "#343450";
+    public string SettingsWindowSurfaceHover { get => _settingsWindowSurfaceHover; set { if (SetProperty(ref _settingsWindowSurfaceHover, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowText = "#E4E4EF";
+    public string SettingsWindowText { get => _settingsWindowText; set { if (SetProperty(ref _settingsWindowText, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowTextSecondary = "#9898B0";
+    public string SettingsWindowTextSecondary { get => _settingsWindowTextSecondary; set { if (SetProperty(ref _settingsWindowTextSecondary, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowTextMuted = "#6B6B80";
+    public string SettingsWindowTextMuted { get => _settingsWindowTextMuted; set { if (SetProperty(ref _settingsWindowTextMuted, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowAccent = "#7C5CFC";
+    public string SettingsWindowAccent { get => _settingsWindowAccent; set { if (SetProperty(ref _settingsWindowAccent, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    private string _settingsWindowBorder = "#363650";
+    public string SettingsWindowBorder { get => _settingsWindowBorder; set { if (SetProperty(ref _settingsWindowBorder, value)) { QueueSave(); ApplySettingsTheme(); } } }
+
+    public List<string> AvailableSettingsThemeModes { get; } = new() { "Dark", "Light", "System" };
+
+    private void ApplySettingsTheme()
+    {
+        if (System.Windows.Application.Current == null) return;
+        Services.SettingsThemeService.ApplySettingsTheme(BuildCurrentSettings());
+    }
+
+    private AppSettings BuildCurrentSettings()
+    {
+        return new AppSettings
+        {
+            SettingsThemeMode = SettingsThemeMode,
+            SettingsWindowBg = SettingsWindowBg,
+            SettingsWindowSurface = SettingsWindowSurface,
+            SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
+            SettingsWindowSurfaceHover = SettingsWindowSurfaceHover,
+            SettingsWindowText = SettingsWindowText,
+            SettingsWindowTextSecondary = SettingsWindowTextSecondary,
+            SettingsWindowTextMuted = SettingsWindowTextMuted,
+            SettingsWindowAccent = SettingsWindowAccent,
+            SettingsWindowBorder = SettingsWindowBorder,
+        };
+    }
+
+    // Settings window display mode (M9.5)
+    private string _settingsDisplayMode = "Window";
+    public string SettingsDisplayMode { get => _settingsDisplayMode; set { if (SetProperty(ref _settingsDisplayMode, value)) QueueSave(); } }
+
+    private bool _popupAutoClose;
+    public bool PopupAutoClose { get => _popupAutoClose; set { if (SetProperty(ref _popupAutoClose, value)) QueueSave(); } }
+
+    public List<string> AvailableSettingsDisplayModes { get; } = new() { "Window", "Popup" };
 
     // System Integration (M9) — Start with Windows
     private bool _startWithWindows;
@@ -392,6 +513,16 @@ public class SettingsViewModel : BaseViewModel
 
     private double _snapDistance = 20;
     public double SnapDistance { get => _snapDistance; set { if (SetProperty(ref _snapDistance, value)) QueueSave(); } }
+
+    // Overlay scrollbar (M9.5)
+    private bool _overlayScrollbarVisible = true;
+    public bool OverlayScrollbarVisible { get => _overlayScrollbarVisible; set { if (SetProperty(ref _overlayScrollbarVisible, value)) QueueSave(); } }
+
+    private double _overlayScrollbarWidth = 8;
+    public double OverlayScrollbarWidth { get => _overlayScrollbarWidth; set { if (SetProperty(ref _overlayScrollbarWidth, Math.Clamp(value, 4, 20))) QueueSave(); } }
+
+    private double _overlayScrollbarOpacity = 1.0;
+    public double OverlayScrollbarOpacity { get => _overlayScrollbarOpacity; set { if (SetProperty(ref _overlayScrollbarOpacity, Math.Clamp(value, 0.1, 1.0))) QueueSave(); } }
 
     // Collections
     public List<string> AvailableFonts { get; }
@@ -539,12 +670,19 @@ public class SettingsViewModel : BaseViewModel
         _deduplicationEnabled = s.DeduplicationEnabled;
         _deduplicationWindowSeconds = s.DeduplicationWindowSeconds;
         _highlightColor = s.HighlightColor;
+        _showNotificationIcons = s.ShowNotificationIcons;
+        _iconSize = s.IconSize;
+        _defaultIconPreset = s.DefaultIconPreset;
+        _soundEnabled = s.SoundEnabled;
+        _defaultSound = s.DefaultSound;
+        _suppressToastPopups = s.SuppressToastPopups;
         _quietHoursEnabled = s.QuietHoursEnabled;
         _quietHoursStart = s.QuietHoursStart;
         _quietHoursEnd = s.QuietHoursEnd;
         _burstLimitEnabled = s.BurstLimitEnabled;
         _burstLimitCount = s.BurstLimitCount;
         _burstLimitWindowSeconds = s.BurstLimitWindowSeconds;
+        _accessibilityModeEnabled = s.AccessibilityModeEnabled;
         _persistentNotifications = s.PersistentNotifications;
         _autoDurationEnabled = s.AutoDurationEnabled;
         _autoDurationSecondsPerLine = s.AutoDurationSecondsPerLine;
@@ -565,6 +703,20 @@ public class SettingsViewModel : BaseViewModel
         _presentationModeEnabled = s.PresentationModeEnabled;
         _perAppTintEnabled = s.PerAppTintEnabled;
         _perAppTintOpacity = s.PerAppTintOpacity;
+        _fullscreenOverlayMode = s.FullscreenOverlayMode;
+        _fullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
+        _settingsDisplayMode = s.SettingsDisplayMode;
+        _popupAutoClose = s.PopupAutoClose;
+        _settingsThemeMode = s.SettingsThemeMode;
+        _settingsWindowBg = s.SettingsWindowBg;
+        _settingsWindowSurface = s.SettingsWindowSurface;
+        _settingsWindowSurfaceLight = s.SettingsWindowSurfaceLight;
+        _settingsWindowSurfaceHover = s.SettingsWindowSurfaceHover;
+        _settingsWindowText = s.SettingsWindowText;
+        _settingsWindowTextSecondary = s.SettingsWindowTextSecondary;
+        _settingsWindowTextMuted = s.SettingsWindowTextMuted;
+        _settingsWindowAccent = s.SettingsWindowAccent;
+        _settingsWindowBorder = s.SettingsWindowBorder;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
 
@@ -581,6 +733,9 @@ public class SettingsViewModel : BaseViewModel
         _allowManualResize = s.AllowManualResize;
         _snapToEdges = s.SnapToEdges;
         _snapDistance = s.SnapDistance;
+        _overlayScrollbarVisible = s.OverlayScrollbarVisible;
+        _overlayScrollbarWidth = s.OverlayScrollbarWidth;
+        _overlayScrollbarOpacity = s.OverlayScrollbarOpacity;
         _overlayWidthDirty = false;
         OnPropertyChanged(nameof(IsStackedLayout));
     }
@@ -695,12 +850,21 @@ public class SettingsViewModel : BaseViewModel
             HighlightKeywords = HighlightKeywords.ToList(),
             MuteKeywords = MuteKeywords.ToList(),
             MutedApps = _settingsManager.Settings.MutedApps,
+            ShowNotificationIcons = ShowNotificationIcons,
+            IconSize = IconSize,
+            DefaultIconPreset = DefaultIconPreset,
+            PerAppIcons = new Dictionary<string, string>(_settingsManager.Settings.PerAppIcons),
+            SoundEnabled = SoundEnabled,
+            DefaultSound = DefaultSound,
+            PerAppSounds = new Dictionary<string, string>(_settingsManager.Settings.PerAppSounds),
+            SuppressToastPopups = SuppressToastPopups,
             QuietHoursEnabled = QuietHoursEnabled,
             QuietHoursStart = QuietHoursStart,
             QuietHoursEnd = QuietHoursEnd,
             BurstLimitEnabled = BurstLimitEnabled,
             BurstLimitCount = Math.Max(1, BurstLimitCount),
             BurstLimitWindowSeconds = BurstLimitWindowSeconds,
+            AccessibilityModeEnabled = AccessibilityModeEnabled,
             PersistentNotifications = PersistentNotifications,
             AutoDurationEnabled = AutoDurationEnabled,
             AutoDurationSecondsPerLine = AutoDurationSecondsPerLine,
@@ -719,6 +883,9 @@ public class SettingsViewModel : BaseViewModel
             AllowManualResize = AllowManualResize,
             SnapToEdges = SnapToEdges,
             SnapDistance = SnapDistance,
+            OverlayScrollbarVisible = OverlayScrollbarVisible,
+            OverlayScrollbarWidth = OverlayScrollbarWidth,
+            OverlayScrollbarOpacity = OverlayScrollbarOpacity,
             // Preserve position from current settings
             OverlayLeft = previousSettings.OverlayLeft,
             OverlayTop = previousSettings.OverlayTop,
@@ -734,6 +901,20 @@ public class SettingsViewModel : BaseViewModel
             PresentationApps = PresentationApps.ToList(),
             PerAppTintEnabled = PerAppTintEnabled,
             PerAppTintOpacity = PerAppTintOpacity,
+            FullscreenOverlayMode = FullscreenOverlayMode,
+            FullscreenOverlayOpacity = FullscreenOverlayOpacity,
+            SettingsDisplayMode = SettingsDisplayMode,
+            PopupAutoClose = PopupAutoClose,
+            SettingsThemeMode = SettingsThemeMode,
+            SettingsWindowBg = SettingsWindowBg,
+            SettingsWindowSurface = SettingsWindowSurface,
+            SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
+            SettingsWindowSurfaceHover = SettingsWindowSurfaceHover,
+            SettingsWindowText = SettingsWindowText,
+            SettingsWindowTextSecondary = SettingsWindowTextSecondary,
+            SettingsWindowTextMuted = SettingsWindowTextMuted,
+            SettingsWindowAccent = SettingsWindowAccent,
+            SettingsWindowBorder = SettingsWindowBorder,
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
             HasShownWelcome = previousSettings.HasShownWelcome,
@@ -1125,6 +1306,15 @@ public class SettingsViewModel : BaseViewModel
         }
 
         DensityPreset = preset.Trim();
+    }
+
+    private void ApplyAccessibilityDefaults()
+    {
+        PersistentNotifications = true;
+        RespectReduceMotion = true;
+        RespectHighContrast = true;
+        RespectTextScaling = true;
+        ApplyDensityPreset("Spacious");
     }
 
     private void DismissFirstRunTip()

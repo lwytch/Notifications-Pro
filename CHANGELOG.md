@@ -3,6 +3,28 @@
 ## Unreleased
 
 ### Added
+- **Milestone 9.5: Enhanced Settings, Sounds, Icons & Theming**
+- Width text input box next to overlay width slider in Position tab for precise pixel entry
+- Accessibility master toggle — one-click enable of all recommended accessibility settings (persistent notifications, reduce motion, high contrast, text scaling, spacious density)
+- Accessibility tab descriptions explaining what each section does and why
+- Fullscreen overlay mode — expands overlay background to fill entire screen with configurable opacity
+- Settings window dynamic theming — Dark/Light/System mode selector with DynamicResource conversion for live theme switching
+- SettingsThemeService for runtime Application.Resources brush updates
+- Settings window custom color pickers for background, surface, text, accent, and border colors
+- Overlay scrollbar controls — show/hide toggle, width slider (4-20px), opacity slider
+- Toast suppression — removes Windows toast popups after capture (per-notification, safe on exit, WinRT only)
+- Settings window display mode — Window (normal) or Popup (floating above taskbar, ToolWindow style, optional auto-close on deactivate)
+- Per-app notification sounds — master toggle, default system sound selector (None/Asterisk/Beep/Exclamation/Hand/Question), per-app overrides
+- SoundService for system sounds and custom WAV playback
+- QueueManager.NotificationAdded event for sound/icon integration
+- Per-app notification icons — 10 built-in vector geometry presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark)
+- IconService for per-app icon resolution with in-memory cache (RAM only, privacy safe)
+- IconPreset model with built-in WPF geometry paths
+- AppIconConverter for XAML multi-value binding icon resolution
+- Icon size slider (16-48px) and default icon preset selector in Appearance tab
+- 9 settings window color properties on ThemePreset for theme-aware settings window colors
+- Light theme preset includes light settings window colors
+- 16 new unit tests covering M9.5 AppSettings defaults, clone, deep-copy PerAppSounds/PerAppIcons, JSON round-trip, IconPreset, SoundService, QueueManager NotificationAdded event, ThemePreset settings colors
 - **Milestone 10: Streaming & Presentation**
 - Chroma key background — toggle a solid green/blue/magenta background on the overlay for OBS chroma key capture
 - Chroma key color presets (Green, Blue, Magenta) and custom color picker in Streaming tab
@@ -123,6 +145,12 @@
 - Overlay-height preset buttons for 1080p, 2K, 4K, and 8K display classes
 
 ### Changed
+- All StaticResource brush references in Theme.xaml and SettingsWindow.xaml converted to DynamicResource for runtime theme switching
+- Settings window styles (buttons, toggles, sliders, combos, tabs, scrollbars, tooltips) now respond to theme changes at runtime
+- Overlay scrollbar width and opacity now configurable from Appearance tab (was fixed at 14px)
+- NotificationListener constructor now accepts SettingsManager for toast suppression access
+- Overlay card template now uses a two-column grid layout (icon + content) when icons are enabled
+- CLAUDE.md updated to allow optional per-app icons (user-configured, not from notification content)
 - Built-in theme count increased from 6 to 7 (added Color-Blind Safe)
 - Notification duration slider maximum extended from 30s to 120s for accessibility
 - Existing "Font Size" and "Font Weight" labels renamed to "Body Font Size" and "Body Font Weight" for clarity

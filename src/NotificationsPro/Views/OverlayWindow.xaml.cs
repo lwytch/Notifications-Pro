@@ -208,6 +208,7 @@ public partial class OverlayWindow : Window
             var settings = _settingsManager.Settings;
             UpdateClickThrough(settings.ClickThrough);
             ApplyObsFixedWindowMode(settings);
+            ApplyFullscreenOverlayMode(settings);
             ApplyEffectiveMaxHeight(settings);
             TryApplySingleLineAutoFullWidth(settings);
             TryApplyStoredPosition(settings);
@@ -231,6 +232,42 @@ public partial class OverlayWindow : Window
         {
             SizeToContent = SizeToContent.Height;
             ClearValue(HeightProperty);
+        }
+    }
+
+    private bool _wasFullscreen;
+
+    private void ApplyFullscreenOverlayMode(AppSettings settings)
+    {
+        if (settings.FullscreenOverlayMode)
+        {
+            // Save previous position for restore if entering fullscreen for the first time
+            if (!_wasFullscreen)
+            {
+                settings.OverlayLeft = Left;
+                settings.OverlayTop = Top;
+            }
+
+            var screen = WinForms.Screen.FromPoint(
+                new System.Drawing.Point((int)Left + (int)(Width / 2), (int)Top + (int)(Height / 2)));
+            var workArea = screen.Bounds;
+
+            SizeToContent = SizeToContent.Manual;
+            Left = workArea.Left;
+            Top = workArea.Top;
+            Width = workArea.Width;
+            Height = workArea.Height;
+            _wasFullscreen = true;
+        }
+        else if (_wasFullscreen)
+        {
+            _wasFullscreen = false;
+            // Restore previous size mode
+            if (!settings.ObsFixedWindowMode)
+            {
+                SizeToContent = SizeToContent.Height;
+                ClearValue(HeightProperty);
+            }
         }
     }
 

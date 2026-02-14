@@ -18,6 +18,17 @@ public class ThemePreset
     public string HighlightColor { get; set; } = "#FFD700";
     public string BorderColor { get; set; } = "#363650";
 
+    // Settings window colors
+    public string SettingsWindowBg { get; set; } = "#151521";
+    public string SettingsWindowSurface { get; set; } = "#1E1E2E";
+    public string SettingsWindowSurfaceLight { get; set; } = "#282840";
+    public string SettingsWindowSurfaceHover { get; set; } = "#343450";
+    public string SettingsWindowText { get; set; } = "#E4E4EF";
+    public string SettingsWindowTextSecondary { get; set; } = "#9898B0";
+    public string SettingsWindowTextMuted { get; set; } = "#6B6B80";
+    public string SettingsWindowAccent { get; set; } = "#7C5CFC";
+    public string SettingsWindowBorder { get; set; } = "#363650";
+
     // Shape
     public double CornerRadius { get; set; } = 12;
     public double Padding { get; set; } = 16;
@@ -49,6 +60,15 @@ public class ThemePreset
         settings.AccentThickness = AccentThickness;
         settings.ShowBorder = ShowBorder;
         settings.BorderThickness = BorderThickness;
+        settings.SettingsWindowBg = SettingsWindowBg;
+        settings.SettingsWindowSurface = SettingsWindowSurface;
+        settings.SettingsWindowSurfaceLight = SettingsWindowSurfaceLight;
+        settings.SettingsWindowSurfaceHover = SettingsWindowSurfaceHover;
+        settings.SettingsWindowText = SettingsWindowText;
+        settings.SettingsWindowTextSecondary = SettingsWindowTextSecondary;
+        settings.SettingsWindowTextMuted = SettingsWindowTextMuted;
+        settings.SettingsWindowAccent = SettingsWindowAccent;
+        settings.SettingsWindowBorder = SettingsWindowBorder;
     }
 
     /// <summary>
@@ -75,6 +95,15 @@ public class ThemePreset
             AccentThickness = settings.AccentThickness,
             ShowBorder = settings.ShowBorder,
             BorderThickness = settings.BorderThickness,
+            SettingsWindowBg = settings.SettingsWindowBg,
+            SettingsWindowSurface = settings.SettingsWindowSurface,
+            SettingsWindowSurfaceLight = settings.SettingsWindowSurfaceLight,
+            SettingsWindowSurfaceHover = settings.SettingsWindowSurfaceHover,
+            SettingsWindowText = settings.SettingsWindowText,
+            SettingsWindowTextSecondary = settings.SettingsWindowTextSecondary,
+            SettingsWindowTextMuted = settings.SettingsWindowTextMuted,
+            SettingsWindowAccent = settings.SettingsWindowAccent,
+            SettingsWindowBorder = settings.SettingsWindowBorder,
         };
     }
 
@@ -109,6 +138,11 @@ public class ThemePreset
             AccentColor = "#5B7FFF", HighlightColor = "#E67E00", BorderColor = "#D0D0D0",
             CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
+            SettingsWindowBg = "#F5F5F8", SettingsWindowSurface = "#FFFFFF",
+            SettingsWindowSurfaceLight = "#E8E8F0", SettingsWindowSurfaceHover = "#DEDEE8",
+            SettingsWindowText = "#222222", SettingsWindowTextSecondary = "#555555",
+            SettingsWindowTextMuted = "#888888",
+            SettingsWindowAccent = "#5B7FFF", SettingsWindowBorder = "#D0D0D0",
         },
         new()
         {

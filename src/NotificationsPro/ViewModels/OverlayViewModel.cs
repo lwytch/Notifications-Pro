@@ -15,6 +15,20 @@ public class OverlayViewModel : BaseViewModel
     public ReadOnlyObservableCollection<NotificationItem> Notifications => _queueManager.VisibleNotifications;
     public QueueManager Queue => _queueManager;
 
+    // Icon service for per-app icon resolution
+    public IconService IconService { get; } = new();
+
+    // Current settings snapshot for icon resolution in converters
+    private AppSettings? _currentSettings;
+    public AppSettings? CurrentSettings { get => _currentSettings; set => SetProperty(ref _currentSettings, value); }
+
+    // Icon display
+    private bool _showNotificationIcons;
+    public bool ShowNotificationIcons { get => _showNotificationIcons; set => SetProperty(ref _showNotificationIcons, value); }
+
+    private double _iconSize = 24;
+    public double IconSize { get => _iconSize; set => SetProperty(ref _iconSize, value); }
+
     // Typography — shared
     private string _fontFamily = "Segoe UI";
     public string FontFamily { get => _fontFamily; set => SetProperty(ref _fontFamily, value); }
@@ -204,6 +218,19 @@ public class OverlayViewModel : BaseViewModel
     private double _overlayMaxHeight = 600;
     public double OverlayMaxHeight { get => _overlayMaxHeight; set => SetProperty(ref _overlayMaxHeight, value); }
 
+    // Scrollbar
+    private bool _overlayScrollbarVisible = true;
+    public bool OverlayScrollbarVisible { get => _overlayScrollbarVisible; set => SetProperty(ref _overlayScrollbarVisible, value); }
+
+    private double _overlayScrollbarWidth = 8;
+    public double OverlayScrollbarWidth { get => _overlayScrollbarWidth; set => SetProperty(ref _overlayScrollbarWidth, value); }
+
+    private double _overlayScrollbarOpacity = 1.0;
+    public double OverlayScrollbarOpacity { get => _overlayScrollbarOpacity; set => SetProperty(ref _overlayScrollbarOpacity, value); }
+
+    public System.Windows.Controls.ScrollBarVisibility ScrollbarVisibility =>
+        OverlayScrollbarVisible ? System.Windows.Controls.ScrollBarVisibility.Auto : System.Windows.Controls.ScrollBarVisibility.Hidden;
+
     // Content
     private bool _showAppName = true;
     public bool ShowAppName { get => _showAppName; set => SetProperty(ref _showAppName, value); }
@@ -365,6 +392,13 @@ public class OverlayViewModel : BaseViewModel
     private double _perAppTintOpacity = 0.15;
     public double PerAppTintOpacity { get => _perAppTintOpacity; set => SetProperty(ref _perAppTintOpacity, value); }
 
+    // Fullscreen overlay mode (M9.5)
+    private bool _fullscreenOverlayMode;
+    public bool FullscreenOverlayMode { get => _fullscreenOverlayMode; set => SetProperty(ref _fullscreenOverlayMode, value); }
+
+    private double _fullscreenOverlayOpacity = 0.5;
+    public double FullscreenOverlayOpacity { get => _fullscreenOverlayOpacity; set => SetProperty(ref _fullscreenOverlayOpacity, value); }
+
     // Empty state ghost card visibility
     private Visibility _emptyStateVisibility = Visibility.Visible;
     public Visibility EmptyStateVisibility { get => _emptyStateVisibility; set => SetProperty(ref _emptyStateVisibility, value); }
@@ -451,6 +485,13 @@ public class OverlayViewModel : BaseViewModel
         AnimationDurationMs = s.AnimationDurationMs;
         OverlayWidth = s.OverlayWidth;
         OverlayMaxHeight = s.OverlayMaxHeight;
+        OverlayScrollbarVisible = s.OverlayScrollbarVisible;
+        OverlayScrollbarWidth = s.OverlayScrollbarWidth;
+        OverlayScrollbarOpacity = s.OverlayScrollbarOpacity;
+        OnPropertyChanged(nameof(ScrollbarVisibility));
+        ShowNotificationIcons = s.ShowNotificationIcons;
+        IconSize = s.IconSize;
+        CurrentSettings = s;
         ShowAppName = s.ShowAppName;
         ShowNotificationTitle = s.ShowNotificationTitle;
         ShowNotificationBody = s.ShowNotificationBody;
@@ -467,6 +508,8 @@ public class OverlayViewModel : BaseViewModel
         ChromaKeyColor = s.ChromaKeyColor;
         PerAppTintEnabled = s.PerAppTintEnabled;
         PerAppTintOpacity = s.PerAppTintOpacity;
+        FullscreenOverlayMode = s.FullscreenOverlayMode;
+        FullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
 
         // Notify all computed properties
         OnPropertyChanged(nameof(AppNameLineHeight));
