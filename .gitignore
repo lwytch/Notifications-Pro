@@ -18,6 +18,12 @@ Continue/
 *.userosscache
 *.sln.docstates
 
+# AI assistants (tool-local state)
+.claude/
+.codex/
+.cursor/
+.continue/
+
 # NuGet
 packages/
 *.nupkg
