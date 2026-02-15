@@ -1,5 +1,8 @@
 # Milestone 7: Accessibility & Inclusivity — Implementation Plan
 
+Status: Implemented. This file is retained as the original implementation plan for reference.
+See `docs/PLAN.md` for the current milestone status and roadmap.
+
 ## Phase 1: Notification Timing (Persistent + Extended Duration + Auto-Duration)
 - **AppSettings.cs**: Add `PersistentNotifications`, `AutoDurationEnabled`, `AutoDurationSecondsPerLine`, `AutoDurationBaseSeconds`
 - **SettingsViewModel.cs**: Mirror properties with QueueSave()

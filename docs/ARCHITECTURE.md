@@ -2,68 +2,91 @@
 
 ## Overview
 
-Notifications Pro is a C# .NET 8 WPF application that runs as a system tray app. It captures Windows toast notifications and displays their text in a customizable always-on-top overlay window.
+Notifications Pro is a C# .NET 8 WPF application that runs as a system tray app. It captures Windows toast notification text and displays it in a customizable always-on-top overlay window.
 
 ## Components
 
 ```
 App.xaml.cs (Entry Point)
-├── SettingsManager         Load/save settings from %AppData%\NotificationsPro\settings.json
-├── QueueManager            In-memory notification queue (max 3 visible + overflow count)
-├── OverlayWindow           Transparent always-on-top WPF window
-│   └── OverlayViewModel    Binds queue state and appearance settings to the overlay
-├── SettingsWindow           Tabbed settings UI (Appearance / Behavior / Position)
-│   └── SettingsViewModel   Binds settings with debounced auto-save
-└── TrayIcon (NotifyIcon)   System tray with dark-themed context menu
+├── SettingsManager          Load/save %AppData%\NotificationsPro\settings.json
+├── ThemeManager             Custom themes under %AppData%\NotificationsPro\themes\
+├── QueueManager             In-memory queue + filtering + timers (overflow stores count only)
+│   ├── SoundService          Optional sounds (system or custom WAV)
+│   └── IconService           Optional per-app icons (built-in presets or user-provided image files)
+├── NotificationListener     WinRT listener + polling + accessibility fallback (optional toast suppression)
+├── HotkeyManager            Global hotkeys via Win32 RegisterHotKey
+├── StartupHelper            Start-with-Windows registry helper (HKCU Run key)
+├── OverlayWindow            Transparent overlay window
+│   └── OverlayViewModel     Binds queue state + settings to overlay rendering
+└── SettingsWindow           Tabbed settings UI:
+    - Themes / Appearance / Behavior / Filtering / Position / Streaming / Accessibility / UI Styling
+    └── SettingsViewModel    Binds settings with debounced auto-save + import/export + theme apply
 ```
 
 ## Notification Capture
 
-Uses `Windows.UI.Notifications.Management.UserNotificationListener` API:
-- User-level permission (no admin required) — prompts on first run
-- Sanctioned Microsoft API for reading toast notifications
-- Subscribes to `NotificationChanged` event for real-time detection
-- On each event, calls `GetNotificationsAsync()` and diffs against seen IDs
-- Seen IDs (`HashSet<uint>`) are system-generated, contain no notification content
-- Set is trimmed at 5000 entries to prevent unbounded growth
+Primary path uses `Windows.UI.Notifications.Management.UserNotificationListener`:
+- User-level permission (no admin required) and auto-prompt on first run
+- Subscribes to `NotificationChanged` for real-time detection
+- Polling fallback runs every 2 seconds with an overlap guard
+- On each change/poll: call `GetNotificationsAsync()` and diff against seen IDs
+- Tracks only notification IDs (`uint`) and minimal metadata for dedup (no content persistence)
+- Seen ID set is trimmed (cap 5000) to prevent unbounded growth
 - On startup, existing notifications are seeded as "seen" (not displayed)
-- Some system notifications may not be captured (documented limitation)
+
+Fallback path uses Windows accessibility events (best-effort):
+- Used when WinRT delivery is unreliable on some unpackaged desktop scenarios
+- Captures toast-like candidates using shell host heuristics and surfaces live diagnostics
+
+Optional behavior:
+- If "Suppress Toast Popups" is enabled, captured WinRT notifications are removed from Windows (best-effort) after capture.
 
 ## Overlay Rendering
 
 - `WindowStyle=None`, `AllowsTransparency=True`, `ShowInTaskbar=False`
 - Notifications displayed via `ItemsControl` with a `DataTemplate`
-- Each card has a left accent border, title (semibold), and body
-- Slide-in animation from left on arrival (`TranslateTransform` + `DoubleAnimation`)
-- Fade-out animation on expiry (`Opacity` animation)
+- Layout modes:
+  - stacked cards (wrap + optional line-limiting/truncation, per-field typography, optional timestamps)
+  - one-line banner mode (optional wrap + max lines + auto full-width)
+- Slide-in direction is configurable; animations can be disabled or forced to fade-only
+- If "Respect Reduce Motion" is enabled, system "Reduce Motion" disables motion and forces fade-only
+- Long content uses internal scrolling and user-configurable scrollbar visibility/size/opacity
+- Optional visuals: per-app tinting (deterministic hash) and per-app icons (user-configured)
 - Click-through mode via Win32 `WS_EX_TRANSPARENT` extended window style
+- Multi-monitor support: target monitor selection, monitor-aware snapping/presets, and optional fullscreen overlay backdrop mode
 
 ## Settings Storage
 
-Only file written: `%AppData%\NotificationsPro\settings.json`
+Settings and user-provided assets are stored under `%AppData%\NotificationsPro\`:
+- `settings.json` (preferences, filters, per-app config; never notification content)
+- `themes\*.json` (custom themes)
+- `icons\` (optional custom icon files)
+- `sounds\` (optional custom WAV files)
 
-Contains UI preferences only:
-- Font family, size, weight, line spacing
-- Colors (text, background, accent, title)
-- Opacity, corner radius, padding, border
-- Duration, always-on-top, click-through, animations
-- Overlay position and size
-- Monitor index, snap settings
+Import/export:
+- Settings can be exported to and imported from a user-selected JSON file via file dialogs.
 
 **Never contains notification content.**
 
 ## Queue Logic
 
-1. New notification arrives → deduplicate against visible items (2s window)
-2. If `visible.Count < maxVisible` → add to list (newest first), start expiry timer
-3. If at capacity → increment overflow count, discard content immediately
-4. On expiry → set `IsExpiring=true` (triggers fade-out), then remove from list
-5. On removal → decrement overflow count if > 0
+- Configurable max visible notifications (default 3, range 1–40) with an overflow "+N more" indicator
+- Overflow never stores content (count only)
+- Deduplication window is configurable; duplicate notifications within the window are suppressed
+- Filtering occurs before enqueue:
+  - per-app mute
+  - keyword mute/highlight
+  - quiet hours
+  - burst limiting
+- Expiry timing supports:
+  - persistent notifications (no expiry)
+  - auto-duration based on content length
+  - manual duration setting
 
 ## Privacy Model
 
 - `NotificationItem` exists only in RAM (not serializable, no persistence attributes)
-- `QueueManager` holds max 3 references; overflow stores count only
-- Expiry timers remove references; GC reclaims memory
+- Queue stores only currently visible items; overflow stores count only
+- Expiry/dismissal removes references; GC reclaims memory
 - No logging of notification content
 - No database, registry, cache, or telemetry

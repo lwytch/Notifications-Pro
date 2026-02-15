@@ -42,11 +42,14 @@ src/NotificationsPro/
     ThemePreset.cs             # Named visual theme (colors, opacity, shape, accent)
     IconPreset.cs              # Built-in icon presets (vector geometry paths)
   Services/
-    QueueManager.cs            # Queue logic: max 3 visible, overflow count, dedup, expiry
+    QueueManager.cs            # Queue logic: configurable max visible, overflow count, dedup, expiry + filtering
     SettingsManager.cs         # Load/save settings from %AppData%\NotificationsPro\settings.json
+    NotificationListener.cs    # WinRT listener + polling + accessibility fallback (optional toast suppression)
+    ThemeManager.cs            # Custom theme persistence + settings import/export
     SettingsThemeService.cs    # Runtime settings window theming (Dark/Light/System)
     SoundService.cs            # Per-app notification sounds (system + custom WAV)
     IconService.cs             # Per-app icon resolution (built-in presets + custom images)
+    HotkeyManager.cs           # Global hotkeys via Win32 RegisterHotKey
   ViewModels/
     BaseViewModel.cs           # INotifyPropertyChanged base class
     RelayCommand.cs            # ICommand implementation
@@ -54,17 +57,25 @@ src/NotificationsPro/
     SettingsViewModel.cs       # Binds settings to UI with debounced auto-save
   Views/
     OverlayWindow.xaml(.cs)    # Transparent always-on-top overlay with slide-in animations
-    SettingsWindow.xaml(.cs)   # Tabbed settings UI (Appearance / Behavior / Position)
+    SettingsWindow.xaml(.cs)   # Tabbed settings UI (Themes / Appearance / Behavior / Filtering / Position / Streaming / Accessibility / UI Styling)
   Helpers/
     SnapHelper.cs              # Snap-to-edge calculations
     IconHelper.cs              # Programmatic tray icon generation
+    StartupHelper.cs           # Start-with-Windows registry helper (HKCU Run key)
+    FullscreenHelper.cs        # Fullscreen app detection (presentation mode)
+    AppTintHelper.cs           # Deterministic per-app tint color mapping
+    ContrastHelper.cs          # WCAG contrast calculations for settings UI
   Converters/
     ColorToBrushConverter.cs   # Hex string to WPF Brush converter
+    AppIconConverter.cs        # Resolve icons from per-app icon settings
+    AppTintBrushConverter.cs   # Blend card background with per-app tint
+    WcagContrastConverter.cs   # WCAG contrast labels in settings UI
   Resources/Theme.xaml         # Premium dark theme styles
 tests/NotificationsPro.Tests/
-  QueueManagerTests.cs         # 12 tests: capacity, overflow, dedup, pause, clear
-  SettingsManagerTests.cs      # 7 tests: defaults, clone, reset, apply, privacy
-  SnapHelperTests.cs           # 7 tests: edge snapping, corners, default position
+  QueueManagerTests.cs         # Queue logic, filtering, timing
+  SettingsManagerTests.cs      # Settings load/save + round-trip
+  SnapHelperTests.cs           # Snap + positioning math
+  ThemeTests.cs                # Themes + import/export
 docs/
   PLAN.md                      # Living plan with milestones and checkboxes
   STATUS.md                    # Current state + manual test checklist
@@ -75,10 +86,10 @@ docs/
 
 1. **Never persist notification content** — no database, no flat files, no registry, no cache, no telemetry.
 2. **No logs containing notification title/body/content.** If logging exists, it must be OFF by default and must never include notification content even when enabled.
-3. **Notification content exists only in RAM** for rendering. Discard immediately after display expires. Do not discard windows notifications from notification centre, this is a seperate application.
-4. **No history buffer.** Only hold what's currently on-screen or queued in memory (max 3 visible + overflow count only).
+3. **Notification content exists only in RAM** for rendering. Discard immediately after display expires/dismissal.
+4. **No history buffer.** Only hold what's currently visible/on-screen; overflow stores a count only.
 5. **Overflow notifications store only a count**, not content.
-6. **The only file written** is `%AppData%\NotificationsPro\settings.json` (UI/style settings only, never notification data).
+6. **Persistent writes are settings/assets only** — `%AppData%\NotificationsPro\settings.json`, `%AppData%\NotificationsPro\themes\*.json`, and optional user-provided assets under `%AppData%\NotificationsPro\icons\` and `%AppData%\NotificationsPro\sounds\` (plus user-chosen import/export JSON). Never write notification title/body.
 
 ## Coding Conventions
 
@@ -92,7 +103,7 @@ docs/
 
 ## Queue Logic Rules
 
-- Max 3 notifications visible simultaneously.
+- Max visible notifications is configurable (default 3, range 1–40).
 - Additional notifications increment an overflow counter ("+N more") — do **not** store their content.
 - Each visible notification expires after configurable/system duration, then is discarded from memory.
 
@@ -129,7 +140,4 @@ When making changes, update these files:
 
 ## Milestones
 
-1. Tray app + overlay window + settings UI skeleton + preview/mock notifications + queue logic
-2. Real notification capture + timing alignment + privacy validation
-3. Full customization + snapping + multi-monitor handling + click-through
-4. Packaging + uninstall/reinstall docs + final polish + tests
+See `docs/PLAN.md` for the current milestone status and roadmap.

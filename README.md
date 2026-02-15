@@ -1,109 +1,80 @@
 # Notifications Pro
 
-A lightweight Windows tray app that mirrors Windows toast notification text into a customizable always-on-top overlay window — so you can actually read your notifications in full, without truncation.
+Notifications Pro is a Windows tray app (C# .NET 8 + WPF) that mirrors Windows toast notification text into a customizable always-on-top overlay, so you can actually read notifications without truncation.
 
-## Features
+This project is optimized for:
+- readability (wrapping/scrolling, banner mode, per-field typography),
+- on-stream presentation (chroma key, fixed window mode),
+- and control (filtering, quiet hours, hotkeys, themes).
 
-- **Full-text notifications**: Title and body displayed without truncation, with text wrapping and scrolling for long content
-- **Customizable overlay**: Font, colors, opacity, corner radius, padding, accent color — make it yours
-- **Slide-in animations**: Notifications animate in from the left; configurable speed or disable entirely
-- **Queue management**: Max 3 visible at once with a "+N more" overflow indicator
-- **System tray app**: Runs quietly in the tray with a context menu for quick access
-- **Always-on-top** (configurable): Keep the overlay above all windows, or disable it
-- **Click-through mode**: Let mouse clicks pass through the overlay
-- **Edge snapping**: Overlay snaps to screen edges when dragged nearby
-- **Premium dark theme**: Clean, modern UI throughout
+## Highlights
 
-## Privacy
+- **Real notification capture** via `UserNotificationListener` (with permission prompt), plus a hardened accessibility fallback for cases where WinRT delivery is unreliable.
+- **Overlay window** with always-on-top, click-through, snapping, multi-monitor support, manual edge resize, and optional fullscreen overlay backdrop.
+- **Layout modes**: stacked cards or one-line banner mode (with optional wrap + max lines), plus scroll for long content.
+- **Interaction**: click-to-dismiss, hover-to-pause timers, right-click card menu (dismiss/copy/clear), tray “Clear All”, optional timestamps.
+- **Filtering & smart control**: per-app mute, keyword mute/highlight, quiet hours, burst limiting, focus mode, presentation mode (auto DND when configured apps go fullscreen).
+- **Themes & sharing**: built-in presets, save/load/delete custom themes, import/export settings JSON, and a tray theme quick-switch menu.
+- **Sounds & icons**: optional notification sounds (system sounds or custom WAV) and per-app icons (built-in vector presets or custom image files), with per-app overrides.
+- **System integration**: Start with Windows and global hotkeys (toggle overlay, dismiss all, toggle DND).
+- **Settings UX**: tabs for Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, and UI Styling (including dark/light/system and popup mode).
 
-Notifications Pro is designed with privacy as a hard constraint:
+## Privacy & Data Model
 
-- **No notification content is ever saved to disk.** Content exists only in RAM for display and is discarded after expiry.
-- **No database, no logs, no cache, no telemetry.** The app creates zero persistent records of your notifications.
-- **The only file written** is `%AppData%\NotificationsPro\settings.json`, which stores UI preferences only (fonts, colors, position). It never contains notification content.
-- **No network calls.** Everything runs locally.
+Notifications Pro is designed to avoid persisting notification content:
+- **No notification title/body is written to disk** (no database, no cache, no logs of notification text).
+- Notification content exists only in RAM while displayed and is released after dismissal/expiry.
+- The app makes **no network calls** and includes **no telemetry**.
 
-Windows itself may keep notification history in the Action Center — Notifications Pro does not interfere with or modify that behavior.
+Windows itself may keep notification history in the Action Center. Notifications Pro can optionally suppress native toast popups after capture (WinRT path only); leave this off if you want Windows’ default behavior untouched.
 
-## Setup
+### Files Written
 
-### Requirements
-- Windows 10 (version 1709+) or Windows 11
-- .NET 8 Runtime (or build from source with .NET 8 SDK)
+Under `%AppData%\NotificationsPro\`:
+- `settings.json` (UI + behavior preferences; may include your filter lists like muted apps/keywords)
+- `themes\*.json` (custom themes)
+- `icons\` (optional custom icon files)
+- `sounds\` (optional custom WAV files)
 
-### Build & Run
+See `settings.example.json` for example defaults.
+
+## Requirements
+
+- Windows 10 or Windows 11
+- .NET 8 SDK (to build from source) or .NET 8 Runtime (to run a published build)
+
+## Build / Run / Test
+
 ```bash
 dotnet restore
 dotnet build
 dotnet run --project src/NotificationsPro
+dotnet test
 ```
 
 ### Publish
+
 ```bash
 dotnet publish src/NotificationsPro -c Release -r win-x64 --self-contained
 ```
 
-## How to Use
+## Notification Access
 
-### Tray Icon
-Right-click the purple "N" icon in the system tray:
-
-- **Show/Hide Overlay** — Toggle the overlay window visibility
-- **Pause/Resume Notifications** — Temporarily stop showing new notifications
-- **Settings...** — Open the settings window (also accessible by double-clicking the tray icon)
-- **Quit** — Exit the application
-
-### Settings Window
-The settings window has three tabs:
-
-- **Appearance** — Font family, size, weight, line spacing, colors (title, body, background, accent), opacity, corner radius, padding
-- **Behavior** — Notification duration, always-on-top toggle, click-through mode, animation toggle and speed
-- **Position** — Overlay width, max height, snap-to-edges toggle and distance
-
-Use the **Send Test Notification** button to preview your settings with sample notification content.
-
-Changes are saved automatically.
-
-### Overlay
-- **Drag** the overlay by clicking and dragging anywhere on it (when click-through is off)
-- **Resize** using the grip in the bottom-right corner
-- The overlay snaps to screen edges when dragged nearby (configurable)
-
-## Where Settings Are Stored
-
-`%AppData%\NotificationsPro\settings.json`
-
-This file contains only UI preferences (fonts, colors, layout). See `settings.example.json` for the default values.
-
-## Notification Capture
-
-Notifications Pro uses the `UserNotificationListener` API to capture Windows toast notifications in real time. On first launch, Windows will prompt you to grant notification access.
-
-**If you denied permission or need to re-enable:**
-1. Open Windows Settings > System > Notifications
-2. Scroll down to "Notification access" or "Notification listener"
+On first run, Windows will prompt for notification access. If you denied it:
+1. Open Windows Settings > Notifications (location varies by Windows version)
+2. Find notification access/listener settings
 3. Enable access for Notifications Pro
 
-### Known Limitations
-- Requires user permission grant on first run
-- Some system-level notifications may not be accessible
-- Apps that opt out of notification mirroring won't be captured
-- Notifications dismissed before they can be read are skipped
-- Uses a configurable display duration rather than the system toast duration
+The tray menu also includes “Grant Notification Access” and “Retry Access Check” for troubleshooting.
 
-## Running Tests
-```bash
-dotnet test
-```
+## Troubleshooting
 
-## Install / Uninstall
+- **No notifications captured**: verify permission, then use the tray “Retry Access Check”. Some unpackaged desktop apps can be inconsistent with `UserNotificationListener`; the app will fall back to accessibility capture when needed.
+- **Can’t drag the overlay**: click-through intentionally blocks mouse interaction; disable click-through from the tray menu.
+- **Unexpected missing Windows toasts**: ensure “Suppress Toast Popups” is disabled.
 
-### Install
-Build from source or use the published executable. No installer required for development.
+## Project Docs
 
-### Uninstall
-Delete the application files. Optionally remove settings:
-```
-del "%AppData%\NotificationsPro\settings.json"
-rmdir "%AppData%\NotificationsPro"
-```
+- `docs/STATUS.md` for current capabilities and a manual test checklist
+- `docs/PLAN.md` for milestones/roadmap
+- `docs/ARCHITECTURE.md` for a high-level component overview

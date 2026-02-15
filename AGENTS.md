@@ -4,7 +4,7 @@ Tool-agnostic guidance for any coding agent working in this repository.
 
 ## What This Project Is
 
-Notifications Pro: a Windows tray app (C# .NET 8 + WPF) that mirrors Windows toast notification text into a customizable always-on-top overlay. Text-only, no images, no clickable links.
+Notifications Pro: a Windows tray app (C# .NET 8 + WPF) that mirrors Windows toast notification text into a customizable always-on-top overlay. Text-first (no rich notification content), optional user-configured per-app icons/sounds, and no clickable links.
 
 ## Commands
 
@@ -23,16 +23,17 @@ dotnet publish src/NotificationsPro -c Release -r win-x64 --self-contained  # pu
 src/NotificationsPro/
   App.xaml(.cs)              — Entry point, tray icon, window management
   Models/                    — AppSettings, NotificationItem (in-memory only)
-  Services/                  — QueueManager, SettingsManager
+  Services/                  — QueueManager, SettingsManager, NotificationListener, ThemeManager, SoundService, IconService, HotkeyManager, SettingsThemeService
   ViewModels/                — OverlayViewModel, SettingsViewModel, BaseViewModel, RelayCommand
   Views/                     — OverlayWindow, SettingsWindow (XAML + code-behind)
-  Helpers/                   — SnapHelper, IconHelper
-  Converters/                — ColorToBrushConverter
+  Helpers/                   — SnapHelper, IconHelper, FullscreenHelper, StartupHelper, AppTintHelper, ContrastHelper
+  Converters/                — ColorToBrushConverter, AppIconConverter, AppTintBrushConverter, WcagContrastConverter
   Resources/Theme.xaml       — Premium dark theme styles
 tests/NotificationsPro.Tests/
   QueueManagerTests.cs       — Queue logic tests
   SettingsManagerTests.cs    — Settings serialization tests
   SnapHelperTests.cs         — Edge snap calculation tests
+  ThemeTests.cs              — ThemePreset/ThemeManager tests
 docs/
   PLAN.md                    — Living plan with milestones
   STATUS.md                  — Current state + manual test checklist
@@ -55,8 +56,8 @@ docs/
 2. **No CI/CD** — no `.github/workflows/`, no GitHub Actions
 3. **No paid services** — no hosted APIs, telemetry, error reporting, cloud dependencies
 4. **No clickable links** — URLs display as plain text only
-5. **Text-only overlay** — no images, icons, or rich content
-6. **Settings file only** — the only file the app writes is `%AppData%\NotificationsPro\settings.json` (UI preferences, no notification data)
+5. **Text-first overlay** — no images or rich content from notification payloads; optional per-app icons are user-configured only (built-in presets or user-provided files)
+6. **Settings + user assets only** — persistent data is limited to `%AppData%\NotificationsPro\settings.json`, `%AppData%\NotificationsPro\themes\*.json`, and optional user-provided assets under `%AppData%\NotificationsPro\icons\` and `%AppData%\NotificationsPro\sounds\` (plus user-chosen import/export JSON). Never persist notification content.
 7. **No real settings committed** — only `settings.example.json` goes in the repo
 
 ## Before You Commit Checklist
