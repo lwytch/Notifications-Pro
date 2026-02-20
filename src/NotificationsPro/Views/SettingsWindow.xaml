@@ -4,7 +4,7 @@
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
         Icon="{Binding TrayIconImage}"
-        Width="640" Height="700" MinWidth="520" MinHeight="520"
+        Width="900" Height="760" MinWidth="760" MinHeight="560"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
         ResizeMode="CanResize">
@@ -19,10 +19,10 @@
         <!-- Section header style -->
         <Style x:Key="SectionHeader" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-            <Setter Property="Margin" Value="0,20,0,12"/>
+            <Setter Property="Margin" Value="0,22,0,10"/>
         </Style>
 
         <!-- Setting label -->
@@ -37,8 +37,8 @@
         <!-- Setting description -->
         <Style x:Key="SettingDesc" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="Margin" Value="0,2,0,16"/>
         </Style>
@@ -124,12 +124,13 @@
 
         <!-- First-run tip bar -->
         <Border Grid.Row="1" Padding="16,10" Background="{DynamicResource SurfaceLightBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
                 Visibility="{Binding ShowFirstRunTip, Converter={StaticResource BoolToVis}}">
             <DockPanel>
                 <Button DockPanel.Dock="Right" Content="Got it" Margin="12,0,0,0"
                         Style="{StaticResource SecondaryButton}"
                         Command="{Binding DismissFirstRunTipCommand}"/>
-                <TextBlock Text="Tip: Drag the overlay window to reposition it. Use Ctrl+T to send a test notification."
+                <TextBlock Text="Quick tips: Use the left sidebar to switch sections. Overlay themes and settings-window theme are independent (UI Styling > Theme). Use Ctrl+T for a test notification."
                            FontFamily="{StaticResource UIFont}" FontSize="12"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            VerticalAlignment="Center" TextWrapping="Wrap"/>
@@ -201,7 +202,7 @@
         </Border>
 
         <!-- Tabs -->
-        <TabControl Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="24,0">
+        <TabControl Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="20,12,20,8">
 
             <!-- ═══ THEMES TAB ═══ -->
             <TabItem Header="Themes" Style="{StaticResource SettingsTabItem}">
@@ -209,7 +210,7 @@
                     <StackPanel>
 
                         <TextBlock Text="BUILT-IN THEMES" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="One-click apply sets colors, opacity, shape, and accent at once"
+                        <TextBlock Text="One-click apply updates overlay visuals (cards, colors, shape). UI Styling controls whether settings-window colors are linked."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <ItemsControl ItemsSource="{Binding BuiltInThemes}">
@@ -1641,7 +1642,7 @@
                                           ToolTip="Disable slide animations when Windows 'Reduce Motion' is active"/>
                             <TextBlock Text="Respect Reduce Motion" Style="{StaticResource SettingLabel}"/>
                         </DockPanel>
-                        <TextBlock Text="Automatically disables slide animations when Windows animation settings are off"
+                        <TextBlock Text="Automatically switches to fade-only transitions when Windows animation settings are off"
                                    Style="{StaticResource SettingDesc}"/>
 
                         <DockPanel Margin="0,0,0,4">
@@ -1724,14 +1725,15 @@
 
                         <TextBlock Text="DISPLAY MODE" Style="{StaticResource SectionHeader}"/>
 
-                        <TextBlock Text="Window Mode" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Display Mode" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
                                   ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                   ItemsSource="{Binding AvailableSettingsDisplayModes}"
                                   SelectedItem="{Binding SettingsDisplayMode}"
                                   Margin="0,4,0,4"
-                                  ToolTip="Window mode opens a normal resizable window. Popup mode anchors to the same corner where Windows toasts appear."/>
-                        <TextBlock Text="Window: standard resizable window. Popup: borderless panel anchored to the toast corner of the taskbar monitor. Changes take effect next time Settings is opened."
+                                  ToolTip="Window mode opens a normal resizable window. Popup mode anchors to the same corner where Windows toasts appear."
+                                  />
+                        <TextBlock Text="Window: standard resizable settings window. Popup (default): borderless panel anchored to the Windows toast corner on the taskbar monitor."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <DockPanel Margin="0,0,0,4">
@@ -1753,6 +1755,15 @@
                                   Margin="0,4,0,4"
                                   ToolTip="Dark uses a dark palette. Light uses a light palette. System follows your Windows theme."/>
                         <TextBlock Text="Controls the color scheme of this settings window (independent of overlay theme)"
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <DockPanel Margin="0,0,0,4">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding LinkOverlayThemeAndUiTheme}"
+                                          ToolTip="When enabled, applying an overlay theme also updates the Settings UI palette"/>
+                            <TextBlock Text="Link Overlay Theme to UI Theme" Style="{StaticResource SettingLabel}"/>
+                        </DockPanel>
+                        <TextBlock Text="Off (recommended): overlay themes and Settings UI theme are independent. On: applying a theme updates both."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="CUSTOM COLORS" Style="{StaticResource SectionHeader}"/>

@@ -164,6 +164,11 @@
 - Default built-in theme changed from purple-centric to `Windows Dark`; previous purple look remains available as `Dark Purple`
 - Settings popup placement now anchors to the same toast corner used by Windows notifications on the taskbar monitor
 - UI Styling now surfaces all settings-window color channels (surface light/hover + secondary/muted text in addition to existing fields)
+- Settings window navigation switched to a left-sidebar layout for more reliable section access in popup mode
+- Settings display mode default changed to `Popup` for new installs and reset-to-defaults flows
+- Theme application now targets overlay visuals by default; settings-window theming can optionally be linked via `Link Overlay Theme to UI Theme`
+- Respect Reduce Motion now keeps fade animations active while removing directional movement (fade-only fallback)
+- First-run tips and tray welcome copy updated for current feature set (navigation, theme linkage, shortcuts)
 - All StaticResource brush references in Theme.xaml and SettingsWindow.xaml converted to DynamicResource for runtime theme switching
 - Settings window styles (buttons, toggles, sliders, combos, tabs, scrollbars, tooltips) now respond to theme changes at runtime
 - Overlay scrollbar width and opacity now configurable from Appearance tab (was fixed at 14px)
@@ -193,8 +198,9 @@
 - Overlay Width range increased from 1400px to 7680px for high-resolution displays
 
 ### Fixed
+- Fullscreen overlay no longer stops above the taskbar; it now uses true monitor bounds without work-area clipping
 - Popup mode position regression: saved normal-window coordinates no longer override popup placement
-- Settings tab-header clipping on narrow widths (tab strip now scrolls horizontally instead of truncating labels)
+- Popup-mode section navigation reliability improved by replacing fragile horizontal tab-strip scrolling with a sidebar
 - Filtering tab per-app sound/icon row clipping by switching to a stacked control layout
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
 - Accessibility mode diagnostics now report captured/candidate/event counters to show whether shell events are being seen

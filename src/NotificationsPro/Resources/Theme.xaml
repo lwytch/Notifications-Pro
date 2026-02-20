@@ -369,21 +369,40 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="0"/>
+        <Setter Property="TabStripPlacement" Value="Left"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
-                    <DockPanel>
-                        <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}"
-                                BorderThickness="0,0,0,1" Margin="0,0,0,16">
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                          VerticalScrollBarVisibility="Disabled"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="210"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Background="{DynamicResource SurfaceBgBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="6">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                          VerticalScrollBarVisibility="Auto"
                                           CanContentScroll="False"
                                           Focusable="False">
-                                <TabPanel IsItemsHost="True" Margin="0,0,0,-1"/>
+                                <TabPanel IsItemsHost="True"/>
                             </ScrollViewer>
                         </Border>
-                        <ContentPresenter ContentSource="SelectedContent"/>
-                    </DockPanel>
+
+                        <Border Grid.Column="2"
+                                Background="{DynamicResource SurfaceBgBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="18">
+                            <ContentPresenter ContentSource="SelectedContent"/>
+                        </Border>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -399,16 +418,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
                     <Border x:Name="Bd" Padding="12,10" Background="Transparent"
-                            BorderThickness="0,0,0,2" BorderBrush="Transparent" Margin="0,0,6,0">
-                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Center"/>
+                            BorderThickness="0" BorderBrush="Transparent" Margin="0,0,0,4" CornerRadius="8">
+                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Left"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
                             <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="Bd" Property="BorderThickness" Value="3,0,0,0"/>
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceLightBrush}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceLightBrush}"/>
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

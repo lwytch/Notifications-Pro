@@ -176,10 +176,21 @@ public partial class OverlayWindow : Window
             Top = settings.OverlayTop.Value;
         }
 
-        ApplyEffectiveMaxHeight(settings);
-        TryApplySingleLineAutoFullWidth(settings);
-        ClampToCurrentWorkArea();
-        UpdateEdgeAnchors();
+        ApplyObsFixedWindowMode(settings);
+        ApplyFullscreenOverlayMode(settings);
+
+        if (!settings.FullscreenOverlayMode)
+        {
+            ApplyEffectiveMaxHeight(settings);
+            TryApplySingleLineAutoFullWidth(settings);
+            ClampToCurrentWorkArea();
+            UpdateEdgeAnchors();
+        }
+        else
+        {
+            ApplyEffectiveMaxHeight(settings);
+        }
+
         UpdateClickThrough(settings.ClickThrough);
         _settingsManager.SettingsChanged += OnSettingsChanged;
     }
@@ -209,11 +220,20 @@ public partial class OverlayWindow : Window
             UpdateClickThrough(settings.ClickThrough);
             ApplyObsFixedWindowMode(settings);
             ApplyFullscreenOverlayMode(settings);
-            ApplyEffectiveMaxHeight(settings);
-            TryApplySingleLineAutoFullWidth(settings);
-            TryApplyStoredPosition(settings);
-            ClampToCurrentWorkArea();
-            UpdateEdgeAnchors();
+
+            if (!settings.FullscreenOverlayMode)
+            {
+                ApplyEffectiveMaxHeight(settings);
+                TryApplySingleLineAutoFullWidth(settings);
+                TryApplyStoredPosition(settings);
+                ClampToCurrentWorkArea();
+                UpdateEdgeAnchors();
+            }
+            else
+            {
+                ApplyEffectiveMaxHeight(settings);
+            }
+
             InvalidateMeasure();
             InvalidateArrange();
             UpdateLayout();
@@ -255,6 +275,8 @@ public partial class OverlayWindow : Window
 
             // Use the selected monitor index, not the current window position
             var screens = WinForms.Screen.AllScreens;
+            if (screens.Length == 0)
+                return;
             var idx = Math.Clamp(settings.SelectedMonitorIndex, 0, screens.Length - 1);
             var workArea = screens[idx].Bounds;
 
@@ -313,6 +335,9 @@ public partial class OverlayWindow : Window
         if (_isInternalMove)
             return;
 
+        if (_settingsManager.Settings.FullscreenOverlayMode)
+            return;
+
         if (_ncMouseDownTracked)
             _dragOccurredSinceMouseDown = true;
 
@@ -354,6 +379,9 @@ public partial class OverlayWindow : Window
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (_isInternalMove)
+            return;
+
+        if (_settingsManager.Settings.FullscreenOverlayMode)
             return;
 
         if (ActualWidth > 0)
@@ -653,6 +681,9 @@ public partial class OverlayWindow : Window
 
     private Rect GetCurrentWorkArea()
     {
+        if (_settingsManager.Settings.FullscreenOverlayMode)
+            return GetMonitorBoundsForIndex(_settingsManager.Settings.SelectedMonitorIndex);
+
         var width = ResolveDimension(ActualWidth, Width, MinWidth, 380);
         var height = ResolveDimension(ActualHeight, Height, MinHeight, 120);
         return GetWorkAreaForBounds(Left, Top, width, height);
@@ -683,6 +714,18 @@ public partial class OverlayWindow : Window
         return ToRect(screen.WorkingArea);
     }
 
+    private static Rect GetMonitorBoundsForIndex(int index)
+    {
+        var screens = WinForms.Screen.AllScreens;
+        if (screens.Length == 0)
+            return SystemParameters.WorkArea;
+
+        if (index < 0 || index >= screens.Length)
+            return ToRect(WinForms.Screen.PrimaryScreen?.Bounds ?? screens[0].Bounds);
+
+        return ToRect(screens[index].Bounds);
+    }
+
     private int GetCurrentMonitorIndex()
     {
         var width = ResolveDimension(ActualWidth, Width, MinWidth, 380);
@@ -708,6 +751,9 @@ public partial class OverlayWindow : Window
 
     private void ClampToCurrentWorkArea()
     {
+        if (_settingsManager.Settings.FullscreenOverlayMode)
+            return;
+
         var workArea = GetCurrentWorkArea();
         var targetLeft = ClampToWorkAreaX(Left, workArea);
         var targetTop = ClampToWorkAreaY(Top, workArea);
@@ -766,6 +812,18 @@ public partial class OverlayWindow : Window
 
     private void ApplyEffectiveMaxHeight(AppSettings settings)
     {
+        if (settings.FullscreenOverlayMode)
+        {
+            var monitorBounds = GetMonitorBoundsForIndex(settings.SelectedMonitorIndex);
+            var maxHeight = Math.Max(120, monitorBounds.Height);
+            if (Math.Abs(MaxHeight - maxHeight) > 0.5)
+                MaxHeight = maxHeight;
+
+            if (Math.Abs(NotificationScrollViewer.MaxHeight - maxHeight) > 0.5)
+                NotificationScrollViewer.MaxHeight = maxHeight;
+            return;
+        }
+
         var workArea = GetCurrentWorkArea();
         var userMax = Math.Max(120, settings.OverlayMaxHeight);
         var effectiveMax = Math.Min(userMax, Math.Max(120, workArea.Height - (OverlayMargin * 2)));

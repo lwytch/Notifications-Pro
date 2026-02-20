@@ -52,7 +52,7 @@ public class SettingsViewModel : BaseViewModel
     private int _previewIndex;
 
     // Preview card visibility (not persisted — session-only toggle)
-    private bool _showPreviewCard = true;
+    private bool _showPreviewCard;
     public bool ShowPreviewCard { get => _showPreviewCard; set => SetProperty(ref _showPreviewCard, value); }
 
     // Typography — shared
@@ -418,6 +418,9 @@ public class SettingsViewModel : BaseViewModel
     private string _settingsWindowBorder = "#353535";
     public string SettingsWindowBorder { get => _settingsWindowBorder; set { if (SetProperty(ref _settingsWindowBorder, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
+    private bool _linkOverlayThemeAndUiTheme;
+    public bool LinkOverlayThemeAndUiTheme { get => _linkOverlayThemeAndUiTheme; set { if (SetProperty(ref _linkOverlayThemeAndUiTheme, value)) QueueSave(); } }
+
     public List<string> AvailableSettingsThemeModes { get; } = new() { "Dark", "Light", "System" };
 
     private void ApplySettingsTheme()
@@ -440,11 +443,12 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowTextMuted = SettingsWindowTextMuted,
             SettingsWindowAccent = SettingsWindowAccent,
             SettingsWindowBorder = SettingsWindowBorder,
+            LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
         };
     }
 
     // Settings window display mode (M9.5)
-    private string _settingsDisplayMode = "Window";
+    private string _settingsDisplayMode = "Popup";
     public string SettingsDisplayMode { get => _settingsDisplayMode; set { if (SetProperty(ref _settingsDisplayMode, value)) QueueSave(); } }
 
     private bool _popupAutoClose;
@@ -739,6 +743,7 @@ public class SettingsViewModel : BaseViewModel
         _settingsWindowTextMuted = s.SettingsWindowTextMuted;
         _settingsWindowAccent = s.SettingsWindowAccent;
         _settingsWindowBorder = s.SettingsWindowBorder;
+        _linkOverlayThemeAndUiTheme = s.LinkOverlayThemeAndUiTheme;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
 
@@ -938,6 +943,7 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowTextMuted = SettingsWindowTextMuted,
             SettingsWindowAccent = SettingsWindowAccent,
             SettingsWindowBorder = SettingsWindowBorder,
+            LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
             HasShownWelcome = previousSettings.HasShownWelcome,
@@ -1233,7 +1239,9 @@ public class SettingsViewModel : BaseViewModel
         SaveSettings();
 
         var updated = _settingsManager.Settings.Clone();
-        theme.ApplyTo(updated);
+        theme.ApplyOverlayTo(updated);
+        if (updated.LinkOverlayThemeAndUiTheme)
+            theme.ApplySettingsWindowTo(updated);
         _settingsManager.Apply(updated);
         LoadFromSettings();
 

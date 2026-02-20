@@ -22,10 +22,11 @@ public class M95Tests
         Assert.NotNull(s.PerAppSounds);
         Assert.Empty(s.PerAppSounds);
         Assert.False(s.SuppressToastPopups);
-        Assert.Equal("Window", s.SettingsDisplayMode);
+        Assert.Equal("Popup", s.SettingsDisplayMode);
         Assert.False(s.PopupAutoClose);
         Assert.Equal("Dark", s.SettingsThemeMode);
         Assert.Equal("#111111", s.SettingsWindowBg);
+        Assert.False(s.LinkOverlayThemeAndUiTheme);
         Assert.True(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);
@@ -70,6 +71,7 @@ public class M95Tests
             SettingsDisplayMode = "Popup",
             PopupAutoClose = true,
             SettingsThemeMode = "Light",
+            LinkOverlayThemeAndUiTheme = true,
             OverlayScrollbarVisible = false,
             OverlayScrollbarWidth = 12,
             OverlayScrollbarOpacity = 0.5,
@@ -87,6 +89,7 @@ public class M95Tests
         Assert.Equal("Popup", clone.SettingsDisplayMode);
         Assert.True(clone.PopupAutoClose);
         Assert.Equal("Light", clone.SettingsThemeMode);
+        Assert.True(clone.LinkOverlayThemeAndUiTheme);
         Assert.False(clone.OverlayScrollbarVisible);
         Assert.Equal(12, clone.OverlayScrollbarWidth);
         Assert.Equal(0.5, clone.OverlayScrollbarOpacity);

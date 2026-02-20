@@ -164,7 +164,7 @@ Profiles (stretch):
 Professional accessibility support beyond basic customization.
 
 System integration:
-- [x] Respect Windows "Reduce motion" setting (`SystemParameters.ClientAreaAnimation`) — auto-disable animations when system says so
+- [x] Respect Windows "Reduce motion" setting (`SystemParameters.ClientAreaAnimation`) — force fade-only transitions when system motion is reduced
 - [x] Toggle: "Respect Windows Reduce Motion" (on by default, allow override)
 - [x] Detect Windows High Contrast mode (`SystemParameters.HighContrast`) — auto-apply High Contrast theme preset
 - [x] Respect Windows text scaling — optional "Scale with Windows text size" toggle
@@ -204,8 +204,8 @@ Live preview:
 
 Empty & first-run states:
 - [x] Empty overlay ghost card — when no notifications visible, show a low-opacity "Waiting for notifications..." placeholder so new users know the overlay is there
-- [x] First-run tray balloon — `NotifyIcon.ShowBalloonTip()` on first launch: "Notifications Pro is running. Right-click here for settings."
-- [x] First-run tip bar in settings — dismissable info bar on first open: "Drag the overlay to reposition it."
+- [x] First-run tray balloon — `NotifyIcon.ShowBalloonTip()` on first launch with tray/settings quick-start guidance
+- [x] First-run tip bar in settings — dismissable info bar with updated navigation/theme/shortcut guidance
 - [x] Track `HasShownWelcome` in AppSettings (UI state, not notification content)
 
 Settings window polish:
@@ -267,7 +267,13 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [ ] Clean uninstall (optionally remove %AppData% settings)
 - [x] Final polish: settings popup now anchors to the Windows toast corner on the taskbar monitor (multi-monitor aware)
 - [x] Final polish: settings popup position restore no longer overrides popup mode placement
-- [x] Final polish: settings UI tab strip and cramped per-app rows cleaned up to prevent clipped labels
+- [x] Final polish: fullscreen overlay mode now renders true fullscreen (monitor bounds) without taskbar/work-area clipping
+- [x] Final polish: settings UI now uses a professional left navigation layout for reliable tab access in popup mode
+- [x] Final polish: settings default display mode changed to Popup for new installs/reset defaults
+- [x] Final polish: overlay theme application can now be decoupled from settings-window theme via UI toggle
+- [x] Final polish: settings tips and first-run guidance updated for current feature set
+- [x] Final polish: reduced-motion handling now keeps reliable fade animations instead of silently disabling all transitions
+- [x] Final polish: cramped per-app sound/icon rows cleaned up to prevent clipped labels
 - [x] Final polish: default dark palette shifted to Windows-like neutral colors (overlay, settings UI, tray menu)
 - [x] Final polish: surfaced hidden UI Styling color fields (surface light/hover + secondary/muted text)
 - [ ] Full manual test checklist pass
@@ -275,7 +281,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 11 final polish is in progress (UI cleanup, popup placement correctness, and default theme refinement complete). Next: packaging and installer work.
+Milestone 11 final polish is in progress (fullscreen correctness, popup defaults/layout, and theme separation complete). Next: packaging/installer and final manual QA pass.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

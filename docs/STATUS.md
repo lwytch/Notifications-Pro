@@ -23,8 +23,8 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: eight tabs (Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
-- Settings tab strip now scrolls horizontally to avoid clipped tab labels on narrower window widths
+- Settings window: eight sections (Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
+- Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Behavior tab includes:
@@ -39,6 +39,8 @@
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Position tab includes quick preset buttons for top/side placement
 - Position tab now includes overlay-width and overlay-height presets for 1080p/2K/4K/8K targets
+- Settings display mode now defaults to `Popup` for new installs/reset defaults
+- Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
 - Appearance tab includes per-field typography controls (font size + weight for app name, title, body independently)
 - Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
 - Appearance tab includes color picker buttons and separate app-name color customization
@@ -87,7 +89,8 @@
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
-  - One-click theme apply sets all visual properties (colors, opacity, corner radius, accent, border) at once
+  - One-click theme apply sets overlay visual properties (colors, opacity, corner radius, accent, border)
+  - Optional "Link Overlay Theme to UI Theme" toggle in UI Styling controls whether theme apply also updates settings-window colors
   - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
   - Load, switch between, and delete custom themes from Settings > Themes tab
   - Export full settings to a shareable JSON file
@@ -98,7 +101,7 @@
   - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
   - Auto-duration — longer notifications get more display time based on estimated line count
   - Extended duration slider max (up to 120s)
-  - Respect Reduce Motion — auto-disables slide animations when Windows "Reduce Motion" is active
+  - Respect Reduce Motion — auto-forces fade-only transitions when Windows "Reduce Motion" is active
   - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
   - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
   - Global hotkeys — system-wide keyboard shortcuts for toggle overlay, dismiss all, toggle DND
@@ -158,7 +161,7 @@
   - Fullscreen overlay section moved from Behavior to Position tab for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
-- 132 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
+- 133 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
 
 ## What Doesn't Work Yet
 - Installer/packaging (Milestone 11)
@@ -186,7 +189,7 @@ dotnet test
 - [ ] App starts and tray icon appears
 - [ ] Right-click tray icon shows dark context menu
 - [ ] "Settings..." opens settings window
-- [ ] Settings tab headers remain fully accessible (horizontal header scroll appears if tabs overflow)
+- [ ] Settings left-sidebar navigation remains fully accessible in both Window and Popup display modes
 - [ ] "Send Test Notification" shows a notification card in the overlay
 - [ ] Notification slides in from the left
 - [ ] Notification fades out after configured duration
@@ -253,6 +256,7 @@ dotnet test
 - [ ] Auto-Duration toggle extends display time for longer notifications
 - [ ] Duration slider now goes up to 120s
 - [ ] Respect Reduce Motion disables slide animations when Windows setting is off
+- [ ] With Respect Reduce Motion on, reduced-motion systems use fade-only transitions (instead of fully disabling animations)
 - [ ] Respect High Contrast auto-applies HC theme when Windows HC mode activates
 - [ ] Respect Text Scaling scales overlay font sizes to match Windows text size
 - [ ] Global Hotkeys toggle + key combo fields register system-wide shortcuts
@@ -281,6 +285,7 @@ dotnet test
 - [ ] App launches at Windows startup when the toggle is on
 - [ ] Streaming tab appears in Settings between Position and Accessibility
 - [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
+- [ ] Fullscreen overlay mode covers the full monitor area including taskbar region
 - [ ] Chroma Key toggle turns overlay background solid green
 - [ ] Chroma Key preset buttons (Green/Blue/Magenta) change chroma background color
 - [ ] Custom chroma key color picker works

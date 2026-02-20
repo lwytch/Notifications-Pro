@@ -479,10 +479,11 @@ public class OverlayViewModel : BaseViewModel
         BorderThickness = s.BorderThickness;
         AlwaysOnTop = s.AlwaysOnTop;
 
-        // Override animations when system "Reduce Motion" is active
+        // Respect Reduce Motion by removing directional movement, but keep fades
+        // if the user has animations enabled to avoid "randomly no animation" behavior.
         var reduceMotion = s.RespectReduceMotion && !SystemParameters.ClientAreaAnimation;
-        AnimationsEnabled = reduceMotion ? false : s.AnimationsEnabled;
-        FadeOnlyAnimation = reduceMotion ? true : s.FadeOnlyAnimation;
+        AnimationsEnabled = s.AnimationsEnabled;
+        FadeOnlyAnimation = s.FadeOnlyAnimation || reduceMotion;
 
         SlideInDirection = s.SlideInDirection;
         AnimationDurationMs = s.AnimationDurationMs;

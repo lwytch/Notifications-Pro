@@ -160,9 +160,10 @@ public class AppSettings
     public string SettingsWindowTextMuted { get; set; } = "#8A8A8A";
     public string SettingsWindowAccent { get; set; } = "#0078D4";
     public string SettingsWindowBorder { get; set; } = "#353535";
+    public bool LinkOverlayThemeAndUiTheme { get; set; } = false;
 
     // Settings window display mode (M9.5)
-    public string SettingsDisplayMode { get; set; } = "Window"; // "Window" or "Popup"
+    public string SettingsDisplayMode { get; set; } = "Popup"; // "Window" or "Popup"
     public bool PopupAutoClose { get; set; } = false;
 
     // UX Polish (M8)

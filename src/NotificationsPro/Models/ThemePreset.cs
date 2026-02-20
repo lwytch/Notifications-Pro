@@ -40,9 +40,9 @@ public class ThemePreset
     public double BorderThickness { get; set; } = 1;
 
     /// <summary>
-    /// Apply this theme's visual properties onto an AppSettings instance.
+    /// Apply only overlay visuals (cards/overlay colors + shape) onto settings.
     /// </summary>
-    public void ApplyTo(AppSettings settings)
+    public void ApplyOverlayTo(AppSettings settings)
     {
         settings.TextColor = TextColor;
         settings.TitleColor = TitleColor;
@@ -60,6 +60,13 @@ public class ThemePreset
         settings.AccentThickness = AccentThickness;
         settings.ShowBorder = ShowBorder;
         settings.BorderThickness = BorderThickness;
+    }
+
+    /// <summary>
+    /// Apply only settings window colors onto settings.
+    /// </summary>
+    public void ApplySettingsWindowTo(AppSettings settings)
+    {
         settings.SettingsWindowBg = SettingsWindowBg;
         settings.SettingsWindowSurface = SettingsWindowSurface;
         settings.SettingsWindowSurfaceLight = SettingsWindowSurfaceLight;
@@ -69,6 +76,15 @@ public class ThemePreset
         settings.SettingsWindowTextMuted = SettingsWindowTextMuted;
         settings.SettingsWindowAccent = SettingsWindowAccent;
         settings.SettingsWindowBorder = SettingsWindowBorder;
+    }
+
+    /// <summary>
+    /// Apply both overlay and settings-window visuals.
+    /// </summary>
+    public void ApplyTo(AppSettings settings)
+    {
+        ApplyOverlayTo(settings);
+        ApplySettingsWindowTo(settings);
     }
 
     /// <summary>

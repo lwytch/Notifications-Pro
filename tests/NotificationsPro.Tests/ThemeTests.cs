@@ -103,6 +103,22 @@ public class ThemeTests : IDisposable
     }
 
     [Fact]
+    public void ApplyOverlayTo_DoesNotChangeSettingsWindowColors()
+    {
+        var settings = new AppSettings
+        {
+            SettingsWindowBg = "#010101",
+            SettingsWindowAccent = "#020202",
+        };
+
+        var theme = ThemePreset.BuiltInThemes[0];
+        theme.ApplyOverlayTo(settings);
+
+        Assert.Equal("#010101", settings.SettingsWindowBg);
+        Assert.Equal("#020202", settings.SettingsWindowAccent);
+    }
+
+    [Fact]
     public void FromSettings_CapturesVisualProperties()
     {
         var settings = new AppSettings

@@ -133,7 +133,7 @@ public partial class App : Application
             _trayIcon.ShowBalloonTip(
                 5000,
                 "Notifications Pro",
-                "Notifications Pro is running. Right-click the tray icon for settings.",
+                "Notifications Pro is running in the tray. Right-click for settings, quick theme switching, and focus mode.",
                 WinForms.ToolTipIcon.Info);
         }
 
@@ -165,7 +165,9 @@ public partial class App : Application
         if (hcTheme == null) return;
 
         var updated = _settingsManager.Settings.Clone();
-        hcTheme.ApplyTo(updated);
+        hcTheme.ApplyOverlayTo(updated);
+        if (updated.LinkOverlayThemeAndUiTheme)
+            hcTheme.ApplySettingsWindowTo(updated);
         _settingsManager.Apply(updated);
     }
 
@@ -675,7 +677,9 @@ public partial class App : Application
     {
         if (_settingsManager == null) return;
         var updated = _settingsManager.Settings.Clone();
-        theme.ApplyTo(updated);
+        theme.ApplyOverlayTo(updated);
+        if (updated.LinkOverlayThemeAndUiTheme)
+            theme.ApplySettingsWindowTo(updated);
         _settingsManager.Apply(updated);
     }
 
