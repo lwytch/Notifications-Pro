@@ -172,6 +172,8 @@
 - Timestamp controls now support display mode (`Relative`, `Time`, `DateTime`) and adjustable timestamp font size
 - Timestamp controls now also support independent font weight and color customization (with live preview)
 - UI theme preset dropdown now mirrors overlay theme names (built-in + custom), plus `System` and `Custom`
+- Timestamp appearance controls were moved to `Appearance` (Behavior now keeps only the show/hide toggle)
+- Section headings across settings tabs are now rendered as boxed panels to improve scanability in long forms
 - Default visible notification count increased from `3` to `15` (still user-configurable 1-40)
 - Windowed settings mode now applies immersive dark title-bar styling to avoid light-gray native chrome
 - Settings panel spacing refined (labels/controls/descriptions) to reduce cramped layouts
@@ -207,6 +209,7 @@
 - Overlay Width range increased from 1400px to 7680px for high-resolution displays
 
 ### Fixed
+- Overlay theme application now explicitly preserves the current settings-window theme/palette when link mode is disabled
 - Primary button text readability in high-contrast UI themes by auto-selecting black/white foreground against accent color
 - Fullscreen overlay no longer stops above the taskbar; it now uses true monitor bounds without work-area clipping
 - Popup mode position regression: saved normal-window coordinates no longer override popup placement

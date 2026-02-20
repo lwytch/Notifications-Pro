@@ -546,6 +546,20 @@ public class SettingsViewModel : BaseViewModel
         ];
     }
 
+    private static void CopySettingsUiTheme(AppSettings source, AppSettings target)
+    {
+        target.SettingsThemeMode = source.SettingsThemeMode;
+        target.SettingsWindowBg = source.SettingsWindowBg;
+        target.SettingsWindowSurface = source.SettingsWindowSurface;
+        target.SettingsWindowSurfaceLight = source.SettingsWindowSurfaceLight;
+        target.SettingsWindowSurfaceHover = source.SettingsWindowSurfaceHover;
+        target.SettingsWindowText = source.SettingsWindowText;
+        target.SettingsWindowTextSecondary = source.SettingsWindowTextSecondary;
+        target.SettingsWindowTextMuted = source.SettingsWindowTextMuted;
+        target.SettingsWindowAccent = source.SettingsWindowAccent;
+        target.SettingsWindowBorder = source.SettingsWindowBorder;
+    }
+
     private void RefreshSettingsThemeModeOptions()
     {
         var options = new List<string> { "System" };
@@ -1428,12 +1442,18 @@ public class SettingsViewModel : BaseViewModel
         _saveDebounce.Stop();
         SaveSettings();
 
-        var updated = _settingsManager.Settings.Clone();
+        var current = _settingsManager.Settings;
+        var updated = current.Clone();
         theme.ApplyOverlayTo(updated);
         if (updated.LinkOverlayThemeAndUiTheme)
         {
             theme.ApplySettingsWindowTo(updated);
             updated.SettingsThemeMode = theme.Name;
+        }
+        else
+        {
+            // Guardrail: overlay theme changes must not mutate settings-window theme when unlinked.
+            CopySettingsUiTheme(current, updated);
         }
         _settingsManager.Apply(updated);
         LoadFromSettings();

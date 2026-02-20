@@ -164,12 +164,17 @@ public partial class App : Application
             .FirstOrDefault(t => t.Name == "High Contrast");
         if (hcTheme == null) return;
 
-        var updated = _settingsManager.Settings.Clone();
+        var current = _settingsManager.Settings;
+        var updated = current.Clone();
         hcTheme.ApplyOverlayTo(updated);
         if (updated.LinkOverlayThemeAndUiTheme)
         {
             hcTheme.ApplySettingsWindowTo(updated);
             updated.SettingsThemeMode = hcTheme.Name;
+        }
+        else
+        {
+            CopySettingsUiTheme(current, updated);
         }
         _settingsManager.Apply(updated);
     }
@@ -679,14 +684,34 @@ public partial class App : Application
     private void ApplyThemeFromTray(ThemePreset theme)
     {
         if (_settingsManager == null) return;
-        var updated = _settingsManager.Settings.Clone();
+        var current = _settingsManager.Settings;
+        var updated = current.Clone();
         theme.ApplyOverlayTo(updated);
         if (updated.LinkOverlayThemeAndUiTheme)
         {
             theme.ApplySettingsWindowTo(updated);
             updated.SettingsThemeMode = theme.Name;
         }
+        else
+        {
+            // Keep settings-window palette unchanged when themes are unlinked.
+            CopySettingsUiTheme(current, updated);
+        }
         _settingsManager.Apply(updated);
+    }
+
+    private static void CopySettingsUiTheme(AppSettings source, AppSettings target)
+    {
+        target.SettingsThemeMode = source.SettingsThemeMode;
+        target.SettingsWindowBg = source.SettingsWindowBg;
+        target.SettingsWindowSurface = source.SettingsWindowSurface;
+        target.SettingsWindowSurfaceLight = source.SettingsWindowSurfaceLight;
+        target.SettingsWindowSurfaceHover = source.SettingsWindowSurfaceHover;
+        target.SettingsWindowText = source.SettingsWindowText;
+        target.SettingsWindowTextSecondary = source.SettingsWindowTextSecondary;
+        target.SettingsWindowTextMuted = source.SettingsWindowTextMuted;
+        target.SettingsWindowAccent = source.SettingsWindowAccent;
+        target.SettingsWindowBorder = source.SettingsWindowBorder;
     }
 
     private void QuitApp()

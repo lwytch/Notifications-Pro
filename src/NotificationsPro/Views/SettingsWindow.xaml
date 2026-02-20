@@ -16,13 +16,23 @@
         <converters:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
+        <!-- Section header panel -->
+        <Style x:Key="SectionHeaderPanel" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceLightBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,20,0,12"/>
+        </Style>
+
         <!-- Section header style -->
         <Style x:Key="SectionHeader" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-            <Setter Property="Margin" Value="0,24,0,12"/>
+            <Setter Property="Margin" Value="0"/>
         </Style>
 
         <!-- Setting label -->
@@ -213,7 +223,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock Text="IMPORT / EXPORT" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="IMPORT / EXPORT" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Save and restore complete app profiles (all tabs) as JSON files."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -238,7 +250,9 @@
                     <StackPanel>
 
                         <!-- OVERLAY THEMES section -->
-                        <TextBlock Text="OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Quickly style notification cards. These theme presets affect the overlay. UI Styling controls settings-window colors."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -265,7 +279,9 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="CUSTOM OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="CUSTOM OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Save your current overlay look, then re-apply it anytime."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -308,7 +324,9 @@
                                    Visibility="{Binding CustomThemes.Count, Converter={StaticResource ZeroToVisible}}"/>
 
                         <!-- TYPOGRAPHY section -->
-                        <TextBlock Text="TYPOGRAPHY" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="TYPOGRAPHY" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Font Family" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
@@ -401,8 +419,79 @@
                         <TextBlock Text="More spacing makes dense notifications easier to scan"
                                    Style="{StaticResource SettingDesc}"/>
 
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="TIMESTAMP APPEARANCE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock Text="Control how timestamp text looks. Timestamp visibility is toggled in Behavior &gt; Content."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Tip: Turn on 'Show Timestamp' in Behavior to apply these appearance options."
+                                   Margin="0,0,0,8">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource SettingDesc}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowTimestamp}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <StackPanel IsEnabled="{Binding ShowTimestamp}">
+                            <TextBlock Text="Timestamp Style" Style="{StaticResource SettingLabel}"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableTimestampDisplayModes}"
+                                      SelectedItem="{Binding TimestampDisplayMode}"
+                                      Margin="0,4,0,4"
+                                      ToolTip="Relative shows '2m ago'. Time shows clock time. DateTime shows date and time."/>
+                            <TextBlock Text="Relative: '2m ago'. Time: '14:35'. DateTime: localized date and time."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Timestamp Size" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding TimestampFontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="8" Maximum="32" Value="{Binding TimestampFontSize}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Font size for timestamp text on each notification card"/>
+                            </DockPanel>
+                            <TextBlock Text="Increase for readability on larger displays, or reduce for compact layouts."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Timestamp Font Weight" Style="{StaticResource SettingLabel}"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableFontWeights}"
+                                      SelectedItem="{Binding TimestampFontWeight}"
+                                      Margin="0,4,0,4"
+                                      ToolTip="Choose how bold timestamp text appears on each card."/>
+                            <TextBlock Text="Use medium or semibold for stronger readability in busy overlays."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Timestamp Color" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,12">
+                                <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                        Background="{Binding TimestampColor, Converter={StaticResource ColorToBrush}}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                                <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                        Width="40" Height="28" Margin="8,0,0,0"
+                                        Tag="TimestampColor" Click="OnPickColorClick"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding TimestampColor, UpdateSourceTrigger=LostFocus}"/>
+                            </DockPanel>
+                            <TextBlock Text="Adjust timestamp contrast independently from app/title/body text colors."
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
+
                         <!-- COLORS section -->
-                        <TextBlock Text="COLORS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="COLORS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Title Color" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
@@ -504,7 +593,9 @@
                                    Style="{StaticResource SettingDesc}"/>
 
                         <!-- SHAPE section -->
-                        <TextBlock Text="SHAPE" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SHAPE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Corner Radius" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
@@ -558,7 +649,9 @@
                         <TextBlock Text="Space around the entire card area inside the overlay window"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="ACCENT STRIPE" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="ACCENT STRIPE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -582,7 +675,9 @@
                         <TextBlock Text="Width of the left accent stripe in pixels"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="CARD BORDER" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="CARD BORDER" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -624,7 +719,9 @@
                         <TextBlock Text="Width of the border around each card in pixels"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="NOTIFICATION ICONS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="NOTIFICATION ICONS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,4,0,12">
                             <TextBlock Text="Show Icons" Style="{StaticResource SettingLabel}"/>
@@ -664,7 +761,9 @@
                         <TextBlock Text="Upload a PNG/JPG/ICO file to use as a custom notification icon"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="OVERLAY SCROLLBAR" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="OVERLAY SCROLLBAR" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,4,0,12">
                             <TextBlock Text="Show Scrollbar" Style="{StaticResource SettingLabel}"/>
@@ -709,7 +808,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock Text="TIMING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="TIMING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Notification Duration" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
@@ -737,7 +838,9 @@
                         <TextBlock Text="Default is 15. Lower counts reduce noise; higher counts keep more recent context visible."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="CONTENT" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="CONTENT" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -772,71 +875,8 @@
                                           ToolTip="Show timestamp text on each notification card"/>
                             <TextBlock Text="Show Timestamp" Style="{StaticResource SettingLabel}"/>
                         </DockPanel>
-                        <TextBlock Text="Show when each notification arrived. You can choose relative or clock-based formats below."
+                        <TextBlock Text="Show when each notification arrived. Configure timestamp style and color in Appearance &gt; Timestamp Appearance."
                                    Style="{StaticResource SettingDesc}"/>
-
-                        <TextBlock Text="Tip: Turn on 'Show Timestamp' above to apply these formatting options."
-                                   Margin="0,0,0,8">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource SettingDesc}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ShowTimestamp}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-
-                        <StackPanel IsEnabled="{Binding ShowTimestamp}">
-                            <TextBlock Text="Timestamp Style" Style="{StaticResource SettingLabel}"/>
-                            <ComboBox Style="{StaticResource SettingsComboBox}"
-                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                      ItemsSource="{Binding AvailableTimestampDisplayModes}"
-                                      SelectedItem="{Binding TimestampDisplayMode}"
-                                      Margin="0,4,0,4"
-                                      ToolTip="Relative shows '2m ago'. Time shows clock time. DateTime shows date and time."/>
-                            <TextBlock Text="Relative: '2m ago'. Time: '14:35'. DateTime: localized date and time."
-                                       Style="{StaticResource SettingDesc}"/>
-
-                            <TextBlock Text="Timestamp Size" Style="{StaticResource SettingLabel}"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding TimestampFontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="8" Maximum="32" Value="{Binding TimestampFontSize}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True"
-                                        ToolTip="Font size for timestamp text on each notification card"/>
-                            </DockPanel>
-                            <TextBlock Text="Increase for readability on larger displays, or reduce for compact layouts."
-                                       Style="{StaticResource SettingDesc}"/>
-
-                            <TextBlock Text="Timestamp Font Weight" Style="{StaticResource SettingLabel}"/>
-                            <ComboBox Style="{StaticResource SettingsComboBox}"
-                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                      ItemsSource="{Binding AvailableFontWeights}"
-                                      SelectedItem="{Binding TimestampFontWeight}"
-                                      Margin="0,4,0,4"
-                                      ToolTip="Choose how bold timestamp text appears on each card."/>
-                            <TextBlock Text="Use medium or semibold for stronger readability in busy overlays."
-                                       Style="{StaticResource SettingDesc}"/>
-
-                            <TextBlock Text="Timestamp Color" Style="{StaticResource SettingLabel}"/>
-                            <DockPanel Margin="0,4,0,12">
-                                <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
-                                        Background="{Binding TimestampColor, Converter={StaticResource ColorToBrush}}"
-                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
-                                <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
-                                        Width="40" Height="28" Margin="8,0,0,0"
-                                        Tag="TimestampColor" Click="OnPickColorClick"/>
-                                <TextBox Style="{StaticResource SettingsTextBox}"
-                                         Text="{Binding TimestampColor, UpdateSourceTrigger=LostFocus}"/>
-                            </DockPanel>
-                            <TextBlock Text="Adjust timestamp contrast independently from app/title/body text colors."
-                                       Style="{StaticResource SettingDesc}"/>
-                        </StackPanel>
 
                         <StackPanel Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
                             <DockPanel Margin="0,0,0,4">
@@ -941,7 +981,9 @@
                                        Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -961,7 +1003,9 @@
                         <TextBlock Text="Mouse clicks pass through the overlay so you can interact with windows behind it. Disable to drag/resize the overlay."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="ANIMATIONS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="ANIMATIONS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1004,7 +1048,9 @@
                         <TextBlock Text="0 means instant transitions; higher values feel smoother"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="DEDUPLICATION" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="DEDUPLICATION" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1028,7 +1074,9 @@
                         <TextBlock Text="How long (in seconds) to consider identical notifications as duplicates"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1043,7 +1091,9 @@
                         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" Margin="0,0,0,12"
                                    Text="Suppression is only active while Notifications Pro is running. Closing the app immediately restores normal toast behavior."/>
 
-                        <TextBlock Text="SOUNDS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SOUNDS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1084,7 +1134,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock Text="PER-APP MUTING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="PER-APP MUTING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Apps seen this session appear below. Toggle to mute/unmute."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -1106,7 +1158,9 @@
                                    Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
                                    Visibility="{Binding MutedAppEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
 
-                        <TextBlock Text="KEYWORD HIGHLIGHTING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="KEYWORD HIGHLIGHTING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Notifications matching these keywords get a colored accent stripe"
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -1150,7 +1204,9 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="KEYWORD MUTING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="KEYWORD MUTING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Notifications containing these keywords will be silently suppressed"
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -1176,7 +1232,9 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="PER-APP SOUNDS &amp; ICONS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="PER-APP SOUNDS &amp; ICONS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Assign individual sounds and icons per app. 'Default' uses the global setting."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -1222,7 +1280,9 @@
                                    Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
                                    Visibility="{Binding PerAppConfigEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
 
-                        <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1249,7 +1309,9 @@
                             <TextBlock Text="e.g. 08:00 for 8 AM" Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="BURST LIMITING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="BURST LIMITING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1297,7 +1359,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock Text="MONITOR" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="MONITOR" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Target Monitor" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
@@ -1315,7 +1379,9 @@
                         <TextBlock Text="Choose a monitor, then click Move to reposition the overlay. Position presets also use this monitor."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1326,7 +1392,9 @@
                         <TextBlock Text="Automatically launch Notifications Pro when you sign in"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="SIZE" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SIZE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Overlay Width" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,0">
@@ -1397,7 +1465,9 @@
                         <TextBlock Text="Quickly set max-height targets for common display classes."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1421,7 +1491,9 @@
                         <TextBlock Text="How close (in pixels) the overlay needs to be before it snaps into place"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Move overlay to common positions on the selected monitor"
                                    Style="{StaticResource SettingDesc}"/>
                         <WrapPanel Margin="0,0,0,8" ItemWidth="120">
@@ -1437,7 +1509,9 @@
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-right"/>
                         </WrapPanel>
 
-                        <TextBlock Text="FULLSCREEN OVERLAY" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="FULLSCREEN OVERLAY" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1491,7 +1565,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock Text="CHROMA KEY" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="CHROMA KEY" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1529,7 +1605,9 @@
                                        Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="OBS WINDOW CAPTURE" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="OBS WINDOW CAPTURE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1566,7 +1644,9 @@
                                        Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="PRESENTATION MODE" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="PRESENTATION MODE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1606,7 +1686,9 @@
                                        Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="PER-APP COLOR TINTING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="PER-APP COLOR TINTING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -1652,7 +1734,9 @@
                         <TextBlock Text="Enables persistent notifications, respect for system motion/contrast/text settings, and spacious layout in one click. Individual settings below still work independently."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="NOTIFICATION TIMING" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="NOTIFICATION TIMING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Control how long notifications stay visible on screen."
                                    Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
 
@@ -1702,7 +1786,9 @@
                                        Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="SYSTEM INTEGRATION" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SYSTEM INTEGRATION" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Automatically adapt the overlay to match your Windows accessibility settings."
                                    Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
 
@@ -1733,7 +1819,9 @@
                         <TextBlock Text="Scales notification text to match your Windows accessibility text size setting"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Control the overlay from anywhere using system-wide keyboard shortcuts."
                                    Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
 
@@ -1766,7 +1854,9 @@
                             <TextBlock Text="Pause or resume notification delivery" Style="{StaticResource SettingDesc}"/>
                         </StackPanel>
 
-                        <TextBlock Text="INFORMATION DENSITY" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="INFORMATION DENSITY" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Choose how much information fits on screen at once. Compact shows more notifications, Spacious is easier to read."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -1793,7 +1883,9 @@
                         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,12,0,12"
                                    Text="Customize the appearance and behavior of this settings window. These options do not affect the notification overlay."/>
 
-                        <TextBlock Text="DISPLAY MODE" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="DISPLAY MODE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="Display Mode" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
@@ -1815,7 +1907,9 @@
                         <TextBlock Text="In Popup mode, automatically closes the settings panel when it loses focus"
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="THEME" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="THEME" Style="{StaticResource SectionHeader}"/>
+                        </Border>
 
                         <TextBlock Text="UI Theme Preset" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
@@ -1836,7 +1930,9 @@
                         <TextBlock Text="Off (recommended): overlay themes and Settings UI theme are independent. On: applying a theme updates both."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <TextBlock Text="CUSTOM COLORS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="CUSTOM COLORS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
                         <TextBlock Text="Fine-tune settings-window colors. These apply when UI Theme Preset is set to Custom."
                                    Style="{StaticResource SettingDesc}"/>
 
@@ -1970,3 +2066,4 @@
         </Border>
     </Grid>
 </Window>
+

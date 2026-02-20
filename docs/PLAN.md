@@ -282,8 +282,11 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Final polish: windowed settings title bar now uses immersive dark non-client styling (no light-gray chrome clash)
 - [x] Final polish: UI theme preset dropdown now mirrors overlay theme names (built-in + custom) for consistent selection
 - [x] Final polish: settings spacing pass applied for improved readability across panels
+- [x] Final polish: section headers now render in boxed panels across settings tabs for faster visual scanning
 - [x] Final polish: tray/settings icon updated to monochrome white badge with black "N" (purple removed)
 - [x] Final polish: primary button text now auto-contrasts against accent color (fixes high-contrast readability)
+- [x] Final polish: timestamp style controls moved to Appearance; Behavior keeps timestamp visibility toggle
+- [x] Final polish: overlay theme apply now explicitly preserves settings-window theme when link toggle is off
 - [ ] Full manual test checklist pass
 - [ ] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience

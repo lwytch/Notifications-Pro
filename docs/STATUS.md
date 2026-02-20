@@ -30,10 +30,11 @@
 - Settings header icon treatment simplified (no padded badge container) and app icon palette is now monochrome white/black
 - Windowed settings mode now applies immersive dark title-bar styling (removes the light-gray native chrome mismatch)
 - Settings control spacing refined (labels, inputs, and descriptions) to reduce cramped text/field layout
+- Section headers now render as boxed panels across tabs to improve category scanning in long scrollable pages
 - Behavior tab includes:
   - configurable visible card count (1-40)
   - content field toggles (show app name, title, body)
-  - timestamp controls (show/hide, display mode, font size, font weight, color)
+  - timestamp visibility toggle (show/hide)
   - full-wrap stacked mode toggle (disable line clamping/truncation)
   - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
@@ -47,6 +48,7 @@
 - Visible-notification default increased to `15` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
 - Appearance tab includes per-field typography controls (font size + weight for app name, title, body independently)
+- Appearance tab includes timestamp appearance controls (display mode, size, weight, color)
 - Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
@@ -82,7 +84,7 @@
   - Context menu themed to match overlay colors
   - "Clear All Notifications" in tray menu
   - Optional timestamps on cards ("just now", clock time, or date+time) refreshed every 15s for relative mode
-  - Show Timestamp toggle plus style/size controls in Settings > Behavior > Content
+  - Show Timestamp toggle in Settings > Behavior > Content, with timestamp appearance controls in Settings > Appearance > Timestamp Appearance
 - **Filtering & Smart Control (Milestone 5)**:
   - Per-app muting — mute/unmute from card context menu, tray Quick Mute submenu, or Filtering settings tab
   - Keyword highlighting — notifications matching configured keywords get a colored accent stripe
@@ -96,6 +98,7 @@
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
   - One-click theme apply sets overlay visual properties (colors, opacity, corner radius, accent, border)
   - Optional "Link Overlay Theme to UI Theme" toggle in UI Styling controls whether theme apply also updates settings-window colors
+  - Overlay theme apply now explicitly preserves current settings-window theme/palette when link toggle is off
   - UI Styling theme preset dropdown now uses the same named theme presets as overlay themes (plus System and Custom)
   - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
   - Load, switch between, and delete custom themes from Settings > Appearance > Overlay Themes
@@ -242,10 +245,10 @@ dotnet test
 - [ ] Right-click a card shows context menu (Dismiss, Copy Text, Clear All)
 - [ ] "Copy Text" copies card app/title/body to clipboard
 - [ ] "Clear All Notifications" in tray menu removes all visible cards
-- [ ] "Show Timestamp" toggle displays timestamp text on each stacked card
-- [ ] Timestamp style selector switches between Relative, Time, and DateTime formats
-- [ ] Timestamp size slider updates timestamp readability without affecting title/body sizes
-- [ ] Timestamp font-weight selector and color picker update timestamp styling immediately
+- [ ] "Show Timestamp" toggle in Behavior > Content displays timestamp text on each stacked card
+- [ ] Timestamp style selector in Appearance > Timestamp Appearance switches between Relative, Time, and DateTime formats
+- [ ] Timestamp size slider in Appearance > Timestamp Appearance updates timestamp readability without affecting title/body sizes
+- [ ] Timestamp font-weight selector and color picker in Appearance > Timestamp Appearance update timestamp styling immediately
 - [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit sections
 - [ ] Muting an app from card context menu suppresses future notifications from that app
 - [ ] Unmuting an app from Filtering tab restores notifications

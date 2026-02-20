@@ -107,15 +107,31 @@ public class ThemeTests : IDisposable
     {
         var settings = new AppSettings
         {
+            SettingsThemeMode = "Windows Light",
             SettingsWindowBg = "#010101",
+            SettingsWindowSurface = "#111111",
+            SettingsWindowSurfaceLight = "#212121",
+            SettingsWindowSurfaceHover = "#313131",
+            SettingsWindowText = "#F1F1F1",
+            SettingsWindowTextSecondary = "#D2D2D2",
+            SettingsWindowTextMuted = "#A3A3A3",
             SettingsWindowAccent = "#020202",
+            SettingsWindowBorder = "#565656",
         };
 
         var theme = ThemePreset.BuiltInThemes[0];
         theme.ApplyOverlayTo(settings);
 
+        Assert.Equal("Windows Light", settings.SettingsThemeMode);
         Assert.Equal("#010101", settings.SettingsWindowBg);
+        Assert.Equal("#111111", settings.SettingsWindowSurface);
+        Assert.Equal("#212121", settings.SettingsWindowSurfaceLight);
+        Assert.Equal("#313131", settings.SettingsWindowSurfaceHover);
+        Assert.Equal("#F1F1F1", settings.SettingsWindowText);
+        Assert.Equal("#D2D2D2", settings.SettingsWindowTextSecondary);
+        Assert.Equal("#A3A3A3", settings.SettingsWindowTextMuted);
         Assert.Equal("#020202", settings.SettingsWindowAccent);
+        Assert.Equal("#565656", settings.SettingsWindowBorder);
     }
 
     [Fact]
