@@ -8,7 +8,7 @@
 - [x] Solution structure (.NET 8 WPF)
 - [x] AppSettings model with defaults
 - [x] SettingsManager (load/save %AppData%\NotificationsPro\settings.json)
-- [x] QueueManager (max 3 visible, overflow count, dedup, expiry)
+- [x] QueueManager (configurable visible limit, overflow count, dedup, expiry)
 - [x] System tray app with dark-themed context menu
 - [x] Overlay window (transparent, always-on-top configurable, slide-in animations)
 - [x] Settings window (tabbed: Appearance / Behavior / Position)
@@ -110,8 +110,8 @@ Right-click context menu on cards:
 - [x] Copy text to clipboard
 
 Timestamps:
-- [x] Optional relative timestamps on cards ("just now", "2m ago") — refreshed every 15s
-- [x] Show/hide timestamp toggle in settings (Behavior > Content)
+- [x] Optional timestamps on cards with selectable format (Relative / Time / DateTime)
+- [x] Timestamp display controls in settings (show/hide + style + size + weight + color)
 
 ### Milestone 5: Filtering & Smart Control
 **Status: Complete**
@@ -249,7 +249,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Width text input box (Position tab) for precise pixel overlay width entry
 - [x] Accessibility master toggle + section descriptions in Accessibility tab
 - [x] Fullscreen overlay mode with configurable opacity
-- [x] Settings window dynamic theming (Dark/Light/System mode + custom colors)
+- [x] Settings window dynamic theming (Windows Dark/Light, High Contrast, System, or Custom colors)
 - [x] StaticResource→DynamicResource conversion for live theme switching (Theme.xaml + SettingsWindow.xaml)
 - [x] SettingsThemeService for runtime Application.Resources brush updates
 - [x] Overlay scrollbar controls (show/hide, width 4-20px, opacity)
@@ -276,12 +276,20 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Final polish: cramped per-app sound/icon rows cleaned up to prevent clipped labels
 - [x] Final polish: default dark palette shifted to Windows-like neutral colors (overlay, settings UI, tray menu)
 - [x] Final polish: surfaced hidden UI Styling color fields (surface light/hover + secondary/muted text)
+- [x] Final polish: default visible notifications increased from 3 to 15 for better context retention
+- [x] Final polish: overlay theme controls moved into Appearance; Profiles tab now focuses on full settings import/export
+- [x] Final polish: timestamp controls now include size, display mode, weight, and color with live preview
+- [x] Final polish: windowed settings title bar now uses immersive dark non-client styling (no light-gray chrome clash)
+- [x] Final polish: UI theme preset dropdown now mirrors overlay theme names (built-in + custom) for consistent selection
+- [x] Final polish: settings spacing pass applied for improved readability across panels
+- [x] Final polish: tray/settings icon updated to monochrome white badge with black "N" (purple removed)
+- [x] Final polish: primary button text now auto-contrasts against accent color (fixes high-contrast readability)
 - [ ] Full manual test checklist pass
 - [ ] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 11 final polish is in progress (fullscreen correctness, popup defaults/layout, and theme separation complete). Next: packaging/installer and final manual QA pass.
+Milestone 11 final polish is in progress (UI clarity, timestamp controls, and theme preset polish complete). Next: packaging/installer and final manual QA pass.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

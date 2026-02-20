@@ -23,13 +23,17 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: eight sections (Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
+- Settings window: eight sections (Profiles, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
+- Settings header icon treatment simplified (no padded badge container) and app icon palette is now monochrome white/black
+- Windowed settings mode now applies immersive dark title-bar styling (removes the light-gray native chrome mismatch)
+- Settings control spacing refined (labels, inputs, and descriptions) to reduce cramped text/field layout
 - Behavior tab includes:
   - configurable visible card count (1-40)
   - content field toggles (show app name, title, body)
+  - timestamp controls (show/hide, display mode, font size, font weight, color)
   - full-wrap stacked mode toggle (disable line clamping/truncation)
   - per-field line count controls for app/title/body in stacked mode
   - single-line banner toggle
@@ -40,6 +44,7 @@
 - Position tab includes quick preset buttons for top/side placement
 - Position tab now includes overlay-width and overlay-height presets for 1080p/2K/4K/8K targets
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
+- Visible-notification default increased to `15` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
 - Appearance tab includes per-field typography controls (font size + weight for app name, title, body independently)
 - Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
@@ -76,8 +81,8 @@
   - Right-click context menu on cards: Dismiss, Copy Text, Clear All
   - Context menu themed to match overlay colors
   - "Clear All Notifications" in tray menu
-  - Optional relative timestamps on cards ("just now", "2m ago", etc.) refreshed every 15s
-  - Show Timestamp toggle in Settings > Behavior > Content
+  - Optional timestamps on cards ("just now", clock time, or date+time) refreshed every 15s for relative mode
+  - Show Timestamp toggle plus style/size controls in Settings > Behavior > Content
 - **Filtering & Smart Control (Milestone 5)**:
   - Per-app muting — mute/unmute from card context menu, tray Quick Mute submenu, or Filtering settings tab
   - Keyword highlighting — notifications matching configured keywords get a colored accent stripe
@@ -91,12 +96,13 @@
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
   - One-click theme apply sets overlay visual properties (colors, opacity, corner radius, accent, border)
   - Optional "Link Overlay Theme to UI Theme" toggle in UI Styling controls whether theme apply also updates settings-window colors
+  - UI Styling theme preset dropdown now uses the same named theme presets as overlay themes (plus System and Custom)
   - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
-  - Load, switch between, and delete custom themes from Settings > Themes tab
+  - Load, switch between, and delete custom themes from Settings > Appearance > Overlay Themes
   - Export full settings to a shareable JSON file
   - Import settings from a JSON file
   - Theme quick-switch submenu in tray menu (built-in + custom themes)
-  - Themes tab in Settings with built-in theme grid, custom theme management, and import/export buttons
+  - Profiles tab in Settings now focuses on import/export of full settings profiles
 - **Accessibility & Inclusivity (Milestone 7)**:
   - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
   - Auto-duration — longer notifications get more display time based on estimated line count
@@ -116,8 +122,8 @@
 - **UX Polish & Settings Enhancements (Milestone 8)**:
   - Inline live preview card in settings window — always-visible sample card updates in real-time as you adjust settings
   - Empty overlay ghost card — low-opacity "Waiting for notifications..." placeholder when no cards are visible
-  - First-run tray balloon tip — "Notifications Pro is running. Right-click the tray icon for settings."
-  - First-run tip bar in settings — dismissable info bar on first open with drag/Ctrl+T hints
+  - First-run tray balloon tip — tray/settings quick-start guidance with theme/focus hints
+  - First-run tip bar in settings — dismissable info bar on first open with sidebar/theme/Ctrl+T guidance
   - HasShownWelcome tracking in AppSettings (UI state, not notification content)
   - Confirm before "Reset to Defaults" — MessageBox confirmation prevents accidental resets
   - "Saved" micro-feedback — brief "Saved" label appears next to auto-save text after each save
@@ -147,7 +153,7 @@
   - Accessibility master toggle — one-click enable of recommended accessibility bundle
   - Accessibility tab descriptions explaining each section's purpose
   - Fullscreen overlay mode — fill-screen background with configurable opacity
-  - Settings window dynamic theming — Dark/Light/System mode selector
+  - Settings window dynamic theming — Windows Dark/Light, High Contrast, System, or Custom palette
   - SettingsThemeService for runtime DynamicResource brush updates
   - Custom settings window color pickers (background, surface, surface light, surface hover, text, text secondary, text muted, accent, border)
   - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
@@ -161,7 +167,8 @@
   - Fullscreen overlay section moved from Behavior to Position tab for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
-- 133 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
+  - Primary button text foreground now auto-selects black/white for contrast against the active accent color (improves high-contrast readability)
+- 134 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
 
 ## What Doesn't Work Yet
 - Installer/packaging (Milestone 11)
@@ -193,7 +200,7 @@ dotnet test
 - [ ] "Send Test Notification" shows a notification card in the overlay
 - [ ] Notification slides in from the left
 - [ ] Notification fades out after configured duration
-- [ ] Sending 4+ test notifications shows "+N more" overflow indicator
+- [ ] Sending more than the visible limit (default 15) shows "+N more" overflow indicator
 - [ ] "Visible Notifications" slider changes how many cards persist on screen
 - [ ] "Show App Name / Show Title / Show Body Text" toggles update cards immediately
 - [ ] "Limit Text Lines (Truncate)" off shows full multi-line wrapped text in stacked mode
@@ -235,7 +242,10 @@ dotnet test
 - [ ] Right-click a card shows context menu (Dismiss, Copy Text, Clear All)
 - [ ] "Copy Text" copies card app/title/body to clipboard
 - [ ] "Clear All Notifications" in tray menu removes all visible cards
-- [ ] "Show Timestamp" toggle displays relative time on each stacked card
+- [ ] "Show Timestamp" toggle displays timestamp text on each stacked card
+- [ ] Timestamp style selector switches between Relative, Time, and DateTime formats
+- [ ] Timestamp size slider updates timestamp readability without affecting title/body sizes
+- [ ] Timestamp font-weight selector and color picker update timestamp styling immediately
 - [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit sections
 - [ ] Muting an app from card context menu suppresses future notifications from that app
 - [ ] Unmuting an app from Filtering tab restores notifications
@@ -245,10 +255,12 @@ dotnet test
 - [ ] Burst limit toggle suppresses when too many notifications arrive quickly
 - [ ] Focus mode (tray menu) pauses notifications for selected duration with countdown
 - [ ] Quick Mute App submenu in tray menu shows seen apps with mute/unmute toggles
-- [ ] Themes tab appears in Settings with built-in themes, custom themes, and import/export
+- [ ] Appearance tab exposes built-in and custom overlay theme controls
+- [ ] UI Styling theme preset dropdown lists System + overlay theme names + Custom
 - [ ] Clicking a built-in theme applies its colors/shape to the overlay immediately
 - [ ] Saving a custom theme creates a file and it appears in the custom themes list
 - [ ] Deleting a custom theme removes it from the list and from disk
+- [ ] Profiles tab provides Import/Export for full settings snapshots
 - [ ] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
 - [ ] Accessibility tab appears in Settings with timing, system integration, hotkeys, and density sections
@@ -258,6 +270,7 @@ dotnet test
 - [ ] Respect Reduce Motion disables slide animations when Windows setting is off
 - [ ] With Respect Reduce Motion on, reduced-motion systems use fade-only transitions (instead of fully disabling animations)
 - [ ] Respect High Contrast auto-applies HC theme when Windows HC mode activates
+- [ ] In high-contrast UI theme, primary button text remains readable against accent backgrounds
 - [ ] Respect Text Scaling scales overlay font sizes to match Windows text size
 - [ ] Global Hotkeys toggle + key combo fields register system-wide shortcuts
 - [ ] Ctrl+Alt+N toggles overlay visibility, Ctrl+Alt+D dismisses all, Ctrl+Alt+P toggles DND
@@ -285,6 +298,7 @@ dotnet test
 - [ ] App launches at Windows startup when the toggle is on
 - [ ] Streaming tab appears in Settings between Position and Accessibility
 - [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
+- [ ] In Window mode, settings title bar uses dark styling (no light-gray native caption clash)
 - [ ] Fullscreen overlay mode covers the full monitor area including taskbar region
 - [ ] Chroma Key toggle turns overlay background solid green
 - [ ] Chroma Key preset buttons (Green/Blue/Magenta) change chroma background color

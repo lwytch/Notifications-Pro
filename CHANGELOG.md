@@ -167,6 +167,15 @@
 - Settings window navigation switched to a left-sidebar layout for more reliable section access in popup mode
 - Settings display mode default changed to `Popup` for new installs and reset-to-defaults flows
 - Theme application now targets overlay visuals by default; settings-window theming can optionally be linked via `Link Overlay Theme to UI Theme`
+- Overlay theme controls moved into `Appearance`; the `Themes` tab was repurposed to `Profiles` (full settings import/export)
+- UI Styling theme selector now supports explicit presets: `Windows Dark`, `Windows Light`, `High Contrast`, `System`, and `Custom`
+- Timestamp controls now support display mode (`Relative`, `Time`, `DateTime`) and adjustable timestamp font size
+- Timestamp controls now also support independent font weight and color customization (with live preview)
+- UI theme preset dropdown now mirrors overlay theme names (built-in + custom), plus `System` and `Custom`
+- Default visible notification count increased from `3` to `15` (still user-configurable 1-40)
+- Windowed settings mode now applies immersive dark title-bar styling to avoid light-gray native chrome
+- Settings panel spacing refined (labels/controls/descriptions) to reduce cramped layouts
+- App icon design updated to monochrome white badge with black `N` (purple removed) across tray/settings surfaces
 - Respect Reduce Motion now keeps fade animations active while removing directional movement (fade-only fallback)
 - First-run tips and tray welcome copy updated for current feature set (navigation, theme linkage, shortcuts)
 - All StaticResource brush references in Theme.xaml and SettingsWindow.xaml converted to DynamicResource for runtime theme switching
@@ -198,6 +207,7 @@
 - Overlay Width range increased from 1400px to 7680px for high-resolution displays
 
 ### Fixed
+- Primary button text readability in high-contrast UI themes by auto-selecting black/white foreground against accent color
 - Fullscreen overlay no longer stops above the taskbar; it now uses true monitor bounds without work-area clipping
 - Popup mode position regression: saved normal-window coordinates no longer override popup placement
 - Popup-mode section navigation reliability improved by replacing fragile horizontal tab-strip scrolling with a sidebar

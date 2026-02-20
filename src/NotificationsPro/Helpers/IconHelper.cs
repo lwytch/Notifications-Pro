@@ -20,13 +20,15 @@ public static class IconHelper
         g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias;
         g.TextRenderingHint = DrawingText.TextRenderingHint.AntiAliasGridFit;
 
-        // Purple rounded background
-        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(124, 92, 252));
+        // Neutral white badge background
+        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.White);
         FillRoundedRect(g, bgBrush, new Drawing.Rectangle(1, 1, 30, 30), 8);
+        using var borderPen = new Drawing.Pen(Drawing.Color.Black, 1.2f);
+        DrawRoundedRect(g, borderPen, new Drawing.Rectangle(1, 1, 30, 30), 8);
 
-        // White "N" letter
+        // Black "N" letter
         using var font = new Drawing.Font("Segoe UI", 15, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Pixel);
-        using var textBrush = new Drawing.SolidBrush(Drawing.Color.White);
+        using var textBrush = new Drawing.SolidBrush(Drawing.Color.Black);
         var format = new Drawing.StringFormat
         {
             Alignment = Drawing.StringAlignment.Center,
@@ -68,12 +70,14 @@ public static class IconHelper
         g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias;
         g.TextRenderingHint = DrawingText.TextRenderingHint.AntiAliasGridFit;
 
-        // Dimmed gray-purple background
-        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(180, 80, 80, 110));
+        // Dimmed monochrome variant
+        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(200, 230, 230, 230));
         FillRoundedRect(g, bgBrush, new Drawing.Rectangle(1, 1, 30, 30), 8);
+        using var borderPen = new Drawing.Pen(Drawing.Color.FromArgb(200, 80, 80, 80), 1.2f);
+        DrawRoundedRect(g, borderPen, new Drawing.Rectangle(1, 1, 30, 30), 8);
 
         using var font = new Drawing.Font("Segoe UI", 15, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Pixel);
-        using var textBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(180, 255, 255, 255));
+        using var textBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(210, 40, 40, 40));
         var format = new Drawing.StringFormat
         {
             Alignment = Drawing.StringAlignment.Center,
@@ -103,13 +107,15 @@ public static class IconHelper
         g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias;
         g.TextRenderingHint = DrawingText.TextRenderingHint.AntiAliasGridFit;
 
-        // Normal purple background
-        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.FromArgb(124, 92, 252));
+        // Neutral white background
+        using var bgBrush = new Drawing.SolidBrush(Drawing.Color.White);
         FillRoundedRect(g, bgBrush, new Drawing.Rectangle(1, 1, 30, 30), 8);
+        using var borderPen = new Drawing.Pen(Drawing.Color.Black, 1.2f);
+        DrawRoundedRect(g, borderPen, new Drawing.Rectangle(1, 1, 30, 30), 8);
 
-        // White "N" letter
+        // Black "N" letter
         using var font = new Drawing.Font("Segoe UI", 15, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Pixel);
-        using var textBrush = new Drawing.SolidBrush(Drawing.Color.White);
+        using var textBrush = new Drawing.SolidBrush(Drawing.Color.Black);
         var format = new Drawing.StringFormat
         {
             Alignment = Drawing.StringAlignment.Center,
@@ -155,5 +161,17 @@ public static class IconHelper
         path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90);
         path.CloseFigure();
         g.FillPath(brush, path);
+    }
+
+    private static void DrawRoundedRect(Drawing.Graphics g, Drawing.Pen pen, Drawing.Rectangle rect, int radius)
+    {
+        using var path = new Drawing2D.GraphicsPath();
+        var d = radius * 2;
+        path.AddArc(rect.X, rect.Y, d, d, 180, 90);
+        path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90);
+        path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90);
+        path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90);
+        path.CloseFigure();
+        g.DrawPath(pen, path);
     }
 }

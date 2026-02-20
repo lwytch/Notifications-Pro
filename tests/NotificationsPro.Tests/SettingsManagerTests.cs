@@ -31,7 +31,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(14, sm.Settings.FontSize);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
-        Assert.Equal(3, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(15, sm.Settings.MaxVisibleNotifications);
         Assert.True(sm.Settings.ShowAppName);
         Assert.True(sm.Settings.ShowNotificationTitle);
         Assert.True(sm.Settings.ShowNotificationBody);
@@ -92,7 +92,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(1, settings.BorderThickness);
         Assert.Equal("#0078D4", settings.AccentColor);
         Assert.Equal(5, settings.NotificationDuration);
-        Assert.Equal(3, settings.MaxVisibleNotifications);
+        Assert.Equal(15, settings.MaxVisibleNotifications);
         Assert.True(settings.ShowAppName);
         Assert.True(settings.ShowNotificationTitle);
         Assert.True(settings.ShowNotificationBody);
@@ -112,6 +112,10 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Left", settings.SlideInDirection);
         Assert.Equal(300, settings.AnimationDurationMs);
         Assert.False(settings.ShowTimestamp);
+        Assert.Equal(11, settings.TimestampFontSize);
+        Assert.Equal("Relative", settings.TimestampDisplayMode);
+        Assert.Equal("Normal", settings.TimestampFontWeight);
+        Assert.Equal("#C8C8C8", settings.TimestampColor);
         Assert.True(settings.DeduplicationEnabled);
         Assert.Equal(2, settings.DeduplicationWindowSeconds);
         Assert.Empty(settings.MutedApps);

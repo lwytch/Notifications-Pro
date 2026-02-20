@@ -21,6 +21,7 @@
         <converters:NotificationTextVisibilityConverter x:Key="NotificationTextVisibility"/>
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <converters:AppIconConverter x:Key="AppIconConverter"/>
+        <converters:TimestampTextConverter x:Key="TimestampText"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- Notification card template -->
@@ -171,12 +172,20 @@
 
                         <!-- Timestamp -->
                         <TextBlock Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   Text="{Binding RelativeTimeText}"
                                    FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontSize="11"
-                                   Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    Opacity="0.7"
-                                   Margin="0,4,0,0"/>
+                                   Margin="0,4,0,0">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource TimestampText}">
+                                    <Binding Path="RelativeTimeText"/>
+                                    <Binding Path="ReceivedAt"/>
+                                    <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </StackPanel>
 
                     <!-- One-line banner mode -->

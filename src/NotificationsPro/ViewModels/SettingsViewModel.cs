@@ -134,7 +134,7 @@ public class SettingsViewModel : BaseViewModel
     private double _notificationDuration = 5;
     public double NotificationDuration { get => _notificationDuration; set { if (SetProperty(ref _notificationDuration, value)) QueueSave(); } }
 
-    private int _maxVisibleNotifications = 3;
+    private int _maxVisibleNotifications = 15;
     public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, Math.Max(1, value))) QueueSave(); } }
 
     private bool _showAppName = true;
@@ -181,6 +181,18 @@ public class SettingsViewModel : BaseViewModel
 
     private bool _showTimestamp;
     public bool ShowTimestamp { get => _showTimestamp; set { if (SetProperty(ref _showTimestamp, value)) QueueSave(); } }
+
+    private double _timestampFontSize = 11;
+    public double TimestampFontSize { get => _timestampFontSize; set { if (SetProperty(ref _timestampFontSize, Math.Clamp(value, 8, 32))) QueueSave(); } }
+
+    private string _timestampDisplayMode = "Relative";
+    public string TimestampDisplayMode { get => _timestampDisplayMode; set { if (SetProperty(ref _timestampDisplayMode, NormalizeTimestampDisplayMode(value))) QueueSave(); } }
+
+    private string _timestampFontWeight = "Normal";
+    public string TimestampFontWeight { get => _timestampFontWeight; set { if (SetProperty(ref _timestampFontWeight, value)) QueueSave(); } }
+
+    private string _timestampColor = "#C8C8C8";
+    public string TimestampColor { get => _timestampColor; set { if (SetProperty(ref _timestampColor, value)) QueueSave(); } }
 
     private bool _newestOnTop = true;
     public bool NewestOnTop { get => _newestOnTop; set { if (SetProperty(ref _newestOnTop, value)) QueueSave(); } }
@@ -379,49 +391,191 @@ public class SettingsViewModel : BaseViewModel
     public string FullscreenOverlayColor { get => _fullscreenOverlayColor; set { if (SetProperty(ref _fullscreenOverlayColor, value)) QueueSave(); } }
 
     // Settings window theming (M9.5)
-    private string _settingsThemeMode = "Dark";
+    private bool _suppressSettingsThemeAutoCustom;
+
+    private string _settingsThemeMode = "Windows Dark";
     public string SettingsThemeMode
     {
         get => _settingsThemeMode;
         set
         {
-            if (!SetProperty(ref _settingsThemeMode, value)) return;
+            var normalized = Services.SettingsThemeService.NormalizeThemeMode(value);
+            if (!SetProperty(ref _settingsThemeMode, normalized)) return;
+
+            if (string.Equals(normalized, "System", StringComparison.OrdinalIgnoreCase)
+                && Services.SettingsThemeService.TryGetPresetColors(normalized, out var systemColors))
+            {
+                ApplySettingsThemeColors(systemColors, queueSave: false);
+            }
+            else if (!string.Equals(normalized, "Custom", StringComparison.OrdinalIgnoreCase))
+            {
+                var namedTheme = FindThemeByName(normalized);
+                if (namedTheme != null)
+                {
+                    ApplySettingsThemeColors(GetSettingsThemeColors(namedTheme), queueSave: false);
+                }
+                else if (Services.SettingsThemeService.TryGetPresetColors(normalized, out var presetColors))
+                {
+                    ApplySettingsThemeColors(presetColors, queueSave: false);
+                }
+            }
+
             QueueSave();
             ApplySettingsTheme();
         }
     }
 
     private string _settingsWindowBg = "#111111";
-    public string SettingsWindowBg { get => _settingsWindowBg; set { if (SetProperty(ref _settingsWindowBg, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowBg { get => _settingsWindowBg; set => SetSettingsWindowColor(ref _settingsWindowBg, value); }
 
     private string _settingsWindowSurface = "#1C1C1C";
-    public string SettingsWindowSurface { get => _settingsWindowSurface; set { if (SetProperty(ref _settingsWindowSurface, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowSurface { get => _settingsWindowSurface; set => SetSettingsWindowColor(ref _settingsWindowSurface, value); }
 
     private string _settingsWindowSurfaceLight = "#262626";
-    public string SettingsWindowSurfaceLight { get => _settingsWindowSurfaceLight; set { if (SetProperty(ref _settingsWindowSurfaceLight, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowSurfaceLight { get => _settingsWindowSurfaceLight; set => SetSettingsWindowColor(ref _settingsWindowSurfaceLight, value); }
 
     private string _settingsWindowSurfaceHover = "#303030";
-    public string SettingsWindowSurfaceHover { get => _settingsWindowSurfaceHover; set { if (SetProperty(ref _settingsWindowSurfaceHover, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowSurfaceHover { get => _settingsWindowSurfaceHover; set => SetSettingsWindowColor(ref _settingsWindowSurfaceHover, value); }
 
     private string _settingsWindowText = "#F3F3F3";
-    public string SettingsWindowText { get => _settingsWindowText; set { if (SetProperty(ref _settingsWindowText, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowText { get => _settingsWindowText; set => SetSettingsWindowColor(ref _settingsWindowText, value); }
 
     private string _settingsWindowTextSecondary = "#C7C7C7";
-    public string SettingsWindowTextSecondary { get => _settingsWindowTextSecondary; set { if (SetProperty(ref _settingsWindowTextSecondary, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowTextSecondary { get => _settingsWindowTextSecondary; set => SetSettingsWindowColor(ref _settingsWindowTextSecondary, value); }
 
     private string _settingsWindowTextMuted = "#8A8A8A";
-    public string SettingsWindowTextMuted { get => _settingsWindowTextMuted; set { if (SetProperty(ref _settingsWindowTextMuted, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowTextMuted { get => _settingsWindowTextMuted; set => SetSettingsWindowColor(ref _settingsWindowTextMuted, value); }
 
     private string _settingsWindowAccent = "#0078D4";
-    public string SettingsWindowAccent { get => _settingsWindowAccent; set { if (SetProperty(ref _settingsWindowAccent, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowAccent { get => _settingsWindowAccent; set => SetSettingsWindowColor(ref _settingsWindowAccent, value); }
 
     private string _settingsWindowBorder = "#353535";
-    public string SettingsWindowBorder { get => _settingsWindowBorder; set { if (SetProperty(ref _settingsWindowBorder, value)) { QueueSave(); ApplySettingsTheme(); } } }
+    public string SettingsWindowBorder { get => _settingsWindowBorder; set => SetSettingsWindowColor(ref _settingsWindowBorder, value); }
 
     private bool _linkOverlayThemeAndUiTheme;
     public bool LinkOverlayThemeAndUiTheme { get => _linkOverlayThemeAndUiTheme; set { if (SetProperty(ref _linkOverlayThemeAndUiTheme, value)) QueueSave(); } }
 
-    public List<string> AvailableSettingsThemeModes { get; } = new() { "Dark", "Light", "System" };
+    public ObservableCollection<string> AvailableSettingsThemeModes { get; } = new();
+
+    private void SetSettingsWindowColor(ref string backingField, string value)
+    {
+        if (!SetProperty(ref backingField, value))
+            return;
+
+        if (!_suppressSettingsThemeAutoCustom
+            && !string.Equals(_settingsThemeMode, "Custom", StringComparison.OrdinalIgnoreCase))
+        {
+            _settingsThemeMode = "Custom";
+            OnPropertyChanged(nameof(SettingsThemeMode));
+        }
+
+        QueueSave();
+        ApplySettingsTheme();
+    }
+
+    private void ApplySettingsThemeColors(IReadOnlyList<string> colors, bool queueSave)
+    {
+        if (colors.Count < 9)
+            return;
+
+        _suppressSettingsThemeAutoCustom = true;
+        try
+        {
+            _settingsWindowBg = colors[0];
+            _settingsWindowSurface = colors[1];
+            _settingsWindowSurfaceLight = colors[2];
+            _settingsWindowSurfaceHover = colors[3];
+            _settingsWindowText = colors[4];
+            _settingsWindowTextSecondary = colors[5];
+            _settingsWindowTextMuted = colors[6];
+            _settingsWindowAccent = colors[7];
+            _settingsWindowBorder = colors[8];
+        }
+        finally
+        {
+            _suppressSettingsThemeAutoCustom = false;
+        }
+
+        OnPropertyChanged(nameof(SettingsWindowBg));
+        OnPropertyChanged(nameof(SettingsWindowSurface));
+        OnPropertyChanged(nameof(SettingsWindowSurfaceLight));
+        OnPropertyChanged(nameof(SettingsWindowSurfaceHover));
+        OnPropertyChanged(nameof(SettingsWindowText));
+        OnPropertyChanged(nameof(SettingsWindowTextSecondary));
+        OnPropertyChanged(nameof(SettingsWindowTextMuted));
+        OnPropertyChanged(nameof(SettingsWindowAccent));
+        OnPropertyChanged(nameof(SettingsWindowBorder));
+
+        if (queueSave)
+            QueueSave();
+    }
+
+    private ThemePreset? FindThemeByName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return null;
+
+        foreach (var theme in BuiltInThemes)
+        {
+            if (string.Equals(theme.Name, name, StringComparison.OrdinalIgnoreCase))
+                return theme;
+        }
+
+        foreach (var theme in CustomThemes)
+        {
+            if (string.Equals(theme.Name, name, StringComparison.OrdinalIgnoreCase))
+                return theme;
+        }
+
+        return null;
+    }
+
+    private static string[] GetSettingsThemeColors(ThemePreset theme)
+    {
+        return
+        [
+            theme.SettingsWindowBg,
+            theme.SettingsWindowSurface,
+            theme.SettingsWindowSurfaceLight,
+            theme.SettingsWindowSurfaceHover,
+            theme.SettingsWindowText,
+            theme.SettingsWindowTextSecondary,
+            theme.SettingsWindowTextMuted,
+            theme.SettingsWindowAccent,
+            theme.SettingsWindowBorder
+        ];
+    }
+
+    private void RefreshSettingsThemeModeOptions()
+    {
+        var options = new List<string> { "System" };
+
+        foreach (var theme in BuiltInThemes)
+        {
+            if (!options.Contains(theme.Name, StringComparer.OrdinalIgnoreCase))
+                options.Add(theme.Name);
+        }
+
+        foreach (var theme in CustomThemes)
+        {
+            if (!options.Contains(theme.Name, StringComparer.OrdinalIgnoreCase))
+                options.Add(theme.Name);
+        }
+
+        var currentMode = Services.SettingsThemeService.NormalizeThemeMode(_settingsThemeMode);
+        if (!string.IsNullOrWhiteSpace(currentMode)
+            && !options.Contains(currentMode, StringComparer.OrdinalIgnoreCase)
+            && !string.Equals(currentMode, "Custom", StringComparison.OrdinalIgnoreCase))
+        {
+            options.Add(currentMode);
+        }
+
+        options.Add("Custom");
+
+        AvailableSettingsThemeModes.Clear();
+        foreach (var option in options)
+            AvailableSettingsThemeModes.Add(option);
+    }
 
     private void ApplySettingsTheme()
     {
@@ -433,7 +587,7 @@ public class SettingsViewModel : BaseViewModel
     {
         return new AppSettings
         {
-            SettingsThemeMode = SettingsThemeMode,
+            SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
             SettingsWindowBg = SettingsWindowBg,
             SettingsWindowSurface = SettingsWindowSurface,
             SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
@@ -445,6 +599,21 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowBorder = SettingsWindowBorder,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
         };
+    }
+
+    private static string NormalizeTimestampDisplayMode(string? mode)
+    {
+        if (string.IsNullOrWhiteSpace(mode))
+            return "Relative";
+
+        if (string.Equals(mode, "Relative", StringComparison.OrdinalIgnoreCase))
+            return "Relative";
+        if (string.Equals(mode, "Time", StringComparison.OrdinalIgnoreCase))
+            return "Time";
+        if (string.Equals(mode, "DateTime", StringComparison.OrdinalIgnoreCase))
+            return "DateTime";
+
+        return "Relative";
     }
 
     // Settings window display mode (M9.5)
@@ -552,6 +721,11 @@ public class SettingsViewModel : BaseViewModel
     public List<string> AvailableSlideDirections { get; } = new()
     {
         "Left", "Right", "Top", "Bottom"
+    };
+
+    public List<string> AvailableTimestampDisplayModes { get; } = new()
+    {
+        "Relative", "Time", "DateTime"
     };
 
     // Commands
@@ -685,6 +859,10 @@ public class SettingsViewModel : BaseViewModel
         _singleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
         _singleLineAutoFullWidth = s.SingleLineAutoFullWidth;
         _showTimestamp = s.ShowTimestamp;
+        _timestampFontSize = Math.Clamp(s.TimestampFontSize, 8, 32);
+        _timestampDisplayMode = NormalizeTimestampDisplayMode(s.TimestampDisplayMode);
+        _timestampFontWeight = string.IsNullOrWhiteSpace(s.TimestampFontWeight) ? "Normal" : s.TimestampFontWeight;
+        _timestampColor = string.IsNullOrWhiteSpace(s.TimestampColor) ? "#C8C8C8" : s.TimestampColor;
         _newestOnTop = s.NewestOnTop;
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
@@ -733,7 +911,7 @@ public class SettingsViewModel : BaseViewModel
         _fullscreenOverlayColor = s.FullscreenOverlayColor;
         _settingsDisplayMode = s.SettingsDisplayMode;
         _popupAutoClose = s.PopupAutoClose;
-        _settingsThemeMode = s.SettingsThemeMode;
+        _settingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(s.SettingsThemeMode);
         _settingsWindowBg = s.SettingsWindowBg;
         _settingsWindowSurface = s.SettingsWindowSurface;
         _settingsWindowSurfaceLight = s.SettingsWindowSurfaceLight;
@@ -746,6 +924,14 @@ public class SettingsViewModel : BaseViewModel
         _linkOverlayThemeAndUiTheme = s.LinkOverlayThemeAndUiTheme;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
+
+        RefreshSettingsThemeModeOptions();
+
+        if (!string.Equals(_settingsThemeMode, "Custom", StringComparison.OrdinalIgnoreCase)
+            && Services.SettingsThemeService.TryGetPresetColors(_settingsThemeMode, out var presetColors))
+        {
+            ApplySettingsThemeColors(presetColors, queueSave: false);
+        }
 
         HighlightKeywords.Clear();
         foreach (var kw in s.HighlightKeywords) HighlightKeywords.Add(kw);
@@ -864,6 +1050,10 @@ public class SettingsViewModel : BaseViewModel
             SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
             SingleLineAutoFullWidth = SingleLineAutoFullWidth,
             ShowTimestamp = ShowTimestamp,
+            TimestampFontSize = Math.Clamp(TimestampFontSize, 8, 32),
+            TimestampDisplayMode = NormalizeTimestampDisplayMode(TimestampDisplayMode),
+            TimestampFontWeight = TimestampFontWeight,
+            TimestampColor = TimestampColor,
             NewestOnTop = NewestOnTop,
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
@@ -933,7 +1123,7 @@ public class SettingsViewModel : BaseViewModel
             FullscreenOverlayColor = FullscreenOverlayColor,
             SettingsDisplayMode = SettingsDisplayMode,
             PopupAutoClose = PopupAutoClose,
-            SettingsThemeMode = SettingsThemeMode,
+            SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
             SettingsWindowBg = SettingsWindowBg,
             SettingsWindowSurface = SettingsWindowSurface,
             SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
@@ -1241,7 +1431,10 @@ public class SettingsViewModel : BaseViewModel
         var updated = _settingsManager.Settings.Clone();
         theme.ApplyOverlayTo(updated);
         if (updated.LinkOverlayThemeAndUiTheme)
+        {
             theme.ApplySettingsWindowTo(updated);
+            updated.SettingsThemeMode = theme.Name;
+        }
         _settingsManager.Apply(updated);
         LoadFromSettings();
 
@@ -1276,6 +1469,7 @@ public class SettingsViewModel : BaseViewModel
         CustomThemes.Clear();
         foreach (var t in _themeManager.LoadCustomThemes())
             CustomThemes.Add(t);
+        RefreshSettingsThemeModeOptions();
     }
 
     private void ExportSettings()

@@ -33,7 +33,7 @@ public class AppSettings
 
     // Behavior
     public double NotificationDuration { get; set; } = 5;
-    public int MaxVisibleNotifications { get; set; } = 3;
+    public int MaxVisibleNotifications { get; set; } = 15;
     public bool ShowAppName { get; set; } = true;
     public bool ShowNotificationTitle { get; set; } = true;
     public bool ShowNotificationBody { get; set; } = true;
@@ -46,6 +46,10 @@ public class AppSettings
     public int SingleLineMaxLines { get; set; } = 3;
     public bool SingleLineAutoFullWidth { get; set; } = false;
     public bool ShowTimestamp { get; set; } = false;
+    public double TimestampFontSize { get; set; } = 11;
+    public string TimestampDisplayMode { get; set; } = "Relative"; // "Relative", "Time", "DateTime"
+    public string TimestampFontWeight { get; set; } = "Normal";
+    public string TimestampColor { get; set; } = "#C8C8C8";
     public bool NewestOnTop { get; set; } = true;
     public bool AlwaysOnTop { get; set; } = true;
     public bool ClickThrough { get; set; } = false;
@@ -150,7 +154,8 @@ public class AppSettings
     public int SelectedMonitorIndex { get; set; } = 0;
 
     // Settings window theming (M9.5)
-    public string SettingsThemeMode { get; set; } = "Dark"; // "Dark", "Light", "System"
+    // Supports "System", "Custom", or any overlay theme name (built-in/custom).
+    public string SettingsThemeMode { get; set; } = "Windows Dark";
     public string SettingsWindowBg { get; set; } = "#111111";
     public string SettingsWindowSurface { get; set; } = "#1C1C1C";
     public string SettingsWindowSurfaceLight { get; set; } = "#262626";

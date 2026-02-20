@@ -22,7 +22,7 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-            <Setter Property="Margin" Value="0,22,0,10"/>
+            <Setter Property="Margin" Value="0,24,0,12"/>
         </Style>
 
         <!-- Setting label -->
@@ -32,6 +32,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,2,0,4"/>
         </Style>
 
         <!-- Setting description -->
@@ -40,7 +41,7 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Margin" Value="0,2,0,16"/>
+            <Setter Property="Margin" Value="0,6,0,18"/>
         </Style>
 
         <!-- Value display next to slider -->
@@ -98,13 +99,8 @@
         <Border Grid.Row="0" Padding="24,20" BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,0,0,1">
             <DockPanel LastChildFill="True">
-                <Border Width="36" Height="36" CornerRadius="10"
-                        Background="{DynamicResource SurfaceLightBrush}"
-                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                        Margin="0,0,12,0">
-                    <Image Source="{Binding TrayIconImage}" Width="22" Height="22"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
+                <Image Source="{Binding TrayIconImage}" Width="28" Height="28"
+                       Margin="0,0,12,0" VerticalAlignment="Top"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
                     <TextBlock Text="Preview" FontFamily="{StaticResource UIFont}" FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
@@ -130,7 +126,7 @@
                 <Button DockPanel.Dock="Right" Content="Got it" Margin="12,0,0,0"
                         Style="{StaticResource SecondaryButton}"
                         Command="{Binding DismissFirstRunTipCommand}"/>
-                <TextBlock Text="Quick tips: Use the left sidebar to switch sections. Overlay themes and settings-window theme are independent (UI Styling > Theme). Use Ctrl+T for a test notification."
+                <TextBlock Text="Quick tips: Use the left sidebar to switch sections. Overlay themes are under Appearance. Settings-window theme lives in UI Styling. Use Ctrl+T for a test notification."
                            FontFamily="{StaticResource UIFont}" FontSize="12"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            VerticalAlignment="Center" TextWrapping="Wrap"/>
@@ -196,6 +192,14 @@
                                    Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
                                    Visibility="{Binding ShowNotificationBody, Converter={StaticResource BoolToVis}}"
                                    TextWrapping="Wrap"/>
+                        <TextBlock Text="2m ago"
+                                   FontFamily="{Binding FontFamily}"
+                                   FontSize="{Binding TimestampFontSize}"
+                                   FontWeight="{Binding TimestampFontWeight}"
+                                   Foreground="{Binding TimestampColor, Converter={StaticResource ColorToBrush}}"
+                                   Visibility="{Binding ShowTimestamp, Converter={StaticResource BoolToVis}}"
+                                   Opacity="0.8"
+                                   Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
             </Border>
@@ -204,13 +208,38 @@
         <!-- Tabs -->
         <TabControl Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="20,12,20,8">
 
-            <!-- ═══ THEMES TAB ═══ -->
-            <TabItem Header="Themes" Style="{StaticResource SettingsTabItem}">
+            <!-- ═══ PROFILES TAB ═══ -->
+            <TabItem Header="Profiles" Style="{StaticResource SettingsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock Text="BUILT-IN THEMES" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="One-click apply updates overlay visuals (cards, colors, shape). UI Styling controls whether settings-window colors are linked."
+                        <TextBlock Text="IMPORT / EXPORT" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Save and restore complete app profiles (all tabs) as JSON files."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                        <WrapPanel Margin="0,0,0,8">
+                            <Button Content="Export Settings" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8" Command="{Binding ExportSettingsCommand}"
+                                    ToolTip="Save all current settings to a JSON file"/>
+                            <Button Content="Import Settings" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8" Command="{Binding ImportSettingsCommand}"
+                                    ToolTip="Load settings from a previously exported JSON file"/>
+                        </WrapPanel>
+                        <TextBlock Text="Import replaces all settings, including behavior, appearance, position, and filtering."
+                                   Style="{StaticResource SettingDesc}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ APPEARANCE TAB ═══ -->
+            <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <!-- OVERLAY THEMES section -->
+                        <TextBlock Text="OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Quickly style notification cards. These theme presets affect the overlay. UI Styling controls settings-window colors."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <ItemsControl ItemsSource="{Binding BuiltInThemes}">
@@ -222,7 +251,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button Style="{StaticResource SecondaryButton}"
-                                            Margin="0,0,8,8" MinWidth="100" Padding="12,8"
+                                            Margin="0,0,8,8" MinWidth="110" Padding="12,8"
                                             Command="{Binding DataContext.ApplyThemeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding}">
                                         <StackPanel Orientation="Horizontal">
@@ -236,8 +265,8 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="CUSTOM THEMES" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="Save your current look as a named theme"
+                        <TextBlock Text="CUSTOM OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock Text="Save your current overlay look, then re-apply it anytime."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <DockPanel Margin="0,4,0,8">
@@ -245,7 +274,7 @@
                                     Margin="8,0,0,0" Command="{Binding SaveCustomThemeCommand}"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding NewThemeName, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Enter a name for the custom theme"/>
+                                     ToolTip="Enter a name for the custom overlay theme"/>
                         </DockPanel>
 
                         <ItemsControl ItemsSource="{Binding CustomThemes}">
@@ -274,33 +303,9 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="No custom themes saved yet"
+                        <TextBlock Text="No custom themes saved yet."
                                    Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
                                    Visibility="{Binding CustomThemes.Count, Converter={StaticResource ZeroToVisible}}"/>
-
-                        <TextBlock Text="IMPORT / EXPORT" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="Share your full settings (all tabs) as a JSON file"
-                                   Style="{StaticResource SettingDesc}"/>
-
-                        <WrapPanel Margin="0,0,0,8">
-                            <Button Content="Export Settings" Style="{StaticResource SecondaryButton}"
-                                    Margin="0,0,8,8" Command="{Binding ExportSettingsCommand}"
-                                    ToolTip="Save all current settings to a JSON file"/>
-                            <Button Content="Import Settings" Style="{StaticResource SecondaryButton}"
-                                    Margin="0,0,8,8" Command="{Binding ImportSettingsCommand}"
-                                    ToolTip="Load settings from a previously exported JSON file"/>
-                        </WrapPanel>
-                        <TextBlock Text="Import replaces all settings including behavior, position, and filtering"
-                                   Style="{StaticResource SettingDesc}"/>
-
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <!-- ═══ APPEARANCE TAB ═══ -->
-            <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
-                    <StackPanel>
 
                         <!-- TYPOGRAPHY section -->
                         <TextBlock Text="TYPOGRAPHY" Style="{StaticResource SectionHeader}"/>
@@ -729,7 +734,7 @@
                                     TickFrequency="1" IsSnapToTickEnabled="True"
                                     ToolTip="Maximum number of notification cards shown at once"/>
                         </DockPanel>
-                        <TextBlock Text="Lower counts reduce visual noise; higher counts keep more context visible"
+                        <TextBlock Text="Default is 15. Lower counts reduce noise; higher counts keep more recent context visible."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="CONTENT" Style="{StaticResource SectionHeader}"/>
@@ -764,11 +769,74 @@
                         <DockPanel Margin="0,0,0,4">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding ShowTimestamp}"
-                                          ToolTip="Show a relative timestamp on each notification card"/>
+                                          ToolTip="Show timestamp text on each notification card"/>
                             <TextBlock Text="Show Timestamp" Style="{StaticResource SettingLabel}"/>
                         </DockPanel>
-                        <TextBlock Text="Displays how long ago each notification arrived (e.g. '2m ago')"
+                        <TextBlock Text="Show when each notification arrived. You can choose relative or clock-based formats below."
                                    Style="{StaticResource SettingDesc}"/>
+
+                        <TextBlock Text="Tip: Turn on 'Show Timestamp' above to apply these formatting options."
+                                   Margin="0,0,0,8">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource SettingDesc}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowTimestamp}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <StackPanel IsEnabled="{Binding ShowTimestamp}">
+                            <TextBlock Text="Timestamp Style" Style="{StaticResource SettingLabel}"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableTimestampDisplayModes}"
+                                      SelectedItem="{Binding TimestampDisplayMode}"
+                                      Margin="0,4,0,4"
+                                      ToolTip="Relative shows '2m ago'. Time shows clock time. DateTime shows date and time."/>
+                            <TextBlock Text="Relative: '2m ago'. Time: '14:35'. DateTime: localized date and time."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Timestamp Size" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding TimestampFontSize, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="8" Maximum="32" Value="{Binding TimestampFontSize}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Font size for timestamp text on each notification card"/>
+                            </DockPanel>
+                            <TextBlock Text="Increase for readability on larger displays, or reduce for compact layouts."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Timestamp Font Weight" Style="{StaticResource SettingLabel}"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableFontWeights}"
+                                      SelectedItem="{Binding TimestampFontWeight}"
+                                      Margin="0,4,0,4"
+                                      ToolTip="Choose how bold timestamp text appears on each card."/>
+                            <TextBlock Text="Use medium or semibold for stronger readability in busy overlays."
+                                       Style="{StaticResource SettingDesc}"/>
+
+                            <TextBlock Text="Timestamp Color" Style="{StaticResource SettingLabel}"/>
+                            <DockPanel Margin="0,4,0,12">
+                                <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                        Background="{Binding TimestampColor, Converter={StaticResource ColorToBrush}}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                                <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                        Width="40" Height="28" Margin="8,0,0,0"
+                                        Tag="TimestampColor" Click="OnPickColorClick"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding TimestampColor, UpdateSourceTrigger=LostFocus}"/>
+                            </DockPanel>
+                            <TextBlock Text="Adjust timestamp contrast independently from app/title/body text colors."
+                                       Style="{StaticResource SettingDesc}"/>
+                        </StackPanel>
 
                         <StackPanel Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
                             <DockPanel Margin="0,0,0,4">
@@ -1379,6 +1447,8 @@
                         </DockPanel>
                         <TextBlock Text="Expands the overlay background to fill your screen with a configurable backdrop for dedicated notification monitoring."
                                    Style="{StaticResource SettingDesc}"/>
+                        <TextBlock Text="Tip: If fullscreen still appears slightly short on your setup, increase Overlay Max Height above until the overlay fully matches your screen."
+                                   Style="{StaticResource SettingDesc}"/>
 
                         <StackPanel Visibility="{Binding FullscreenOverlayMode, Converter={StaticResource BoolToVis}}">
                             <TextBlock Text="Background Color" Style="{StaticResource SettingLabel}"/>
@@ -1747,14 +1817,14 @@
 
                         <TextBlock Text="THEME" Style="{StaticResource SectionHeader}"/>
 
-                        <TextBlock Text="Color Scheme" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="UI Theme Preset" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
                                   ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                   ItemsSource="{Binding AvailableSettingsThemeModes}"
                                   SelectedItem="{Binding SettingsThemeMode}"
                                   Margin="0,4,0,4"
-                                  ToolTip="Dark uses a dark palette. Light uses a light palette. System follows your Windows theme."/>
-                        <TextBlock Text="Controls the color scheme of this settings window (independent of overlay theme)"
+                                  ToolTip="Uses the same named theme presets as the overlay (plus System and Custom)."/>
+                        <TextBlock Text="Use the same named themes as the overlay for a consistent look. System follows Windows. Custom uses the color fields below."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <DockPanel Margin="0,0,0,4">
@@ -1767,7 +1837,7 @@
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="CUSTOM COLORS" Style="{StaticResource SectionHeader}"/>
-                        <TextBlock Text="Fine-tune settings window colors. Only applies in Dark mode."
+                        <TextBlock Text="Fine-tune settings-window colors. These apply when UI Theme Preset is set to Custom."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <TextBlock Text="Background" Style="{StaticResource SettingLabel}"/>

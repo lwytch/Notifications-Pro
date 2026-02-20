@@ -119,6 +119,16 @@ public class ThemeTests : IDisposable
     }
 
     [Fact]
+    public void HighContrastTheme_HasSettingsWindowPalette()
+    {
+        var theme = ThemePreset.BuiltInThemes.First(t => t.Name == "High Contrast");
+
+        Assert.Equal("#000000", theme.SettingsWindowBg);
+        Assert.Equal("#FFFFFF", theme.SettingsWindowText);
+        Assert.Equal("#00FFFF", theme.SettingsWindowAccent);
+    }
+
+    [Fact]
     public void FromSettings_CapturesVisualProperties()
     {
         var settings = new AppSettings

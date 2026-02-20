@@ -338,6 +338,18 @@ public class OverlayViewModel : BaseViewModel
     }
     public Visibility TimestampVisibility => ShowTimestamp ? Visibility.Visible : Visibility.Collapsed;
 
+    private double _timestampFontSize = 11;
+    public double TimestampFontSize { get => _timestampFontSize; set => SetProperty(ref _timestampFontSize, Math.Clamp(value, 8, 32)); }
+
+    private string _timestampDisplayMode = "Relative";
+    public string TimestampDisplayMode { get => _timestampDisplayMode; set => SetProperty(ref _timestampDisplayMode, value); }
+
+    private string _timestampFontWeight = "Normal";
+    public string TimestampFontWeight { get => _timestampFontWeight; set => SetProperty(ref _timestampFontWeight, value); }
+
+    private string _timestampColor = "#C8C8C8";
+    public string TimestampColor { get => _timestampColor; set => SetProperty(ref _timestampColor, value); }
+
     private bool _singleLineAutoFullWidth;
     public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set => SetProperty(ref _singleLineAutoFullWidth, value); }
 
@@ -508,6 +520,10 @@ public class OverlayViewModel : BaseViewModel
         SingleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
         SingleLineAutoFullWidth = s.SingleLineAutoFullWidth;
         ShowTimestamp = s.ShowTimestamp;
+        TimestampFontSize = s.TimestampFontSize;
+        TimestampDisplayMode = string.IsNullOrWhiteSpace(s.TimestampDisplayMode) ? "Relative" : s.TimestampDisplayMode;
+        TimestampFontWeight = string.IsNullOrWhiteSpace(s.TimestampFontWeight) ? "Normal" : s.TimestampFontWeight;
+        TimestampColor = string.IsNullOrWhiteSpace(s.TimestampColor) ? "#C8C8C8" : s.TimestampColor;
         ChromaKeyEnabled = s.ChromaKeyEnabled;
         ChromaKeyColor = s.ChromaKeyColor;
         PerAppTintEnabled = s.PerAppTintEnabled;

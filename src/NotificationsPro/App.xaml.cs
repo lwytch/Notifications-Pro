@@ -102,7 +102,7 @@ public partial class App : Application
 
         SetupTrayIcon();
 
-        // Apply settings window theme (Dark/Light/System)
+        // Apply settings window theme preset/custom palette.
         Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
         _settingsManager.SettingsChanged += () =>
             Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
@@ -167,7 +167,10 @@ public partial class App : Application
         var updated = _settingsManager.Settings.Clone();
         hcTheme.ApplyOverlayTo(updated);
         if (updated.LinkOverlayThemeAndUiTheme)
+        {
             hcTheme.ApplySettingsWindowTo(updated);
+            updated.SettingsThemeMode = hcTheme.Name;
+        }
         _settingsManager.Apply(updated);
     }
 
@@ -679,7 +682,10 @@ public partial class App : Application
         var updated = _settingsManager.Settings.Clone();
         theme.ApplyOverlayTo(updated);
         if (updated.LinkOverlayThemeAndUiTheme)
+        {
             theme.ApplySettingsWindowTo(updated);
+            updated.SettingsThemeMode = theme.Name;
+        }
         _settingsManager.Apply(updated);
     }
 

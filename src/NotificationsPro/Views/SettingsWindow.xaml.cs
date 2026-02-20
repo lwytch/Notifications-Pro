@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using NotificationsPro.Services;
 using WpfInput = System.Windows.Input;
@@ -12,6 +13,11 @@ namespace NotificationsPro.Views;
 public partial class SettingsWindow : Window
 {
     private readonly SettingsManager? _settingsManager;
+    private const int DwmUseImmersiveDarkMode = 20;
+    private const int DwmUseImmersiveDarkModeLegacy = 19;
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
 
     public SettingsWindow(SettingsViewModel viewModel, SettingsManager? settingsManager = null)
     {
@@ -28,6 +34,8 @@ public partial class SettingsWindow : Window
     {
         if (IsPopupDisplayMode())
             return;
+
+        ApplyWindowedTitleBarTheme();
 
         // Restore saved window position
         if (_settingsManager != null)
@@ -128,6 +136,29 @@ public partial class SettingsWindow : Window
         catch
         {
             return System.Windows.Media.Colors.White;
+        }
+    }
+
+    private void ApplyWindowedTitleBarTheme()
+    {
+        try
+        {
+            var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            if (hwnd == IntPtr.Zero)
+                return;
+
+            var enabled = 1;
+            var size = Marshal.SizeOf<int>();
+            var result = DwmSetWindowAttribute(hwnd, DwmUseImmersiveDarkMode, ref enabled, size);
+            if (result != 0)
+            {
+                // Fallback for older Windows builds.
+                DwmSetWindowAttribute(hwnd, DwmUseImmersiveDarkModeLegacy, ref enabled, size);
+            }
+        }
+        catch
+        {
+            // Non-critical visual enhancement.
         }
     }
 

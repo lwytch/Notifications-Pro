@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using MediaColor = System.Windows.Media.Color;
 using MediaColorConverter = System.Windows.Media.ColorConverter;
@@ -12,18 +13,31 @@ namespace NotificationsPro.Services;
 /// </summary>
 public static class SettingsThemeService
 {
-    private static readonly string[] DarkDefaults =
+    private const string ModeWindowsDark = "Windows Dark";
+    private const string ModeWindowsLight = "Windows Light";
+    private const string ModeHighContrast = "High Contrast";
+    private const string ModeSystem = "System";
+    private const string ModeCustom = "Custom";
+
+    private static readonly string[] WindowsDarkDefaults =
     {
         "#111111", "#1C1C1C", "#262626", "#303030",
         "#F3F3F3", "#C7C7C7", "#8A8A8A",
         "#0078D4", "#353535"
     };
 
-    private static readonly string[] LightDefaults =
+    private static readonly string[] WindowsLightDefaults =
     {
         "#F0F0F5", "#FFFFFF", "#E2E2EC", "#D4D4E0",
         "#1A1A2E", "#4A4A60", "#7A7A90",
         "#5B5FD6", "#B8B8CC"
+    };
+
+    private static readonly string[] HighContrastDefaults =
+    {
+        "#000000", "#000000", "#101010", "#1A1A1A",
+        "#FFFFFF", "#FFFF00", "#BFBFBF",
+        "#00FFFF", "#FFFFFF"
     };
 
     /// <summary>
@@ -33,19 +47,28 @@ public static class SettingsThemeService
     public static void ApplySettingsTheme(AppSettings settings)
     {
         var resources = System.Windows.Application.Current.Resources;
+        var mode = NormalizeThemeMode(settings.SettingsThemeMode);
 
         string[] colors;
-        if (settings.SettingsThemeMode == "System")
+        if (mode == ModeSystem)
         {
-            colors = IsSystemLightTheme() ? LightDefaults : DarkDefaults;
+            colors = IsSystemLightTheme() ? WindowsLightDefaults : WindowsDarkDefaults;
         }
-        else if (settings.SettingsThemeMode == "Light")
+        else if (mode == ModeWindowsLight)
         {
-            colors = LightDefaults;
+            colors = WindowsLightDefaults;
+        }
+        else if (mode == ModeWindowsDark)
+        {
+            colors = WindowsDarkDefaults;
+        }
+        else if (mode == ModeHighContrast)
+        {
+            colors = HighContrastDefaults;
         }
         else
         {
-            // Use the custom settings window colors from AppSettings
+            // Custom UI palette from AppSettings.
             colors = new[]
             {
                 settings.SettingsWindowBg, settings.SettingsWindowSurface,
@@ -70,6 +93,69 @@ public static class SettingsThemeService
         SetBrush(resources, "AccentHoverBrush", LightenColor(colors[7], 0.15));
         SetBrush(resources, "AccentMutedBrush", WithAlpha(colors[7], 0x33));
         SetBrush(resources, "BorderLightBrush", LightenColor(colors[8], 0.1));
+        SetBrush(resources, "PrimaryButtonForegroundBrush", GetReadableTextColor(colors[7]));
+    }
+
+    public static string NormalizeThemeMode(string? mode)
+    {
+        if (string.IsNullOrWhiteSpace(mode))
+            return ModeWindowsDark;
+
+        var trimmed = mode.Trim();
+
+        // Back-compat with earlier values.
+        if (trimmed.Equals("Dark", StringComparison.OrdinalIgnoreCase))
+            return ModeWindowsDark;
+        if (trimmed.Equals("Light", StringComparison.OrdinalIgnoreCase))
+            return "Light";
+
+        if (trimmed.Equals(ModeWindowsDark, StringComparison.OrdinalIgnoreCase))
+            return ModeWindowsDark;
+        if (trimmed.Equals(ModeWindowsLight, StringComparison.OrdinalIgnoreCase))
+            return ModeWindowsLight;
+        if (trimmed.Equals(ModeHighContrast, StringComparison.OrdinalIgnoreCase))
+            return ModeHighContrast;
+        if (trimmed.Equals(ModeSystem, StringComparison.OrdinalIgnoreCase))
+            return ModeSystem;
+        if (trimmed.Equals(ModeCustom, StringComparison.OrdinalIgnoreCase))
+            return ModeCustom;
+
+        // Unknown values are treated as named theme selections where
+        // SettingsWindow* color channels are already populated.
+        return trimmed;
+    }
+
+    public static bool TryGetPresetColors(string? mode, out string[] colors)
+    {
+        var normalized = NormalizeThemeMode(mode);
+        if (normalized == ModeWindowsDark)
+        {
+            colors = (string[])WindowsDarkDefaults.Clone();
+            return true;
+        }
+
+        if (normalized == ModeWindowsLight)
+        {
+            colors = (string[])WindowsLightDefaults.Clone();
+            return true;
+        }
+
+        if (normalized == ModeHighContrast)
+        {
+            colors = (string[])HighContrastDefaults.Clone();
+            return true;
+        }
+
+        if (normalized == ModeSystem)
+        {
+            colors = IsSystemLightTheme()
+                ? (string[])WindowsLightDefaults.Clone()
+                : (string[])WindowsDarkDefaults.Clone();
+            return true;
+        }
+
+        colors = Array.Empty<string>();
+        return false;
     }
 
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
@@ -103,6 +189,27 @@ public static class SettingsThemeService
             return $"#{alpha:X2}{c.R:X2}{c.G:X2}{c.B:X2}";
         }
         catch { return hex; }
+    }
+
+    private static string GetReadableTextColor(string backgroundHex)
+    {
+        try
+        {
+            var bg = ParseToRgbHex(backgroundHex);
+            var whiteRatio = ContrastHelper.GetContrastRatio("#FFFFFF", bg);
+            var blackRatio = ContrastHelper.GetContrastRatio("#000000", bg);
+            return blackRatio >= whiteRatio ? "#000000" : "#FFFFFF";
+        }
+        catch
+        {
+            return "#FFFFFF";
+        }
+    }
+
+    private static string ParseToRgbHex(string hex)
+    {
+        var c = (MediaColor)MediaColorConverter.ConvertFromString(hex);
+        return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
     }
 
     private static bool IsSystemLightTheme()

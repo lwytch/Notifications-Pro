@@ -21,12 +21,17 @@ public class M95Tests
         Assert.Equal("None", s.DefaultSound);
         Assert.NotNull(s.PerAppSounds);
         Assert.Empty(s.PerAppSounds);
+        Assert.Equal(15, s.MaxVisibleNotifications);
         Assert.False(s.SuppressToastPopups);
         Assert.Equal("Popup", s.SettingsDisplayMode);
         Assert.False(s.PopupAutoClose);
-        Assert.Equal("Dark", s.SettingsThemeMode);
+        Assert.Equal("Windows Dark", s.SettingsThemeMode);
         Assert.Equal("#111111", s.SettingsWindowBg);
         Assert.False(s.LinkOverlayThemeAndUiTheme);
+        Assert.Equal(11, s.TimestampFontSize);
+        Assert.Equal("Relative", s.TimestampDisplayMode);
+        Assert.Equal("Normal", s.TimestampFontWeight);
+        Assert.Equal("#C8C8C8", s.TimestampColor);
         Assert.True(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);
@@ -70,8 +75,12 @@ public class M95Tests
             DefaultIconPreset = "Bell",
             SettingsDisplayMode = "Popup",
             PopupAutoClose = true,
-            SettingsThemeMode = "Light",
+            SettingsThemeMode = "Windows Light",
             LinkOverlayThemeAndUiTheme = true,
+            TimestampFontSize = 16,
+            TimestampDisplayMode = "DateTime",
+            TimestampFontWeight = "SemiBold",
+            TimestampColor = "#AABBCC",
             OverlayScrollbarVisible = false,
             OverlayScrollbarWidth = 12,
             OverlayScrollbarOpacity = 0.5,
@@ -88,8 +97,12 @@ public class M95Tests
         Assert.Equal("Bell", clone.DefaultIconPreset);
         Assert.Equal("Popup", clone.SettingsDisplayMode);
         Assert.True(clone.PopupAutoClose);
-        Assert.Equal("Light", clone.SettingsThemeMode);
+        Assert.Equal("Windows Light", clone.SettingsThemeMode);
         Assert.True(clone.LinkOverlayThemeAndUiTheme);
+        Assert.Equal(16, clone.TimestampFontSize);
+        Assert.Equal("DateTime", clone.TimestampDisplayMode);
+        Assert.Equal("SemiBold", clone.TimestampFontWeight);
+        Assert.Equal("#AABBCC", clone.TimestampColor);
         Assert.False(clone.OverlayScrollbarVisible);
         Assert.Equal(12, clone.OverlayScrollbarWidth);
         Assert.Equal(0.5, clone.OverlayScrollbarOpacity);
@@ -113,6 +126,10 @@ public class M95Tests
             DefaultIconPreset = "Star",
             SettingsDisplayMode = "Popup",
             SettingsThemeMode = "System",
+            TimestampFontSize = 18,
+            TimestampDisplayMode = "Time",
+            TimestampFontWeight = "Medium",
+            TimestampColor = "#334455",
             OverlayScrollbarWidth = 16,
             FullscreenOverlayMode = true,
         };
@@ -131,6 +148,10 @@ public class M95Tests
         Assert.Equal("Chat", deserialized.PerAppIcons["Teams"]);
         Assert.Equal("Popup", deserialized.SettingsDisplayMode);
         Assert.Equal("System", deserialized.SettingsThemeMode);
+        Assert.Equal(18, deserialized.TimestampFontSize);
+        Assert.Equal("Time", deserialized.TimestampDisplayMode);
+        Assert.Equal("Medium", deserialized.TimestampFontWeight);
+        Assert.Equal("#334455", deserialized.TimestampColor);
         Assert.Equal(16, deserialized.OverlayScrollbarWidth);
         Assert.True(deserialized.FullscreenOverlayMode);
     }
