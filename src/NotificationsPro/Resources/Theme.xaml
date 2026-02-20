@@ -4,18 +4,18 @@
     <!-- ═══════════════════════════════════════════════════════════════
          COLOR PALETTE
          ═══════════════════════════════════════════════════════════════ -->
-    <Color x:Key="WindowBg">#FF151521</Color>
-    <Color x:Key="SurfaceBg">#FF1E1E2E</Color>
-    <Color x:Key="SurfaceLight">#FF282840</Color>
-    <Color x:Key="SurfaceHover">#FF343450</Color>
-    <Color x:Key="Accent">#FF7C5CFC</Color>
-    <Color x:Key="AccentHover">#FF9478FF</Color>
-    <Color x:Key="AccentMuted">#337C5CFC</Color>
-    <Color x:Key="TextPrimary">#FFE4E4EF</Color>
-    <Color x:Key="TextSecondary">#FF9898B0</Color>
-    <Color x:Key="TextMuted">#FF6B6B80</Color>
-    <Color x:Key="Border">#FF363650</Color>
-    <Color x:Key="BorderLight">#FF454560</Color>
+    <Color x:Key="WindowBg">#FF111111</Color>
+    <Color x:Key="SurfaceBg">#FF1C1C1C</Color>
+    <Color x:Key="SurfaceLight">#FF262626</Color>
+    <Color x:Key="SurfaceHover">#FF303030</Color>
+    <Color x:Key="Accent">#FF0078D4</Color>
+    <Color x:Key="AccentHover">#FF2893E8</Color>
+    <Color x:Key="AccentMuted">#330078D4</Color>
+    <Color x:Key="TextPrimary">#FFF3F3F3</Color>
+    <Color x:Key="TextSecondary">#FFC7C7C7</Color>
+    <Color x:Key="TextMuted">#FF8A8A8A</Color>
+    <Color x:Key="Border">#FF353535</Color>
+    <Color x:Key="BorderLight">#FF464646</Color>
     <Color x:Key="Success">#FF5FE09D</Color>
     <Color x:Key="Error">#FFFF6B6B</Color>
 
@@ -374,8 +374,13 @@
                 <ControlTemplate TargetType="TabControl">
                     <DockPanel>
                         <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}"
-                                BorderThickness="0,0,0,1" Margin="0,0,0,20">
-                            <TabPanel IsItemsHost="True" Margin="0,0,0,-1"/>
+                                BorderThickness="0,0,0,1" Margin="0,0,0,16">
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Disabled"
+                                          CanContentScroll="False"
+                                          Focusable="False">
+                                <TabPanel IsItemsHost="True" Margin="0,0,0,-1"/>
+                            </ScrollViewer>
                         </Border>
                         <ContentPresenter ContentSource="SelectedContent"/>
                     </DockPanel>
@@ -387,14 +392,14 @@
     <Style x:Key="SettingsTabItem" TargetType="TabItem">
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Border x:Name="Bd" Padding="16,12" Background="Transparent"
-                            BorderThickness="0,0,0,2" BorderBrush="Transparent" Margin="0,0,4,0">
+                    <Border x:Name="Bd" Padding="12,10" Background="Transparent"
+                            BorderThickness="0,0,0,2" BorderBrush="Transparent" Margin="0,0,6,0">
                         <ContentPresenter ContentSource="Header" HorizontalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>

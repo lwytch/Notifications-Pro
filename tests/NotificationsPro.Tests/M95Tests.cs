@@ -25,7 +25,7 @@ public class M95Tests
         Assert.Equal("Window", s.SettingsDisplayMode);
         Assert.False(s.PopupAutoClose);
         Assert.Equal("Dark", s.SettingsThemeMode);
-        Assert.Equal("#151521", s.SettingsWindowBg);
+        Assert.Equal("#111111", s.SettingsWindowBg);
         Assert.True(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);

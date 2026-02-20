@@ -138,7 +138,7 @@ Settings UI:
 **Status: Complete**
 
 Built-in theme presets:
-- [x] Ship 6 presets: "Dark Purple" (default), "Dark Neutral", "Light", "Frosted Glass", "High Contrast", "Minimal"
+- [x] Ship 6 presets: "Windows Dark" (default), "Dark Purple", "Light", "Frosted Glass", "High Contrast", "Minimal"
 - [x] One-click apply sets all colors, opacity, corner radius, and accent at once
 - [ ] Per-field "reset to theme default" micro-button next to each color picker (deferred)
 
@@ -254,24 +254,28 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] SettingsThemeService for runtime Application.Resources brush updates
 - [x] Overlay scrollbar controls (show/hide, width 4-20px, opacity)
 - [x] Toast suppression toggle (remove Windows toast after capture, WinRT only, safe on exit)
-- [x] Settings window popup display mode (Window vs Popup above taskbar, auto-close option)
+- [x] Settings window popup display mode (Window vs Popup anchored to toast corner on the taskbar monitor, auto-close option)
 - [x] Per-app notification sounds (system sounds + custom WAV, per-app overrides)
 - [x] Per-app notification icons (10 built-in vector presets, icon size slider 16-48px, per-app overrides)
 - [x] IconService, SoundService, IconPreset, AppIconConverter
 - [x] 16 new unit tests (M9.5 defaults, clone, deep-copy, JSON round-trip, IconPreset, SoundService, QueueManager NotificationAdded, ThemePreset settings colors)
 
 ### Milestone 11: Packaging & Final Polish
-**Status: Not Started**
+**Status: In Progress**
 
 - [ ] MSIX packaging or installer
 - [ ] Clean uninstall (optionally remove %AppData% settings)
-- [ ] Final polish: edge cases, error resilience
+- [x] Final polish: settings popup now anchors to the Windows toast corner on the taskbar monitor (multi-monitor aware)
+- [x] Final polish: settings popup position restore no longer overrides popup mode placement
+- [x] Final polish: settings UI tab strip and cramped per-app rows cleaned up to prevent clipped labels
+- [x] Final polish: default dark palette shifted to Windows-like neutral colors (overlay, settings UI, tray menu)
+- [x] Final polish: surfaced hidden UI Styling color fields (surface light/hover + secondary/muted text)
 - [ ] Full manual test checklist pass
 - [ ] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 9.5 enhanced settings, sounds, icons & theming complete. Next: Milestone 11 packaging & final polish.
+Milestone 11 final polish is in progress (UI cleanup, popup placement correctness, and default theme refinement complete). Next: packaging and installer work.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

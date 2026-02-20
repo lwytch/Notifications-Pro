@@ -84,22 +84,22 @@ public class SettingsViewModel : BaseViewModel
     public string TitleFontWeight { get => _titleFontWeight; set { if (SetProperty(ref _titleFontWeight, value)) QueueSave(); } }
 
     // Colors
-    private string _textColor = "#E4E4EF";
+    private string _textColor = "#E6E6E6";
     public string TextColor { get => _textColor; set { if (SetProperty(ref _textColor, value)) QueueSave(); } }
 
     private string _titleColor = "#FFFFFF";
     public string TitleColor { get => _titleColor; set { if (SetProperty(ref _titleColor, value)) QueueSave(); } }
 
-    private string _appNameColor = "#B8B8CC";
+    private string _appNameColor = "#C8C8C8";
     public string AppNameColor { get => _appNameColor; set { if (SetProperty(ref _appNameColor, value)) QueueSave(); } }
 
-    private string _backgroundColor = "#1E1E2E";
+    private string _backgroundColor = "#202020";
     public string BackgroundColor { get => _backgroundColor; set { if (SetProperty(ref _backgroundColor, value)) QueueSave(); } }
 
-    private double _backgroundOpacity = 0.92;
+    private double _backgroundOpacity = 0.94;
     public double BackgroundOpacity { get => _backgroundOpacity; set { if (SetProperty(ref _backgroundOpacity, value)) QueueSave(); } }
 
-    private string _accentColor = "#7C5CFC";
+    private string _accentColor = "#0078D4";
     public string AccentColor { get => _accentColor; set { if (SetProperty(ref _accentColor, value)) QueueSave(); } }
 
     // Card shape
@@ -124,7 +124,7 @@ public class SettingsViewModel : BaseViewModel
     private bool _showBorder;
     public bool ShowBorder { get => _showBorder; set { if (SetProperty(ref _showBorder, value)) QueueSave(); } }
 
-    private string _borderColor = "#363650";
+    private string _borderColor = "#3A3A3A";
     public string BorderColor { get => _borderColor; set { if (SetProperty(ref _borderColor, value)) QueueSave(); } }
 
     private double _borderThickness = 1;
@@ -391,31 +391,31 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    private string _settingsWindowBg = "#151521";
+    private string _settingsWindowBg = "#111111";
     public string SettingsWindowBg { get => _settingsWindowBg; set { if (SetProperty(ref _settingsWindowBg, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowSurface = "#1E1E2E";
+    private string _settingsWindowSurface = "#1C1C1C";
     public string SettingsWindowSurface { get => _settingsWindowSurface; set { if (SetProperty(ref _settingsWindowSurface, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowSurfaceLight = "#282840";
+    private string _settingsWindowSurfaceLight = "#262626";
     public string SettingsWindowSurfaceLight { get => _settingsWindowSurfaceLight; set { if (SetProperty(ref _settingsWindowSurfaceLight, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowSurfaceHover = "#343450";
+    private string _settingsWindowSurfaceHover = "#303030";
     public string SettingsWindowSurfaceHover { get => _settingsWindowSurfaceHover; set { if (SetProperty(ref _settingsWindowSurfaceHover, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowText = "#E4E4EF";
+    private string _settingsWindowText = "#F3F3F3";
     public string SettingsWindowText { get => _settingsWindowText; set { if (SetProperty(ref _settingsWindowText, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowTextSecondary = "#9898B0";
+    private string _settingsWindowTextSecondary = "#C7C7C7";
     public string SettingsWindowTextSecondary { get => _settingsWindowTextSecondary; set { if (SetProperty(ref _settingsWindowTextSecondary, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowTextMuted = "#6B6B80";
+    private string _settingsWindowTextMuted = "#8A8A8A";
     public string SettingsWindowTextMuted { get => _settingsWindowTextMuted; set { if (SetProperty(ref _settingsWindowTextMuted, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowAccent = "#7C5CFC";
+    private string _settingsWindowAccent = "#0078D4";
     public string SettingsWindowAccent { get => _settingsWindowAccent; set { if (SetProperty(ref _settingsWindowAccent, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
-    private string _settingsWindowBorder = "#363650";
+    private string _settingsWindowBorder = "#353535";
     public string SettingsWindowBorder { get => _settingsWindowBorder; set { if (SetProperty(ref _settingsWindowBorder, value)) { QueueSave(); ApplySettingsTheme(); } } }
 
     public List<string> AvailableSettingsThemeModes { get; } = new() { "Dark", "Light", "System" };

@@ -160,6 +160,10 @@
 - Overlay-height preset buttons for 1080p, 2K, 4K, and 8K display classes
 
 ### Changed
+- Default dark palette updated to a Windows-style neutral look (overlay cards, settings UI defaults, and tray menu colors)
+- Default built-in theme changed from purple-centric to `Windows Dark`; previous purple look remains available as `Dark Purple`
+- Settings popup placement now anchors to the same toast corner used by Windows notifications on the taskbar monitor
+- UI Styling now surfaces all settings-window color channels (surface light/hover + secondary/muted text in addition to existing fields)
 - All StaticResource brush references in Theme.xaml and SettingsWindow.xaml converted to DynamicResource for runtime theme switching
 - Settings window styles (buttons, toggles, sliders, combos, tabs, scrollbars, tooltips) now respond to theme changes at runtime
 - Overlay scrollbar width and opacity now configurable from Appearance tab (was fixed at 14px)
@@ -189,6 +193,9 @@
 - Overlay Width range increased from 1400px to 7680px for high-resolution displays
 
 ### Fixed
+- Popup mode position regression: saved normal-window coordinates no longer override popup placement
+- Settings tab-header clipping on narrow widths (tab strip now scrolls horizontally instead of truncating labels)
+- Filtering tab per-app sound/icon row clipping by switching to a stacked control layout
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
 - Accessibility mode diagnostics now report captured/candidate/event counters to show whether shell events are being seen
 - Notification body text visibility bug (body was bound through a boolean converter incorrectly)

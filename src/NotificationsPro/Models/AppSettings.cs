@@ -13,12 +13,12 @@ public class AppSettings
     public double LineSpacing { get; set; } = 1.5;
 
     // Appearance — Colors
-    public string TextColor { get; set; } = "#E4E4EF";
+    public string TextColor { get; set; } = "#E6E6E6";
     public string TitleColor { get; set; } = "#FFFFFF";
-    public string AppNameColor { get; set; } = "#B8B8CC";
-    public string BackgroundColor { get; set; } = "#1E1E2E";
-    public double BackgroundOpacity { get; set; } = 0.92;
-    public string AccentColor { get; set; } = "#7C5CFC";
+    public string AppNameColor { get; set; } = "#C8C8C8";
+    public string BackgroundColor { get; set; } = "#202020";
+    public double BackgroundOpacity { get; set; } = 0.94;
+    public string AccentColor { get; set; } = "#0078D4";
 
     // Appearance — Card Shape
     public double CornerRadius { get; set; } = 12;
@@ -28,7 +28,7 @@ public class AppSettings
     public bool ShowAccent { get; set; } = true;
     public double AccentThickness { get; set; } = 3;
     public bool ShowBorder { get; set; } = false;
-    public string BorderColor { get; set; } = "#363650";
+    public string BorderColor { get; set; } = "#3A3A3A";
     public double BorderThickness { get; set; } = 1;
 
     // Behavior
@@ -151,15 +151,15 @@ public class AppSettings
 
     // Settings window theming (M9.5)
     public string SettingsThemeMode { get; set; } = "Dark"; // "Dark", "Light", "System"
-    public string SettingsWindowBg { get; set; } = "#151521";
-    public string SettingsWindowSurface { get; set; } = "#1E1E2E";
-    public string SettingsWindowSurfaceLight { get; set; } = "#282840";
-    public string SettingsWindowSurfaceHover { get; set; } = "#343450";
-    public string SettingsWindowText { get; set; } = "#E4E4EF";
-    public string SettingsWindowTextSecondary { get; set; } = "#9898B0";
-    public string SettingsWindowTextMuted { get; set; } = "#6B6B80";
-    public string SettingsWindowAccent { get; set; } = "#7C5CFC";
-    public string SettingsWindowBorder { get; set; } = "#363650";
+    public string SettingsWindowBg { get; set; } = "#111111";
+    public string SettingsWindowSurface { get; set; } = "#1C1C1C";
+    public string SettingsWindowSurfaceLight { get; set; } = "#262626";
+    public string SettingsWindowSurfaceHover { get; set; } = "#303030";
+    public string SettingsWindowText { get; set; } = "#F3F3F3";
+    public string SettingsWindowTextSecondary { get; set; } = "#C7C7C7";
+    public string SettingsWindowTextMuted { get; set; } = "#8A8A8A";
+    public string SettingsWindowAccent { get; set; } = "#0078D4";
+    public string SettingsWindowBorder { get; set; } = "#353535";
 
     // Settings window display mode (M9.5)
     public string SettingsDisplayMode { get; set; } = "Window"; // "Window" or "Popup"

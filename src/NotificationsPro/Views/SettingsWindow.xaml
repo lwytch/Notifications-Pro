@@ -4,7 +4,7 @@
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
         Icon="{Binding TrayIconImage}"
-        Width="560" Height="640" MinWidth="480" MinHeight="500"
+        Width="640" Height="700" MinWidth="520" MinHeight="520"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
         ResizeMode="CanResize">
@@ -31,6 +31,7 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
         <!-- Setting description -->
@@ -426,7 +427,7 @@
                                     ToolTip="Open color picker for app-name text"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding AppNameColor, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Hex color for source app names (e.g. #B8B8CC)"
+                                     ToolTip="Hex color for source app names (e.g. #C8C8C8)"
                                      MaxLength="7"/>
                         </DockPanel>
                         <TextBlock Text="Color used for the source app line (Teams, Slack, Outlook, etc.)"
@@ -444,7 +445,7 @@
                                     ToolTip="Open color picker for notification body text"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding TextColor, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Hex color for notification body text (e.g. #E4E4EF)"
+                                     ToolTip="Hex color for notification body text (e.g. #E6E6E6)"
                                      MaxLength="7"/>
                         </DockPanel>
                         <TextBlock Text="Color of the notification body content" Style="{StaticResource SettingDesc}"/>
@@ -598,7 +599,7 @@
                                     ToolTip="Open color picker for card border"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding BorderColor, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Hex color for the card border (e.g. #363650)"
+                                     ToolTip="Hex color for the card border (e.g. #3A3A3A)"
                                      MaxLength="7"/>
                         </DockPanel>
                         <TextBlock Text="Color of the border around notification cards"
@@ -1122,19 +1123,23 @@
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="Sound:" Style="{StaticResource SettingLabel}"
-                                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                                <ComboBox Grid.Column="1" Style="{StaticResource SettingsComboBox}"
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Sound" Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,8,8" VerticalAlignment="Center"/>
+                                                <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource SettingsComboBox}"
                                                           ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                                           ItemsSource="{Binding DataContext.PerAppSoundOptions, RelativeSource={RelativeSource AncestorType=Window}}"
                                                           SelectedItem="{Binding Sound}"
-                                                          Margin="0,0,12,0"/>
-                                                <TextBlock Grid.Column="2" Text="Icon:" Style="{StaticResource SettingLabel}"
+                                                          Margin="0,0,0,8"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Icon" Style="{StaticResource SettingLabel}"
                                                            Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                                <ComboBox Grid.Column="3" Style="{StaticResource SettingsComboBox}"
+                                                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SettingsComboBox}"
                                                           ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                                           ItemsSource="{Binding DataContext.PerAppIconOptions, RelativeSource={RelativeSource AncestorType=Window}}"
                                                           SelectedItem="{Binding Icon}"/>
@@ -1725,8 +1730,8 @@
                                   ItemsSource="{Binding AvailableSettingsDisplayModes}"
                                   SelectedItem="{Binding SettingsDisplayMode}"
                                   Margin="0,4,0,4"
-                                  ToolTip="Window mode opens a normal resizable window. Popup mode opens a compact panel above the taskbar."/>
-                        <TextBlock Text="Window: standard resizable window. Popup: borderless panel fixed above the system tray. Changes take effect next time Settings is opened."
+                                  ToolTip="Window mode opens a normal resizable window. Popup mode anchors to the same corner where Windows toasts appear."/>
+                        <TextBlock Text="Window: standard resizable window. Popup: borderless panel anchored to the toast corner of the taskbar monitor. Changes take effect next time Settings is opened."
                                    Style="{StaticResource SettingDesc}"/>
 
                         <DockPanel Margin="0,0,0,4">
@@ -1776,6 +1781,28 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurface, UpdateSourceTrigger=LostFocus}"/>
                         </DockPanel>
 
+                        <TextBlock Text="Surface Light" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowSurfaceLight, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowSurfaceLight" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurfaceLight, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Surface Hover" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowSurfaceHover, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowSurfaceHover" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurfaceHover, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
                         <TextBlock Text="Text" Style="{StaticResource SettingLabel}"/>
                         <DockPanel Margin="0,4,0,12">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
@@ -1785,6 +1812,28 @@
                                     Width="40" Height="28" Margin="8,0,0,0"
                                     Tag="SettingsWindowText" Click="OnPickColorClick"/>
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowText, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Text Secondary" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowTextSecondary, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowTextSecondary" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowTextSecondary, UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Text Muted" Style="{StaticResource SettingLabel}"/>
+                        <DockPanel Margin="0,4,0,12">
+                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                                    Background="{Binding SettingsWindowTextMuted, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ColorPickButton}"
+                                    Width="40" Height="28" Margin="8,0,0,0"
+                                    Tag="SettingsWindowTextMuted" Click="OnPickColorClick"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowTextMuted, UpdateSourceTrigger=LostFocus}"/>
                         </DockPanel>
 
                         <TextBlock Text="Accent" Style="{StaticResource SettingLabel}"/>

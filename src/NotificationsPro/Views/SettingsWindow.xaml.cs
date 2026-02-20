@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Windows;
 using NotificationsPro.Services;
@@ -25,6 +26,9 @@ public partial class SettingsWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (IsPopupDisplayMode())
+            return;
+
         // Restore saved window position
         if (_settingsManager != null)
         {
@@ -51,6 +55,9 @@ public partial class SettingsWindow : Window
 
     private void OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
+        if (IsPopupDisplayMode())
+            return;
+
         // Save window position
         if (_settingsManager != null)
         {
@@ -122,5 +129,14 @@ public partial class SettingsWindow : Window
         {
             return System.Windows.Media.Colors.White;
         }
+    }
+
+    private bool IsPopupDisplayMode()
+    {
+        if (_settingsManager == null)
+            return WindowStyle == WindowStyle.None;
+
+        return string.Equals(_settingsManager.Settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase)
+               || WindowStyle == WindowStyle.None;
     }
 }

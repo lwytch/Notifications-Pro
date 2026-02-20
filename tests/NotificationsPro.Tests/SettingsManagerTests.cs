@@ -29,7 +29,7 @@ public class SettingsManagerTests : IDisposable
 
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(14, sm.Settings.FontSize);
-        Assert.Equal(0.92, sm.Settings.BackgroundOpacity);
+        Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
         Assert.Equal(3, sm.Settings.MaxVisibleNotifications);
         Assert.True(sm.Settings.ShowAppName);
@@ -72,11 +72,11 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(14, settings.FontSize);
         Assert.Equal("Normal", settings.FontWeight);
         Assert.Equal(1.5, settings.LineSpacing);
-        Assert.Equal("#E4E4EF", settings.TextColor);
+        Assert.Equal("#E6E6E6", settings.TextColor);
         Assert.Equal("#FFFFFF", settings.TitleColor);
-        Assert.Equal("#B8B8CC", settings.AppNameColor);
-        Assert.Equal("#1E1E2E", settings.BackgroundColor);
-        Assert.Equal(0.92, settings.BackgroundOpacity);
+        Assert.Equal("#C8C8C8", settings.AppNameColor);
+        Assert.Equal("#202020", settings.BackgroundColor);
+        Assert.Equal(0.94, settings.BackgroundOpacity);
         Assert.Equal(14, settings.AppNameFontSize);
         Assert.Equal("SemiBold", settings.AppNameFontWeight);
         Assert.Equal(16, settings.TitleFontSize);
@@ -88,9 +88,9 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.ShowAccent);
         Assert.Equal(3, settings.AccentThickness);
         Assert.False(settings.ShowBorder);
-        Assert.Equal("#363650", settings.BorderColor);
+        Assert.Equal("#3A3A3A", settings.BorderColor);
         Assert.Equal(1, settings.BorderThickness);
-        Assert.Equal("#7C5CFC", settings.AccentColor);
+        Assert.Equal("#0078D4", settings.AccentColor);
         Assert.Equal(5, settings.NotificationDuration);
         Assert.Equal(3, settings.MaxVisibleNotifications);
         Assert.True(settings.ShowAppName);
@@ -180,7 +180,7 @@ public class SettingsManagerTests : IDisposable
 
         Assert.Equal(14, sm.Settings.FontSize);
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
-        Assert.Equal(0.92, sm.Settings.BackgroundOpacity);
+        Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
     }
 
     [Fact]

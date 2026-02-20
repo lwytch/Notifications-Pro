@@ -17,13 +17,13 @@ public class AppTintBrushConverter : IMultiValueConverter
     {
         // Fallback: return standard bg
         if (values.Length < 5)
-            return new SolidColorBrush(Color.FromArgb(230, 30, 30, 46));
+            return new SolidColorBrush(Color.FromArgb(240, 32, 32, 32));
 
         var appName = values[0] as string ?? string.Empty;
         var tintEnabled = values[1] is true;
         var tintOpacity = values[2] is double t ? t : 0.15;
-        var bgHex = values[3] as string ?? "#1E1E2E";
-        var bgOpacity = values[4] is double o ? o : 0.92;
+        var bgHex = values[3] as string ?? "#202020";
+        var bgOpacity = values[4] is double o ? o : 0.94;
 
         try
         {
@@ -46,7 +46,7 @@ public class AppTintBrushConverter : IMultiValueConverter
         }
         catch
         {
-            return new SolidColorBrush(Color.FromArgb(230, 30, 30, 46));
+            return new SolidColorBrush(Color.FromArgb(240, 32, 32, 32));
         }
     }
 

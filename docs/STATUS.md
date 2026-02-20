@@ -23,7 +23,8 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: eight tabs (Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with premium dark theme
+- Settings window: eight tabs (Themes, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
+- Settings tab strip now scrolls horizontally to avoid clipped tab labels on narrower window widths
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Behavior tab includes:
@@ -85,7 +86,7 @@
   - New Filtering tab in Settings with per-app toggles, keyword management, quiet hours, burst limit
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
-  - 6 built-in theme presets: Dark Purple, Dark Neutral, Light, Frosted Glass, High Contrast, Minimal
+  - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
   - One-click theme apply sets all visual properties (colors, opacity, corner radius, accent, border) at once
   - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
   - Load, switch between, and delete custom themes from Settings > Themes tab
@@ -145,14 +146,14 @@
   - Fullscreen overlay mode — fill-screen background with configurable opacity
   - Settings window dynamic theming — Dark/Light/System mode selector
   - SettingsThemeService for runtime DynamicResource brush updates
-  - Custom settings window color pickers (background, surface, text, accent, border)
+  - Custom settings window color pickers (background, surface, surface light, surface hover, text, text secondary, text muted, accent, border)
   - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
-  - Settings popup display mode — Window or Popup (positioned above system tray via Win32 TrayNotifyWnd, auto-close option)
+  - Settings popup display mode — Window or Popup (toast-corner anchored on the taskbar monitor, auto-close option)
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
-  - Per-app sound and icon assignment UI in Filtering tab
+  - Per-app sound and icon assignment UI in Filtering tab (stacked row layout to prevent label/combobox clipping)
   - Fullscreen overlay background color picker (in addition to opacity)
   - Fullscreen overlay section moved from Behavior to Position tab for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
@@ -185,6 +186,7 @@ dotnet test
 - [ ] App starts and tray icon appears
 - [ ] Right-click tray icon shows dark context menu
 - [ ] "Settings..." opens settings window
+- [ ] Settings tab headers remain fully accessible (horizontal header scroll appears if tabs overflow)
 - [ ] "Send Test Notification" shows a notification card in the overlay
 - [ ] Notification slides in from the left
 - [ ] Notification fades out after configured duration
@@ -221,6 +223,7 @@ dotnet test
 - [ ] Click-through mode allows clicking through the overlay to underlying apps
 - [ ] Position preset buttons move overlay to expected top/side anchors
 - [ ] "Reset to Defaults" restores all settings
+- [ ] UI Styling tab shows full settings-window color controls (including Surface Light/Hover and Secondary/Muted text)
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart
 - [ ] Notification slides in from each configured direction (Left/Right/Top/Bottom)
@@ -277,6 +280,7 @@ dotnet test
 - [ ] Disabling Start with Windows removes the registry Run key
 - [ ] App launches at Windows startup when the toggle is on
 - [ ] Streaming tab appears in Settings between Position and Accessibility
+- [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
 - [ ] Chroma Key toggle turns overlay background solid green
 - [ ] Chroma Key preset buttons (Green/Blue/Magenta) change chroma background color
 - [ ] Custom chroma key color picker works

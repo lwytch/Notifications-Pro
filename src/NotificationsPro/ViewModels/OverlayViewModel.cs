@@ -58,22 +58,22 @@ public class OverlayViewModel : BaseViewModel
     public string TitleFontWeight { get => _titleFontWeight; set => SetProperty(ref _titleFontWeight, value); }
 
     // Colors
-    private string _textColor = "#E4E4EF";
+    private string _textColor = "#E6E6E6";
     public string TextColor { get => _textColor; set => SetProperty(ref _textColor, value); }
 
     private string _titleColor = "#FFFFFF";
     public string TitleColor { get => _titleColor; set => SetProperty(ref _titleColor, value); }
 
-    private string _appNameColor = "#B8B8CC";
+    private string _appNameColor = "#C8C8C8";
     public string AppNameColor { get => _appNameColor; set => SetProperty(ref _appNameColor, value); }
 
-    private string _backgroundColor = "#1E1E2E";
+    private string _backgroundColor = "#202020";
     public string BackgroundColor { get => _backgroundColor; set => SetProperty(ref _backgroundColor, value); }
 
-    private double _backgroundOpacity = 0.92;
+    private double _backgroundOpacity = 0.94;
     public double BackgroundOpacity { get => _backgroundOpacity; set => SetProperty(ref _backgroundOpacity, value); }
 
-    private string _accentColor = "#7C5CFC";
+    private string _accentColor = "#0078D4";
     public string AccentColor { get => _accentColor; set => SetProperty(ref _accentColor, value); }
 
     private string _highlightColor = "#FFD700";
@@ -141,7 +141,7 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
-    private string _borderColor = "#363650";
+    private string _borderColor = "#3A3A3A";
     public string BorderColor { get => _borderColor; set => SetProperty(ref _borderColor, value); }
 
     private double _borderThickness = 1;

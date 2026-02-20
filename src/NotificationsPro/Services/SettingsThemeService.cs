@@ -14,9 +14,9 @@ public static class SettingsThemeService
 {
     private static readonly string[] DarkDefaults =
     {
-        "#151521", "#1E1E2E", "#282840", "#343450",
-        "#E4E4EF", "#9898B0", "#6B6B80",
-        "#7C5CFC", "#363650"
+        "#111111", "#1C1C1C", "#262626", "#303030",
+        "#F3F3F3", "#C7C7C7", "#8A8A8A",
+        "#0078D4", "#353535"
     };
 
     private static readonly string[] LightDefaults =

@@ -61,6 +61,14 @@ public partial class App : Application
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT { public int Left, Top, Right, Bottom; }
 
+    private enum TaskbarEdge
+    {
+        Bottom,
+        Top,
+        Left,
+        Right
+    }
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -195,8 +203,8 @@ public partial class App : Application
         _alwaysOnTopItem = new WinForms.ToolStripMenuItem("Disable Always on Top", null, (_, _) => ToggleAlwaysOnTop());
 
         var contextMenu = new WinForms.ContextMenuStrip();
-        contextMenu.BackColor = Drawing.Color.FromArgb(30, 30, 46);
-        contextMenu.ForeColor = Drawing.Color.FromArgb(228, 228, 239);
+        contextMenu.BackColor = Drawing.Color.FromArgb(28, 28, 28);
+        contextMenu.ForeColor = Drawing.Color.FromArgb(243, 243, 243);
         contextMenu.Renderer = new DarkMenuRenderer();
 
         _statusItem = new WinForms.ToolStripMenuItem("Initializing...") { Enabled = false };
@@ -388,31 +396,11 @@ public partial class App : Application
                 _settingsWindow.ShowInTaskbar = false;
                 _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
 
-                var windowWidth = _settingsWindow.Width;
-
-                // Use 70% of primary screen height with padding
-                var primaryScreen = WinForms.Screen.PrimaryScreen ?? WinForms.Screen.AllScreens[0];
-                var workArea = primaryScreen.WorkingArea;
-                var windowHeight = workArea.Height * 0.7;
-                _settingsWindow.Height = windowHeight;
-
-                // Position fixed above the system tray notification area
-                var trayRect = GetTrayNotificationAreaRect();
-                if (trayRect.HasValue)
-                {
-                    var r = trayRect.Value;
-                    _settingsWindow.Left = Math.Max(workArea.Left, r.Right - windowWidth);
-                    _settingsWindow.Top = r.Top - windowHeight - 8;
-                }
-                else
-                {
-                    _settingsWindow.Left = workArea.Right - windowWidth - 8;
-                    _settingsWindow.Top = workArea.Bottom - windowHeight - 8;
-                }
-
-                // Clamp to work area bounds
-                if (_settingsWindow.Top < workArea.Top)
-                    _settingsWindow.Top = workArea.Top;
+                var popupBounds = CalculateSettingsPopupBounds(_settingsWindow.Width, _settingsWindow.Height);
+                _settingsWindow.Width = popupBounds.Width;
+                _settingsWindow.Height = popupBounds.Height;
+                _settingsWindow.Left = popupBounds.Left;
+                _settingsWindow.Top = popupBounds.Top;
 
                 if (settings.PopupAutoClose)
                 {
@@ -426,8 +414,7 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Finds the screen rectangle of the Windows system tray notification area
-    /// using Win32 window hierarchy: Shell_TrayWnd > TrayNotifyWnd.
+    /// Finds the screen rectangle of the Windows system tray notification area.
     /// </summary>
     private static System.Drawing.Rectangle? GetTrayNotificationAreaRect()
     {
@@ -442,6 +429,75 @@ public partial class App : Application
         return new System.Drawing.Rectangle(
             rect.Left, rect.Top,
             rect.Right - rect.Left, rect.Bottom - rect.Top);
+    }
+
+    private static System.Drawing.Rectangle? GetTaskbarRect()
+    {
+        var taskbar = FindWindow("Shell_TrayWnd", null);
+        if (taskbar == IntPtr.Zero) return null;
+        if (!GetWindowRect(taskbar, out var rect)) return null;
+
+        return new System.Drawing.Rectangle(
+            rect.Left, rect.Top,
+            rect.Right - rect.Left, rect.Bottom - rect.Top);
+    }
+
+    private static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight)
+    {
+        const double margin = 12;
+
+        var trayRect = GetTrayNotificationAreaRect();
+        var taskbarRect = GetTaskbarRect();
+        var anchorRect = trayRect ?? taskbarRect;
+
+        var screen = anchorRect.HasValue
+            ? WinForms.Screen.FromRectangle(anchorRect.Value)
+            : (WinForms.Screen.PrimaryScreen ?? WinForms.Screen.AllScreens[0]);
+        var workArea = screen.WorkingArea;
+
+        var preferredWidth = requestedWidth > 0 ? requestedWidth : 640;
+        var maxWidth = Math.Max(320, workArea.Width - (margin * 2));
+        var minWidth = Math.Min(460, maxWidth);
+        var width = Math.Clamp(preferredWidth, minWidth, maxWidth);
+
+        var preferredHeight = Math.Max(requestedHeight, workArea.Height * 0.72);
+        var maxHeight = Math.Max(280, workArea.Height - (margin * 2));
+        var minHeight = Math.Min(420, maxHeight);
+        var height = Math.Clamp(preferredHeight, minHeight, maxHeight);
+
+        var left = workArea.Right - width - margin;
+        var top = workArea.Bottom - height - margin;
+
+        if (taskbarRect.HasValue)
+        {
+            var edge = DetectTaskbarEdge(screen.Bounds, taskbarRect.Value);
+            if (edge == TaskbarEdge.Top)
+                top = workArea.Top + margin;
+            else if (edge == TaskbarEdge.Left)
+                left = workArea.Left + margin;
+            else if (edge == TaskbarEdge.Right)
+                left = workArea.Right - width - margin;
+        }
+
+        left = Math.Clamp(left, workArea.Left + 2, workArea.Right - width - 2);
+        top = Math.Clamp(top, workArea.Top + 2, workArea.Bottom - height - 2);
+
+        return new Rect(left, top, width, height);
+    }
+
+    private static TaskbarEdge DetectTaskbarEdge(System.Drawing.Rectangle screenBounds, System.Drawing.Rectangle taskbarRect)
+    {
+        var horizontalTaskbar = taskbarRect.Width >= taskbarRect.Height;
+        if (horizontalTaskbar)
+        {
+            var distanceToTop = Math.Abs(taskbarRect.Top - screenBounds.Top);
+            var distanceToBottom = Math.Abs(screenBounds.Bottom - taskbarRect.Bottom);
+            return distanceToTop <= distanceToBottom ? TaskbarEdge.Top : TaskbarEdge.Bottom;
+        }
+
+        var distanceToLeft = Math.Abs(taskbarRect.Left - screenBounds.Left);
+        var distanceToRight = Math.Abs(screenBounds.Right - taskbarRect.Right);
+        return distanceToLeft <= distanceToRight ? TaskbarEdge.Left : TaskbarEdge.Right;
     }
 
     private void OnSettingsWindowDeactivated(object? sender, EventArgs e)
@@ -652,24 +708,24 @@ internal class DarkMenuRenderer : WinForms.ToolStripProfessionalRenderer
 
     protected override void OnRenderItemText(WinForms.ToolStripItemTextRenderEventArgs e)
     {
-        e.TextColor = Drawing.Color.FromArgb(228, 228, 239);
+        e.TextColor = Drawing.Color.FromArgb(243, 243, 243);
         base.OnRenderItemText(e);
     }
 }
 
 internal class DarkMenuColors : WinForms.ProfessionalColorTable
 {
-    public override Drawing.Color MenuItemSelected => Drawing.Color.FromArgb(52, 52, 80);
-    public override Drawing.Color MenuItemBorder => Drawing.Color.FromArgb(54, 54, 80);
-    public override Drawing.Color MenuBorder => Drawing.Color.FromArgb(54, 54, 80);
-    public override Drawing.Color MenuItemSelectedGradientBegin => Drawing.Color.FromArgb(52, 52, 80);
-    public override Drawing.Color MenuItemSelectedGradientEnd => Drawing.Color.FromArgb(52, 52, 80);
-    public override Drawing.Color MenuItemPressedGradientBegin => Drawing.Color.FromArgb(40, 40, 64);
-    public override Drawing.Color MenuItemPressedGradientEnd => Drawing.Color.FromArgb(40, 40, 64);
-    public override Drawing.Color ToolStripDropDownBackground => Drawing.Color.FromArgb(30, 30, 46);
-    public override Drawing.Color ImageMarginGradientBegin => Drawing.Color.FromArgb(30, 30, 46);
-    public override Drawing.Color ImageMarginGradientMiddle => Drawing.Color.FromArgb(30, 30, 46);
-    public override Drawing.Color ImageMarginGradientEnd => Drawing.Color.FromArgb(30, 30, 46);
-    public override Drawing.Color SeparatorDark => Drawing.Color.FromArgb(54, 54, 80);
-    public override Drawing.Color SeparatorLight => Drawing.Color.FromArgb(54, 54, 80);
+    public override Drawing.Color MenuItemSelected => Drawing.Color.FromArgb(45, 45, 45);
+    public override Drawing.Color MenuItemBorder => Drawing.Color.FromArgb(65, 65, 65);
+    public override Drawing.Color MenuBorder => Drawing.Color.FromArgb(65, 65, 65);
+    public override Drawing.Color MenuItemSelectedGradientBegin => Drawing.Color.FromArgb(45, 45, 45);
+    public override Drawing.Color MenuItemSelectedGradientEnd => Drawing.Color.FromArgb(45, 45, 45);
+    public override Drawing.Color MenuItemPressedGradientBegin => Drawing.Color.FromArgb(38, 38, 38);
+    public override Drawing.Color MenuItemPressedGradientEnd => Drawing.Color.FromArgb(38, 38, 38);
+    public override Drawing.Color ToolStripDropDownBackground => Drawing.Color.FromArgb(28, 28, 28);
+    public override Drawing.Color ImageMarginGradientBegin => Drawing.Color.FromArgb(28, 28, 28);
+    public override Drawing.Color ImageMarginGradientMiddle => Drawing.Color.FromArgb(28, 28, 28);
+    public override Drawing.Color ImageMarginGradientEnd => Drawing.Color.FromArgb(28, 28, 28);
+    public override Drawing.Color SeparatorDark => Drawing.Color.FromArgb(65, 65, 65);
+    public override Drawing.Color SeparatorLight => Drawing.Color.FromArgb(65, 65, 65);
 }
