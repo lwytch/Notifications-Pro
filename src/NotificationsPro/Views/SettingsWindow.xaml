@@ -1030,7 +1030,7 @@
                                        ToolTip="Notifications matching these keywords get a colored accent stripe."/>
                         </Border>
 
-                        <TextBlock Text="Highlight Color" Style="{StaticResource SettingLabel}" ToolTip="Accent color used for keyword-matched notification cards"/>
+                        <TextBlock Text="Default highlight color" Style="{StaticResource SettingLabel}" ToolTip="Default accent color applied to new keywords. Each keyword can have its own color."/>
                         <DockPanel Margin="0,4,0,0">
                             <Border DockPanel.Dock="Left" Width="32" Height="32" CornerRadius="6"
                                     Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
@@ -1039,21 +1039,21 @@
                             <Button DockPanel.Dock="Right" Content="Pick"
                                     Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
                                     Tag="HighlightColor" Click="OnPickColorClick"
-                                    ToolTip="Open color picker for highlight accent"/>
+                                    ToolTip="Open color picker for the default highlight color"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding HighlightColor, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Hex color for highlighted notification accent"
+                                     ToolTip="Hex color used as default for new keywords"
                                      MaxLength="7"/>
                         </DockPanel>
 
-                        <DockPanel Margin="0,4,0,8">
+                        <DockPanel Margin="0,8,0,8">
                             <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
                                     Width="64" Margin="8,0,0,0" Command="{Binding AddHighlightKeywordCommand}"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding NewHighlightKeyword, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Type a keyword and press Add"/>
                         </DockPanel>
-                        <ItemsControl ItemsSource="{Binding HighlightKeywords}" Margin="0,4,0,0">
+                        <ItemsControl ItemsSource="{Binding HighlightKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel Margin="0,0,0,8">
@@ -1061,7 +1061,15 @@
                                                 Width="64" Padding="0"
                                                 Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding}"/>
-                                        <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}"
+                                        <Button DockPanel.Dock="Right" Content="Color" Style="{StaticResource SecondaryButton}"
+                                                Width="52" Padding="0" Margin="0,0,4,0"
+                                                Click="OnPickKeywordColorClick"
+                                                ToolTip="Pick a custom highlight color for this keyword"/>
+                                        <Border DockPanel.Dock="Right" Width="22" Height="22" CornerRadius="4"
+                                                Background="{Binding Color, Converter={StaticResource ColorToBrush}}"
+                                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                                Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
                                                    VerticalAlignment="Center"/>
                                     </DockPanel>
                                 </DataTemplate>

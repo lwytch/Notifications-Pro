@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using NotificationsPro.Models;
 using NotificationsPro.ViewModels;
@@ -125,9 +126,13 @@ public class QueueManager : BaseViewModel
 
         var item = new NotificationItem(appName, title, body);
 
-        // Check highlight keywords
-        if (MatchesAnyKeyword(settings.HighlightKeywords, title, body))
+        // Check highlight keywords — find the first match and use its per-keyword color (falls back to global)
+        var highlightColor = FindMatchingKeywordColor(settings.HighlightKeywords, settings.PerKeywordColors, settings.HighlightColor, title, body);
+        if (highlightColor != null)
+        {
             item.IsHighlighted = true;
+            item.HighlightColor = highlightColor;
+        }
 
         if (settings.NewestOnTop)
             _visibleNotifications.Insert(0, item);
@@ -302,11 +307,37 @@ public class QueueManager : BaseViewModel
         var combined = $"{title} {body}";
         foreach (var kw in keywords)
         {
-            if (!string.IsNullOrWhiteSpace(kw) &&
-                combined.Contains(kw, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(kw)) continue;
+            var pattern = @"\b" + Regex.Escape(kw) + @"\b";
+            if (Regex.IsMatch(combined, pattern, RegexOptions.IgnoreCase))
                 return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Returns the effective highlight color for the first matched keyword, or null if no keyword matches.
+    /// Per-keyword color is used when set; otherwise falls back to the global highlight color.
+    /// </summary>
+    private static string? FindMatchingKeywordColor(
+        List<string> keywords,
+        Dictionary<string, string> perKeywordColors,
+        string globalColor,
+        string title,
+        string body)
+    {
+        if (keywords.Count == 0) return null;
+        var combined = $"{title} {body}";
+        foreach (var kw in keywords)
+        {
+            if (string.IsNullOrWhiteSpace(kw)) continue;
+
+            // Use whole-word matching so "bug" does not match "debug" or "bugs".
+            var pattern = @"\b" + Regex.Escape(kw) + @"\b";
+            if (Regex.IsMatch(combined, pattern, RegexOptions.IgnoreCase))
+                return perKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : globalColor;
+        }
+        return null;
     }
 
     private void OnSettingsChanged()

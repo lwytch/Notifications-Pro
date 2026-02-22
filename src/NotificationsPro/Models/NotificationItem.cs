@@ -35,6 +35,9 @@ public class NotificationItem : INotifyPropertyChanged
 
     public bool IsHighlighted { get; set; }
 
+    /// <summary>Per-notification highlight color (hex). Empty means fall back to the global HighlightColor.</summary>
+    public string HighlightColor { get; set; } = string.Empty;
+
     public void NotifyTimestampChanged() => OnPropertyChanged(nameof(RelativeTimeText));
 
     public NotificationItem(string appName, string title, string body)

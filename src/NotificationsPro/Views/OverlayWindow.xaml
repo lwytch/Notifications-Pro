@@ -37,6 +37,16 @@
                     <TranslateTransform X="0"/>
                 </Border.RenderTransform>
 
+                <Grid>
+                    <!-- Highlight tint overlay — sits outside AccentBorder so it covers the full card (no padding offset).
+                         Background binds to the per-notification HighlightColor so each keyword can have a unique shade. -->
+                    <Border x:Name="HighlightOverlay"
+                            CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Opacity="0"
+                            IsHitTestVisible="False"
+                            Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
+                            Panel.ZIndex="1"/>
+
                 <Border x:Name="AccentBorder"
                         CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
                         Padding="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -57,14 +67,6 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
-                    <!-- Highlight tint overlay — visible when IsHighlighted=True (set via DataTrigger below) -->
-                    <Border x:Name="HighlightOverlay"
-                            Grid.ColumnSpan="2"
-                            CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
-                            Opacity="0"
-                            IsHitTestVisible="False"
-                            Background="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
 
                     <!-- Icon column -->
                     <Image Grid.Column="0" VerticalAlignment="Top"
@@ -321,19 +323,20 @@
                     </Grid>
                 </Grid>
                 </Border>
+                </Grid>
             </Border>
 
             <DataTemplate.Triggers>
                 <!-- Highlight accent override for keyword-matched notifications -->
                 <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
-                    <!-- Recolour the accent stripe -->
+                    <!-- Recolour the accent stripe using the per-notification HighlightColor -->
                     <Setter TargetName="AccentBorder" Property="BorderBrush"
-                            Value="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                            Value="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
                     <!-- Show the background tint overlay -->
                     <Setter TargetName="HighlightOverlay" Property="Opacity" Value="0.18"/>
                     <!-- Also frame the outer card with the highlight colour -->
                     <Setter TargetName="Card" Property="BorderBrush"
-                            Value="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                            Value="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
                     <Setter TargetName="Card" Property="BorderThickness" Value="0,1,1,1"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">

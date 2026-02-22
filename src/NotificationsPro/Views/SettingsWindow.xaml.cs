@@ -114,6 +114,26 @@ public partial class SettingsWindow : Window
         property.SetValue(DataContext, hex);
     }
 
+    private void OnPickKeywordColorClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { DataContext: ViewModels.KeywordHighlightEntry entry }) return;
+        if (DataContext is not ViewModels.SettingsViewModel vm) return;
+
+        var start = ParseHex(entry.Color);
+        using var dialog = new WinForms.ColorDialog
+        {
+            FullOpen = true,
+            AnyColor = true,
+            Color = System.Drawing.Color.FromArgb(start.A, start.R, start.G, start.B)
+        };
+
+        if (dialog.ShowDialog() != WinForms.DialogResult.OK) return;
+
+        var selected = dialog.Color;
+        entry.Color = $"#{selected.R:X2}{selected.G:X2}{selected.B:X2}";
+        vm.NotifyKeywordColorChanged();
+    }
+
     private void OnPickChromaPreset(object sender, RoutedEventArgs e)
     {
         if (sender is not System.Windows.Controls.Button { Tag: string propertyName, CommandParameter: string colorValue }) return;

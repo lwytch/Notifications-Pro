@@ -65,6 +65,7 @@ public class AppSettings
     // Filtering
     public List<string> MutedApps { get; set; } = new();
     public List<string> HighlightKeywords { get; set; } = new();
+    public Dictionary<string, string> PerKeywordColors { get; set; } = new();
     public List<string> MuteKeywords { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
 
@@ -182,6 +183,7 @@ public class AppSettings
         var clone = (AppSettings)MemberwiseClone();
         clone.MutedApps = new List<string>(MutedApps);
         clone.HighlightKeywords = new List<string>(HighlightKeywords);
+        clone.PerKeywordColors = new Dictionary<string, string>(PerKeywordColors);
         clone.MuteKeywords = new List<string>(MuteKeywords);
         clone.PresentationApps = new List<string>(PresentationApps);
         clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);

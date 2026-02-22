@@ -237,7 +237,7 @@ public class SettingsViewModel : BaseViewModel
     private string _newMuteKeyword = string.Empty;
     public string NewMuteKeyword { get => _newMuteKeyword; set => SetProperty(ref _newMuteKeyword, value); }
 
-    public ObservableCollection<string> HighlightKeywords { get; } = new();
+    public ObservableCollection<KeywordHighlightEntry> HighlightKeywordEntries { get; } = new();
     public ObservableCollection<string> MuteKeywords { get; } = new();
     public ObservableCollection<MutedAppEntry> MutedAppEntries { get; } = new();
 
@@ -996,8 +996,14 @@ public class SettingsViewModel : BaseViewModel
             ApplySettingsThemeColors(presetColors, queueSave: false);
         }
 
-        HighlightKeywords.Clear();
-        foreach (var kw in s.HighlightKeywords) HighlightKeywords.Add(kw);
+        HighlightKeywordEntries.Clear();
+        foreach (var kw in s.HighlightKeywords)
+        {
+            var color = s.PerKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : s.HighlightColor;
+            var entry = new KeywordHighlightEntry(kw, color);
+            entry.PropertyChanged += (_, _) => QueueSave();
+            HighlightKeywordEntries.Add(entry);
+        }
         MuteKeywords.Clear();
         foreach (var kw in s.MuteKeywords) MuteKeywords.Add(kw);
         PresentationApps.Clear();
@@ -1128,7 +1134,10 @@ public class SettingsViewModel : BaseViewModel
             DeduplicationEnabled = DeduplicationEnabled,
             DeduplicationWindowSeconds = DeduplicationWindowSeconds,
             HighlightColor = HighlightColor,
-            HighlightKeywords = HighlightKeywords.ToList(),
+            HighlightKeywords = HighlightKeywordEntries.Select(e => e.Keyword).ToList(),
+            PerKeywordColors = HighlightKeywordEntries
+                .Where(e => !string.Equals(e.Color, HighlightColor, StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(e => e.Keyword, e => e.Color),
             MuteKeywords = MuteKeywords.ToList(),
             MutedApps = _settingsManager.Settings.MutedApps,
             ShowNotificationIcons = ShowNotificationIcons,
@@ -1398,9 +1407,11 @@ public class SettingsViewModel : BaseViewModel
     {
         var kw = NewHighlightKeyword?.Trim();
         if (string.IsNullOrWhiteSpace(kw)) return;
-        if (!HighlightKeywords.Contains(kw, StringComparer.OrdinalIgnoreCase))
+        if (!HighlightKeywordEntries.Any(e => string.Equals(e.Keyword, kw, StringComparison.OrdinalIgnoreCase)))
         {
-            HighlightKeywords.Add(kw);
+            var entry = new KeywordHighlightEntry(kw, HighlightColor);
+            entry.PropertyChanged += (_, _) => QueueSave();
+            HighlightKeywordEntries.Add(entry);
             QueueSave();
         }
         NewHighlightKeyword = string.Empty;
@@ -1408,12 +1419,21 @@ public class SettingsViewModel : BaseViewModel
 
     private void RemoveHighlightKeyword(object? parameter)
     {
-        if (parameter is string kw)
+        KeywordHighlightEntry? entry = parameter switch
         {
-            HighlightKeywords.Remove(kw);
+            KeywordHighlightEntry e => e,
+            string kw => HighlightKeywordEntries.FirstOrDefault(e => e.Keyword == kw),
+            _ => null
+        };
+        if (entry != null)
+        {
+            HighlightKeywordEntries.Remove(entry);
             QueueSave();
         }
     }
+
+    /// <summary>Called from code-behind after updating a KeywordHighlightEntry color.</summary>
+    public void NotifyKeywordColorChanged() => QueueSave();
 
     private void AddMuteKeyword()
     {

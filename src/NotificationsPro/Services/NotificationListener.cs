@@ -80,7 +80,7 @@ public class NotificationListener
     private const uint EVENT_OBJECT_NAMECHANGE = 0x800C;
     private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
     private const uint WINEVENT_SKIPOWNPROCESS = 0x0002;
-    private static readonly TimeSpan AccessibilityDebounceWindow = TimeSpan.FromMilliseconds(350);
+    private static readonly TimeSpan AccessibilityDebounceWindow = TimeSpan.FromMilliseconds(150);
 
     public NotificationListener(QueueManager queueManager, Dispatcher dispatcher, SettingsManager settingsManager)
     {
@@ -319,8 +319,10 @@ public class NotificationListener
     {
         try
         {
-            // Short delay to let the notification render.
-            Thread.Sleep(80);
+            // Wait for stacked notifications to render. 300 ms gives enough time for a second
+            // simultaneous toast (e.g. Reddit + X arriving together) to appear in the same host
+            // window so FindNotificationSplitPanes can separate them in one scan.
+            Thread.Sleep(300);
 
             var element = AutomationElement.FromHandle(hwnd);
             if (element == null) return;
@@ -365,6 +367,14 @@ public class NotificationListener
             var depth2 = depth1[0].FindAll(TreeScope.Children, paneCondition);
             if (depth2.Count >= 2)
                 return depth2.Cast<AutomationElement>().ToList();
+
+            // Depth 3 — one more level of nesting (seen on some Windows 11 builds)
+            if (depth2.Count == 1)
+            {
+                var depth3 = depth2[0].FindAll(TreeScope.Children, paneCondition);
+                if (depth3.Count >= 2)
+                    return depth3.Cast<AutomationElement>().ToList();
+            }
         }
 
         return new List<AutomationElement>();
