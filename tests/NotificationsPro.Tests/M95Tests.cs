@@ -190,13 +190,18 @@ public class M95Tests
     // ---- SoundService ----
 
     [Fact]
-    public void SoundService_HasSystemSoundNames()
+    public void SoundService_GetWindowsSounds_ReturnsValidEntries()
     {
-        var names = SoundService.SystemSoundNames;
-        Assert.True(names.Length >= 6);
-        Assert.Contains("None", names);
-        Assert.Contains("Asterisk", names);
-        Assert.Contains("Beep", names);
+        var sounds = SoundService.GetWindowsSounds();
+        // All entries must have non-empty names and WAV paths
+        foreach (var s in sounds)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(s.Name));
+            Assert.False(string.IsNullOrWhiteSpace(s.WavPath));
+        }
+        // Paths (if any) should exist on disk (registry enumeration may return 0 sounds in CI)
+        foreach (var s in sounds)
+            Assert.True(System.IO.File.Exists(s.WavPath), $"WAV not found: {s.WavPath}");
     }
 
     [Fact]

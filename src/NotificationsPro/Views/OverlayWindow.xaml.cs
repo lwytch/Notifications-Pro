@@ -291,6 +291,7 @@ public partial class OverlayWindow : Window
             Left = workArea.Left;
             Top = workArea.Top;
             Width = workArea.Width;
+            MaxHeight = workArea.Height; // Must be set before Height to remove any prior constraint
             Height = workArea.Height;
             _wasFullscreen = true;
 

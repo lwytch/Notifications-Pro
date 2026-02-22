@@ -260,10 +260,10 @@ public class SettingsViewModel : BaseViewModel
     private string _defaultSound = "None";
     public string DefaultSound { get => _defaultSound; set { if (SetProperty(ref _defaultSound, value)) QueueSave(); } }
 
-    public ObservableCollection<string> AvailableSystemSounds { get; } = new(Services.SoundService.SystemSoundNames);
+    public ObservableCollection<Services.SoundService.WindowsSound> AvailableWindowsSounds { get; } = new();
 
     // Per-app dropdown options include "Default" as a fallback option
-    public List<string> PerAppSoundOptions { get; } = new(new[] { "Default" }.Concat(Services.SoundService.SystemSoundNames));
+    public ObservableCollection<Services.SoundService.WindowsSound> PerAppSoundOptions { get; } = new();
     public List<string> PerAppIconOptions { get; } = new(new[] { "Default" }.Concat(Models.IconPreset.PresetNames));
 
     // Toast suppression (M9.5)
@@ -838,6 +838,7 @@ public class SettingsViewModel : BaseViewModel
             BuiltInThemes.Add(t);
         _selectedBuiltInTheme = BuiltInThemes.FirstOrDefault();
         RefreshCustomThemes();
+        RefreshWindowsSounds();
 
         LoadFromSettings();
         RefreshMonitors();
@@ -906,7 +907,9 @@ public class SettingsViewModel : BaseViewModel
         _iconSize = s.IconSize;
         _defaultIconPreset = s.DefaultIconPreset;
         _soundEnabled = s.SoundEnabled;
-        _defaultSound = s.DefaultSound;
+        // Migrate old system sound names (pre-registry) to "None"
+        _defaultSound = s.DefaultSound is "Asterisk" or "Beep" or "Exclamation" or "Hand" or "Question"
+            ? "None" : s.DefaultSound;
         _suppressToastPopups = s.SuppressToastPopups;
         _quietHoursEnabled = s.QuietHoursEnabled;
         _quietHoursStart = s.QuietHoursStart;
@@ -1426,6 +1429,9 @@ public class SettingsViewModel : BaseViewModel
         {
             s.PerAppSounds.TryGetValue(app, out var sound);
             s.PerAppIcons.TryGetValue(app, out var icon);
+            // Migrate old system sound names (pre-registry) to "Default"
+            if (sound is "Asterisk" or "Beep" or "Exclamation" or "Hand" or "Question")
+                sound = null;
             PerAppConfigEntries.Add(new PerAppConfigEntry(app, sound ?? "Default", icon ?? "Default", OnPerAppConfigChanged));
         }
     }
@@ -1505,6 +1511,28 @@ public class SettingsViewModel : BaseViewModel
         foreach (var t in _themeManager.LoadCustomThemes())
             CustomThemes.Add(t);
         RefreshSettingsThemeModeOptions();
+    }
+
+    private void RefreshWindowsSounds()
+    {
+        var none = new Services.SoundService.WindowsSound("None", "None");
+        AvailableWindowsSounds.Clear();
+        AvailableWindowsSounds.Add(none);
+        foreach (var s in Services.SoundService.GetWindowsSounds())
+            AvailableWindowsSounds.Add(s);
+
+        // Re-add any custom WAV entries that are in settings but not from registry
+        var knownPaths = AvailableWindowsSounds.Select(s => s.WavPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (!string.IsNullOrWhiteSpace(_defaultSound) && _defaultSound != "None" && !knownPaths.Contains(_defaultSound))
+        {
+            var name = System.IO.Path.GetFileNameWithoutExtension(_defaultSound);
+            AvailableWindowsSounds.Add(new Services.SoundService.WindowsSound(name, _defaultSound));
+        }
+
+        PerAppSoundOptions.Clear();
+        PerAppSoundOptions.Add(new Services.SoundService.WindowsSound("Default", "Default"));
+        foreach (var s in AvailableWindowsSounds)
+            PerAppSoundOptions.Add(s);
     }
 
     private void ExportSettings()
@@ -1681,8 +1709,12 @@ public class SettingsViewModel : BaseViewModel
 
         // Add to available sounds if not already present
         var displayName = System.IO.Path.GetFileNameWithoutExtension(fileName);
-        if (!AvailableSystemSounds.Contains(destPath))
-            AvailableSystemSounds.Add(destPath);
+        if (!AvailableWindowsSounds.Any(s => string.Equals(s.WavPath, destPath, StringComparison.OrdinalIgnoreCase)))
+        {
+            var ws = new Services.SoundService.WindowsSound(displayName, destPath);
+            AvailableWindowsSounds.Add(ws);
+            PerAppSoundOptions.Add(ws);
+        }
 
         DefaultSound = destPath;
     }
