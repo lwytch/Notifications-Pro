@@ -319,40 +319,60 @@ public class NotificationListener
     {
         try
         {
-            // Brief delay for the notification to fully render
-            Thread.Sleep(300);
+            // Short delay to let the notification render, but short enough that
+            // simultaneous notifications haven't yet stacked into the same window.
+            Thread.Sleep(100);
 
             var element = AutomationElement.FromHandle(hwnd);
             if (element == null) return;
 
-            // Find all text elements in the toast
-            var textCondition = new PropertyCondition(
-                AutomationElement.ControlTypeProperty, ControlType.Text);
-            var textElements = element.FindAll(TreeScope.Descendants, textCondition);
+            // When multiple toasts are stacked in the same host window they appear as
+            // separate Pane children. Process each child independently so simultaneous
+            // notifications are captured as distinct items rather than merged into one.
+            var paneCondition = new PropertyCondition(
+                AutomationElement.ControlTypeProperty, ControlType.Pane);
+            var childPanes = element.FindAll(TreeScope.Children, paneCondition);
 
-            var texts = new List<string>();
-            foreach (AutomationElement textEl in textElements)
+            if (childPanes.Count >= 2)
             {
-                var text = NormalizeText(textEl.Current.Name);
-                if (!string.IsNullOrWhiteSpace(text) && !IsIgnoredUiAutomationText(text))
-                    texts.Add(text);
+                foreach (AutomationElement pane in childPanes)
+                    ExtractAndDispatchFromElement(pane);
             }
-
-            if (texts.Count == 0) return;
-            texts = texts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            var fields = BuildNotificationFields(texts, appName: string.Empty, assumeLeadingAppNameWhenUnknown: true);
-
-            _dispatcher.InvokeAsync(() =>
+            else
             {
-                _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
-                _capturedCount++;
-                UpdateAccessibilityStatus();
-            });
+                ExtractAndDispatchFromElement(element);
+            }
         }
         catch
         {
             // Automation element may have been disposed — skip
         }
+    }
+
+    private void ExtractAndDispatchFromElement(AutomationElement element)
+    {
+        var textCondition = new PropertyCondition(
+            AutomationElement.ControlTypeProperty, ControlType.Text);
+        var textElements = element.FindAll(TreeScope.Descendants, textCondition);
+
+        var texts = new List<string>();
+        foreach (AutomationElement textEl in textElements)
+        {
+            var text = NormalizeText(textEl.Current.Name);
+            if (!string.IsNullOrWhiteSpace(text) && !IsIgnoredUiAutomationText(text))
+                texts.Add(text);
+        }
+
+        if (texts.Count == 0) return;
+        texts = texts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var fields = BuildNotificationFields(texts, appName: string.Empty, assumeLeadingAppNameWhenUnknown: true);
+
+        _dispatcher.InvokeAsync(() =>
+        {
+            _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
+            _capturedCount++;
+            UpdateAccessibilityStatus();
+        });
     }
 
     private static bool IsShellHostWindow(IntPtr hwnd)
