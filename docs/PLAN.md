@@ -287,12 +287,16 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Final polish: primary button text now auto-contrasts against accent color (fixes high-contrast readability)
 - [x] Final polish: timestamp style controls moved to Appearance; Behavior keeps timestamp visibility toggle
 - [x] Final polish: overlay theme apply now explicitly preserves settings-window theme when link toggle is off
+- [x] Final polish: Position tab reorganized (monitor targeting + snapping + 3x3 quick presets) and size controls moved to dedicated Size tab
+- [x] Final polish: settings tab content top-gap reduced and section/action control spacing tightened to reduce visual clutter
+- [x] Final polish: keyword/presentation add-remove actions widened to prevent clipped button labels in Filtering/Streaming
+- [x] Final polish: accessibility fallback now splits merged browser-hosted notifications (e.g., Reddit + X from Chrome) into separate cards
 - [ ] Full manual test checklist pass
 - [ ] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience
 
 ## Current Focus
-Milestone 11 final polish is in progress (UI clarity, timestamp controls, and theme preset polish complete). Next: packaging/installer and final manual QA pass.
+Milestone 11 final polish is in progress (notification split hardening + Position/Size UI cleanup complete). Next: packaging/installer and full manual QA pass.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

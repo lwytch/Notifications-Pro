@@ -400,7 +400,7 @@
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="1"
                                 CornerRadius="10"
-                                Padding="18">
+                                Padding="14,10,14,14">
                             <ContentPresenter ContentSource="SelectedContent"/>
                         </Border>
                     </Grid>

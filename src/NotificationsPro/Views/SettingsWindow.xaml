@@ -16,22 +16,24 @@
         <converters:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <!-- Section header panel — left accent stripe, no box -->
+        <!-- Section header panel -->
         <Style x:Key="SectionHeaderPanel" TargetType="Border">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="BorderThickness" Value="3,0,0,0"/>
-            <Setter Property="Padding" Value="10,3"/>
-            <Setter Property="Margin" Value="0,28,0,12"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceLightBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="0,12,0,10"/>
         </Style>
 
         <!-- Section header text -->
         <Style x:Key="SectionHeader" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
-            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="Margin" Value="0"/>
+            <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}"/>
         </Style>
 
         <!-- Setting label -->
@@ -41,7 +43,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Margin" Value="0,10,0,4"/>
+            <Setter Property="Margin" Value="0,8,0,4"/>
         </Style>
 
         <!-- Setting description -->
@@ -1047,8 +1049,9 @@
                         </DockPanel>
 
                         <DockPanel Margin="0,8,0,8">
-                            <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
-                                    Width="64" Margin="8,0,0,0" Command="{Binding AddHighlightKeywordCommand}"/>
+                            <Button DockPanel.Dock="Right" Content="Add Keyword" Style="{StaticResource SecondaryButton}"
+                                    MinWidth="120" Margin="8,0,0,0" Command="{Binding AddHighlightKeywordCommand}"
+                                    ToolTip="Add the entered keyword to highlight matching notifications"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding NewHighlightKeyword, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Type a keyword and press Add"/>
@@ -1058,9 +1061,10 @@
                                 <DataTemplate>
                                     <DockPanel Margin="0,0,0,8">
                                         <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
-                                                Width="64" Padding="0"
+                                                MinWidth="96"
                                                 Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"/>
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Remove this highlight keyword"/>
                                         <Button DockPanel.Dock="Right" Content="Color" Style="{StaticResource SecondaryButton}"
                                                 Width="52" Padding="0" Margin="0,0,4,0"
                                                 Click="OnPickKeywordColorClick"
@@ -1082,8 +1086,9 @@
                         </Border>
 
                         <DockPanel Margin="0,4,0,8">
-                            <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
-                                    Width="64" Margin="8,0,0,0" Command="{Binding AddMuteKeywordCommand}"/>
+                            <Button DockPanel.Dock="Right" Content="Add Keyword" Style="{StaticResource SecondaryButton}"
+                                    MinWidth="120" Margin="8,0,0,0" Command="{Binding AddMuteKeywordCommand}"
+                                    ToolTip="Add the entered keyword to suppress matching notifications"/>
                             <TextBox Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding NewMuteKeyword, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Type a keyword and press Add"/>
@@ -1093,9 +1098,10 @@
                                 <DataTemplate>
                                     <DockPanel Margin="0,0,0,8">
                                         <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
-                                                Width="64" Padding="0"
+                                                MinWidth="96"
                                                 Command="{Binding DataContext.RemoveMuteKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"/>
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Remove this mute keyword"/>
                                         <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}"
                                                    VerticalAlignment="Center"/>
                                     </DockPanel>
@@ -1232,18 +1238,18 @@
                         </Border>
 
                         <TextBlock Text="Target Monitor" Style="{StaticResource SettingLabel}" ToolTip="Choose a monitor, then click Move to reposition the overlay. Position presets also use this monitor."/>
-                        <DockPanel Margin="0,4,0,0">
-                            <Button DockPanel.Dock="Right" Content="Move" Style="{StaticResource SecondaryButton}"
-                                    Command="{Binding MoveToMonitorCommand}" Margin="8,0,0,0"
-                                    ToolTip="Move the overlay to the selected monitor"/>
-                            <Button DockPanel.Dock="Right" Content="Refresh" Style="{StaticResource SecondaryButton}"
-                                    Command="{Binding RefreshMonitorsCommand}" Margin="8,0,0,0"
+                        <ComboBox Style="{StaticResource SettingsComboBox}" Margin="0,4,0,6"
+                                  ItemsSource="{Binding MonitorItems}"
+                                  SelectedIndex="{Binding SelectedMonitorIndex}"
+                                  ToolTip="Select which monitor the overlay should appear on"/>
+                        <WrapPanel HorizontalAlignment="Right" Margin="0,0,0,4">
+                            <Button Content="Refresh Monitors" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding RefreshMonitorsCommand}" Margin="0,0,8,8"
                                     ToolTip="Re-detect connected monitors"/>
-                            <ComboBox Style="{StaticResource SettingsComboBox}"
-                                      ItemsSource="{Binding MonitorItems}"
-                                      SelectedIndex="{Binding SelectedMonitorIndex}"
-                                      ToolTip="Select which monitor the overlay should appear on"/>
-                        </DockPanel>
+                            <Button Content="Move Overlay" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding MoveToMonitorCommand}" Margin="0,0,0,8"
+                                    ToolTip="Move the overlay to the selected monitor"/>
+                        </WrapPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
@@ -1255,67 +1261,6 @@
                                           ToolTip="Automatically start Notifications Pro when you sign in to Windows"/>
                             <TextBlock Text="Start with Windows" Style="{StaticResource SettingLabel}" ToolTip="Automatically launch Notifications Pro when you sign in"/>
                         </DockPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="SIZE" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <TextBlock Text="Overlay Width" Style="{StaticResource SettingLabel}" ToolTip="Wider overlays show more text per line and work best with single-line mode"/>
-                        <DockPanel Margin="0,4,0,0">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                <TextBox Style="{StaticResource SettingsTextBox}" Width="90"
-                                         Margin="8,0,0,0" VerticalAlignment="Center"
-                                         Text="{Binding OverlayWidth, UpdateSourceTrigger=LostFocus, StringFormat='{}{0:0}'}"
-                                         ToolTip="Type exact width in pixels (220-7680)"/>
-                                <TextBlock Style="{StaticResource SliderValue}" VerticalAlignment="Center"
-                                           Margin="4,0,0,0" Text="px"/>
-                            </StackPanel>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="220" Maximum="7680" Value="{Binding OverlayWidth}"
-                                    TickFrequency="20" IsSnapToTickEnabled="True"
-                                    ToolTip="Width of the overlay window in pixels"/>
-                        </DockPanel>
-                        <TextBlock Text="Width Presets" Style="{StaticResource SettingLabel}" ToolTip="Quickly set width targets for common display classes."/>
-                        <WrapPanel Margin="0,4,0,8" ItemWidth="88">
-                            <Button Content="1080p" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="1080p"/>
-                            <Button Content="2K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="2k"/>
-                            <Button Content="4K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="4k"/>
-                            <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="8k"/>
-                        </WrapPanel>
-
-                        <DockPanel Margin="0,0,0,12">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding AllowManualResize}"
-                                          ToolTip="Allow drag-resizing from left/right edges of the overlay"/>
-                            <TextBlock Text="Allow Manual Resize" Style="{StaticResource SettingLabel}" ToolTip="When enabled, drag the left or right edge of the overlay to resize quickly"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Max Overlay Height" Style="{StaticResource SettingLabel}" ToolTip="The overlay expands vertically as needed up to this limit, then scrolls. If long stacked notifications appear cut off, increase this value or scroll within the overlay. Effective height is still clamped to your active monitor's work area."/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding OverlayMaxHeight, StringFormat='{}{0:0}'}"/><Run Text="px"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="200" Maximum="4320" Value="{Binding OverlayMaxHeight}"
-                                    TickFrequency="10" IsSnapToTickEnabled="True"
-                                    ToolTip="Maximum height the overlay can grow to before scrolling"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Height Presets" Style="{StaticResource SettingLabel}" ToolTip="Quickly set max-height targets for common display classes."/>
-                        <WrapPanel Margin="0,4,0,8" ItemWidth="88">
-                            <Button Content="1080p" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="1080p"/>
-                            <Button Content="2K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="2k"/>
-                            <Button Content="4K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="4k"/>
-                            <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="8k"/>
-                        </WrapPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>
@@ -1343,19 +1288,98 @@
                             <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"
                                        ToolTip="Move overlay to common positions on the selected monitor."/>
                         </Border>
-                        <TextBlock Text="Quick Position" Style="{StaticResource SettingLabel}"/>
-                        <WrapPanel Margin="0,4,0,8" ItemWidth="120">
+                        <TextBlock Text="Quick Position" Style="{StaticResource SettingLabel}" ToolTip="Move overlay to standard positions on the selected monitor."/>
+                        <UniformGrid Columns="3" Margin="0,4,0,8">
                             <Button Content="Top Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-left"/>
                             <Button Content="Top Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-center"/>
-                            <Button Content="Top Right" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                            <Button Content="Top Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-right"/>
                             <Button Content="Middle Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-left"/>
-                            <Button Content="Middle Right" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                            <Button Content="Middle Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-center"/>
+                            <Button Content="Middle Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-right"/>
-                        </WrapPanel>
+                            <Button Content="Bottom Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-left"/>
+                            <Button Content="Bottom Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-center"/>
+                            <Button Content="Bottom Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,0"
+                                    Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-right"/>
+                        </UniformGrid>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- ═══ SIZE TAB ═══ -->
+            <TabItem Header="Size" Style="{StaticResource SettingsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="OVERLAY SIZE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Configure overlay width, height limits, and quick presets."/>
+                        </Border>
+
+                        <TextBlock Text="Overlay Width" Style="{StaticResource SettingLabel}" ToolTip="Wider overlays show more text per line and work best with single-line mode"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <TextBox Style="{StaticResource SettingsTextBox}" Width="90"
+                                         Margin="8,0,0,0" VerticalAlignment="Center"
+                                         Text="{Binding OverlayWidth, UpdateSourceTrigger=LostFocus, StringFormat='{}{0:0}'}"
+                                         ToolTip="Type exact width in pixels (220-7680)"/>
+                                <TextBlock Style="{StaticResource SliderValue}" VerticalAlignment="Center"
+                                           Margin="4,0,0,0" Text="px"/>
+                            </StackPanel>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="220" Maximum="7680" Value="{Binding OverlayWidth}"
+                                    TickFrequency="20" IsSnapToTickEnabled="True"
+                                    ToolTip="Width of the overlay window in pixels"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Width Presets" Style="{StaticResource SettingLabel}" ToolTip="Quickly set width targets for common display classes."/>
+                        <UniformGrid Columns="4" Margin="0,4,0,8">
+                            <Button Content="1080p" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="1080p"/>
+                            <Button Content="2K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="2k"/>
+                            <Button Content="4K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="4k"/>
+                            <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
+                                    Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="8k"/>
+                        </UniformGrid>
+
+                        <DockPanel Margin="0,0,0,12">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AllowManualResize}"
+                                          ToolTip="Allow drag-resizing from left/right edges of the overlay"/>
+                            <TextBlock Text="Allow Manual Resize" Style="{StaticResource SettingLabel}" ToolTip="When enabled, drag the left or right edge of the overlay to resize quickly"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Max Overlay Height" Style="{StaticResource SettingLabel}" ToolTip="The overlay expands vertically as needed up to this limit, then scrolls. If long stacked notifications appear cut off, increase this value or scroll within the overlay. Effective height is still clamped to your active monitor's work area."/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OverlayMaxHeight, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="200" Maximum="4320" Value="{Binding OverlayMaxHeight}"
+                                    TickFrequency="10" IsSnapToTickEnabled="True"
+                                    ToolTip="Maximum height the overlay can grow to before scrolling"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Height Presets" Style="{StaticResource SettingLabel}" ToolTip="Quickly set max-height targets for common display classes."/>
+                        <UniformGrid Columns="4" Margin="0,4,0,8">
+                            <Button Content="1080p" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="1080p"/>
+                            <Button Content="2K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="2k"/>
+                            <Button Content="4K" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="4k"/>
+                            <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
+                                    Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="8k"/>
+                        </UniformGrid>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -1502,8 +1526,10 @@
                                     <DataTemplate>
                                         <DockPanel Margin="0,0,0,8">
                                             <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
+                                                    MinWidth="96"
                                                     Command="{Binding DataContext.RemovePresentationAppCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}" Margin="8,0,0,0"/>
+                                                    CommandParameter="{Binding}" Margin="8,0,0,0"
+                                                    ToolTip="Remove this app from presentation-mode monitoring"/>
                                             <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}" VerticalAlignment="Center"/>
                                         </DockPanel>
                                     </DataTemplate>
@@ -1511,8 +1537,9 @@
                             </ItemsControl>
 
                             <DockPanel Margin="0,0,0,8">
-                                <Button DockPanel.Dock="Right" Content="Add" Style="{StaticResource SecondaryButton}"
-                                        Command="{Binding AddPresentationAppCommand}" Margin="8,0,0,0"/>
+                                <Button DockPanel.Dock="Right" Content="Add App" Style="{StaticResource SecondaryButton}"
+                                        MinWidth="110" Command="{Binding AddPresentationAppCommand}" Margin="8,0,0,0"
+                                        ToolTip="Add this process name to presentation-mode monitoring"/>
                                 <TextBox Style="{StaticResource SettingsTextBox}"
                                          Text="{Binding NewPresentationApp, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="Process name to monitor (e.g. PowerPoint, Zoom)"/>
@@ -2074,4 +2101,3 @@
         </Border>
     </Grid>
 </Window>
-

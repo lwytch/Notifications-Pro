@@ -177,6 +177,10 @@
 - Default visible notification count increased from `3` to `15` (still user-configurable 1-40)
 - Windowed settings mode now applies immersive dark title-bar styling to avoid light-gray native chrome
 - Settings panel spacing refined (labels/controls/descriptions) to reduce cramped layouts
+- Settings tab content top padding reduced and action-row spacing tightened for denser, cleaner scanning
+- Position tab reorganized for clearer flow (monitor picker + action row, snapping section, 3x3 quick-position grid)
+- Overlay size controls moved from `Position` into a dedicated `Size` tab
+- Quick-position presets expanded to include bottom row and middle-center anchors
 - App icon design updated to monochrome white badge with black `N` (purple removed) across tray/settings surfaces
 - Respect Reduce Motion now keeps fade animations active while removing directional movement (fade-only fallback)
 - First-run tips and tray welcome copy updated for current feature set (navigation, theme linkage, shortcuts)
@@ -215,8 +219,10 @@
 - Popup mode position regression: saved normal-window coordinates no longer override popup placement
 - Popup-mode section navigation reliability improved by replacing fragile horizontal tab-strip scrolling with a sidebar
 - Filtering tab per-app sound/icon row clipping by switching to a stacked control layout
+- Keyword/presentation list action buttons no longer clip text (`Add Keyword`, `Add App`, `Remove`)
 - Drag lockout diagnosability: click-through state is now obvious and quickly reversible from tray menu
 - Accessibility mode diagnostics now report captured/candidate/event counters to show whether shell events are being seen
+- Accessibility fallback notification extraction now detects Pane/Group/ListItem split containers and prevents occasional merged browser-hosted toasts (e.g., Reddit + X in Chrome)
 - Notification body text visibility bug (body was bound through a boolean converter incorrectly)
 - Faint transparent panel under cards and persistent tiny scrollbar artifacts in the overlay
 - Expiry removal now respects animation disablement (instant removal when animations are off)

@@ -81,6 +81,19 @@ public class NotificationListener
     private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
     private const uint WINEVENT_SKIPOWNPROCESS = 0x0002;
     private static readonly TimeSpan AccessibilityDebounceWindow = TimeSpan.FromMilliseconds(150);
+    private static readonly string[] KnownBrowserHostNames =
+    {
+        "Google Chrome",
+        "Chrome",
+        "Microsoft Edge",
+        "Edge",
+        "Mozilla Firefox",
+        "Firefox",
+        "Brave",
+        "Brave Browser",
+        "Opera",
+        "Vivaldi"
+    };
 
     public NotificationListener(QueueManager queueManager, Dispatcher dispatcher, SettingsManager settingsManager)
     {
@@ -327,14 +340,15 @@ public class NotificationListener
             var element = AutomationElement.FromHandle(hwnd);
             if (element == null) return;
 
-            // When multiple toasts are stacked in the same host window they appear as
-            // separate Pane children at depth 1 or 2. Search both levels so simultaneous
-            // notifications from different apps (e.g. Reddit + X) are captured separately.
-            var splitPanes = FindNotificationSplitPanes(element);
-            if (splitPanes.Count >= 2)
+            // When multiple toasts are stacked in the same host window they can appear as
+            // Pane/Group/ListItem containers depending on Windows build. Search these
+            // container types at several depths so simultaneous notifications (e.g. Reddit + X)
+            // are captured as separate cards.
+            var splitContainers = FindNotificationSplitContainers(element);
+            if (splitContainers.Count >= 2)
             {
-                foreach (var pane in splitPanes)
-                    ExtractAndDispatchFromElement(pane);
+                foreach (var container in splitContainers)
+                    ExtractAndDispatchFromElement(container);
             }
             else
             {
@@ -348,36 +362,72 @@ public class NotificationListener
     }
 
     /// <summary>
-    /// Searches for notification pane boundaries at depth 1 then depth 2.
-    /// Returns the list of split panes when ≥2 found, or an empty list when the
+    /// Searches for notification container boundaries at depth 1 then depth 2/3.
+    /// Returns the list of split containers when ≥2 found, or an empty list when the
     /// notification appears to be a single item.
     /// </summary>
-    private static List<AutomationElement> FindNotificationSplitPanes(AutomationElement root)
+    private static List<AutomationElement> FindNotificationSplitContainers(AutomationElement root)
     {
-        var paneCondition = new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Pane);
+        var containerCondition = new OrCondition(
+            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Pane),
+            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Group),
+            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem));
 
         // Depth 1 — most common case
-        var depth1 = root.FindAll(TreeScope.Children, paneCondition);
+        var depth1 = FilterContainersWithRelevantText(root.FindAll(TreeScope.Children, containerCondition));
         if (depth1.Count >= 2)
-            return depth1.Cast<AutomationElement>().ToList();
+            return depth1;
 
         // Depth 2 — notifications nested inside a single intermediate pane
         if (depth1.Count == 1)
         {
-            var depth2 = depth1[0].FindAll(TreeScope.Children, paneCondition);
+            var depth2 = FilterContainersWithRelevantText(depth1[0].FindAll(TreeScope.Children, containerCondition));
             if (depth2.Count >= 2)
-                return depth2.Cast<AutomationElement>().ToList();
+                return depth2;
 
             // Depth 3 — one more level of nesting (seen on some Windows 11 builds)
             if (depth2.Count == 1)
             {
-                var depth3 = depth2[0].FindAll(TreeScope.Children, paneCondition);
+                var depth3 = FilterContainersWithRelevantText(depth2[0].FindAll(TreeScope.Children, containerCondition));
                 if (depth3.Count >= 2)
-                    return depth3.Cast<AutomationElement>().ToList();
+                    return depth3;
             }
         }
 
         return new List<AutomationElement>();
+    }
+
+    private static List<AutomationElement> FilterContainersWithRelevantText(AutomationElementCollection candidates)
+    {
+        var filtered = new List<AutomationElement>();
+        foreach (AutomationElement candidate in candidates)
+        {
+            if (HasRelevantTextDescendants(candidate))
+                filtered.Add(candidate);
+        }
+        return filtered;
+    }
+
+    private static bool HasRelevantTextDescendants(AutomationElement element)
+    {
+        try
+        {
+            var textCondition = new PropertyCondition(
+                AutomationElement.ControlTypeProperty, ControlType.Text);
+            var textElements = element.FindAll(TreeScope.Descendants, textCondition);
+            foreach (AutomationElement textEl in textElements)
+            {
+                var text = NormalizeText(textEl.Current.Name);
+                if (!string.IsNullOrWhiteSpace(text) && !IsIgnoredUiAutomationText(text))
+                    return true;
+            }
+        }
+        catch
+        {
+            // Ignore stale/disposed accessibility elements.
+        }
+
+        return false;
     }
 
     private void ExtractAndDispatchFromElement(AutomationElement element)
@@ -395,15 +445,102 @@ public class NotificationListener
         }
 
         if (texts.Count == 0) return;
-        texts = texts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        var fields = BuildNotificationFields(texts, appName: string.Empty, assumeLeadingAppNameWhenUnknown: true);
+
+        // Try to split merged browser notifications from a single accessibility host
+        // (e.g., simultaneous Reddit + X toasts from Chrome).
+        var splitFields = SplitCombinedBrowserToasts(texts);
+        var fieldsToDispatch = new List<(string AppName, string Title, string Body)>();
+
+        if (splitFields.Count >= 2)
+        {
+            fieldsToDispatch.AddRange(splitFields);
+        }
+        else
+        {
+            var distinctTexts = texts.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            var fields = BuildNotificationFields(distinctTexts, appName: string.Empty, assumeLeadingAppNameWhenUnknown: true);
+            if (!string.IsNullOrWhiteSpace(fields.Title) || !string.IsNullOrWhiteSpace(fields.Body))
+                fieldsToDispatch.Add(fields);
+        }
+
+        if (fieldsToDispatch.Count == 0)
+            return;
 
         _dispatcher.InvokeAsync(() =>
         {
-            _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
-            _capturedCount++;
+            foreach (var fields in fieldsToDispatch)
+            {
+                _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
+                _capturedCount++;
+            }
             UpdateAccessibilityStatus();
         });
+    }
+
+    internal static List<(string AppName, string Title, string Body)> SplitCombinedBrowserToasts(IReadOnlyList<string> texts)
+    {
+        var parts = texts
+            .Select(NormalizeText)
+            .Where(t => !string.IsNullOrWhiteSpace(t) && !IsIgnoredUiAutomationText(t))
+            .ToList();
+
+        if (parts.Count < 4)
+            return new();
+
+        var marker = parts[0];
+        if (string.IsNullOrWhiteSpace(marker) || !IsKnownBrowserHostName(marker))
+            return new();
+
+        var markerIndexes = new List<int>();
+        for (var i = 0; i < parts.Count; i++)
+        {
+            if (parts[i].Equals(marker, StringComparison.OrdinalIgnoreCase))
+                markerIndexes.Add(i);
+        }
+
+        if (markerIndexes.Count < 2 || markerIndexes[0] != 0)
+            return new();
+
+        // Reject invalid split points that would produce empty segments.
+        for (var i = 1; i < markerIndexes.Count; i++)
+        {
+            if (markerIndexes[i] - markerIndexes[i - 1] < 2)
+                return new();
+        }
+
+        markerIndexes.Add(parts.Count);
+
+        var results = new List<(string AppName, string Title, string Body)>();
+        for (var i = 0; i < markerIndexes.Count - 1; i++)
+        {
+            var start = markerIndexes[i];
+            var end = markerIndexes[i + 1];
+            var segment = parts.Skip(start).Take(end - start).ToList();
+            if (segment.Count < 2)
+                return new();
+            if (!segment[0].Equals(marker, StringComparison.OrdinalIgnoreCase))
+                return new();
+
+            segment.RemoveAt(0); // remove browser app marker
+            if (segment.Count == 0)
+                return new();
+
+            var fields = BuildNotificationFields(
+                segment,
+                appName: string.Empty,
+                assumeLeadingAppNameWhenUnknown: true);
+            var appName = string.IsNullOrWhiteSpace(fields.AppName) ? marker : fields.AppName;
+
+            if (!string.IsNullOrWhiteSpace(fields.Title) || !string.IsNullOrWhiteSpace(fields.Body))
+                results.Add((appName, fields.Title, fields.Body));
+        }
+
+        return results.Count >= 2 ? results : new();
+    }
+
+    private static bool IsKnownBrowserHostName(string value)
+    {
+        return KnownBrowserHostNames.Contains(value, StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool IsShellHostWindow(IntPtr hwnd)

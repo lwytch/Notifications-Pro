@@ -1289,9 +1289,25 @@ public class SettingsViewModel : BaseViewModel
                 targetLeft = workArea.Left + margin;
                 targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
                 break;
+            case "middle-center":
+                targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
+                targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                break;
             case "middle-right":
                 targetLeft = workArea.Right - targetWidth - margin;
                 targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                break;
+            case "bottom-left":
+                targetLeft = workArea.Left + margin;
+                targetTop = workArea.Bottom - fallbackHeight - margin;
+                break;
+            case "bottom-center":
+                targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
+                targetTop = workArea.Bottom - fallbackHeight - margin;
+                break;
+            case "bottom-right":
+                targetLeft = workArea.Right - targetWidth - margin;
+                targetTop = workArea.Bottom - fallbackHeight - margin;
                 break;
             default:
                 return;

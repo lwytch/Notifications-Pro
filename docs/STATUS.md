@@ -23,7 +23,7 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: eight sections (Profiles, Appearance, Behavior, Filtering, Position, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
+- Settings window: nine sections (Profiles, Appearance, Behavior, Filtering, Position, Size, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
@@ -43,7 +43,9 @@
   - fade-only animation toggle and wider animation speed range (0-1200ms)
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Position tab includes quick preset buttons for top/side placement
-- Position tab now includes overlay-width and overlay-height presets for 1080p/2K/4K/8K targets
+- Position tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
+- Position tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
+- Size tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), and manual-resize toggle
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
 - Visible-notification default increased to `15` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
@@ -73,6 +75,8 @@
   - removes overly strict window/object filters
   - filters by shell host process + toast-like window size
   - surfaces live diagnostics (captured/candidate/event counters + last class seen)
+  - split-container detection now handles Pane/Group/ListItem toast trees to prevent occasional merged browser-hosted notifications
+  - fallback extraction now splits repeated browser-host markers so simultaneous Chrome toasts (for example Reddit + X) dispatch as separate cards
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
 - Slide-in direction configurable (Left, Right, Top, Bottom) via Settings > Behavior > Animations
@@ -171,7 +175,7 @@
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
   - Primary button text foreground now auto-selects black/white for contrast against the active accent color (improves high-contrast readability)
-- 134 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper)
+- 137 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Installer/packaging (Milestone 11)
@@ -295,11 +299,12 @@ dotnet test
 - [ ] Position tab shows Monitor section with detected monitors ComboBox
 - [ ] Selecting a different monitor and clicking "Move" repositions the overlay on that monitor
 - [ ] "Refresh" button updates the monitor list after connecting/disconnecting a display
-- [ ] Position presets (top-left, top-center, etc.) target the selected monitor
+- [ ] Position presets (top/middle/bottom left/center/right) target the selected monitor
+- [ ] Size tab exposes overlay width/max-height sliders, numeric width entry, and 1080p/2K/4K/8K preset buttons
 - [ ] Start with Windows toggle adds a registry Run key for automatic startup
 - [ ] Disabling Start with Windows removes the registry Run key
 - [ ] App launches at Windows startup when the toggle is on
-- [ ] Streaming tab appears in Settings between Position and Accessibility
+- [ ] Streaming tab appears in Settings between Size and Accessibility
 - [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
 - [ ] In Window mode, settings title bar uses dark styling (no light-gray native caption clash)
 - [ ] Fullscreen overlay mode covers the full monitor area including taskbar region
@@ -317,6 +322,7 @@ dotnet test
 - [ ] Per-App Color Tinting toggle enables colored card backgrounds based on source app
 - [ ] Tint intensity slider adjusts the blending strength of per-app colors
 - [ ] Different apps produce visually distinct tint colors
+- [ ] Simultaneous browser-hosted notifications (for example Reddit + X in Chrome) render as separate cards and do not merge text
 
 ## Known Limitations
 - No installer — run from source or publish manually
