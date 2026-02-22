@@ -192,6 +192,13 @@ public partial class OverlayWindow : Window
         }
 
         UpdateClickThrough(settings.ClickThrough);
+
+        // Force a synchronous layout pass so fullscreen/height settings applied above
+        // take effect immediately rather than waiting for the next render frame.
+        InvalidateMeasure();
+        InvalidateArrange();
+        UpdateLayout();
+
         _settingsManager.SettingsChanged += OnSettingsChanged;
     }
 

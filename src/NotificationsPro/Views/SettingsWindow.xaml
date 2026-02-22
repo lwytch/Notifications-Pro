@@ -50,7 +50,7 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Margin" Value="0,6,0,18"/>
+            <Setter Property="Margin" Value="0,3,0,14"/>
         </Style>
 
         <!-- Value display next to slider -->
@@ -117,12 +117,12 @@
                                   ToolTip="Show or hide the live preview card"/>
                 </StackPanel>
                 <StackPanel>
-                    <TextBlock Text="Settings" FontFamily="{StaticResource UIFont}"
+                    <TextBlock Text="Notifications Pro" FontFamily="{StaticResource UIFont}"
                                FontSize="20" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
-                    <TextBlock Text="Customize how notifications appear on your screen"
+                    <TextBlock Text="Settings"
                                FontFamily="{StaticResource UIFont}" FontSize="12"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3,0,0"/>
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -255,28 +255,27 @@
                         <TextBlock Text="Quickly style notification cards. These theme presets affect the overlay. UI Styling controls settings-window colors."
                                    Style="{StaticResource SettingDesc}"/>
 
-                        <ItemsControl ItemsSource="{Binding BuiltInThemes}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Style="{StaticResource SecondaryButton}"
-                                            Margin="0,0,8,8" MinWidth="110" Padding="12,8"
-                                            Command="{Binding DataContext.ApplyThemeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding}">
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Apply" Style="{StaticResource PrimaryButton}"
+                                    Margin="8,0,0,0" Command="{Binding ApplySelectedBuiltInThemeCommand}"
+                                    ToolTip="Apply the selected built-in theme to the overlay"/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding BuiltInThemes}"
+                                      SelectedItem="{Binding SelectedBuiltInTheme}"
+                                      ToolTip="Choose a built-in overlay theme">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Border Width="14" Height="14" CornerRadius="3"
+                                            <Border Width="12" Height="12" CornerRadius="2"
                                                     Background="{Binding AccentColor, Converter={StaticResource ColorToBrush}}"
-                                                    Margin="0,0,6,0"/>
+                                                    Margin="0,0,8,0" VerticalAlignment="Center"/>
                                             <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
                                         </StackPanel>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="CUSTOM OVERLAY THEMES" Style="{StaticResource SectionHeader}"/>
@@ -1495,7 +1494,8 @@
                         </Border>
                         <TextBlock Text="Move overlay to common positions on the selected monitor"
                                    Style="{StaticResource SettingDesc}"/>
-                        <WrapPanel Margin="0,0,0,8" ItemWidth="120">
+                        <TextBlock Text="Quick Position" Style="{StaticResource SettingLabel}"/>
+                        <WrapPanel Margin="0,4,0,8" ItemWidth="120">
                             <Button Content="Top Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-left"/>
                             <Button Content="Top Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
@@ -1721,7 +1721,10 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
-                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,12"
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="ACCESSIBILITY" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Style="{StaticResource SettingDesc}"
                                    Text="Accessibility features help you read, interact with, and manage notifications more easily. Enable Accessibility Mode for a recommended bundle of settings, or configure individual options below."/>
 
                         <DockPanel Margin="0,0,0,4">

@@ -777,6 +777,15 @@ public class SettingsViewModel : BaseViewModel
     public ObservableCollection<ThemePreset> BuiltInThemes { get; } = new();
     public ObservableCollection<ThemePreset> CustomThemes { get; } = new();
 
+    private ThemePreset? _selectedBuiltInTheme;
+    public ThemePreset? SelectedBuiltInTheme
+    {
+        get => _selectedBuiltInTheme;
+        set => SetProperty(ref _selectedBuiltInTheme, value);
+    }
+
+    public ICommand ApplySelectedBuiltInThemeCommand { get; private set; } = null!;
+
     public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
     {
         _settingsManager = settingsManager;
@@ -805,6 +814,11 @@ public class SettingsViewModel : BaseViewModel
         RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
         ToggleMuteAppCommand = new RelayCommand(ToggleMuteApp);
         ApplyThemeCommand = new RelayCommand(ApplyTheme);
+        ApplySelectedBuiltInThemeCommand = new RelayCommand(_ =>
+        {
+            if (SelectedBuiltInTheme != null)
+                ApplyTheme(SelectedBuiltInTheme);
+        });
         SaveCustomThemeCommand = new RelayCommand(_ => SaveCustomTheme());
         DeleteCustomThemeCommand = new RelayCommand(DeleteCustomTheme);
         ExportSettingsCommand = new RelayCommand(_ => ExportSettings());
@@ -822,6 +836,7 @@ public class SettingsViewModel : BaseViewModel
 
         foreach (var t in ThemePreset.BuiltInThemes)
             BuiltInThemes.Add(t);
+        _selectedBuiltInTheme = BuiltInThemes.FirstOrDefault();
         RefreshCustomThemes();
 
         LoadFromSettings();
@@ -1520,6 +1535,19 @@ public class SettingsViewModel : BaseViewModel
 
         var imported = ThemeManager.ImportSettings(dialog.FileName);
         if (imported == null) return;
+
+        // Preserve device-specific fields so importing doesn't reposition the
+        // overlay or reset session state on the current machine.
+        var current = _settingsManager.Settings;
+        imported.OverlayLeft = current.OverlayLeft;
+        imported.OverlayTop = current.OverlayTop;
+        imported.MonitorIndex = current.MonitorIndex;
+        imported.SelectedMonitorIndex = current.SelectedMonitorIndex;
+        imported.SettingsWindowLeft = current.SettingsWindowLeft;
+        imported.SettingsWindowTop = current.SettingsWindowTop;
+        imported.HasShownWelcome = current.HasShownWelcome;
+        imported.OverlayVisible = current.OverlayVisible;
+        imported.NotificationsPaused = current.NotificationsPaused;
 
         _settingsManager.Apply(imported);
         LoadFromSettings();
