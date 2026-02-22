@@ -105,6 +105,18 @@ public class QueueManager : BaseViewModel
 
         int maxVisible = Math.Max(1, settings.MaxVisibleNotifications);
 
+        // Single-line replace mode: clear all current notifications so the new one
+        // takes their place instead of stacking or going to overflow.
+        if (settings.SingleLineMode && settings.SingleLineReplaceMode && _visibleNotifications.Count > 0)
+        {
+            foreach (var old in _visibleNotifications.ToList())
+            {
+                if (_expiryTimers.TryGetValue(old, out var t)) { t.Stop(); _expiryTimers.Remove(old); }
+                _visibleNotifications.Remove(old);
+            }
+            OverflowCount = 0;
+        }
+
         if (_visibleNotifications.Count >= maxVisible)
         {
             OverflowCount++;

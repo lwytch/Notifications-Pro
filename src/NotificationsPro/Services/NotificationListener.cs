@@ -319,23 +319,19 @@ public class NotificationListener
     {
         try
         {
-            // Short delay to let the notification render, but short enough that
-            // simultaneous notifications haven't yet stacked into the same window.
-            Thread.Sleep(100);
+            // Short delay to let the notification render.
+            Thread.Sleep(80);
 
             var element = AutomationElement.FromHandle(hwnd);
             if (element == null) return;
 
             // When multiple toasts are stacked in the same host window they appear as
-            // separate Pane children. Process each child independently so simultaneous
-            // notifications are captured as distinct items rather than merged into one.
-            var paneCondition = new PropertyCondition(
-                AutomationElement.ControlTypeProperty, ControlType.Pane);
-            var childPanes = element.FindAll(TreeScope.Children, paneCondition);
-
-            if (childPanes.Count >= 2)
+            // separate Pane children at depth 1 or 2. Search both levels so simultaneous
+            // notifications from different apps (e.g. Reddit + X) are captured separately.
+            var splitPanes = FindNotificationSplitPanes(element);
+            if (splitPanes.Count >= 2)
             {
-                foreach (AutomationElement pane in childPanes)
+                foreach (var pane in splitPanes)
                     ExtractAndDispatchFromElement(pane);
             }
             else
@@ -347,6 +343,31 @@ public class NotificationListener
         {
             // Automation element may have been disposed — skip
         }
+    }
+
+    /// <summary>
+    /// Searches for notification pane boundaries at depth 1 then depth 2.
+    /// Returns the list of split panes when ≥2 found, or an empty list when the
+    /// notification appears to be a single item.
+    /// </summary>
+    private static List<AutomationElement> FindNotificationSplitPanes(AutomationElement root)
+    {
+        var paneCondition = new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Pane);
+
+        // Depth 1 — most common case
+        var depth1 = root.FindAll(TreeScope.Children, paneCondition);
+        if (depth1.Count >= 2)
+            return depth1.Cast<AutomationElement>().ToList();
+
+        // Depth 2 — notifications nested inside a single intermediate pane
+        if (depth1.Count == 1)
+        {
+            var depth2 = depth1[0].FindAll(TreeScope.Children, paneCondition);
+            if (depth2.Count >= 2)
+                return depth2.Cast<AutomationElement>().ToList();
+        }
+
+        return new List<AutomationElement>();
     }
 
     private void ExtractAndDispatchFromElement(AutomationElement element)

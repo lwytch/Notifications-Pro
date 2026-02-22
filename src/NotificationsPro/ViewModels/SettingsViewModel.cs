@@ -179,6 +179,9 @@ public class SettingsViewModel : BaseViewModel
     private bool _singleLineAutoFullWidth;
     public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set { if (SetProperty(ref _singleLineAutoFullWidth, value)) QueueSave(); } }
 
+    private bool _singleLineReplaceMode;
+    public bool SingleLineReplaceMode { get => _singleLineReplaceMode; set { if (SetProperty(ref _singleLineReplaceMode, value)) QueueSave(); } }
+
     private bool _showTimestamp;
     public bool ShowTimestamp { get => _showTimestamp; set { if (SetProperty(ref _showTimestamp, value)) QueueSave(); } }
 
@@ -258,7 +261,34 @@ public class SettingsViewModel : BaseViewModel
     public bool SoundEnabled { get => _soundEnabled; set { if (SetProperty(ref _soundEnabled, value)) QueueSave(); } }
 
     private string _defaultSound = "None";
-    public string DefaultSound { get => _defaultSound; set { if (SetProperty(ref _defaultSound, value)) QueueSave(); } }
+    public string DefaultSound
+    {
+        get => _defaultSound;
+        set
+        {
+            if (!SetProperty(ref _defaultSound, value)) return;
+            // Keep SelectedWindowsSound in sync
+            var match = AvailableWindowsSounds.FirstOrDefault(s => string.Equals(s.WavPath, value, StringComparison.OrdinalIgnoreCase));
+            if (match != _selectedWindowsSound)
+                SetProperty(ref _selectedWindowsSound, match, nameof(SelectedWindowsSound));
+            QueueSave();
+        }
+    }
+
+    private Services.SoundService.WindowsSound? _selectedWindowsSound;
+    public Services.SoundService.WindowsSound? SelectedWindowsSound
+    {
+        get => _selectedWindowsSound;
+        set
+        {
+            if (!SetProperty(ref _selectedWindowsSound, value)) return;
+            // Keep DefaultSound in sync
+            var path = value?.WavPath ?? "None";
+            if (_defaultSound != path)
+                SetProperty(ref _defaultSound, path, nameof(DefaultSound));
+            QueueSave();
+        }
+    }
 
     public ObservableCollection<Services.SoundService.WindowsSound> AvailableWindowsSounds { get; } = new();
 
@@ -838,9 +868,9 @@ public class SettingsViewModel : BaseViewModel
             BuiltInThemes.Add(t);
         _selectedBuiltInTheme = BuiltInThemes.FirstOrDefault();
         RefreshCustomThemes();
-        RefreshWindowsSounds();
 
         LoadFromSettings();
+        RefreshWindowsSounds(); // After LoadFromSettings so custom WAV paths are already known
         RefreshMonitors();
         RefreshPerAppConfig();
 
@@ -888,6 +918,7 @@ public class SettingsViewModel : BaseViewModel
         _singleLineWrapText = s.SingleLineWrapText;
         _singleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
         _singleLineAutoFullWidth = s.SingleLineAutoFullWidth;
+        _singleLineReplaceMode = s.SingleLineReplaceMode;
         _showTimestamp = s.ShowTimestamp;
         _timestampFontSize = Math.Clamp(s.TimestampFontSize, 8, 32);
         _timestampDisplayMode = NormalizeTimestampDisplayMode(s.TimestampDisplayMode);
@@ -1081,6 +1112,7 @@ public class SettingsViewModel : BaseViewModel
             SingleLineWrapText = SingleLineWrapText,
             SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
             SingleLineAutoFullWidth = SingleLineAutoFullWidth,
+            SingleLineReplaceMode = SingleLineReplaceMode,
             ShowTimestamp = ShowTimestamp,
             TimestampFontSize = Math.Clamp(TimestampFontSize, 8, 32),
             TimestampDisplayMode = NormalizeTimestampDisplayMode(TimestampDisplayMode),
@@ -1533,6 +1565,11 @@ public class SettingsViewModel : BaseViewModel
         PerAppSoundOptions.Add(new Services.SoundService.WindowsSound("Default", "Default"));
         foreach (var s in AvailableWindowsSounds)
             PerAppSoundOptions.Add(s);
+
+        // Sync SelectedWindowsSound to current DefaultSound
+        _selectedWindowsSound = AvailableWindowsSounds.FirstOrDefault(
+            s => string.Equals(s.WavPath, _defaultSound, StringComparison.OrdinalIgnoreCase));
+        OnPropertyChanged(nameof(SelectedWindowsSound));
     }
 
     private void ExportSettings()

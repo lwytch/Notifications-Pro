@@ -58,6 +58,14 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- Highlight tint overlay — visible when IsHighlighted=True (set via DataTrigger below) -->
+                    <Border x:Name="HighlightOverlay"
+                            Grid.ColumnSpan="2"
+                            CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Opacity="0"
+                            IsHitTestVisible="False"
+                            Background="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+
                     <!-- Icon column -->
                     <Image Grid.Column="0" VerticalAlignment="Top"
                            Width="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -318,8 +326,15 @@
             <DataTemplate.Triggers>
                 <!-- Highlight accent override for keyword-matched notifications -->
                 <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                    <!-- Recolour the accent stripe -->
                     <Setter TargetName="AccentBorder" Property="BorderBrush"
                             Value="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                    <!-- Show the background tint overlay -->
+                    <Setter TargetName="HighlightOverlay" Property="Opacity" Value="0.18"/>
+                    <!-- Also frame the outer card with the highlight colour -->
+                    <Setter TargetName="Card" Property="BorderBrush"
+                            Value="{Binding DataContext.HighlightColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                    <Setter TargetName="Card" Property="BorderThickness" Value="0,1,1,1"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>

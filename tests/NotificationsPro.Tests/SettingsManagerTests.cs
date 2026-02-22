@@ -110,7 +110,7 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.AnimationsEnabled);
         Assert.False(settings.FadeOnlyAnimation);
         Assert.Equal("Left", settings.SlideInDirection);
-        Assert.Equal(300, settings.AnimationDurationMs);
+        Assert.Equal(1200, settings.AnimationDurationMs);
         Assert.False(settings.ShowTimestamp);
         Assert.Equal(11, settings.TimestampFontSize);
         Assert.Equal("Relative", settings.TimestampDisplayMode);

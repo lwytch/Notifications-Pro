@@ -45,6 +45,7 @@ public class AppSettings
     public bool SingleLineWrapText { get; set; } = false;
     public int SingleLineMaxLines { get; set; } = 3;
     public bool SingleLineAutoFullWidth { get; set; } = false;
+    public bool SingleLineReplaceMode { get; set; } = false; // Replace existing notification rather than stacking
     public bool ShowTimestamp { get; set; } = false;
     public double TimestampFontSize { get; set; } = 11;
     public string TimestampDisplayMode { get; set; } = "Relative"; // "Relative", "Time", "DateTime"
@@ -56,7 +57,7 @@ public class AppSettings
     public bool AnimationsEnabled { get; set; } = true;
     public bool FadeOnlyAnimation { get; set; } = false;
     public string SlideInDirection { get; set; } = "Left";
-    public double AnimationDurationMs { get; set; } = 300;
+    public double AnimationDurationMs { get; set; } = 1200;
     public bool NotificationsPaused { get; set; } = false;
     public bool DeduplicationEnabled { get; set; } = true;
     public double DeduplicationWindowSeconds { get; set; } = 2;
