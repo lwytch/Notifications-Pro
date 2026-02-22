@@ -51,3 +51,14 @@ Properties/PublishProfiles/
 # Local settings overrides
 appsettings.*.json
 !appsettings.json
+
+# Secrets / credentials
+.env
+.env.*
+!.env.example
+*.token
+*.key
+*.pem
+*.credentials
+secrets.*
+!secrets.example.*
