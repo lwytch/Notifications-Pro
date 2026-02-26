@@ -119,9 +119,9 @@ public class AppSettings
     // Position & Size (null = not yet positioned, use default)
     public double? OverlayLeft { get; set; }
     public double? OverlayTop { get; set; }
-    public double OverlayWidth { get; set; } = 380;
-    public double LastManualOverlayWidth { get; set; } = 380;
-    public double OverlayMaxHeight { get; set; } = 600;
+    public double OverlayWidth { get; set; } = 340;
+    public double LastManualOverlayWidth { get; set; } = 340;
+    public double OverlayMaxHeight { get; set; } = 480;
     public bool AllowManualResize { get; set; } = true;
     public int MonitorIndex { get; set; } = 0;
     public bool SnapToEdges { get; set; } = true;

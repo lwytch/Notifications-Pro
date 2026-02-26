@@ -385,7 +385,7 @@
                                 Background="{DynamicResource SurfaceBgBrush}"
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="10"
+                                CornerRadius="8"
                                 Padding="6">
                             <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                           VerticalScrollBarVisibility="Auto"
@@ -399,8 +399,8 @@
                                 Background="{DynamicResource SurfaceBgBrush}"
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="10"
-                                Padding="14,10,14,14">
+                                CornerRadius="8"
+                                Padding="14,6,14,14">
                             <ContentPresenter ContentSource="SelectedContent"/>
                         </Border>
                     </Grid>

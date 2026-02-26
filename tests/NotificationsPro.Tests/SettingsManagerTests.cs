@@ -128,9 +128,9 @@ public class SettingsManagerTests : IDisposable
         Assert.False(settings.BurstLimitEnabled);
         Assert.Equal(10, settings.BurstLimitCount);
         Assert.Equal(5, settings.BurstLimitWindowSeconds);
-        Assert.Equal(380, settings.OverlayWidth);
-        Assert.Equal(380, settings.LastManualOverlayWidth);
-        Assert.Equal(600, settings.OverlayMaxHeight);
+        Assert.Equal(340, settings.OverlayWidth);
+        Assert.Equal(340, settings.LastManualOverlayWidth);
+        Assert.Equal(480, settings.OverlayMaxHeight);
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);

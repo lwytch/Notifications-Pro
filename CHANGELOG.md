@@ -3,6 +3,30 @@
 ## Unreleased
 
 ### Added
+- **Per-keyword highlight colors** — each keyword can have its own highlight color with per-keyword color picker in Filtering tab
+- **Comprehensive UI/UX polish pass (21 fixes)**
+  - Settings window default height reduced (760→680) for better fit on 1080p
+  - Section header margins increased for clearer visual separation between sections
+  - Setting label top margin increased for better vertical rhythm
+  - Setting description bottom margin reduced to tighten spacing
+  - Color picker standardization: all swatches 28×28, all Pick buttons labeled, all hex inputs live-update
+  - Toggle row spacing tightened (12px→8px bottom gap)
+  - Redundant section header self-tooltip removed
+  - Custom theme Delete button now labeled (was cryptic "X")
+  - List item button sizing standardized across all tabs (Remove=72px, Add=110px)
+  - List item row margins unified to 6px
+  - Add-keyword input row margins made consistent
+  - Redundant "Quick Position" label removed (section header suffices)
+  - Conditional sub-settings now visually indented 12px for hierarchy
+  - Help tab grid columns unified to 180px width with consistent row spacing
+  - Help tab expanded: Settings Overview section, extra troubleshooting entries, hotkey format guidance
+  - Overlay default width reduced (380→340) and max height (600→480) for smaller displays
+  - Tab panel corner radius unified to 8px (was 10px) matching control radius
+  - Tab content top padding reduced for tighter first-section clearance
+  - UI Styling color picker spacing reduced (12px→4px between rows)
+  - ComboBox bottom margins standardized to 0px
+
+### Previously added
 - **Milestone 9.5: Enhanced Settings, Sounds, Icons & Theming**
 - Width text input box next to overlay width slider in Position tab for precise pixel entry
 - Accessibility master toggle — one-click enable of all recommended accessibility settings (persistent notifications, reduce motion, high contrast, text scaling, spacious density)

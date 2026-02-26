@@ -31,6 +31,10 @@
 - Windowed settings mode now applies immersive dark title-bar styling (removes the light-gray native chrome mismatch)
 - Settings control spacing refined (labels, inputs, and descriptions) to reduce cramped text/field layout
 - Section headers now render as boxed panels across tabs to improve category scanning in long scrollable pages
+- Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
+- Per-keyword highlight colors — each keyword can have its own color with inline color picker
+- Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
+- Settings window default height reduced to 680px
 - Behavior tab includes:
   - configurable visible card count (1-40)
   - content field toggles (show app name, title, body)

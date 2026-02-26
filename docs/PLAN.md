@@ -295,8 +295,31 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [ ] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience
 
+### UI/UX Audit & Polish Pass
+**Status: Complete**
+
+Comprehensive professional UI/UX review — 21 fixes covering spacing, consistency, visual hierarchy, and Help content:
+- [x] Settings window height reduced (760→680)
+- [x] Section header and setting label vertical rhythm improved
+- [x] Color pickers standardized (swatch size, button labeling, live-update bindings)
+- [x] Toggle row margins tightened (12→8px)
+- [x] Redundant self-tooltip on section headers removed
+- [x] Custom theme delete button properly labeled
+- [x] List item button sizing and row margins unified
+- [x] Add-keyword input row margins made consistent
+- [x] Redundant Quick Position label removed
+- [x] Conditional/nested settings visually indented
+- [x] Help tab grids unified (column width, row spacing)
+- [x] Help tab expanded with Settings Overview and extra troubleshooting
+- [x] Overlay default size reduced for smaller displays
+- [x] Tab panel corner radius unified (10→8px)
+- [x] Tab content padding asymmetry fixed
+- [x] UI Styling color picker spacing reduced
+- [x] ComboBox bottom margins standardized
+- [x] Per-keyword highlight colors with per-keyword color picker
+
 ## Current Focus
-Milestone 11 final polish is in progress (notification split hardening + Position/Size UI cleanup complete). Next: packaging/installer and full manual QA pass.
+UI/UX audit complete. Milestone 11 final polish continues: packaging/installer and full manual QA pass.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.
