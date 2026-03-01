@@ -62,3 +62,5 @@ appsettings.*.json
 *.credentials
 secrets.*
 !secrets.example.*
+#### Ignore Project Summary Json
+_cv_project_export.json
