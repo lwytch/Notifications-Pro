@@ -238,7 +238,7 @@ public class SettingsViewModel : BaseViewModel
     public string NewMuteKeyword { get => _newMuteKeyword; set => SetProperty(ref _newMuteKeyword, value); }
 
     public ObservableCollection<KeywordHighlightEntry> HighlightKeywordEntries { get; } = new();
-    public ObservableCollection<string> MuteKeywords { get; } = new();
+    public ObservableCollection<MuteKeywordEntry> MuteKeywordEntries { get; } = new();
     public ObservableCollection<MutedAppEntry> MutedAppEntries { get; } = new();
 
     // Notification icons (M9.5)
@@ -299,6 +299,13 @@ public class SettingsViewModel : BaseViewModel
     // Toast suppression (M9.5)
     private bool _suppressToastPopups;
     public bool SuppressToastPopups { get => _suppressToastPopups; set { if (SetProperty(ref _suppressToastPopups, value)) QueueSave(); } }
+
+    // Session archive (M13) — opt-in, RAM-only
+    private bool _sessionArchiveEnabled;
+    public bool SessionArchiveEnabled { get => _sessionArchiveEnabled; set { if (SetProperty(ref _sessionArchiveEnabled, value)) QueueSave(); } }
+
+    private int _sessionArchiveMaxItems = 200;
+    public int SessionArchiveMaxItems { get => _sessionArchiveMaxItems; set { if (SetProperty(ref _sessionArchiveMaxItems, Math.Clamp(value, 10, 1000))) QueueSave(); } }
 
     // Scheduling
     private bool _quietHoursEnabled;
@@ -481,6 +488,9 @@ public class SettingsViewModel : BaseViewModel
 
     private string _settingsWindowBorder = "#353535";
     public string SettingsWindowBorder { get => _settingsWindowBorder; set => SetSettingsWindowColor(ref _settingsWindowBorder, value); }
+
+    private double _settingsWindowCornerRadius = 12;
+    public double SettingsWindowCornerRadius { get => _settingsWindowCornerRadius; set { if (SetProperty(ref _settingsWindowCornerRadius, value)) QueueSave(); } }
 
     private bool _linkOverlayThemeAndUiTheme;
     public bool LinkOverlayThemeAndUiTheme { get => _linkOverlayThemeAndUiTheme; set { if (SetProperty(ref _linkOverlayThemeAndUiTheme, value)) QueueSave(); } }
@@ -796,6 +806,8 @@ public class SettingsViewModel : BaseViewModel
     public ICommand TestSoundCommand { get; }
     public ICommand BrowseCustomSoundCommand { get; }
     public ICommand BrowseCustomIconCommand { get; }
+    public ICommand ApplyStreamingPresetCommand { get; }
+    public ICommand ViewSessionArchiveCommand { get; }
     public ImageSource TrayIconImage { get; }
 
     // Themes
@@ -861,6 +873,8 @@ public class SettingsViewModel : BaseViewModel
         TestSoundCommand = new RelayCommand(_ => TestSound());
         BrowseCustomSoundCommand = new RelayCommand(_ => BrowseCustomSound());
         BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
+        ApplyStreamingPresetCommand = new RelayCommand(_ => ApplyStreamingPreset());
+        ViewSessionArchiveCommand = new RelayCommand(_ => ViewSessionArchive());
         DismissFirstRunTipCommand = new RelayCommand(_ => DismissFirstRunTip());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
@@ -942,6 +956,8 @@ public class SettingsViewModel : BaseViewModel
         _defaultSound = s.DefaultSound is "Asterisk" or "Beep" or "Exclamation" or "Hand" or "Question"
             ? "None" : s.DefaultSound;
         _suppressToastPopups = s.SuppressToastPopups;
+        _sessionArchiveEnabled = s.SessionArchiveEnabled;
+        _sessionArchiveMaxItems = s.SessionArchiveMaxItems;
         _quietHoursEnabled = s.QuietHoursEnabled;
         _quietHoursStart = s.QuietHoursStart;
         _quietHoursEnd = s.QuietHoursEnd;
@@ -984,6 +1000,7 @@ public class SettingsViewModel : BaseViewModel
         _settingsWindowTextMuted = s.SettingsWindowTextMuted;
         _settingsWindowAccent = s.SettingsWindowAccent;
         _settingsWindowBorder = s.SettingsWindowBorder;
+        _settingsWindowCornerRadius = s.SettingsWindowCornerRadius;
         _linkOverlayThemeAndUiTheme = s.LinkOverlayThemeAndUiTheme;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
@@ -1000,12 +1017,19 @@ public class SettingsViewModel : BaseViewModel
         foreach (var kw in s.HighlightKeywords)
         {
             var color = s.PerKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : s.HighlightColor;
-            var entry = new KeywordHighlightEntry(kw, color);
+            var isRegex = s.HighlightKeywordRegexFlags.TryGetValue(kw, out var rf) && rf;
+            var entry = new KeywordHighlightEntry(kw, color, isRegex);
             entry.PropertyChanged += (_, _) => QueueSave();
             HighlightKeywordEntries.Add(entry);
         }
-        MuteKeywords.Clear();
-        foreach (var kw in s.MuteKeywords) MuteKeywords.Add(kw);
+        MuteKeywordEntries.Clear();
+        foreach (var kw in s.MuteKeywords)
+        {
+            var isRegex = s.MuteKeywordRegexFlags.TryGetValue(kw, out var rf) && rf;
+            var entry = new MuteKeywordEntry(kw, isRegex);
+            entry.PropertyChanged += (_, _) => QueueSave();
+            MuteKeywordEntries.Add(entry);
+        }
         PresentationApps.Clear();
         foreach (var app in s.PresentationApps) PresentationApps.Add(app);
         RefreshMutedAppEntries();
@@ -1138,7 +1162,13 @@ public class SettingsViewModel : BaseViewModel
             PerKeywordColors = HighlightKeywordEntries
                 .Where(e => !string.Equals(e.Color, HighlightColor, StringComparison.OrdinalIgnoreCase))
                 .ToDictionary(e => e.Keyword, e => e.Color),
-            MuteKeywords = MuteKeywords.ToList(),
+            HighlightKeywordRegexFlags = HighlightKeywordEntries
+                .Where(e => e.IsRegex)
+                .ToDictionary(e => e.Keyword, _ => true),
+            MuteKeywords = MuteKeywordEntries.Select(e => e.Keyword).ToList(),
+            MuteKeywordRegexFlags = MuteKeywordEntries
+                .Where(e => e.IsRegex)
+                .ToDictionary(e => e.Keyword, _ => true),
             MutedApps = _settingsManager.Settings.MutedApps,
             ShowNotificationIcons = ShowNotificationIcons,
             IconSize = IconSize,
@@ -1148,6 +1178,8 @@ public class SettingsViewModel : BaseViewModel
             DefaultSound = DefaultSound,
             PerAppSounds = new Dictionary<string, string>(_settingsManager.Settings.PerAppSounds),
             SuppressToastPopups = SuppressToastPopups,
+            SessionArchiveEnabled = SessionArchiveEnabled,
+            SessionArchiveMaxItems = SessionArchiveMaxItems,
             QuietHoursEnabled = QuietHoursEnabled,
             QuietHoursStart = QuietHoursStart,
             QuietHoursEnd = QuietHoursEnd,
@@ -1206,6 +1238,7 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowTextMuted = SettingsWindowTextMuted,
             SettingsWindowAccent = SettingsWindowAccent,
             SettingsWindowBorder = SettingsWindowBorder,
+            SettingsWindowCornerRadius = SettingsWindowCornerRadius,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
@@ -1455,9 +1488,11 @@ public class SettingsViewModel : BaseViewModel
     {
         var kw = NewMuteKeyword?.Trim();
         if (string.IsNullOrWhiteSpace(kw)) return;
-        if (!MuteKeywords.Contains(kw, StringComparer.OrdinalIgnoreCase))
+        if (!MuteKeywordEntries.Any(e => string.Equals(e.Keyword, kw, StringComparison.OrdinalIgnoreCase)))
         {
-            MuteKeywords.Add(kw);
+            var entry = new MuteKeywordEntry(kw);
+            entry.PropertyChanged += (_, _) => QueueSave();
+            MuteKeywordEntries.Add(entry);
             QueueSave();
         }
         NewMuteKeyword = string.Empty;
@@ -1465,9 +1500,15 @@ public class SettingsViewModel : BaseViewModel
 
     private void RemoveMuteKeyword(object? parameter)
     {
-        if (parameter is string kw)
+        MuteKeywordEntry? entry = parameter switch
         {
-            MuteKeywords.Remove(kw);
+            MuteKeywordEntry e => e,
+            string kw => MuteKeywordEntries.FirstOrDefault(e => e.Keyword == kw),
+            _ => null
+        };
+        if (entry != null)
+        {
+            MuteKeywordEntries.Remove(entry);
             QueueSave();
         }
     }
@@ -1817,6 +1858,43 @@ public class SettingsViewModel : BaseViewModel
             AvailableIconPresets.Add(destPath);
 
         DefaultIconPreset = destPath;
+    }
+
+    private void ApplyStreamingPreset()
+    {
+        ChromaKeyEnabled = true;
+        ChromaKeyColor = "#00FF00";
+        ObsFixedWindowMode = true;
+        PerAppTintEnabled = true;
+        QueueSave();
+    }
+
+    private void ViewSessionArchive()
+    {
+        var archive = _queueManager.SessionArchive;
+        if (archive.Count == 0)
+        {
+            System.Windows.MessageBox.Show("No archived notifications yet.\n\nNotifications are archived while the app is running when Session Archive is enabled.",
+                "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var lines = archive
+            .AsEnumerable().Reverse()
+            .Select(a =>
+            {
+                var elapsed = DateTime.Now - a.ReceivedAt;
+                var timeStr = elapsed.TotalMinutes < 1 ? "just now"
+                    : elapsed.TotalMinutes < 60 ? $"{(int)elapsed.TotalMinutes}m ago"
+                    : $"{(int)elapsed.TotalHours}h ago";
+                var parts = new[] { a.AppName, a.Title, a.Body }
+                    .Where(s => !string.IsNullOrWhiteSpace(s));
+                return $"[{timeStr}] {string.Join(" — ", parts)}";
+            });
+        var text = string.Join("\n", lines);
+        System.Windows.Clipboard.SetText(text);
+        System.Windows.MessageBox.Show($"{archive.Count} archived notification(s) copied to clipboard.\n\nThis data exists only in RAM and will be cleared when the app closes.",
+            "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     public void RefreshMonitors()

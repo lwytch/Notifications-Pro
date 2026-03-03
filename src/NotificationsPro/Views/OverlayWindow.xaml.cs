@@ -63,9 +63,18 @@ public partial class OverlayWindow : Window
         // we can install the Win32 hook. Loaded fires AFTER the window is shown.
         SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
+        Closed += OnClosed;
         LocationChanged += OnLocationChanged;
         SizeChanged += OnSizeChanged;
         PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        _settingsManager.SettingsChanged -= OnSettingsChanged;
+        _hoverCheckTimer?.Stop();
+        if (DataContext is OverlayViewModel vm)
+            vm.Cleanup();
     }
 
     private void OnSourceInitialized(object? sender, EventArgs e)
@@ -599,9 +608,56 @@ public partial class OverlayWindow : Window
                         muteVm.Queue.MuteApp(item.AppName);
                 };
                 menu.Items.Add(muteMenuItem);
+
+                var settingsForAppMenuItem = new MenuItem { Header = $"Settings for {item.AppName}..." };
+                settingsForAppMenuItem.Click += (_, _) =>
+                {
+                    if (System.Windows.Application.Current is App app)
+                        app.ShowSettingsForApp(item.AppName);
+                };
+                menu.Items.Add(settingsForAppMenuItem);
             }
 
             menu.Items.Add(new Separator());
+        }
+
+        var copyAllMenuItem = new MenuItem { Header = "Copy All to Clipboard" };
+        copyAllMenuItem.Click += (_, _) =>
+        {
+            if (DataContext is OverlayViewModel copyAllVm)
+            {
+                var notifications = copyAllVm.Queue.VisibleNotifications.ToList();
+                if (notifications.Count == 0) return;
+                var lines = notifications.Select(n =>
+                {
+                    var parts = new[] { n.AppName, n.Title, n.Body }
+                        .Where(s => !string.IsNullOrWhiteSpace(s));
+                    return string.Join(" — ", parts);
+                });
+                System.Windows.Clipboard.SetText(string.Join("\n", lines));
+            }
+        };
+        menu.Items.Add(copyAllMenuItem);
+
+        // Search toggle
+        if (DataContext is OverlayViewModel searchVm)
+        {
+            var searchMenuItem = new MenuItem { Header = searchVm.IsSearchVisible ? "Hide Search" : "Search..." };
+            searchMenuItem.Click += (_, _) =>
+            {
+                if (DataContext is OverlayViewModel svm)
+                {
+                    svm.IsSearchVisible = !svm.IsSearchVisible;
+                    if (svm.IsSearchVisible)
+                    {
+                        Dispatcher.BeginInvoke(() =>
+                        {
+                            SearchBox?.Focus();
+                        }, System.Windows.Threading.DispatcherPriority.Input);
+                    }
+                }
+            };
+            menu.Items.Add(searchMenuItem);
         }
 
         var clearMenuItem = new MenuItem { Header = "Clear All" };

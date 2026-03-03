@@ -9,10 +9,10 @@ namespace NotificationsPro.Services;
 /// </summary>
 public class HotkeyManager : IDisposable
 {
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
     private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
     private const int WM_HOTKEY = 0x0312;
@@ -79,6 +79,7 @@ public class HotkeyManager : IDisposable
         UnregisterHotKey(_hwnd, HOTKEY_TOGGLE_DND);
 
         _hwndSource?.RemoveHook(WndProc);
+        _hwndSource?.Dispose();
         _hwndSource = null;
         _registered = false;
     }

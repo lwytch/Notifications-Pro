@@ -57,7 +57,7 @@ src/NotificationsPro/
     SettingsViewModel.cs       # Binds settings to UI with debounced auto-save
   Views/
     OverlayWindow.xaml(.cs)    # Transparent always-on-top overlay with slide-in animations
-    SettingsWindow.xaml(.cs)   # Tabbed settings UI (Themes / Appearance / Behavior / Filtering / Position / Streaming / Accessibility / UI Styling)
+    SettingsWindow.xaml(.cs)   # Tabbed settings UI (Themes / Appearance / Behavior / Filtering / Layout / Sounds / Streaming / Accessibility / UI Styling)
   Helpers/
     SnapHelper.cs              # Snap-to-edge calculations
     IconHelper.cs              # Programmatic tray icon generation
@@ -87,7 +87,7 @@ docs/
 1. **Never persist notification content** — no database, no flat files, no registry, no cache, no telemetry.
 2. **No logs containing notification title/body/content.** If logging exists, it must be OFF by default and must never include notification content even when enabled.
 3. **Notification content exists only in RAM** for rendering. Discard immediately after display expires/dismissal.
-4. **No history buffer.** Only hold what's currently visible/on-screen; overflow stores a count only.
+4. **No history buffer by default.** Only hold what's currently visible/on-screen; overflow stores a count only. Exception: the opt-in Session Archive (disabled by default) temporarily holds notification text in RAM for the current session. It is never written to disk and is cleared when the app closes.
 5. **Overflow notifications store only a count**, not content.
 6. **Persistent writes are settings/assets only** — `%AppData%\NotificationsPro\settings.json`, `%AppData%\NotificationsPro\themes\*.json`, and optional user-provided assets under `%AppData%\NotificationsPro\icons\` and `%AppData%\NotificationsPro\sounds\` (plus user-chosen import/export JSON). Never write notification title/body.
 

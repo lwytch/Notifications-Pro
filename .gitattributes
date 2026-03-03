@@ -1,0 +1,31 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Source code
+*.cs text
+*.xaml text
+*.csproj text
+*.sln text
+
+# Documentation
+*.md text
+*.txt text
+
+# Data
+*.json text
+*.xml text
+
+# Config
+*.editorconfig text
+*.gitignore text
+*.gitattributes text
+
+# Binary files
+*.exe binary
+*.dll binary
+*.pdb binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.wav binary

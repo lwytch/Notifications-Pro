@@ -41,12 +41,22 @@ public class NotificationListener
     private int _accessibilityEventCount;
     private int _accessibilityCandidateCount;
 
+    // WinRT auto-retry
+    private DispatcherTimer? _winrtRetryTimer;
+    private int _winrtRetryCount;
+
+    // Shell host process ID cache (lock-free — only accessed from dispatcher thread)
+    // Avoids expensive Process.GetProcessById on every accessibility event
+    private readonly Dictionary<uint, (bool IsShellHost, DateTime CachedAt)> _shellHostCache = new();
+    private static readonly TimeSpan ShellHostCacheTtl = TimeSpan.FromSeconds(60);
+
     // Shared state
     private bool _isRunning;
     private int _pollCount;
     private int _capturedCount;
 
     public bool IsAccessGranted { get; private set; }
+    public string ListenerMode => _usingAccessibility ? "Accessibility" : (IsAccessGranted ? "WinRT" : "Initializing");
     public string StatusMessage { get; private set; } = "Not initialized";
     public event Action? StatusChanged;
 
@@ -135,6 +145,13 @@ public class NotificationListener
 
         // Fall back to accessibility-based capture
         StartAccessibilityCapture();
+
+        // Do NOT auto-retry WinRT — RequestAccessAsync can report "Allowed"
+        // for unpackaged desktop apps even though the WinRT listener never
+        // delivers notifications. Auto-upgrading would kill the working
+        // accessibility hook and replace it with a broken WinRT path.
+        // Users can manually retry via the tray menu if needed.
+
         return _usingAccessibility;
     }
 
@@ -166,7 +183,7 @@ public class NotificationListener
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Seed failed ({ex.GetType().Name}): {ex.Message}";
+            StatusMessage = $"Seed failed ({ex.GetType().Name})";
             StatusChanged?.Invoke();
         }
 
@@ -209,7 +226,7 @@ public class NotificationListener
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Poll #{_pollCount} error: {ex.GetType().Name}: {ex.Message}";
+            StatusMessage = $"Poll #{_pollCount} error: {ex.GetType().Name}";
             StatusChanged?.Invoke();
         }
         finally
@@ -228,7 +245,11 @@ public class NotificationListener
         {
             var notifications = await _listener.GetNotificationsAsync(NotificationKinds.Toast);
             var notification = notifications.FirstOrDefault(n => n.Id == notificationId);
-            if (notification != null) ExtractAndForwardWinRT(notification);
+            if (notification != null)
+            {
+                _capturedCount++;
+                ExtractAndForwardWinRT(notification);
+            }
         }
         catch { }
     }
@@ -543,21 +564,50 @@ public class NotificationListener
         return KnownBrowserHostNames.Contains(value, StringComparer.OrdinalIgnoreCase);
     }
 
-    private static bool IsShellHostWindow(IntPtr hwnd)
+    /// <summary>
+    /// Checks if the window belongs to a shell host process (toast container).
+    /// Uses a lock-free cache to avoid calling Process.GetProcessById on every
+    /// accessibility event (hundreds/sec). Safe because OnWinEvent always runs
+    /// on the dispatcher thread (WINEVENT_OUTOFCONTEXT).
+    /// </summary>
+    private bool IsShellHostWindow(IntPtr hwnd)
     {
         _ = GetWindowThreadProcessId(hwnd, out var processId);
         if (processId == 0) return false;
 
+        var now = DateTime.UtcNow;
+
+        // Check cache first (no lock needed — single-threaded access)
+        if (_shellHostCache.TryGetValue(processId, out var cached) &&
+            now - cached.CachedAt < ShellHostCacheTtl)
+        {
+            return cached.IsShellHost;
+        }
+
+        bool isShellHost;
         try
         {
             using var process = Process.GetProcessById((int)processId);
-            return process.ProcessName.Equals("ShellExperienceHost", StringComparison.OrdinalIgnoreCase)
+            isShellHost = process.ProcessName.Equals("ShellExperienceHost", StringComparison.OrdinalIgnoreCase)
                 || process.ProcessName.Equals("StartMenuExperienceHost", StringComparison.OrdinalIgnoreCase);
         }
         catch
         {
-            return false;
+            isShellHost = false;
         }
+
+        _shellHostCache[processId] = (isShellHost, now);
+
+        // Periodic eviction to prevent unbounded growth
+        if (_shellHostCache.Count > 100)
+        {
+            var staleKeys = _shellHostCache
+                .Where(kvp => now - kvp.Value.CachedAt > ShellHostCacheTtl)
+                .Select(kvp => kvp.Key).ToList();
+            foreach (var key in staleKeys) _shellHostCache.Remove(key);
+        }
+
+        return isShellHost;
     }
 
     private bool ShouldProcessAccessibilityCandidate(IntPtr hwnd)
@@ -680,6 +730,52 @@ public class NotificationListener
     //  Shared
     // ========================
 
+    private void StartWinRTRetryTimer()
+    {
+        _winrtRetryTimer?.Stop();
+        _winrtRetryTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(60) };
+        _winrtRetryTimer.Tick += async (_, _) => await TryWinRTUpgradeAsync();
+        _winrtRetryTimer.Start();
+    }
+
+    private async Task TryWinRTUpgradeAsync()
+    {
+        _winrtRetryCount++;
+        try
+        {
+            var listener = UserNotificationListener.Current;
+            var accessStatus = await listener.RequestAccessAsync();
+
+            if (accessStatus == UserNotificationListenerAccessStatus.Allowed)
+            {
+                // WinRT is now available — switch from accessibility
+                _winrtRetryTimer?.Stop();
+                _winrtRetryTimer = null;
+
+                // Stop accessibility capture
+                if (_winEventHook != IntPtr.Zero)
+                {
+                    UnhookWinEvent(_winEventHook);
+                    _winEventHook = IntPtr.Zero;
+                }
+                _accessibilityStatusTimer?.Stop();
+                _usingAccessibility = false;
+
+                // Start WinRT
+                _listener = listener;
+                IsAccessGranted = true;
+                _isRunning = false; // Reset so StartWinRTListening proceeds
+                StatusMessage = "Upgraded to WinRT listener (access granted on retry)";
+                StatusChanged?.Invoke();
+                StartWinRTListening();
+            }
+        }
+        catch
+        {
+            // Still unavailable — keep retrying
+        }
+    }
+
     public async Task RetryAccessAsync()
     {
         Stop();
@@ -695,6 +791,8 @@ public class NotificationListener
         _isRunning = false;
         _pollTimer?.Stop();
         _pollTimer = null;
+        _winrtRetryTimer?.Stop();
+        _winrtRetryTimer = null;
 
         if (_accessibilityStatusTimer != null)
         {
@@ -713,6 +811,7 @@ public class NotificationListener
         }
 
         _seenIds.Clear();
+        _shellHostCache.Clear();
         lock (_accessibilityGate)
         {
             _recentAccessibilityCandidates.Clear();

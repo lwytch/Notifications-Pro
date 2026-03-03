@@ -388,6 +388,28 @@
                 </Style>
             </ScrollViewer.Resources>
             <StackPanel>
+                <!-- Search bar (toggled via right-click context menu) -->
+                <Border Visibility="{Binding SearchBarVisibility}"
+                        Margin="0,0,0,4"
+                        CornerRadius="{Binding CornerRadius}"
+                        Padding="8,6">
+                    <Border.Background>
+                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                            <Binding Path="BackgroundColor"/>
+                            <Binding Path="BackgroundOpacity"/>
+                        </MultiBinding>
+                    </Border.Background>
+                    <TextBox x:Name="SearchBox"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             FontFamily="{Binding FontFamily}"
+                             FontSize="{Binding FontSize}"
+                             Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             CaretBrush="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                             VerticalContentAlignment="Center"/>
+                </Border>
+
                 <!-- Empty state ghost card -->
                 <Border Visibility="{Binding EmptyStateVisibility}"
                         Margin="{Binding CardMargin}"

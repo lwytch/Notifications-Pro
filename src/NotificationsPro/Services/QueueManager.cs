@@ -24,6 +24,15 @@ public class QueueManager : BaseViewModel
     /// </summary>
     public HashSet<string> SeenAppNames { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Session-only notification archive (RAM only, never persisted to disk).
+    /// Stores lightweight snapshots of notifications that were displayed this session.
+    /// Cleared when the app closes. Opt-in via SessionArchiveEnabled setting.
+    /// </summary>
+    public List<ArchiveEntry> SessionArchive { get; } = new();
+
+    public record ArchiveEntry(string AppName, string Title, string Body, DateTime ReceivedAt);
+
     public ReadOnlyObservableCollection<NotificationItem> VisibleNotifications { get; }
 
     private int _overflowCount;
@@ -83,7 +92,7 @@ public class QueueManager : BaseViewModel
             return;
 
         // Check mute keywords
-        if (MatchesAnyKeyword(settings.MuteKeywords, title, body))
+        if (MatchesAnyKeyword(settings.MuteKeywords, settings.MuteKeywordRegexFlags, title, body))
             return;
 
         // Check burst rate limiting
@@ -101,7 +110,10 @@ public class QueueManager : BaseViewModel
             }
         }
 
-        // Track for burst rate
+        // Track for burst rate (clean up stale entries to prevent unbounded growth)
+        var burstWindow = TimeSpan.FromSeconds(Math.Max(10, _settingsManager.Settings.BurstLimitWindowSeconds));
+        var burstCutoff = DateTime.Now - burstWindow;
+        _recentNotificationTimes.RemoveAll(t => t < burstCutoff);
         _recentNotificationTimes.Add(DateTime.Now);
 
         int maxVisible = Math.Max(1, settings.MaxVisibleNotifications);
@@ -127,7 +139,7 @@ public class QueueManager : BaseViewModel
         var item = new NotificationItem(appName, title, body);
 
         // Check highlight keywords — find the first match and use its per-keyword color (falls back to global)
-        var highlightColor = FindMatchingKeywordColor(settings.HighlightKeywords, settings.PerKeywordColors, settings.HighlightColor, title, body);
+        var highlightColor = FindMatchingKeywordColor(settings.HighlightKeywords, settings.HighlightKeywordRegexFlags, settings.PerKeywordColors, settings.HighlightColor, title, body);
         if (highlightColor != null)
         {
             item.IsHighlighted = true;
@@ -139,6 +151,16 @@ public class QueueManager : BaseViewModel
         else
             _visibleNotifications.Add(item);
         StartExpiryTimer(item);
+
+        // Add to session archive (RAM only, never persisted)
+        if (settings.SessionArchiveEnabled)
+        {
+            var maxArchive = Math.Clamp(settings.SessionArchiveMaxItems, 10, 1000);
+            SessionArchive.Add(new ArchiveEntry(appName, title, body, item.ReceivedAt));
+            while (SessionArchive.Count > maxArchive)
+                SessionArchive.RemoveAt(0);
+        }
+
         NotificationAdded?.Invoke(appName);
     }
 
@@ -301,16 +323,30 @@ public class QueueManager : BaseViewModel
         return _recentNotificationTimes.Count >= _settingsManager.Settings.BurstLimitCount;
     }
 
-    private static bool MatchesAnyKeyword(List<string> keywords, string title, string body)
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(100);
+
+    private static bool MatchesAnyKeyword(List<string> keywords, Dictionary<string, bool> regexFlags, string title, string body)
     {
         if (keywords.Count == 0) return false;
         var combined = $"{title} {body}";
         foreach (var kw in keywords)
         {
             if (string.IsNullOrWhiteSpace(kw)) continue;
-            var pattern = @"\b" + Regex.Escape(kw) + @"\b";
-            if (Regex.IsMatch(combined, pattern, RegexOptions.IgnoreCase))
-                return true;
+            var isRegex = regexFlags.TryGetValue(kw, out var flag) && flag;
+            var pattern = isRegex ? kw : @"\b" + Regex.Escape(kw) + @"\b";
+            try
+            {
+                if (Regex.IsMatch(combined, pattern, RegexOptions.IgnoreCase, RegexTimeout))
+                    return true;
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // Skip this keyword to avoid UI hang
+            }
+            catch (ArgumentException)
+            {
+                // Invalid regex pattern — skip silently
+            }
         }
         return false;
     }
@@ -321,6 +357,7 @@ public class QueueManager : BaseViewModel
     /// </summary>
     private static string? FindMatchingKeywordColor(
         List<string> keywords,
+        Dictionary<string, bool> regexFlags,
         Dictionary<string, string> perKeywordColors,
         string globalColor,
         string title,
@@ -332,10 +369,15 @@ public class QueueManager : BaseViewModel
         {
             if (string.IsNullOrWhiteSpace(kw)) continue;
 
-            // Use whole-word matching so "bug" does not match "debug" or "bugs".
-            var pattern = @"\b" + Regex.Escape(kw) + @"\b";
-            if (Regex.IsMatch(combined, pattern, RegexOptions.IgnoreCase))
-                return perKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : globalColor;
+            var isRegex = regexFlags.TryGetValue(kw, out var flag) && flag;
+            var pattern = isRegex ? kw : @"\b" + Regex.Escape(kw) + @"\b";
+            try
+            {
+                if (Regex.IsMatch(combined, pattern, RegexOptions.IgnoreCase, RegexTimeout))
+                    return perKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : globalColor;
+            }
+            catch (RegexMatchTimeoutException) { }
+            catch (ArgumentException) { }
         }
         return null;
     }

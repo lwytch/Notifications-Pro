@@ -33,7 +33,7 @@ public class AppSettings
 
     // Behavior
     public double NotificationDuration { get; set; } = 5;
-    public int MaxVisibleNotifications { get; set; } = 15;
+    public int MaxVisibleNotifications { get; set; } = 20;
     public bool ShowAppName { get; set; } = true;
     public bool ShowNotificationTitle { get; set; } = true;
     public bool ShowNotificationBody { get; set; } = true;
@@ -46,7 +46,7 @@ public class AppSettings
     public int SingleLineMaxLines { get; set; } = 3;
     public bool SingleLineAutoFullWidth { get; set; } = false;
     public bool SingleLineReplaceMode { get; set; } = false; // Replace existing notification rather than stacking
-    public bool ShowTimestamp { get; set; } = false;
+    public bool ShowTimestamp { get; set; } = true;
     public double TimestampFontSize { get; set; } = 11;
     public string TimestampDisplayMode { get; set; } = "Relative"; // "Relative", "Time", "DateTime"
     public string TimestampFontWeight { get; set; } = "Normal";
@@ -67,6 +67,8 @@ public class AppSettings
     public List<string> HighlightKeywords { get; set; } = new();
     public Dictionary<string, string> PerKeywordColors { get; set; } = new();
     public List<string> MuteKeywords { get; set; } = new();
+    public Dictionary<string, bool> HighlightKeywordRegexFlags { get; set; } = new();
+    public Dictionary<string, bool> MuteKeywordRegexFlags { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
 
     // Notification icons (M9.5)
@@ -172,6 +174,11 @@ public class AppSettings
     // Settings window display mode (M9.5)
     public string SettingsDisplayMode { get; set; } = "Popup"; // "Window" or "Popup"
     public bool PopupAutoClose { get; set; } = false;
+    public double SettingsWindowCornerRadius { get; set; } = 12;
+
+    // Session archive (M13) — opt-in, RAM-only, never persisted to disk
+    public bool SessionArchiveEnabled { get; set; } = false;
+    public int SessionArchiveMaxItems { get; set; } = 200;
 
     // UX Polish (M8)
     public bool HasShownWelcome { get; set; } = false;
@@ -184,6 +191,8 @@ public class AppSettings
         clone.MutedApps = new List<string>(MutedApps);
         clone.HighlightKeywords = new List<string>(HighlightKeywords);
         clone.PerKeywordColors = new Dictionary<string, string>(PerKeywordColors);
+        clone.HighlightKeywordRegexFlags = new Dictionary<string, bool>(HighlightKeywordRegexFlags);
+        clone.MuteKeywordRegexFlags = new Dictionary<string, bool>(MuteKeywordRegexFlags);
         clone.MuteKeywords = new List<string>(MuteKeywords);
         clone.PresentationApps = new List<string>(PresentationApps);
         clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);

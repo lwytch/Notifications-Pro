@@ -380,4 +380,116 @@ public class QueueManagerTests
 
         Assert.Equal(2, queue.VisibleNotifications.Count);
     }
+
+    [Fact]
+    public void AddNotification_RegexMuteKeywordSuppresses()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MuteKeywords.Add(@"bug\d+");
+        settings.Settings.MuteKeywordRegexFlags["bug\\d+"] = true;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Fixed bug123 today", "details");
+
+        Assert.Empty(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_RegexMuteKeywordDoesNotSuppressNonMatch()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MuteKeywords.Add(@"bug\d+");
+        settings.Settings.MuteKeywordRegexFlags["bug\\d+"] = true;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Fixed bugs today", "details");
+
+        Assert.Single(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_RegexHighlightKeywordSetsFlag()
+    {
+        var settings = CreateSettings();
+        settings.Settings.HighlightKeywords.Add(@"error|warning");
+        settings.Settings.HighlightKeywordRegexFlags["error|warning"] = true;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Build warning found", "details");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.True(queue.VisibleNotifications[0].IsHighlighted);
+    }
+
+    [Fact]
+    public void AddNotification_InvalidRegexDoesNotCrash()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MuteKeywords.Add("[invalid");
+        settings.Settings.MuteKeywordRegexFlags["[invalid"] = true;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "[invalid regex", "body");
+
+        // Invalid regex is silently skipped, notification passes through
+        Assert.Single(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void SessionArchive_RecordsNotificationsWhenEnabled()
+    {
+        var settings = CreateSettings();
+        settings.Settings.SessionArchiveEnabled = true;
+        settings.Settings.SessionArchiveMaxItems = 100;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("Teams", "Meeting", "Join now");
+        queue.AddNotification("Slack", "Message", "Hello");
+
+        Assert.Equal(2, queue.SessionArchive.Count);
+        Assert.Equal("Teams", queue.SessionArchive[0].AppName);
+        Assert.Equal("Slack", queue.SessionArchive[1].AppName);
+    }
+
+    [Fact]
+    public void SessionArchive_DoesNotRecordWhenDisabled()
+    {
+        var settings = CreateSettings();
+        settings.Settings.SessionArchiveEnabled = false;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("Teams", "Meeting", "Join now");
+
+        Assert.Empty(queue.SessionArchive);
+    }
+
+    [Fact]
+    public void SessionArchive_RespectsMaxItems()
+    {
+        var settings = CreateSettings(maxVisible: 20);
+        settings.Settings.SessionArchiveEnabled = true;
+        settings.Settings.SessionArchiveMaxItems = 10;
+        var queue = new QueueManager(settings);
+
+        for (var i = 0; i < 15; i++)
+            queue.AddNotification("App", $"Title {i}", $"Body {i}");
+
+        Assert.Equal(10, queue.SessionArchive.Count);
+        // Oldest items removed — first entry should be item #5
+        Assert.Equal("Title 5", queue.SessionArchive[0].Title);
+    }
+
+    [Fact]
+    public void SessionArchive_IsRamOnly_ClearedWithNewInstance()
+    {
+        var settings = CreateSettings();
+        settings.Settings.SessionArchiveEnabled = true;
+        var queue1 = new QueueManager(settings);
+        queue1.AddNotification("App", "Test", "Body");
+        Assert.Single(queue1.SessionArchive);
+
+        // New instance has empty archive (simulates app restart)
+        var queue2 = new QueueManager(settings);
+        Assert.Empty(queue2.SessionArchive);
+    }
 }

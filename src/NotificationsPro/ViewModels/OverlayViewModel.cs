@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using NotificationsPro.Models;
@@ -414,6 +416,58 @@ public class OverlayViewModel : BaseViewModel
     private string _fullscreenOverlayColor = "#000000";
     public string FullscreenOverlayColor { get => _fullscreenOverlayColor; set => SetProperty(ref _fullscreenOverlayColor, value); }
 
+    // Search/filter (M13)
+    private string _searchText = string.Empty;
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (!SetProperty(ref _searchText, value)) return;
+            _notificationsView?.Refresh();
+        }
+    }
+
+    private bool _isSearchVisible;
+    public bool IsSearchVisible
+    {
+        get => _isSearchVisible;
+        set
+        {
+            if (!SetProperty(ref _isSearchVisible, value)) return;
+            OnPropertyChanged(nameof(SearchBarVisibility));
+            if (!value)
+            {
+                SearchText = string.Empty;
+            }
+        }
+    }
+
+    public Visibility SearchBarVisibility => IsSearchVisible ? Visibility.Visible : Visibility.Collapsed;
+
+    private ICollectionView? _notificationsView;
+    public ICollectionView NotificationsView
+    {
+        get
+        {
+            if (_notificationsView == null)
+            {
+                _notificationsView = CollectionViewSource.GetDefaultView(Notifications);
+                _notificationsView.Filter = FilterNotification;
+            }
+            return _notificationsView;
+        }
+    }
+
+    private bool FilterNotification(object obj)
+    {
+        if (string.IsNullOrWhiteSpace(_searchText)) return true;
+        if (obj is not NotificationItem item) return false;
+        return item.AppName.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
+            || item.Title.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
+            || item.Body.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
+    }
+
     // Empty state ghost card visibility
     private Visibility _emptyStateVisibility = Visibility.Visible;
     public Visibility EmptyStateVisibility { get => _emptyStateVisibility; set => SetProperty(ref _emptyStateVisibility, value); }
@@ -432,14 +486,22 @@ public class OverlayViewModel : BaseViewModel
         UpdateEmptyState();
 
         // Refresh relative timestamps every 15 seconds
-        var timestampTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
-        timestampTimer.Tick += (_, _) =>
+        _timestampTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
+        _timestampTimer.Tick += (_, _) =>
         {
             if (!ShowTimestamp) return;
             foreach (var n in _queueManager.VisibleNotifications)
                 n.NotifyTimestampChanged();
         };
-        timestampTimer.Start();
+        _timestampTimer.Start();
+    }
+
+    private readonly DispatcherTimer _timestampTimer;
+
+    /// <summary>Stop background timers when the overlay is no longer needed.</summary>
+    public void Cleanup()
+    {
+        _timestampTimer.Stop();
     }
 
     public void ApplySettings(AppSettings s)

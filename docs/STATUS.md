@@ -23,7 +23,7 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: nine sections (Profiles, Appearance, Behavior, Filtering, Position, Size, Streaming, Accessibility, UI Styling) with a Windows-style dark default theme
+- Settings window: ten sections (Appearance, Behavior, Filtering, Layout, Sounds, Streaming, Accessibility, UI Styling, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
@@ -162,14 +162,14 @@
 - **Enhanced Settings, Sounds, Icons & Theming (Milestone 9.5)**:
   - Width text input box in Position tab for precise pixel entry alongside slider
   - Accessibility master toggle — one-click enable of recommended accessibility bundle
-  - Accessibility tab descriptions explaining each section's purpose
   - Fullscreen overlay mode — fill-screen background with configurable opacity
   - Settings window dynamic theming — Windows Dark/Light, High Contrast, System, or Custom palette
   - SettingsThemeService for runtime DynamicResource brush updates
   - Custom settings window color pickers (background, surface, surface light, surface hover, text, text secondary, text muted, accent, border)
   - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
-  - Settings popup display mode — Window or Popup (toast-corner anchored on the taskbar monitor, auto-close option)
+  - Settings popup display mode — Window or Popup (toast-corner anchored on the taskbar monitor, auto-close option, reduced popup height at 55% of work area)
+  - Settings window rounded corners with adjustable radius slider (0–20px) in UI Styling — XAML clipping in popup mode, DWM corner preference in windowed mode
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
@@ -179,7 +179,31 @@
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
   - Primary button text foreground now auto-selects black/white for contrast against the active accent color (improves high-contrast readability)
-- 137 unit tests covering QueueManager (including filtering + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- **Security & Release Prep (Milestone 12)**:
+  - Timestamp DispatcherTimer lifecycle managed (started/stopped/cleaned up properly)
+  - OverlayWindow OnClosed handler unsubscribes events to prevent memory leaks
+  - 0-monitor crash guard in popup bounds calculation
+  - StaticPropertyChanged handler properly unsubscribed on quit
+  - HwndSource disposed in HotkeyManager to prevent handle leaks
+  - Path traversal validation in IconService (custom icons confined to AppData directory)
+  - Import size limit (1MB) + numeric clamping in ThemeManager
+  - Regex timeout (100ms) in QueueManager keyword matching to prevent ReDoS
+  - Safe hex parsing in ContrastHelper
+  - SetLastError on HotkeyManager P/Invoke declarations
+  - Sanitized exception messages in NotificationListener (type name only, no message text)
+  - SECURITY.md, CONTRIBUTING.md, .gitattributes added for GitHub release readiness
+- **Functionality & UX (Milestone 13 Essential)**:
+  - About dialog in tray menu (version, listener mode, .NET version, license, GitHub link)
+  - Listener health status in tray tooltip ("Listening via WinRT/Accessibility" + paused/click-through state)
+  - WinRT auto-retry removed — RequestAccessAsync false-positive "Allowed" for unpackaged apps silently killed accessibility hook. Manual retry via tray menu still available.
+  - Streaming preset button — one-click OBS setup (chroma key + fixed window + per-app tint)
+  - Keyboard shortcut hints in tray menu items (Show Overlay, Pause show assigned hotkey combo)
+- **Functionality & UX (Milestone 13 High Value)**:
+  - Regex keyword matching — per-keyword ".*" toggle treats keywords as regex patterns (both highlight and mute, with timeout + invalid-regex safety)
+  - Overlay search/filter reverted — ICollectionView binding caused display breakage over time. Search bar UI remains but filtering disabled pending safer implementation.
+  - Session-only notification archive — opt-in RAM-only archive (Settings > Behavior) keeps up to 1000 notifications for the current session, "View Archive" in tray menu and settings
+  - Copy All to Clipboard, "Settings for [app]..." card action, Layout tab consolidation (completed in previous session)
+- 145 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Installer/packaging (Milestone 11)
@@ -245,6 +269,9 @@ dotnet test
 - [ ] Position preset buttons move overlay to expected top/side anchors
 - [ ] "Reset to Defaults" restores all settings
 - [ ] UI Styling tab shows full settings-window color controls (including Surface Light/Hover and Secondary/Muted text)
+- [ ] UI Styling corner radius slider adjusts window rounding (0 = sharp, 20 = very round)
+- [ ] Popup mode shows rounded corners via XAML clipping
+- [ ] Window mode applies DWM corner preference (round/small-round/no-round)
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart
 - [ ] Notification slides in from each configured direction (Left/Right/Top/Bottom)
@@ -327,6 +354,11 @@ dotnet test
 - [ ] Tint intensity slider adjusts the blending strength of per-app colors
 - [ ] Different apps produce visually distinct tint colors
 - [ ] Simultaneous browser-hosted notifications (for example Reddit + X in Chrome) render as separate cards and do not merge text
+- [ ] "About Notifications Pro" tray menu item shows version, listener mode, and GitHub link
+- [ ] Tray tooltip shows "Listening via WinRT" or "Listening via Accessibility" with paused/click-through state
+- [ ] When using accessibility mode, listener stays in accessibility mode (no auto-upgrade to prevent false-positive WinRT breakage)
+- [ ] "Apply OBS Streaming Preset" button in Streaming tab enables chroma key, fixed window, and per-app tinting
+- [ ] When hotkeys are enabled, tray menu items show keyboard shortcut hints (e.g., "Show Overlay    Ctrl+Alt+N")
 
 ## Known Limitations
 - No installer — run from source or publish manually

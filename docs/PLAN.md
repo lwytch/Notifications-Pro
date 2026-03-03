@@ -291,6 +291,9 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Final polish: settings tab content top-gap reduced and section/action control spacing tightened to reduce visual clutter
 - [x] Final polish: keyword/presentation add-remove actions widened to prevent clipped button labels in Filtering/Streaming
 - [x] Final polish: accessibility fallback now splits merged browser-hosted notifications (e.g., Reddit + X from Chrome) into separate cards
+- [x] Final polish: popup panel height reduced (68% → 55% of work area) for a more proportionate panel on 1080p+
+- [x] Final polish: settings window rounded corners with adjustable radius slider (0–20px) in UI Styling tab — XAML clipping in popup mode, DWM corner preference in windowed mode
+- [x] Final polish: tooltips added to all UI Styling color picker labels and section headers
 - [ ] Full manual test checklist pass
 - [ ] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience
@@ -318,8 +321,64 @@ Comprehensive professional UI/UX review — 21 fixes covering spacing, consisten
 - [x] ComboBox bottom margins standardized
 - [x] Per-keyword highlight colors with per-keyword color picker
 
+### Milestone 12: Security Hardening & Code Quality
+**Status: Complete**
+
+Findings from comprehensive pre-release audit.
+
+Security fixes (must fix before public release):
+- [x] S1 (HIGH): Path traversal in custom icon loading — validate file paths stay within AppData icons/sounds directory in IconService.GetOrCreateCustomIcon()
+- [x] S2 (MEDIUM): Settings import validation — add 1MB file size limit, validate numeric bounds, validate custom icon/sound paths in imported JSON
+- [x] S3 (MEDIUM): Regex timeout — add timeout to keyword matching in QueueManager.MatchesAnyKeyword() to prevent hangs
+- [x] S4 (MEDIUM): Hex parsing crash — use TryParse in ContrastHelper.ParseHexToRgb() instead of Convert.ToByte for malformed hex like "#GGGGGG"
+- [x] S5 (MEDIUM): Add SetLastError=true to HotkeyManager P/Invoke declarations for better error diagnostics
+- [x] S6 (LOW): Sanitize exception messages in NotificationListener StatusMessage to avoid exposing debug info
+
+Code quality fixes (critical):
+- [x] C1 (CRITICAL): Memory leak — timestamp DispatcherTimer in OverlayViewModel never stopped; store as field, stop on cleanup
+- [x] C2 (CRITICAL): Memory leak — OverlayWindow subscribes to SettingsChanged in OnLoaded but never unsubscribes on close
+- [x] C3 (HIGH): Crash guard — Screen.AllScreens[0] accessed without length check in App.xaml.cs popup positioning fallback
+- [x] C4 (MEDIUM): SystemParameters.StaticPropertyChanged event handler in App.xaml.cs never unsubscribed
+- [x] C5 (LOW): HwndSource not disposed in HotkeyManager (only set to null)
+
+Release preparation:
+- [x] Add SECURITY.md (privacy statement + security reporting instructions)
+- [x] Add CONTRIBUTING.md
+- [x] Add .gitattributes (line ending normalization)
+
+### Milestone 13: Functionality & UX Improvements
+**Status: Essential + High Value complete**
+
+Post-release improvements identified by comprehensive audit.
+
+Essential (before or shortly after release):
+- [x] About dialog in tray menu (version, GitHub link, license, listener mode, .NET version)
+- [x] Listener health status in tray tooltip ("Listening via WinRT/Accessibility" + paused/click-through state)
+- [x] ~~WinRT auto-retry~~ — **removed**: RequestAccessAsync returns false-positive "Allowed" for unpackaged apps, causing auto-upgrade to silently kill the working accessibility hook. Manual retry via tray menu still works.
+- [x] Streaming preset button — one-click OBS setup (chroma key ON, fixed window ON, tint ON)
+- [x] Keyboard shortcut hints in tray menu items (e.g., "Show Overlay    Ctrl+Alt+N")
+
+High value (v1.1):
+- [x] Regex support for keyword matching (toggle per keyword — ".*" button on highlight and mute keywords)
+- [x] ~~Search/filter overlay~~ — **reverted**: ICollectionView binding caused notification display to break over time. Overlay binds directly to ObservableCollection. Search UI remains but filtering is disabled pending a safer implementation.
+- [x] Right-click card quick action: "Settings for this app..." opens settings on Filtering tab
+- [x] Copy visible notifications to clipboard ("Copy All to Clipboard" in card context menu)
+- [x] Drag cursor affordance on overlay resize edges (already handled by Win32 HTLEFT/HTRIGHT hit test)
+- [x] Consolidate Position + Size tabs into "Layout" (single tab with Monitor, Quick Position, Size, Snapping, Startup)
+- [x] Session-only in-memory notification archive (RAM-only, opt-in, bounded, never persisted, cleared on close)
+
+Nice-to-have (post v1.1):
+- [ ] Notification grouping by app (collapsible)
+- [ ] Time-based theme switching (auto dark mode at sunset)
+- [ ] CLI arguments (--pause, --theme, --send-test)
+- [ ] Dyslexia-friendly font preset (OpenDyslexic)
+- [ ] Undo/redo for settings changes
+- [ ] Named profiles (Work/Gaming/Streaming) bundling theme + filters + position
+- [ ] Full keyboard navigation audit for settings window
+- [ ] Screen reader (Narrator) testing and AutomationProperties audit
+
 ## Current Focus
-UI/UX audit complete. Milestone 11 final polish continues: packaging/installer and full manual QA pass.
+Milestone 13 v1.1 high-value items complete. Nice-to-have items remain for post-v1.1.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

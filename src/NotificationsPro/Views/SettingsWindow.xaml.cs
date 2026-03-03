@@ -15,6 +15,10 @@ public partial class SettingsWindow : Window
     private readonly SettingsManager? _settingsManager;
     private const int DwmUseImmersiveDarkMode = 20;
     private const int DwmUseImmersiveDarkModeLegacy = 19;
+    private const int DwmWindowCornerPreference = 33;
+    private const int DWMWCP_DONOTROUND = 1;
+    private const int DWMWCP_ROUND = 2;
+    private const int DWMWCP_ROUNDSMALL = 3;
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
@@ -175,10 +179,30 @@ public partial class SettingsWindow : Window
                 // Fallback for older Windows builds.
                 DwmSetWindowAttribute(hwnd, DwmUseImmersiveDarkModeLegacy, ref enabled, size);
             }
+
+            // Apply DWM corner preference based on settings radius
+            var radius = _settingsManager?.Settings.SettingsWindowCornerRadius ?? 12;
+            var cornerPref = radius <= 0 ? DWMWCP_DONOTROUND
+                           : radius <= 6 ? DWMWCP_ROUNDSMALL
+                           : DWMWCP_ROUND;
+            DwmSetWindowAttribute(hwnd, DwmWindowCornerPreference, ref cornerPref, size);
         }
         catch
         {
             // Non-critical visual enhancement.
+        }
+    }
+
+    public void NavigateToTab(string tabHeader)
+    {
+        for (var i = 0; i < MainTabControl.Items.Count; i++)
+        {
+            if (MainTabControl.Items[i] is System.Windows.Controls.TabItem tab
+                && string.Equals(tab.Header?.ToString(), tabHeader, StringComparison.OrdinalIgnoreCase))
+            {
+                MainTabControl.SelectedIndex = i;
+                return;
+            }
         }
     }
 

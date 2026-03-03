@@ -52,10 +52,10 @@ public static class ContrastHelper
     {
         hex = hex.TrimStart('#');
         if (hex.Length != 6) return (255, 255, 255);
-        return (
-            Convert.ToByte(hex[..2], 16),
-            Convert.ToByte(hex[2..4], 16),
-            Convert.ToByte(hex[4..6], 16)
-        );
+        if (!byte.TryParse(hex[..2], System.Globalization.NumberStyles.HexNumber, null, out var r) ||
+            !byte.TryParse(hex[2..4], System.Globalization.NumberStyles.HexNumber, null, out var g) ||
+            !byte.TryParse(hex[4..6], System.Globalization.NumberStyles.HexNumber, null, out var b))
+            return (255, 255, 255);
+        return (r, g, b);
     }
 }

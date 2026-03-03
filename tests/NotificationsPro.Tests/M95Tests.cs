@@ -21,7 +21,7 @@ public class M95Tests
         Assert.Equal("None", s.DefaultSound);
         Assert.NotNull(s.PerAppSounds);
         Assert.Empty(s.PerAppSounds);
-        Assert.Equal(15, s.MaxVisibleNotifications);
+        Assert.Equal(20, s.MaxVisibleNotifications);
         Assert.False(s.SuppressToastPopups);
         Assert.Equal("Popup", s.SettingsDisplayMode);
         Assert.False(s.PopupAutoClose);

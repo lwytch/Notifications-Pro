@@ -81,9 +81,18 @@ public class IconService
         {
             if (!File.Exists(filePath)) return null;
 
+            // Validate the path is within the custom icons directory to prevent path traversal
+            var fullPath = Path.GetFullPath(filePath);
+            var customDir = Path.GetFullPath(CustomIconsDir);
+            if (!fullPath.StartsWith(customDir, StringComparison.OrdinalIgnoreCase))
+            {
+                _iconCache[filePath] = null;
+                return null;
+            }
+
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
-            bitmap.UriSource = new Uri(filePath, UriKind.Absolute);
+            bitmap.UriSource = new Uri(fullPath, UriKind.Absolute);
             bitmap.DecodePixelWidth = 128; // Pre-scale for performance
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.EndInit();

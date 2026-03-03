@@ -4,7 +4,7 @@
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
         Icon="{Binding TrayIconImage}"
-        Width="900" Height="680" MinWidth="760" MinHeight="560"
+        Width="780" Height="560" MinWidth="620" MinHeight="480"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
         ResizeMode="CanResize">
@@ -21,7 +21,7 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="0,20,0,6"/>
+            <Setter Property="Margin" Value="0,16,0,6"/>
         </Style>
 
         <!-- Section header text — larger + accent color for clear distinction -->
@@ -95,6 +95,10 @@
         </Style>
     </Window.Resources>
 
+    <Border x:Name="RootBorder"
+            CornerRadius="{Binding SettingsWindowCornerRadius}"
+            Background="{DynamicResource WindowBgBrush}"
+            ClipToBounds="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -210,7 +214,7 @@
         </Border>
 
         <!-- Tabs -->
-        <TabControl Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="20,12,20,8">
+        <TabControl x:Name="MainTabControl" Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="20,12,20,8">
 
             <!-- ═══ PROFILES TAB ═══ -->
             <!-- ═══ APPEARANCE TAB ═══ -->
@@ -373,20 +377,6 @@
                             <TextBlock Text="TIMESTAMP APPEARANCE" Style="{StaticResource SectionHeader}"
                                        ToolTip="Control how timestamp text looks. Timestamp visibility is toggled in Behavior &gt; Content."/>
                         </Border>
-
-                        <TextBlock Text="Tip: Turn on 'Show Timestamp' in Behavior to apply these appearance options."
-                                   Margin="0,0,0,8">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource SettingDesc}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ShowTimestamp}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
 
                         <StackPanel IsEnabled="{Binding ShowTimestamp}">
                             <TextBlock Text="Timestamp Style" Style="{StaticResource SettingLabel}" ToolTip="Relative: '2m ago'. Time: '14:35'. DateTime: localized date and time."/>
@@ -713,7 +703,7 @@
                                           IsChecked="{Binding FullscreenOverlayMode}"
                                           ToolTip="Expand overlay to fill the entire screen"/>
                             <TextBlock Text="Fullscreen Mode" Style="{StaticResource SettingLabel}"
-                                       ToolTip="Expands the overlay background to fill your screen with a configurable backdrop for dedicated notification monitoring. If fullscreen appears slightly short, increase Overlay Max Height in Position until the overlay fully matches your screen."/>
+                                       ToolTip="Expands the overlay background to fill your screen with a configurable backdrop for dedicated notification monitoring. If fullscreen appears slightly short, increase Overlay Max Height in Layout until the overlay fully matches your screen."/>
                         </DockPanel>
 
                         <StackPanel Margin="12,0,0,0" Visibility="{Binding FullscreenOverlayMode, Converter={StaticResource BoolToVis}}">
@@ -994,6 +984,30 @@
                                        ToolTip="Removes Windows toast popups after capture to prevent duplicates on screen. Also removes notifications from Windows notification center. Only works with WinRT capture mode (not accessibility fallback). Suppression stops immediately when the app closes."/>
                         </DockPanel>
 
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SESSION ARCHIVE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Keep a temporary record of notifications received this session. RAM only — never saved to disk, cleared when the app closes."/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SessionArchiveEnabled}"
+                                          ToolTip="When enabled, notifications are kept in memory for the duration of this session. Data is never written to disk and is cleared when the app closes."/>
+                            <TextBlock Text="Enable Session Archive" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Temporarily stores notification text in RAM so you can review missed notifications. Never persisted to disk. Cleared on app close."/>
+                        </DockPanel>
+
+                        <TextBlock Text="Max archive items" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Maximum number of notifications to keep in the session archive (10-1000). Oldest entries are removed when the limit is reached."/>
+                        <Slider Minimum="10" Maximum="1000" TickFrequency="10"
+                                Value="{Binding SessionArchiveMaxItems}"
+                                Style="{StaticResource SettingsSlider}" Margin="0,4,0,0"/>
+
+                        <Button Content="View Archive (Copy to Clipboard)" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding ViewSessionArchiveCommand}"
+                                Margin="0,8,0,0" HorizontalAlignment="Left"
+                                ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -1072,6 +1086,10 @@
                                                 Background="{Binding Color, Converter={StaticResource ColorToBrush}}"
                                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                                 Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
+                                                      Style="{StaticResource SecondaryButton}"
+                                                      Width="36" Padding="0" Margin="0,0,4,0"
+                                                      ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
                                         <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
                                                    VerticalAlignment="Center"/>
                                     </DockPanel>
@@ -1092,7 +1110,7 @@
                                      Text="{Binding NewMuteKeyword, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Type a keyword and press Add"/>
                         </DockPanel>
-                        <ItemsControl ItemsSource="{Binding MuteKeywords}" Margin="0,4,0,0">
+                        <ItemsControl ItemsSource="{Binding MuteKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel Margin="0,0,0,6">
@@ -1101,7 +1119,11 @@
                                                 Command="{Binding DataContext.RemoveMuteKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip="Remove this mute keyword"/>
-                                        <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}"
+                                        <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
+                                                      Style="{StaticResource SecondaryButton}"
+                                                      Width="36" Padding="0" Margin="0,0,4,0"
+                                                      ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
+                                        <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
                                                    VerticalAlignment="Center"/>
                                     </DockPanel>
                                 </DataTemplate>
@@ -1227,8 +1249,8 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ═══ POSITION TAB ═══ -->
-            <TabItem Header="Position" Style="{StaticResource SettingsTabItem}">
+            <!-- ═══ LAYOUT TAB ═══ -->
+            <TabItem Header="Layout" Style="{StaticResource SettingsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1249,39 +1271,6 @@
                                     Command="{Binding MoveToMonitorCommand}" Margin="0,0,0,8"
                                     ToolTip="Move the overlay to the selected monitor"/>
                         </WrapPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding StartWithWindows}"
-                                          ToolTip="Automatically start Notifications Pro when you sign in to Windows"/>
-                            <TextBlock Text="Start with Windows" Style="{StaticResource SettingLabel}" ToolTip="Automatically launch Notifications Pro when you sign in"/>
-                        </DockPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding SnapToEdges}"
-                                          ToolTip="Overlay snaps to screen edges when dragged nearby"/>
-                            <TextBlock Text="Snap to Screen Edges" Style="{StaticResource SettingLabel}" ToolTip="The overlay automatically aligns to screen edges when dragged close to them"/>
-                        </DockPanel>
-
-                        <TextBlock Text="Snap Distance" Style="{StaticResource SettingLabel}" ToolTip="How close (in pixels) the overlay needs to be before it snaps into place"/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding SnapDistance, StringFormat='{}{0:0}'}"/><Run Text="px"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="5" Maximum="50" Value="{Binding SnapDistance}"
-                                    TickFrequency="5" IsSnapToTickEnabled="True"
-                                    ToolTip="How close to a screen edge before the overlay snaps"/>
-                        </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"
@@ -1307,14 +1296,6 @@
                             <Button Content="Bottom Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,0"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-right"/>
                         </UniformGrid>
-
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-            <!-- ═══ SIZE TAB ═══ -->
-            <TabItem Header="Size" Style="{StaticResource SettingsTabItem}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
-                    <StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="OVERLAY SIZE" Style="{StaticResource SectionHeader}"
@@ -1349,13 +1330,6 @@
                                     Command="{Binding SetOverlayWidthPresetCommand}" CommandParameter="8k"/>
                         </UniformGrid>
 
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding AllowManualResize}"
-                                          ToolTip="Allow drag-resizing from left/right edges of the overlay"/>
-                            <TextBlock Text="Allow Manual Resize" Style="{StaticResource SettingLabel}" ToolTip="When enabled, drag the left or right edge of the overlay to resize quickly"/>
-                        </DockPanel>
-
                         <TextBlock Text="Max Overlay Height" Style="{StaticResource SettingLabel}" ToolTip="The overlay expands vertically as needed up to this limit, then scrolls. If long stacked notifications appear cut off, increase this value or scroll within the overlay. Effective height is still clamped to your active monitor's work area."/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
@@ -1378,6 +1352,46 @@
                             <Button Content="8K" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
                                     Command="{Binding SetOverlayHeightPresetCommand}" CommandParameter="8k"/>
                         </UniformGrid>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AllowManualResize}"
+                                          ToolTip="Allow drag-resizing from left/right edges of the overlay"/>
+                            <TextBlock Text="Allow Manual Resize" Style="{StaticResource SettingLabel}" ToolTip="When enabled, drag the left or right edge of the overlay to resize quickly"/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SNAPPING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SnapToEdges}"
+                                          ToolTip="Overlay snaps to screen edges when dragged nearby"/>
+                            <TextBlock Text="Snap to Screen Edges" Style="{StaticResource SettingLabel}" ToolTip="The overlay automatically aligns to screen edges when dragged close to them"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Snap Distance" Style="{StaticResource SettingLabel}" ToolTip="How close (in pixels) the overlay needs to be before it snaps into place"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding SnapDistance, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="5" Maximum="50" Value="{Binding SnapDistance}"
+                                    TickFrequency="5" IsSnapToTickEnabled="True"
+                                    ToolTip="How close to a screen edge before the overlay snaps"/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding StartWithWindows}"
+                                          ToolTip="Automatically start Notifications Pro when you sign in to Windows"/>
+                            <TextBlock Text="Start with Windows" Style="{StaticResource SettingLabel}" ToolTip="Automatically launch Notifications Pro when you sign in"/>
+                        </DockPanel>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -1432,6 +1446,15 @@
             <TabItem Header="Streaming" Style="{StaticResource SettingsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="QUICK SETUP" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <Button Content="Apply OBS Streaming Preset" Style="{StaticResource PrimaryButton}"
+                                Command="{Binding ApplyStreamingPresetCommand}" HorizontalAlignment="Left"
+                                Padding="16,8" Margin="0,0,0,16"
+                                ToolTip="Enables Chroma Key (green), Fixed Window Mode, and Per-App Tinting in one click"/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="CHROMA KEY" Style="{StaticResource SectionHeader}"/>
@@ -1578,7 +1601,7 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="ACCESSIBILITY" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Accessibility features help you read, interact with, and manage notifications more easily. Enable Accessibility Mode for a recommended bundle of settings, or configure individual options below."/>
+                                       ToolTip="Accessibility features for reading and managing notifications. Capture uses WinRT (preferred) or Accessibility fallback automatically. Check the tray icon tooltip for current mode."/>
                         </Border>
 
                         <DockPanel Margin="0,0,0,8">
@@ -1735,7 +1758,25 @@
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="THEME" Style="{StaticResource SectionHeader}"/>
+                            <TextBlock Text="WINDOW SHAPE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Control the visual shape of the settings window. Corner rounding applies in Popup mode; Window mode uses system-level rounding."/>
+                        </Border>
+
+                        <TextBlock Text="Corner Radius" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Adjusts the roundness of the settings window corners (0 = sharp, 20 = very round). In Popup mode this uses XAML clipping; in Window mode it uses the Windows 11 DWM API."/>
+                        <DockPanel Margin="0,4,0,8">
+                            <TextBlock DockPanel.Dock="Right" Width="30" TextAlignment="Right"
+                                       Text="{Binding SettingsWindowCornerRadius, StringFormat={}{0:0}}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                            <Slider Minimum="0" Maximum="20" TickFrequency="1" IsSnapToTickEnabled="True"
+                                    Value="{Binding SettingsWindowCornerRadius}"
+                                    Style="{StaticResource SettingsSlider}"
+                                    ToolTip="Drag to adjust corner rounding (0–20 px)"/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="THEME" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Choose a preset theme for the settings window or create your own custom palette below."/>
                         </Border>
 
                         <TextBlock Text="UI Theme Preset" Style="{StaticResource SettingLabel}"
@@ -1760,7 +1801,7 @@
                                        ToolTip="Fine-tune settings-window colors. These apply when UI Theme Preset is set to Custom."/>
                         </Border>
 
-                        <TextBlock Text="Background" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Background" Style="{StaticResource SettingLabel}" ToolTip="Main background color of the settings window"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowBg, Converter={StaticResource ColorToBrush}}"
@@ -1771,7 +1812,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowBg, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Surface" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Surface" Style="{StaticResource SettingLabel}" ToolTip="Color for panels, cards, and elevated surfaces"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowSurface, Converter={StaticResource ColorToBrush}}"
@@ -1782,7 +1823,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurface, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Surface Light" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Surface Light" Style="{StaticResource SettingLabel}" ToolTip="Lighter surface variant used for input fields and secondary panels"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowSurfaceLight, Converter={StaticResource ColorToBrush}}"
@@ -1793,7 +1834,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurfaceLight, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Surface Hover" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Surface Hover" Style="{StaticResource SettingLabel}" ToolTip="Color shown when hovering over interactive elements"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowSurfaceHover, Converter={StaticResource ColorToBrush}}"
@@ -1804,7 +1845,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowSurfaceHover, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Text" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Text" Style="{StaticResource SettingLabel}" ToolTip="Primary text color for labels and headings"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowText, Converter={StaticResource ColorToBrush}}"
@@ -1815,7 +1856,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowText, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Text Secondary" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Text Secondary" Style="{StaticResource SettingLabel}" ToolTip="Secondary text color for descriptions and help text"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowTextSecondary, Converter={StaticResource ColorToBrush}}"
@@ -1826,7 +1867,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowTextSecondary, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Text Muted" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Text Muted" Style="{StaticResource SettingLabel}" ToolTip="Muted text color for placeholders and disabled labels"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowTextMuted, Converter={StaticResource ColorToBrush}}"
@@ -1837,7 +1878,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowTextMuted, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Accent" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Accent" Style="{StaticResource SettingLabel}" ToolTip="Accent color for active toggles, selected tabs, and highlights"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowAccent, Converter={StaticResource ColorToBrush}}"
@@ -1848,7 +1889,7 @@
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowAccent, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
-                        <TextBlock Text="Border" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="Border" Style="{StaticResource SettingLabel}" ToolTip="Border color for separators, input outlines, and dividers"/>
                         <DockPanel Margin="0,4,0,4">
                             <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding SettingsWindowBorder, Converter={StaticResource ColorToBrush}}"
@@ -2019,7 +2060,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="3" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Use Settings → Position → Quick Position presets to move it back."/>
+                                       Text="Use Settings → Layout → Quick Position presets to move it back."/>
                             <TextBlock Grid.Row="4" Grid.Column="0" Text="Sounds all sound the same" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="4" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
@@ -2100,29 +2141,25 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="Per-app muting, keyword highlighting and muting, per-app sounds/icons, quiet hours, and burst limiting"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Position" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Layout" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Monitor selection, startup, edge snapping, and quick-position presets"
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Monitor selection, quick-position presets, overlay width/height, resize, snapping, and startup"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Size" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Sounds" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="Overlay width and max height with resolution presets"
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="Default notification sound selection and custom WAV import"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Sounds" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Streaming" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Text="Default notification sound selection and custom WAV import"
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="Chroma key, OBS fixed window capture, presentation mode, and per-app color tinting"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Streaming" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Accessibility" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Chroma key, OBS fixed window capture, presentation mode, and per-app color tinting"
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Persistent notifications, auto-duration, system integration, hotkeys, and density presets"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Accessibility" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="7" Grid.Column="1" Text="Persistent notifications, auto-duration, system integration, hotkeys, and density presets"
-                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="8" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="8" Grid.Column="1" Text="Settings window display mode, theme, and custom color palette"
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="Settings window display mode, corner radius, theme, and custom color palette"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                         </Grid>
 
@@ -2172,4 +2209,5 @@
             </DockPanel>
         </Border>
     </Grid>
+    </Border>
 </Window>

@@ -41,6 +41,7 @@ public partial class App : Application
     private ThemeManager? _themeManager;
     private DispatcherTimer? _presentationTimer;
     private bool _presentationDndActive;
+    private System.ComponentModel.PropertyChangedEventHandler? _highContrastHandler;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
     // identify them in Privacy > Notifications and grant listener access.
@@ -109,11 +110,12 @@ public partial class App : Application
 
         // Apply High Contrast theme if active and respected
         ApplyHighContrastIfNeeded();
-        SystemParameters.StaticPropertyChanged += (_, e) =>
+        _highContrastHandler = (_, e) =>
         {
             if (e.PropertyName == nameof(SystemParameters.HighContrast))
                 Dispatcher.Invoke(ApplyHighContrastIfNeeded);
         };
+        SystemParameters.StaticPropertyChanged += _highContrastHandler;
 
         if (_settingsManager.Settings.OverlayVisible)
             ShowOverlay();
@@ -260,7 +262,9 @@ public partial class App : Application
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Clear All Notifications", null, (_, _) => _queueManager?.ClearAll());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
+        contextMenu.Items.Add("View Session Archive", null, (_, _) => ViewSessionArchive());
         contextMenu.Items.Add("Settings...", null, (_, _) => ShowSettings());
+        contextMenu.Items.Add("About Notifications Pro", null, (_, _) => ShowAboutDialog());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Quit", null, (_, _) => QuitApp());
 
@@ -338,13 +342,24 @@ public partial class App : Application
 
     private void UpdateMenuLabels()
     {
+        var hotkeysOn = _settingsManager?.Settings.GlobalHotkeysEnabled == true;
+        var s = _settingsManager?.Settings;
+
         if (_showHideItem != null)
-            _showHideItem.Text = _overlayWindow?.IsVisible == true ? "Hide Overlay" : "Show Overlay";
+        {
+            var label = _overlayWindow?.IsVisible == true ? "Hide Overlay" : "Show Overlay";
+            if (hotkeysOn && s != null && !string.IsNullOrWhiteSpace(s.HotkeyToggleOverlay))
+                label += $"    {s.HotkeyToggleOverlay}";
+            _showHideItem.Text = label;
+        }
 
         var isPaused = _queueManager?.IsPaused == true;
         if (_pauseResumeItem != null)
         {
-            _pauseResumeItem.Text = isPaused ? "Resume Notifications" : "Pause Notifications";
+            var label = isPaused ? "Resume Notifications" : "Pause Notifications";
+            if (hotkeysOn && s != null && !string.IsNullOrWhiteSpace(s.HotkeyToggleDnd))
+                label += $"    {s.HotkeyToggleDnd}";
+            _pauseResumeItem.Text = label;
             _pauseResumeItem.Checked = isPaused;
         }
 
@@ -404,6 +419,8 @@ public partial class App : Application
                 _settingsWindow.WindowStyle = WindowStyle.None;
                 _settingsWindow.ResizeMode = ResizeMode.NoResize;
                 _settingsWindow.ShowInTaskbar = false;
+                _settingsWindow.AllowsTransparency = true;
+                _settingsWindow.Background = System.Windows.Media.Brushes.Transparent;
                 _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
 
                 var popupBounds = CalculateSettingsPopupBounds(_settingsWindow.Width, _settingsWindow.Height);
@@ -460,19 +477,22 @@ public partial class App : Application
         var taskbarRect = GetTaskbarRect();
         var anchorRect = trayRect ?? taskbarRect;
 
+        var screens = WinForms.Screen.AllScreens;
         var screen = anchorRect.HasValue
             ? WinForms.Screen.FromRectangle(anchorRect.Value)
-            : (WinForms.Screen.PrimaryScreen ?? WinForms.Screen.AllScreens[0]);
+            : (WinForms.Screen.PrimaryScreen ?? (screens.Length > 0 ? screens[0] : null));
+        if (screen == null)
+            return new Rect(0, 0, Math.Max(320, requestedWidth), Math.Max(280, requestedHeight));
         var workArea = screen.WorkingArea;
 
         var preferredWidth = requestedWidth > 0 ? requestedWidth : 640;
         var maxWidth = Math.Max(320, workArea.Width - (margin * 2));
-        var minWidth = Math.Min(460, maxWidth);
+        var minWidth = Math.Min(400, maxWidth);
         var width = Math.Clamp(preferredWidth, minWidth, maxWidth);
 
-        var preferredHeight = Math.Max(requestedHeight, workArea.Height * 0.72);
+        var preferredHeight = Math.Max(requestedHeight, workArea.Height * 0.55);
         var maxHeight = Math.Max(280, workArea.Height - (margin * 2));
-        var minHeight = Math.Min(420, maxHeight);
+        var minHeight = Math.Min(380, maxHeight);
         var height = Math.Clamp(preferredHeight, minHeight, maxHeight);
 
         var left = workArea.Right - width - margin;
@@ -539,10 +559,12 @@ public partial class App : Application
             {
                 // Show diagnostic status in tooltip (visible on hover)
                 // NotifyIcon.Text max is 127 chars
+                var mode = _notificationListener.ListenerMode;
+                var isPaused = _queueManager?.IsPaused == true;
+                var pausedSuffix = isPaused ? " | Paused" : string.Empty;
                 var clickThroughSuffix = _settingsManager?.Settings.ClickThrough == true
-                    ? " | click-through ON"
-                    : string.Empty;
-                var tooltip = $"Notifications Pro\n{_notificationListener.StatusMessage}{clickThroughSuffix}";
+                    ? " | Click-through" : string.Empty;
+                var tooltip = $"Notifications Pro — Listening via {mode}{pausedSuffix}{clickThroughSuffix}\n{_notificationListener.StatusMessage}";
                 if (tooltip.Length > 127) tooltip = tooltip[..127];
                 _trayIcon.Text = tooltip;
             }
@@ -714,10 +736,72 @@ public partial class App : Application
         target.SettingsWindowBorder = source.SettingsWindowBorder;
     }
 
+    public void ShowSettingsForApp(string appName)
+    {
+        ShowSettings();
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.NavigateToTab("Filtering");
+        }
+    }
+
+    private void ViewSessionArchive()
+    {
+        if (_queueManager == null) return;
+        var archive = _queueManager.SessionArchive;
+        if (archive.Count == 0)
+        {
+            System.Windows.MessageBox.Show(
+                "No archived notifications yet.\n\nEnable Session Archive in Settings > Behavior to start recording notifications in memory.",
+                "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var lines = archive
+            .AsEnumerable().Reverse()
+            .Select(a =>
+            {
+                var elapsed = DateTime.Now - a.ReceivedAt;
+                var timeStr = elapsed.TotalMinutes < 1 ? "just now"
+                    : elapsed.TotalMinutes < 60 ? $"{(int)elapsed.TotalMinutes}m ago"
+                    : $"{(int)elapsed.TotalHours}h ago";
+                var parts = new[] { a.AppName, a.Title, a.Body }
+                    .Where(s => !string.IsNullOrWhiteSpace(s));
+                return $"[{timeStr}] {string.Join(" — ", parts)}";
+            });
+        var text = string.Join("\n", lines);
+        System.Windows.Clipboard.SetText(text);
+        System.Windows.MessageBox.Show(
+            $"{archive.Count} archived notification(s) copied to clipboard.\n\nThis data exists only in RAM and will be cleared when the app closes.",
+            "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void ShowAboutDialog()
+    {
+        var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        var versionStr = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "1.0.0";
+        var listenerMode = _notificationListener != null
+            ? (_notificationListener.IsAccessGranted ? "WinRT" : "Accessibility")
+            : "Unknown";
+
+        System.Windows.MessageBox.Show(
+            $"Notifications Pro v{versionStr}\n\n" +
+            $"A Windows tray app that mirrors toast notifications\ninto a customizable always-on-top overlay.\n\n" +
+            $"Listener: {listenerMode}\n" +
+            $".NET {Environment.Version}\n\n" +
+            $"License: MIT\n" +
+            $"GitHub: github.com/lwytch/Notifications-Pro",
+            "About Notifications Pro",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
+
     private void QuitApp()
     {
         _presentationTimer?.Stop();
         _focusTimer?.Stop();
+        if (_highContrastHandler != null)
+            SystemParameters.StaticPropertyChanged -= _highContrastHandler;
         _hotkeyManager?.Dispose();
         _notificationListener?.Stop();
         _settingsManager?.Save();

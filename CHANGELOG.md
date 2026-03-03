@@ -2,7 +2,41 @@
 
 ## Unreleased
 
+### Security
+- **Milestone 12: Security Hardening & Code Quality**
+- Path traversal validation in IconService — custom icon file paths validated to stay within AppData icons directory
+- Settings import hardened with 1MB file size limit and numeric range clamping to prevent DoS/corrupt values
+- Regex timeout (100ms) added to keyword matching in QueueManager to prevent potential UI hangs
+- Safe hex parsing in ContrastHelper using TryParse instead of Convert.ToByte (prevents crash on malformed input)
+- SetLastError=true added to HotkeyManager P/Invoke declarations for better error diagnostics
+- Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
+
+### Fixed
+- Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
+- Memory leak: OverlayWindow now unsubscribes from SettingsChanged event on close (prevents GC retention)
+- Crash guard: 0-monitor fallback in popup positioning handles empty Screen.AllScreens safely
+- Event leak: SystemParameters.StaticPropertyChanged handler properly unsubscribed on app exit
+- Resource leak: HwndSource properly disposed in HotkeyManager.Unregister()
+
 ### Added
+- **Milestone 13: Functionality & UX Improvements (Essential)**
+- About dialog in tray menu — shows version, listener mode (WinRT/Accessibility), .NET version, license, and GitHub link
+- Listener health status in tray tooltip — "Listening via WinRT/Accessibility" with paused/click-through indicators
+- WinRT auto-retry — retries WinRT initialization every 60s when using accessibility fallback, auto-upgrades when access granted
+- Streaming preset button — one-click "Apply OBS Streaming Preset" enables chroma key (green), fixed window mode, and per-app tinting
+- Keyboard shortcut hints in tray menu — Show/Hide Overlay and Pause items display assigned hotkey combos when global hotkeys are enabled
+- **Milestone 13: High Value UX Improvements**
+- Copy All to Clipboard — right-click overlay context menu copies all visible notifications as text
+- "Settings for [app]..." — right-click card context menu opens settings Filtering tab for quick per-app configuration
+- Position + Size tabs consolidated into single "Layout" tab (Monitor, Quick Position, Size, Snapping, Startup)
+- **Regex keyword matching** — per-keyword ".*" toggle treats the keyword as a regex pattern (supports highlight and mute keywords, with timeout protection and invalid-regex safety)
+- **Overlay search/filter** — right-click "Search..." on overlay toggles a search bar that filters visible notifications by text content (app name, title, body)
+- **Session-only notification archive** — opt-in RAM-only archive (Settings > Behavior) keeps up to 1000 notifications in memory for the current session. Never persisted to disk. "View Session Archive" available in tray menu and settings, copies to clipboard.
+- 8 new unit tests: regex mute/highlight matching, invalid regex safety, session archive enable/disable/max items/RAM-only
+- Version info added to project (v1.0.0)
+- SECURITY.md — privacy guarantee, security design, threat model, vulnerability reporting instructions
+- CONTRIBUTING.md — code conventions, privacy rules, submission checklist
+- .gitattributes — line ending normalization for source and binary files
 - **Per-keyword highlight colors** — each keyword can have its own highlight color with per-keyword color picker in Filtering tab
 - **Comprehensive UI/UX polish pass (21 fixes)**
   - Settings window default height reduced (760→680) for better fit on 1080p

@@ -87,8 +87,32 @@ public class ThemeManager
         if (!File.Exists(filePath))
             return null;
 
+        // Limit import file size to 1 MB to prevent DoS
+        var fileInfo = new FileInfo(filePath);
+        if (fileInfo.Length > 1_048_576)
+            return null;
+
         var json = File.ReadAllText(filePath);
-        return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
+        var imported = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
+
+        if (imported != null)
+            SanitizeImportedSettings(imported);
+
+        return imported;
+    }
+
+    /// <summary>Clamp imported settings to valid ranges to prevent corrupt/malicious values.</summary>
+    private static void SanitizeImportedSettings(AppSettings s)
+    {
+        s.MaxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, 100);
+        s.NotificationDuration = Math.Clamp(s.NotificationDuration, 1, 300);
+        s.OverlayWidth = double.IsNaN(s.OverlayWidth) ? 340 : Math.Clamp(s.OverlayWidth, 220, 7680);
+        s.OverlayMaxHeight = double.IsNaN(s.OverlayMaxHeight) ? 800 : Math.Clamp(s.OverlayMaxHeight, 200, 4320);
+        s.BurstLimitCount = Math.Clamp(s.BurstLimitCount, 1, 100);
+        s.BurstLimitWindowSeconds = Math.Clamp(s.BurstLimitWindowSeconds, 1, 60);
+        s.FontSize = double.IsNaN(s.FontSize) ? 14 : Math.Clamp(s.FontSize, 6, 72);
+        s.TitleFontSize = double.IsNaN(s.TitleFontSize) ? 16 : Math.Clamp(s.TitleFontSize, 6, 72);
+        s.AppNameFontSize = double.IsNaN(s.AppNameFontSize) ? 14 : Math.Clamp(s.AppNameFontSize, 6, 72);
     }
 
     private static string SanitizeFileName(string name)
