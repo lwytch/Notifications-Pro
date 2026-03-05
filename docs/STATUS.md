@@ -203,6 +203,15 @@
   - Overlay search/filter reverted — ICollectionView binding caused display breakage over time. Search bar UI remains but filtering disabled pending safer implementation.
   - Session-only notification archive — opt-in RAM-only archive (Settings > Behavior) keeps up to 1000 notifications for the current session, "View Archive" in tray menu and settings
   - Copy All to Clipboard, "Settings for [app]..." card action, Layout tab consolidation (completed in previous session)
+- **Functionality & UX (Milestone 13 Nice-to-Have)**:
+  - CLI arguments: --pause, --resume, --theme <name>, --send-test, --hide, --show (processed after initialization)
+  - Time-based theme switching: auto-apply day/night themes on a configurable schedule (HH:mm, 60-second polling)
+  - Dyslexia-friendly font preset: bundled OpenDyslexic font with quick-select buttons in Appearance > Typography
+  - Undo/redo for settings: Ctrl+Z/Ctrl+Y with 50-entry history stack, undo/redo buttons in settings header
+  - Named profiles: save/load/delete named configuration profiles in Profiles tab, tray menu "Switch Profile" submenu
+  - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app name headers
+  - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
+  - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
 - 145 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
@@ -272,6 +281,21 @@ dotnet test
 - [ ] UI Styling corner radius slider adjusts window rounding (0 = sharp, 20 = very round)
 - [ ] Popup mode shows rounded corners via XAML clipping
 - [ ] Window mode applies DWM corner preference (round/small-round/no-round)
+- [ ] CLI: `--pause` starts app with notifications paused
+- [ ] CLI: `--theme "Windows Light"` applies the named theme on startup
+- [ ] CLI: `--send-test` sends a test notification on startup
+- [ ] Theme schedule: enabling schedule switches themes at configured day/night times
+- [ ] Theme schedule: toggle, day/night theme selectors, and time inputs visible in Appearance tab
+- [ ] OpenDyslexic: clicking font preset button changes overlay text to OpenDyslexic font
+- [ ] Undo: Ctrl+Z reverts last settings change; Ctrl+Y re-applies
+- [ ] Undo/Redo buttons in header are disabled when stack is empty
+- [ ] Profiles: saving a profile creates a JSON file in %AppData%\NotificationsPro\profiles\
+- [ ] Profiles: loading a profile restores all settings
+- [ ] Profiles: tray menu "Switch Profile" lists saved profiles
+- [ ] Group by App: toggle in Behavior groups notifications under app name headers
+- [ ] Keyboard: Alt+key mnemonics navigate to correct tabs
+- [ ] Keyboard: Escape closes settings window
+- [ ] Screen reader: Windows Narrator announces tab names and control labels
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart
 - [ ] Notification slides in from each configured direction (Left/Right/Top/Bottom)

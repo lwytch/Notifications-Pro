@@ -176,6 +176,16 @@ public class AppSettings
     public bool PopupAutoClose { get; set; } = false;
     public double SettingsWindowCornerRadius { get; set; } = 12;
 
+    // Time-based theme switching (M13 nice-to-have)
+    public bool ThemeScheduleEnabled { get; set; } = false;
+    public string DayThemeName { get; set; } = "Windows Light";
+    public string NightThemeName { get; set; } = "Windows Dark";
+    public string DayStartTime { get; set; } = "07:00";
+    public string NightStartTime { get; set; } = "19:00";
+
+    // Notification grouping (M13 nice-to-have)
+    public bool GroupByApp { get; set; } = false;
+
     // Session archive (M13) — opt-in, RAM-only, never persisted to disk
     public bool SessionArchiveEnabled { get; set; } = false;
     public int SessionArchiveMaxItems { get; set; } = 200;

@@ -17,4 +17,8 @@
     <InternalsVisibleTo Include="NotificationsPro.Tests"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Fonts\OpenDyslexic-Regular.otf" />
+  </ItemGroup>
+
 </Project>

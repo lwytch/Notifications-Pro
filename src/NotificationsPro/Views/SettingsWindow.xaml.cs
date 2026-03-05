@@ -88,6 +88,26 @@ public partial class SettingsWindow : Window
                 vm.PreviewNotificationCommand.Execute(null);
             e.Handled = true;
         }
+        // Ctrl+Z = Undo
+        else if (e.Key == WpfInput.Key.Z && WpfInput.Keyboard.Modifiers == WpfInput.ModifierKeys.Control)
+        {
+            if (DataContext is SettingsViewModel vm && vm.UndoCommand.CanExecute(null))
+                vm.UndoCommand.Execute(null);
+            e.Handled = true;
+        }
+        // Ctrl+Y = Redo
+        else if (e.Key == WpfInput.Key.Y && WpfInput.Keyboard.Modifiers == WpfInput.ModifierKeys.Control)
+        {
+            if (DataContext is SettingsViewModel vm && vm.RedoCommand.CanExecute(null))
+                vm.RedoCommand.Execute(null);
+            e.Handled = true;
+        }
+        // Escape = Close settings window
+        else if (e.Key == WpfInput.Key.Escape)
+        {
+            Close();
+            e.Handled = true;
+        }
     }
 
     private void OnPickColorClick(object sender, RoutedEventArgs e)
@@ -110,7 +130,13 @@ public partial class SettingsWindow : Window
             Color = System.Drawing.Color.FromArgb(start.A, start.R, start.G, start.B)
         };
 
-        if (dialog.ShowDialog() != WinForms.DialogResult.OK)
+        // Use a Win32 owner wrapper to prevent crashes when AllowsTransparency=true (popup mode)
+        var owner = new WinForms.NativeWindow();
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        if (hwnd != IntPtr.Zero)
+            owner.AssignHandle(hwnd);
+
+        if (dialog.ShowDialog(owner) != WinForms.DialogResult.OK)
             return;
 
         var selected = dialog.Color;
@@ -131,7 +157,12 @@ public partial class SettingsWindow : Window
             Color = System.Drawing.Color.FromArgb(start.A, start.R, start.G, start.B)
         };
 
-        if (dialog.ShowDialog() != WinForms.DialogResult.OK) return;
+        var owner2 = new WinForms.NativeWindow();
+        var hwnd2 = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        if (hwnd2 != IntPtr.Zero)
+            owner2.AssignHandle(hwnd2);
+
+        if (dialog.ShowDialog(owner2) != WinForms.DialogResult.OK) return;
 
         var selected = dialog.Color;
         entry.Color = $"#{selected.R:X2}{selected.G:X2}{selected.B:X2}";

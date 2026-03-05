@@ -22,6 +22,12 @@ public class SettingsViewModel : BaseViewModel
     private readonly DispatcherTimer _saveDebounce;
     private bool _overlayWidthDirty;
 
+    // Undo/Redo
+    private readonly Stack<AppSettings> _undoStack = new();
+    private readonly Stack<AppSettings> _redoStack = new();
+    private const int MaxUndoHistory = 50;
+    private bool _isUndoRedoOperation;
+
     private static readonly string[] PreviewApps =
     {
         "Microsoft Teams",
@@ -306,6 +312,26 @@ public class SettingsViewModel : BaseViewModel
 
     private int _sessionArchiveMaxItems = 200;
     public int SessionArchiveMaxItems { get => _sessionArchiveMaxItems; set { if (SetProperty(ref _sessionArchiveMaxItems, Math.Clamp(value, 10, 1000))) QueueSave(); } }
+
+    // Theme schedule
+    private bool _themeScheduleEnabled;
+    public bool ThemeScheduleEnabled { get => _themeScheduleEnabled; set { if (SetProperty(ref _themeScheduleEnabled, value)) QueueSave(); } }
+
+    private string _dayThemeName = "Windows Light";
+    public string DayThemeName { get => _dayThemeName; set { if (SetProperty(ref _dayThemeName, value)) QueueSave(); } }
+
+    private string _nightThemeName = "Windows Dark";
+    public string NightThemeName { get => _nightThemeName; set { if (SetProperty(ref _nightThemeName, value)) QueueSave(); } }
+
+    private string _dayStartTime = "07:00";
+    public string DayStartTime { get => _dayStartTime; set { if (SetProperty(ref _dayStartTime, value)) QueueSave(); } }
+
+    private string _nightStartTime = "19:00";
+    public string NightStartTime { get => _nightStartTime; set { if (SetProperty(ref _nightStartTime, value)) QueueSave(); } }
+
+    // Notification grouping
+    private bool _groupByApp;
+    public bool GroupByApp { get => _groupByApp; set { if (SetProperty(ref _groupByApp, value)) QueueSave(); } }
 
     // Scheduling
     private bool _quietHoursEnabled;
@@ -808,6 +834,25 @@ public class SettingsViewModel : BaseViewModel
     public ICommand BrowseCustomIconCommand { get; }
     public ICommand ApplyStreamingPresetCommand { get; }
     public ICommand ViewSessionArchiveCommand { get; }
+    public ICommand SetFontPresetCommand { get; }
+    public ICommand UndoCommand { get; }
+    public ICommand RedoCommand { get; }
+    public ICommand SaveProfileCommand { get; }
+    public ICommand LoadProfileCommand { get; }
+    public ICommand DeleteProfileCommand { get; }
+
+    private bool _canUndo;
+    public bool CanUndo { get => _canUndo; private set => SetProperty(ref _canUndo, value); }
+    private bool _canRedo;
+    public bool CanRedo { get => _canRedo; private set => SetProperty(ref _canRedo, value); }
+
+    // Profiles
+    private readonly ProfileManager _profileManager = new();
+    public ObservableCollection<string> SavedProfiles { get; } = new();
+
+    private string _newProfileName = "";
+    public string NewProfileName { get => _newProfileName; set => SetProperty(ref _newProfileName, value); }
+
     public ImageSource TrayIconImage { get; }
 
     // Themes
@@ -840,10 +885,15 @@ public class SettingsViewModel : BaseViewModel
             SaveSettings();
         };
 
-        AvailableFonts = Fonts.SystemFontFamilies
+        var fonts = Fonts.SystemFontFamilies
             .Select(f => f.Source)
             .OrderBy(f => f)
             .ToList();
+        // Add bundled OpenDyslexic font (accessibility preset)
+        const string openDyslexicUri = "pack://application:,,,/Fonts/#OpenDyslexic";
+        if (!fonts.Any(f => f.Contains("OpenDyslexic", StringComparison.OrdinalIgnoreCase)))
+            fonts.Insert(0, openDyslexicUri);
+        AvailableFonts = fonts;
 
         PreviewNotificationCommand = new RelayCommand(SendPreviewNotification);
         ResetToDefaultsCommand = new RelayCommand(ResetToDefaults);
@@ -875,6 +925,12 @@ public class SettingsViewModel : BaseViewModel
         BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
         ApplyStreamingPresetCommand = new RelayCommand(_ => ApplyStreamingPreset());
         ViewSessionArchiveCommand = new RelayCommand(_ => ViewSessionArchive());
+        SetFontPresetCommand = new RelayCommand(o => FontFamily = o as string ?? "Segoe UI");
+        UndoCommand = new RelayCommand(_ => Undo(), _ => _undoStack.Count > 0);
+        RedoCommand = new RelayCommand(_ => Redo(), _ => _redoStack.Count > 0);
+        SaveProfileCommand = new RelayCommand(_ => SaveProfile());
+        LoadProfileCommand = new RelayCommand(o => LoadProfile(o as string));
+        DeleteProfileCommand = new RelayCommand(o => DeleteProfile(o as string));
         DismissFirstRunTipCommand = new RelayCommand(_ => DismissFirstRunTip());
         TrayIconImage = IconHelper.CreateTrayIconImageSource(32);
 
@@ -887,6 +943,7 @@ public class SettingsViewModel : BaseViewModel
         RefreshWindowsSounds(); // After LoadFromSettings so custom WAV paths are already known
         RefreshMonitors();
         RefreshPerAppConfig();
+        RefreshProfiles();
 
         // Show first-run tip if welcome hasn't been shown yet
         if (!_settingsManager.Settings.HasShownWelcome)
@@ -958,6 +1015,12 @@ public class SettingsViewModel : BaseViewModel
         _suppressToastPopups = s.SuppressToastPopups;
         _sessionArchiveEnabled = s.SessionArchiveEnabled;
         _sessionArchiveMaxItems = s.SessionArchiveMaxItems;
+        _themeScheduleEnabled = s.ThemeScheduleEnabled;
+        _dayThemeName = s.DayThemeName;
+        _nightThemeName = s.NightThemeName;
+        _dayStartTime = s.DayStartTime;
+        _nightStartTime = s.NightStartTime;
+        _groupByApp = s.GroupByApp;
         _quietHoursEnabled = s.QuietHoursEnabled;
         _quietHoursStart = s.QuietHoursStart;
         _quietHoursEnd = s.QuietHoursEnd;
@@ -1052,8 +1115,82 @@ public class SettingsViewModel : BaseViewModel
         _saveDebounce.Start();
     }
 
+    private void Undo()
+    {
+        if (_undoStack.Count == 0) return;
+        _redoStack.Push(_settingsManager.Settings.Clone());
+        var previous = _undoStack.Pop();
+        _isUndoRedoOperation = true;
+        _settingsManager.Apply(previous);
+        LoadFromSettings();
+        _isUndoRedoOperation = false;
+        UpdateUndoRedoState();
+    }
+
+    private void Redo()
+    {
+        if (_redoStack.Count == 0) return;
+        _undoStack.Push(_settingsManager.Settings.Clone());
+        var next = _redoStack.Pop();
+        _isUndoRedoOperation = true;
+        _settingsManager.Apply(next);
+        LoadFromSettings();
+        _isUndoRedoOperation = false;
+        UpdateUndoRedoState();
+    }
+
+    private void UpdateUndoRedoState()
+    {
+        CanUndo = _undoStack.Count > 0;
+        CanRedo = _redoStack.Count > 0;
+    }
+
+    private void RefreshProfiles()
+    {
+        SavedProfiles.Clear();
+        foreach (var name in _profileManager.GetProfileNames())
+            SavedProfiles.Add(name);
+    }
+
+    private void SaveProfile()
+    {
+        if (string.IsNullOrWhiteSpace(NewProfileName)) return;
+        _profileManager.SaveProfile(NewProfileName, _settingsManager.Settings);
+        NewProfileName = "";
+        RefreshProfiles();
+    }
+
+    private void LoadProfile(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return;
+        var profile = _profileManager.LoadProfile(name);
+        if (profile == null) return;
+        _settingsManager.Apply(profile);
+        LoadFromSettings();
+    }
+
+    private void DeleteProfile(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return;
+        _profileManager.DeleteProfile(name);
+        RefreshProfiles();
+    }
+
     private void SaveSettings()
     {
+        if (!_isUndoRedoOperation)
+        {
+            _undoStack.Push(_settingsManager.Settings.Clone());
+            if (_undoStack.Count > MaxUndoHistory)
+            {
+                var items = _undoStack.ToArray();
+                _undoStack.Clear();
+                for (int i = 0; i < MaxUndoHistory; i++)
+                    _undoStack.Push(items[i]);
+            }
+            _redoStack.Clear();
+            UpdateUndoRedoState();
+        }
         var previousSettings = _settingsManager.Settings;
         var showAppName = ShowAppName;
         var showTitle = ShowNotificationTitle;
@@ -1180,6 +1317,12 @@ public class SettingsViewModel : BaseViewModel
             SuppressToastPopups = SuppressToastPopups,
             SessionArchiveEnabled = SessionArchiveEnabled,
             SessionArchiveMaxItems = SessionArchiveMaxItems,
+            ThemeScheduleEnabled = ThemeScheduleEnabled,
+            DayThemeName = DayThemeName,
+            NightThemeName = NightThemeName,
+            DayStartTime = DayStartTime,
+            NightStartTime = NightStartTime,
+            GroupByApp = GroupByApp,
             QuietHoursEnabled = QuietHoursEnabled,
             QuietHoursStart = QuietHoursStart,
             QuietHoursEnd = QuietHoursEnd,

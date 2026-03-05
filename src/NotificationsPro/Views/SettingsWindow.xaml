@@ -7,7 +7,8 @@
         Width="780" Height="560" MinWidth="620" MinHeight="480"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        AutomationProperties.Name="Notifications Pro Settings">
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
@@ -114,6 +115,16 @@
                 <Image Source="{Binding TrayIconImage}" Width="28" Height="28"
                        Margin="0,0,12,0" VerticalAlignment="Top"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <Button Content="&#xE10E;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                            Style="{StaticResource SecondaryButton}" Padding="6,4" Margin="0,0,4,0"
+                            Command="{Binding UndoCommand}"
+                            IsEnabled="{Binding CanUndo}"
+                            ToolTip="Undo last change (Ctrl+Z)"/>
+                    <Button Content="&#xE10D;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                            Style="{StaticResource SecondaryButton}" Padding="6,4" Margin="0,0,12,0"
+                            Command="{Binding RedoCommand}"
+                            IsEnabled="{Binding CanRedo}"
+                            ToolTip="Redo last undone change (Ctrl+Y)"/>
                     <TextBlock Text="Preview" FontFamily="{StaticResource UIFont}" FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding ShowPreviewCard}"
@@ -214,11 +225,13 @@
         </Border>
 
         <!-- Tabs -->
-        <TabControl x:Name="MainTabControl" Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="20,12,20,8">
+        <TabControl x:Name="MainTabControl" Grid.Row="3" Style="{StaticResource SettingsTabControl}" Margin="20,12,20,8"
+                    AutomationProperties.Name="Settings categories"
+                    KeyboardNavigation.TabNavigation="Cycle">
 
             <!-- ═══ PROFILES TAB ═══ -->
             <!-- ═══ APPEARANCE TAB ═══ -->
-            <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Appearance settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -293,6 +306,55 @@
                                    Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
                                    Visibility="{Binding CustomThemes.Count, Converter={StaticResource ZeroToVisible}}"/>
 
+                        <!-- THEME SCHEDULE section -->
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="THEME SCHEDULE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Automatically switch overlay themes based on time of day"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ThemeScheduleEnabled}"
+                                          ToolTip="Enable automatic theme switching at scheduled times"/>
+                            <TextBlock Text="Enable Theme Schedule" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Automatically switch between day and night themes at the configured times"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Day Theme" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Theme to apply during daytime hours"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableSettingsThemeModes}"
+                                  SelectedItem="{Binding DayThemeName}"
+                                  Margin="0,4,0,4"
+                                  ToolTip="Select the theme for daytime"/>
+
+                        <TextBlock Text="Night Theme" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Theme to apply during nighttime hours"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableSettingsThemeModes}"
+                                  SelectedItem="{Binding NightThemeName}"
+                                  Margin="0,4,0,4"
+                                  ToolTip="Select the theme for nighttime"/>
+
+                        <UniformGrid Columns="2" Margin="0,4,0,8">
+                            <StackPanel Margin="0,0,8,0">
+                                <TextBlock Text="Day Start (HH:mm)" Style="{StaticResource SettingLabel}"
+                                           ToolTip="Time when the day theme activates (24-hour format)"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding DayStartTime, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Enter time in 24-hour format, e.g. 07:00"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Night Start (HH:mm)" Style="{StaticResource SettingLabel}"
+                                           ToolTip="Time when the night theme activates (24-hour format)"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding NightStartTime, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Enter time in 24-hour format, e.g. 19:00"/>
+                            </StackPanel>
+                        </UniformGrid>
+
                         <!-- TYPOGRAPHY section -->
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="TYPOGRAPHY" Style="{StaticResource SectionHeader}"/>
@@ -305,6 +367,16 @@
                                   SelectedItem="{Binding FontFamily}"
                                   ToolTip="The typeface used for notification text"
                                   Margin="0,4,0,0"/>
+                        <WrapPanel Margin="0,4,0,0">
+                            <Button Content="OpenDyslexic" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,4"
+                                    Command="{Binding SetFontPresetCommand}" CommandParameter="pack://application:,,,/Fonts/#OpenDyslexic"
+                                    ToolTip="Apply OpenDyslexic — a font designed for readers with dyslexia"/>
+                            <Button Content="Segoe UI (Default)" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,4"
+                                    Command="{Binding SetFontPresetCommand}" CommandParameter="Segoe UI"
+                                    ToolTip="Reset to the default Windows font"/>
+                        </WrapPanel>
 
                         <TextBlock Text="Body Font Size" Style="{StaticResource SettingLabel}" ToolTip="Size of the notification body text"/>
                         <DockPanel Margin="0,4,0,0">
@@ -740,7 +812,7 @@
             </TabItem>
 
             <!-- ═══ BEHAVIOR TAB ═══ -->
-            <TabItem Header="Behavior" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Behavior" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Behavior settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -808,6 +880,14 @@
                                               IsChecked="{Binding NewestOnTop}"
                                               ToolTip="When on, newest notifications appear first at the top. Turn off for chronological top-to-bottom flow."/>
                                 <TextBlock Text="Newest on Top" Style="{StaticResource SettingLabel}" ToolTip="Turn off to let new notifications appear underneath older ones."/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding GroupByApp}"
+                                              ToolTip="Group notifications under app name headers in the overlay"/>
+                                <TextBlock Text="Group Notifications by App" Style="{StaticResource SettingLabel}"
+                                           ToolTip="When enabled, notifications from the same app are grouped under a shared header"/>
                             </DockPanel>
 
                             <DockPanel Margin="0,0,0,8">
@@ -1013,7 +1093,7 @@
             </TabItem>
 
             <!-- ═══ FILTERING TAB ═══ -->
-            <TabItem Header="Filtering" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Filtering" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Filtering settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1087,7 +1167,9 @@
                                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                                 Margin="0,0,6,0" VerticalAlignment="Center"/>
                                         <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
-                                                      Style="{StaticResource SecondaryButton}"
+                                                      Background="{DynamicResource SurfaceLightBrush}"
+                                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                                      BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                                       Width="36" Padding="0" Margin="0,0,4,0"
                                                       ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
                                         <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
@@ -1120,7 +1202,9 @@
                                                 CommandParameter="{Binding}"
                                                 ToolTip="Remove this mute keyword"/>
                                         <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
-                                                      Style="{StaticResource SecondaryButton}"
+                                                      Background="{DynamicResource SurfaceLightBrush}"
+                                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                                      BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                                       Width="36" Padding="0" Margin="0,0,4,0"
                                                       ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
                                         <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
@@ -1250,7 +1334,7 @@
             </TabItem>
 
             <!-- ═══ LAYOUT TAB ═══ -->
-            <TabItem Header="Layout" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Layout" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Layout settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1397,7 +1481,7 @@
                 </ScrollViewer>
             </TabItem>
             <!-- ═══ SOUNDS TAB ═══ -->
-            <TabItem Header="Sounds" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Sounds" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Sounds settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1443,7 +1527,7 @@
             </TabItem>
 
             <!-- ═══ STREAMING TAB ═══ -->
-            <TabItem Header="Streaming" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Streaming" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Streaming settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1595,7 +1679,7 @@
                 </ScrollViewer>
             </TabItem>
             <!-- ═══ ACCESSIBILITY TAB ═══ -->
-            <TabItem Header="Accessibility" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Accessibility" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Accessibility settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1731,7 +1815,7 @@
                 </ScrollViewer>
             </TabItem>
             <!-- ═══ UI STYLING TAB ═══ -->
-            <TabItem Header="UI Styling" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="UI Styling" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="UI Styling settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1905,13 +1989,48 @@
             </TabItem>
 
             <!-- ═══ PROFILES TAB ═══ -->
-            <TabItem Header="Profiles" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Profiles" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Profiles settings tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SAVED PROFILES" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Save and switch between named configuration profiles (e.g., Work, Gaming, Streaming). Each profile stores all settings."/>
+                        </Border>
+
+                        <DockPanel Margin="0,4,0,8">
+                            <Button DockPanel.Dock="Right" Content="Save" Style="{StaticResource PrimaryButton}"
+                                    Margin="8,0,0,0" Command="{Binding SaveProfileCommand}"
+                                    ToolTip="Save current settings as a new profile"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding NewProfileName, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Enter a name for the profile (e.g., Work, Gaming, Streaming)"/>
+                        </DockPanel>
+
+                        <ItemsControl ItemsSource="{Binding SavedProfiles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Margin="0,0,0,6">
+                                        <Button DockPanel.Dock="Right" Content="Delete" Style="{StaticResource SecondaryButton}"
+                                                Padding="8,4" Margin="8,0,0,0"
+                                                Command="{Binding DataContext.DeleteProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Delete this profile"/>
+                                        <Button Style="{StaticResource SecondaryButton}"
+                                                Padding="10,6" HorizontalContentAlignment="Left"
+                                                Command="{Binding DataContext.LoadProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Load this profile (replaces all current settings)">
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                        </Button>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="IMPORT / EXPORT" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Save and restore complete app profiles (all tabs) as JSON files."/>
+                                       ToolTip="Save and restore complete app settings (all tabs) as JSON files."/>
                         </Border>
 
                         <WrapPanel Margin="0,0,0,8">
@@ -1928,7 +2047,7 @@
             </TabItem>
 
             <!-- ═══ HELP TAB ═══ -->
-            <TabItem Header="Help" Style="{StaticResource SettingsTabItem}">
+            <TabItem Header="Help" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Help tab">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -2091,6 +2210,9 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Ctrl+T (in settings)" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
@@ -2106,7 +2228,19 @@
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Tray right-click" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Show/hide overlay, DND, always-on-top, click-through, focus mode, clear all"
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Show/hide overlay, DND, always-on-top, click-through, focus mode, clear all, switch profile"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Ctrl+Z / Ctrl+Y" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="Undo / redo settings changes"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8"/>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Escape" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="Close settings window"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8"/>
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="CLI arguments" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="--pause, --resume, --theme &lt;name&gt;, --send-test, --hide, --show"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                         </Grid>
 
@@ -2131,11 +2265,11 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Appearance" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Overlay themes, typography, colors, shapes, icons, scrollbar, and fullscreen mode"
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Overlay themes, theme scheduling, font presets (OpenDyslexic), typography, colors, shapes, icons, scrollbar, and fullscreen mode"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Behavior" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Timing, content visibility, single-line mode, animations, deduplication, and toast suppression"
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Timing, content visibility, single-line mode, group-by-app, animations, deduplication, and toast suppression"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Filtering" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
@@ -2160,6 +2294,10 @@
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" Text="Settings window display mode, corner radius, theme, and custom color palette"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Profiles" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
+                            <TextBlock Grid.Row="8" Grid.Column="1" Text="Save and load named configuration profiles, import/export settings as JSON"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                         </Grid>
 

@@ -445,6 +445,18 @@ public class OverlayViewModel : BaseViewModel
 
     public Visibility SearchBarVisibility => IsSearchVisible ? Visibility.Visible : Visibility.Collapsed;
 
+    // Notification grouping
+    private bool _groupByApp;
+    public bool GroupByApp
+    {
+        get => _groupByApp;
+        set
+        {
+            if (SetProperty(ref _groupByApp, value))
+                UpdateGrouping();
+        }
+    }
+
     private ICollectionView? _notificationsView;
     public ICollectionView NotificationsView
     {
@@ -466,6 +478,14 @@ public class OverlayViewModel : BaseViewModel
         return item.AppName.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
             || item.Title.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
             || item.Body.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void UpdateGrouping()
+    {
+        if (_notificationsView == null) return;
+        _notificationsView.GroupDescriptions.Clear();
+        if (_groupByApp)
+            _notificationsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(NotificationItem.AppName)));
     }
 
     // Empty state ghost card visibility
@@ -593,6 +613,7 @@ public class OverlayViewModel : BaseViewModel
         FullscreenOverlayMode = s.FullscreenOverlayMode;
         FullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
         FullscreenOverlayColor = s.FullscreenOverlayColor;
+        GroupByApp = s.GroupByApp;
 
         // Notify all computed properties
         OnPropertyChanged(nameof(AppNameLineHeight));

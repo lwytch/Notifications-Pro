@@ -36,11 +36,15 @@ public partial class App : Application
     private WinForms.ToolStripMenuItem? _focusModeItem;
     private WinForms.ToolStripMenuItem? _quickMuteItem;
     private WinForms.ToolStripMenuItem? _themeSwitchItem;
+    private WinForms.ToolStripMenuItem? _profileSwitchItem;
+    private ProfileManager? _profileManager;
     private DispatcherTimer? _focusTimer;
     private DateTime _focusEndTime;
     private ThemeManager? _themeManager;
     private DispatcherTimer? _presentationTimer;
     private bool _presentationDndActive;
+    private DispatcherTimer? _themeScheduleTimer;
+    private string? _lastScheduledTheme;
     private System.ComponentModel.PropertyChangedEventHandler? _highContrastHandler;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
@@ -74,6 +78,28 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Global exception handlers — show error details instead of silently closing
+        DispatcherUnhandledException += (_, args) =>
+        {
+            System.Windows.MessageBox.Show(
+                $"Unhandled UI exception:\n\n{args.Exception}",
+                "Notifications Pro — Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            args.Handled = true;
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            if (args.ExceptionObject is Exception ex)
+                System.Windows.MessageBox.Show(
+                    $"Unhandled exception:\n\n{ex}",
+                    "Notifications Pro — Fatal Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+        };
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            args.SetObserved();
+        };
+
         // Set AUMID before any notification API calls — this makes the app
         // appear in Windows Settings > Privacy > Notifications
         SetCurrentProcessExplicitAppUserModelID("NotificationsPro.App");
@@ -81,6 +107,7 @@ public partial class App : Application
         _settingsManager = new SettingsManager();
         _settingsManager.Load();
         _themeManager = new ThemeManager();
+        _profileManager = new ProfileManager();
 
         // Sync startup registry with saved setting
         SyncStartupRegistryState();
@@ -129,6 +156,12 @@ public partial class App : Application
         _presentationTimer.Tick += OnPresentationTimerTick;
         _presentationTimer.Start();
 
+        // Theme schedule: check every 60 seconds for time-based theme switching
+        _themeScheduleTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(60) };
+        _themeScheduleTimer.Tick += OnThemeScheduleTimerTick;
+        _themeScheduleTimer.Start();
+        OnThemeScheduleTimerTick(null, EventArgs.Empty);
+
         // Show first-run balloon tip
         if (!_settingsManager.Settings.HasShownWelcome && _trayIcon != null)
         {
@@ -141,6 +174,74 @@ public partial class App : Application
 
         // Initialize notification listener — will prompt for permission on first run
         await _notificationListener.InitializeAsync();
+
+        // Process CLI arguments after full initialization
+        ProcessCliArguments(e.Args);
+    }
+
+    private void ProcessCliArguments(string[] args)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            var arg = args[i].ToLowerInvariant();
+            switch (arg)
+            {
+                case "--pause":
+                    _queueManager?.Pause();
+                    UpdateMenuLabels();
+                    break;
+                case "--resume":
+                    _queueManager?.Resume();
+                    UpdateMenuLabels();
+                    break;
+                case "--theme" when i + 1 < args.Length:
+                    ApplyThemeByName(args[++i]);
+                    break;
+                case "--send-test":
+                    _settingsViewModel?.PreviewNotificationCommand.Execute(null);
+                    break;
+                case "--hide":
+                    HideOverlay();
+                    break;
+                case "--show":
+                    ShowOverlay();
+                    break;
+            }
+        }
+    }
+
+    private void ApplyThemeByName(string themeName)
+    {
+        var theme = ThemePreset.BuiltInThemes
+            .FirstOrDefault(t => t.Name.Equals(themeName, StringComparison.OrdinalIgnoreCase));
+        if (theme == null && _themeManager != null)
+            theme = _themeManager.LoadCustomThemes()
+                .FirstOrDefault(t => t.Name.Equals(themeName, StringComparison.OrdinalIgnoreCase));
+        if (theme != null)
+            ApplyThemeFromTray(theme);
+    }
+
+    private void OnThemeScheduleTimerTick(object? sender, EventArgs e)
+    {
+        if (_settingsManager == null || !_settingsManager.Settings.ThemeScheduleEnabled)
+            return;
+
+        var settings = _settingsManager.Settings;
+        if (!TimeSpan.TryParse(settings.DayStartTime, out var dayStart) ||
+            !TimeSpan.TryParse(settings.NightStartTime, out var nightStart))
+            return;
+
+        var now = DateTime.Now.TimeOfDay;
+        var isDaytime = dayStart < nightStart
+            ? now >= dayStart && now < nightStart
+            : now >= dayStart || now < nightStart;
+
+        var targetTheme = isDaytime ? settings.DayThemeName : settings.NightThemeName;
+        if (string.Equals(targetTheme, _lastScheduledTheme, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        _lastScheduledTheme = targetTheme;
+        ApplyThemeByName(targetTheme);
     }
 
     private void SyncStartupRegistryState()
@@ -256,6 +357,10 @@ public partial class App : Application
         // Theme quick-switch submenu — populated dynamically when opened
         _themeSwitchItem = new WinForms.ToolStripMenuItem("Switch Theme");
         contextMenu.Items.Add(_themeSwitchItem);
+
+        // Profile quick-switch submenu — populated dynamically when opened
+        _profileSwitchItem = new WinForms.ToolStripMenuItem("Switch Profile");
+        contextMenu.Items.Add(_profileSwitchItem);
 
         contextMenu.Opening += OnTrayMenuOpening;
 
@@ -650,6 +755,7 @@ public partial class App : Application
     {
         PopulateQuickMuteMenu();
         PopulateThemeSwitchMenu();
+        PopulateProfileSwitchMenu();
     }
 
     private void PopulateQuickMuteMenu()
@@ -701,6 +807,32 @@ public partial class App : Application
                 _themeSwitchItem.DropDownItems.Add(theme.Name, null, (_, _) => ApplyThemeFromTray(captured));
             }
         }
+    }
+
+    private void PopulateProfileSwitchMenu()
+    {
+        if (_profileSwitchItem == null || _profileManager == null || _settingsManager == null) return;
+
+        _profileSwitchItem.DropDownItems.Clear();
+        var profiles = _profileManager.GetProfileNames();
+        if (profiles.Count == 0)
+        {
+            _profileSwitchItem.DropDownItems.Add(new WinForms.ToolStripMenuItem("(no saved profiles)") { Enabled = false });
+            return;
+        }
+        foreach (var name in profiles)
+        {
+            var captured = name;
+            _profileSwitchItem.DropDownItems.Add(name, null, (_, _) => ApplyProfileFromTray(captured));
+        }
+    }
+
+    private void ApplyProfileFromTray(string profileName)
+    {
+        if (_profileManager == null || _settingsManager == null) return;
+        var profile = _profileManager.LoadProfile(profileName);
+        if (profile != null)
+            _settingsManager.Apply(profile);
     }
 
     private void ApplyThemeFromTray(ThemePreset theme)

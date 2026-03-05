@@ -367,18 +367,18 @@ High value (v1.1):
 - [x] Consolidate Position + Size tabs into "Layout" (single tab with Monitor, Quick Position, Size, Snapping, Startup)
 - [x] Session-only in-memory notification archive (RAM-only, opt-in, bounded, never persisted, cleared on close)
 
-Nice-to-have (post v1.1):
-- [ ] Notification grouping by app (collapsible)
-- [ ] Time-based theme switching (auto dark mode at sunset)
-- [ ] CLI arguments (--pause, --theme, --send-test)
-- [ ] Dyslexia-friendly font preset (OpenDyslexic)
-- [ ] Undo/redo for settings changes
-- [ ] Named profiles (Work/Gaming/Streaming) bundling theme + filters + position
-- [ ] Full keyboard navigation audit for settings window
-- [ ] Screen reader (Narrator) testing and AutomationProperties audit
+Nice-to-have:
+- [x] Notification grouping by app — toggle in Behavior tab, ICollectionView GroupDescriptions, themed group headers in overlay
+- [x] Time-based theme switching — schedule day/night themes with configurable HH:mm times, 60-second polling timer
+- [x] CLI arguments — --pause, --resume, --theme <name>, --send-test, --hide, --show (parsed in OnStartup after init)
+- [x] Dyslexia-friendly font preset — bundled OpenDyslexic-Regular.otf, quick-select buttons in Appearance > Typography
+- [x] Undo/redo for settings — Ctrl+Z/Y with 50-entry stack, undo/redo buttons in settings header
+- [x] Named profiles — ProfileManager service (%AppData%\profiles\), save/load/delete UI in Profiles tab, tray menu submenu
+- [x] Full keyboard navigation audit — tab mnemonics (Alt+A/B/F/L/O/R/Y/U/P/H), Escape closes, Cycle navigation on TabControl
+- [x] Screen reader / AutomationProperties audit — AutomationProperties.Name on Window, TabControl, all TabItems, notification cards
 
 ## Current Focus
-Milestone 13 v1.1 high-value items complete. Nice-to-have items remain for post-v1.1.
+All Milestone 13 items complete including nice-to-have features.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.
