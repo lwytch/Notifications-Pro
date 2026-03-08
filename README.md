@@ -196,6 +196,21 @@ dotnet publish src/NotificationsPro -c Release -r win-x64 --self-contained
 
 ---
 
+## Installation (MSIX)
+
+Notifications Pro is distributed as a native Windows App package (`.msix`). Because it hooks deeply into Windows Notifications, the installer must be digitally signed. Since this is a free open-source tool, it is signed with a self-signed Developer Certificate.
+
+To install it for the first time:
+1. Download both the **`.msix`** installer and the **`.cer`** certificate file from the [Releases page].
+2. Right-click the `.cer` file and select **Install Certificate**.
+3. Select **Local Machine**, and explicitly browse to place it in the **"Trusted Root Certification Authorities"** store.
+4. Double-click the `.msix` file to install the app natively.
+
+> **Note on Windows Defender / SmartScreen:** 
+> Because this is a new, indie open-source app targeting low-level UI Automation, Microsoft Defender or "Attack Surface Reduction" tools may flag it initially. This is a false positive completely expected for newly compiled binaries. You can safely "Run Anyway" or whitelist the WindowsApps folder path.
+
+---
+
 ## How To Use
 
 ### Tray Icon
@@ -243,3 +258,10 @@ The tray menu also has **Grant Notification Access** and **Retry Access Check** 
 - [`docs/STATUS.md`](docs/STATUS.md) — current capabilities and manual test checklist
 - [`docs/PLAN.md`](docs/PLAN.md) — milestones and roadmap
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — component overview
+
+---
+
+## Disclaimer of Liability
+
+**Notifications Pro is strictly provided "AS IS", without warranty of any kind.**  
+While extensively tested, this software hooks into Windows UI Automation and notification systems. The authors and contributors cannot be held liable for any claim, damages, data loss, or other liability, whether in an action of contract, tort or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software. Please refer to the `LICENSE` file for the full legal text.

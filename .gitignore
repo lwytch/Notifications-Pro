@@ -23,6 +23,8 @@ Continue/
 .codex/
 .cursor/
 .continue/
+.agents/
+.gemini/
 
 # NuGet
 packages/
@@ -59,8 +61,11 @@ appsettings.*.json
 *.token
 *.key
 *.pem
+*.pfx
 *.credentials
-secrets.*
-!secrets.example.*
+# Local Build Scripts and Runbooks
+scripts/app-packaging/
+runbooks/
+
 #### Ignore Project Summary Json
 _cv_project_export.json

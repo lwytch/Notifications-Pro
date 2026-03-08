@@ -263,8 +263,11 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 ### Milestone 11: Packaging & Final Polish
 **Status: In Progress**
 
-- [ ] MSIX packaging or installer
-- [ ] Clean uninstall (optionally remove %AppData% settings)
+- [x] Security Strategy: Remove currently-tracked `.agents` directory (`git rm -r --cached .agents`).
+- [x] Legal Strategy: Add an open-source `LICENSE` (e.g., MIT) to the repo root.
+- [x] Legal Strategy: Add an explicit "Disclaimer of Liability" and "As-Is" warranty section to `README.md`.
+- [x] Packaging Strategy: Implement an MSIX packaging project (`.wapproj`) to bundle the WPF app and grant native WinRT permissions.
+- [x] Update Strategy: Configure an `.appinstaller` file with the MSIX to support automatic over-the-air client updates.
 - [x] Final polish: settings popup now anchors to the Windows toast corner on the taskbar monitor (multi-monitor aware)
 - [x] Final polish: settings popup position restore no longer overrides popup mode placement
 - [x] Final polish: fullscreen overlay mode now renders true fullscreen (monitor bounds) without taskbar/work-area clipping
@@ -295,7 +298,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Final polish: settings window rounded corners with adjustable radius slider (0–20px) in UI Styling tab — XAML clipping in popup mode, DWM corner preference in windowed mode
 - [x] Final polish: tooltips added to all UI Styling color picker labels and section headers
 - [ ] Full manual test checklist pass
-- [ ] README finalization with screenshots
+- [x] README finalization with screenshots
 - [ ] Comprehensive onboarding / first-run experience
 
 ### UI/UX Audit & Polish Pass

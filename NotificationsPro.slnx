@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/NotificationsPro/NotificationsPro.csproj" />
+    <Project Path="src/NotificationsPro.Package/NotificationsPro.Package.wapproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj" />

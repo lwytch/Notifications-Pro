@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Tool-agnostic guidance for any coding agent working in this repository.
+Tool-agnostic guidance for any AI coding agent working in this repository.
 
 ## What This Project Is
 
@@ -13,52 +13,57 @@ dotnet restore                                          # restore dependencies
 dotnet build                                            # build solution
 dotnet run --project src/NotificationsPro               # run the app
 dotnet test                                             # run all tests
-dotnet test --filter "FullyQualifiedName~QueueManager"  # run specific test class
-dotnet publish src/NotificationsPro -c Release -r win-x64 --self-contained  # publish
+# Build MSIX release package (Requires Windows SDK):
+powershell -ExecutionPolicy Bypass -File scripts\app-packaging\release.ps1 -Version "1.x.x"
 ```
 
 ## Repo Map
 
-```
-src/NotificationsPro/
-  App.xaml(.cs)              — Entry point, tray icon, window management
-  Models/                    — AppSettings, NotificationItem (in-memory only)
-  Services/                  — QueueManager, SettingsManager, NotificationListener, ThemeManager, SoundService, IconService, HotkeyManager, SettingsThemeService
-  ViewModels/                — OverlayViewModel, SettingsViewModel, BaseViewModel, RelayCommand
-  Views/                     — OverlayWindow, SettingsWindow (XAML + code-behind)
-  Helpers/                   — SnapHelper, IconHelper, FullscreenHelper, StartupHelper, AppTintHelper, ContrastHelper
-  Converters/                — ColorToBrushConverter, AppIconConverter, AppTintBrushConverter, WcagContrastConverter
-  Resources/Theme.xaml       — Premium dark theme styles
-tests/NotificationsPro.Tests/
-  QueueManagerTests.cs       — Queue logic tests
-  SettingsManagerTests.cs    — Settings serialization tests
-  SnapHelperTests.cs         — Edge snap calculation tests
-  ThemeTests.cs              — ThemePreset/ThemeManager tests
-docs/
-  PLAN.md                    — Living plan with milestones
-  STATUS.md                  — Current state + manual test checklist
-  ARCHITECTURE.md            — System design documentation
-```
+Please read `REPO_MAP.md` in the repository root for a breakdown of the architectural structure, testing locations, packaging scripts, and AI tools.
 
-## Agent Task Workflow
+## Privacy Rules (HARD CONSTRAINTS — never violate)
+
+1. **Never persist notification content** — no database, no flat files, no registry, no cache, no telemetry.
+2. **No logs containing notification title/body/content.** If logging exists, it must be OFF by default and must never include notification content even when enabled.
+3. **Notification content exists only in RAM** for rendering. Discard immediately after display expires/dismissal.
+4. **No history buffer by default.** Only hold what's currently visible/on-screen; overflow stores a count only. Exception: the opt-in Session Archive (disabled by default) temporarily holds notification text in RAM for the current session. It is never written to disk and is cleared when the app closes.
+5. **Overflow notifications store only a count**, not content.
+6. **Persistent writes are settings/assets only** — `%AppData%\NotificationsPro\settings.json`, `%AppData%\NotificationsPro\themes\*.json`, and optional user-provided assets under `%AppData%\NotificationsPro\icons\` and `%AppData%\NotificationsPro\sounds\` (plus user-chosen import/export JSON). Never write notification title/body.
+
+## Queue Logic Rules
+
+- Max visible notifications is configurable (default 3, range 1–40).
+- Additional notifications increment an overflow counter ("+N more") — do **not** store their content.
+- Each visible notification expires after configurable/system duration, then is discarded from memory.
+
+## Coding Conventions
+
+- **MVVM pattern**: Views bind to ViewModels; no code-behind logic beyond window mechanics.
+- **Naming**: PascalCase for public members, `_camelCase` for private fields, `I`-prefix for interfaces.
+- **File layout**: One class per file. Name file after the class.
+- **WPF bindings**: Use `INotifyPropertyChanged` or `ObservableCollection<T>`. No direct UI manipulation from services.
+- **Dependency injection**: Services (QueueManager, SettingsManager, NotificationListener) should be injectable/mockable for testing.
+- **No clickable links**: URLs in notification text render as plain text only.
+- **Overlay icons**: Optional per-app icons (user-configured built-in presets or custom images). Icons are assigned per app name, not per notification. No notification content is used for icon selection.
+
+## Agent Task Workflow & Maintaining Documentation
 
 1. Read `docs/PLAN.md` to find the current focus and pick an unchecked item
 2. Implement the feature or fix
 3. Run `dotnet build` and `dotnet test` — all must pass
-4. Update `docs/PLAN.md` (check off completed items)
+4. Update `docs/PLAN.md` (check off completed items, add new tasks, note blockers)
 5. Update `docs/STATUS.md` (what works, what doesn't)
 6. Update `CHANGELOG.md` if the change is user-visible
-7. Run the "Before You Commit" checklist below
+7. Verify you haven't violated the Privacy Rules.
+8. Run the "Before You Commit" checklist below
 
-## Guardrails — Do NOT Violate
+## Adding Features Safely
 
-1. **No notification content persistence** — never write notification title/body to disk, database, registry, cache, or logs
-2. **No CI/CD** — no `.github/workflows/`, no GitHub Actions
-3. **No paid services** — no hosted APIs, telemetry, error reporting, cloud dependencies
-4. **No clickable links** — URLs display as plain text only
-5. **Text-first overlay** — no images or rich content from notification payloads; optional per-app icons are user-configured only (built-in presets or user-provided files)
-6. **Settings + user assets only** — persistent data is limited to `%AppData%\NotificationsPro\settings.json`, `%AppData%\NotificationsPro\themes\*.json`, and optional user-provided assets under `%AppData%\NotificationsPro\icons\` and `%AppData%\NotificationsPro\sounds\` (plus user-chosen import/export JSON). Never persist notification content.
-7. **No real settings committed** — only `settings.example.json` goes in the repo
+1. Never introduce persistence of notification content (see Privacy Rules above).
+2. No GitHub Actions, CI/CD workflows, or `.github/workflows/` directory.
+3. No paid services, hosted APIs, telemetry, error reporting, or cloud dependencies.
+4. Settings changes go in `AppSettings.cs` model + `settings.example.json` — never commit real `settings.json`.
+5. New testable logic should have corresponding unit tests.
 
 ## Before You Commit Checklist
 
@@ -66,14 +71,7 @@ docs/
 - [ ] `dotnet test` passes all tests
 - [ ] Grep for notification content in any file I/O, logging, or serialization — must find none
 - [ ] No `settings.json` staged — only `settings.example.json`
-- [ ] `.gitignore` covers new artifacts
-- [ ] `docs/PLAN.md` and `docs/STATUS.md` updated
-- [ ] No `.github/workflows/` files
-- [ ] No database, cache, or telemetry code
-
-## Coding Conventions
-
-- MVVM pattern: Views bind to ViewModels, minimal code-behind
-- PascalCase for public members, `_camelCase` for private fields
-- One class per file, file named after class
-- Services should be injectable/mockable for testing
+- [ ] `.gitignore` covers new build artifacts or local files
+- [ ] `docs/PLAN.md` and `docs/STATUS.md` updated if scope changed
+- [ ] No `.github/workflows/` files added
+- [ ] No database, cache, or telemetry code introduced
