@@ -1,14 +1,38 @@
-# Notifications Pro
+<div align="center">
+  <img src="src/NotificationsPro.Package/Images/Square150x150Logo.png" alt="Notifications Pro Logo" width="120" />
+  
+  # Notifications Pro
 
-A Windows tray app (C# .NET 8 + WPF) that mirrors Windows toast notification text into a fully customisable always-on-top overlay — so you can read every notification, in full, without clicking anything.
-
-> Still in active development. I use it every day. More updates coming.
+  **The ultimate open-source, highly-customizable Windows notification overlay.**
+  
+  [![Platform](https://img.shields.io/badge/Platform-Windows_10%20%7C%2011-blue.svg)]()
+  [![Framework](https://img.shields.io/badge/Framework-.NET_8%20%7C%20WPF-purple.svg)]()
+  [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
+  [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg)]()
+</div>
 
 ---
 
-## Why Does This Exist?
+A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customizable, always-on-top overlay widget. Stop missing important messages when the 5-second default popup vanishes—read every notification in full, without ever clicking or switching apps.
 
-Windows truncates most notifications. Teams, Slack, Outlook, Discord — you see the first line and a "..." The only way to read the rest is to open the app. Notifications Pro captures the full text and displays it in an overlay that stays exactly where you put it, sized exactly how you want.
+> Still in active development. I use it every day. More updates coming.
+
+## 🎯 Who is this for?
+
+| Role | Why You Need It |
+|------|-----------------|
+| <img src="https://unpkg.com/lucide-static@0.344.0/icons/gamepad-2.svg" width="18" height="18" alt="Streamers" style="vertical-align: middle;"/> **Streamers & Creators** | Read chat and alerts on a single monitor while maintaining full-screen gaming focus. Use OBS Chroma-key integration for seamless stream overlays. |
+| <img src="https://unpkg.com/lucide-static@0.344.0/icons/code-xml.svg" width="18" height="18" alt="Developers" style="vertical-align: middle;"/> **Developers & Engineers** | Catch CI/CD build failures, PR reviews, or server alerts while deep in focus mode. Texts aren't truncated like default Windows toasts. |
+| <img src="https://unpkg.com/lucide-static@0.344.0/icons/brain-circuit.svg" width="18" height="18" alt="Neurodivergent" style="vertical-align: middle;"/> **ADHD & Neurodivergent** | Never lose a thought. Persistent notifications ensure you decide when a reminder disappears, not an arbitrary 5-second timer. |
+| <img src="https://unpkg.com/lucide-static@0.344.0/icons/briefcase.svg" width="18" height="18" alt="Professionals" style="vertical-align: middle;"/> **Professionals** | Filter noise. Auto-mute Slack during meetings, but highlight "urgent" emails in red so you only break focus for emergencies. |
+| <img src="https://unpkg.com/lucide-static@0.344.0/icons/message-circle-heart.svg" width="18" height="18" alt="Social Media" style="vertical-align: middle;"/> **Social & Community Managers** | Monitor brand mentions, DMs, and engagement across platforms like X (Twitter), Discord, and Reddit without drowning in browser tabs. |
+
+---
+
+## 📸 Screenshots
+*(Add screenshots of the overlay and settings window here)*
+![Overlay Preview](docs/img/placeholder_overlay.png)
+![Settings Window](docs/img/placeholder_settings.png)
 
 ---
 
@@ -138,6 +162,12 @@ Avoid distraction without missing urgent messages:
 - Use **Per-app mute** to silence low-signal channels at certain times.
 - Right-click a card to copy the full notification text to the clipboard.
 - Use **Deduplication** to suppress rapid-fire duplicate messages from chatty threads.
+
+### Social Media & Community Management (X / Reddit / Instagram)
+- Track mentions, replies, and DMs without keeping heavy browser tabs open or switching contexts.
+- Use **Keyword highlight** for your brand name or specific campaign hashtags so you never miss an important engagement.
+- Use **Deduplication** and **Burst limiting** to filter out rapid-fire "liked your post" storms while keeping meaningful comments visible.
+- Keep the overlay tucked in the corner of your screen to passively monitor community health while working on other tasks.
 
 ---
 
