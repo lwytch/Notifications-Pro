@@ -1,18 +1,19 @@
-using Microsoft.Win32;
+using System;
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
 
 namespace NotificationsPro.Helpers;
 
 public static class StartupHelper
 {
-    private const string RunKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-    private const string AppName = "NotificationsPro";
+    private const string StartupTaskId = "NotificationsProStartupId";
 
-    public static bool IsStartupEnabled()
+    public static async Task<bool> IsStartupEnabledAsync()
     {
         try
         {
-            using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, false);
-            return key?.GetValue(AppName) is string;
+            var startupTask = await StartupTask.GetAsync(StartupTaskId);
+            return startupTask.State == StartupTaskState.Enabled;
         }
         catch
         {
@@ -20,28 +21,26 @@ public static class StartupHelper
         }
     }
 
-    public static void EnableStartup()
+    public static async Task<bool> EnableStartupAsync()
     {
         try
         {
-            var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
-            if (string.IsNullOrEmpty(exePath)) return;
-
-            using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, true);
-            key?.SetValue(AppName, $"\"{exePath}\"");
+            var startupTask = await StartupTask.GetAsync(StartupTaskId);
+            var state = await startupTask.RequestEnableAsync();
+            return state == StartupTaskState.Enabled;
         }
         catch
         {
-            // Silently fail — user may not have registry write access
+            return false;
         }
     }
 
-    public static void DisableStartup()
+    public static async Task DisableStartupAsync()
     {
         try
         {
-            using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, true);
-            key?.DeleteValue(AppName, false);
+            var startupTask = await StartupTask.GetAsync(StartupTaskId);
+            startupTask.Disable();
         }
         catch
         {

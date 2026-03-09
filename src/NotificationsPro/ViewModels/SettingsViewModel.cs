@@ -28,6 +28,7 @@ public class SettingsViewModel : BaseViewModel
     private const int MaxUndoHistory = 50;
     private bool _isUndoRedoOperation;
 
+
     private static readonly string[] PreviewApps =
     {
         "Microsoft Teams",
@@ -714,9 +715,9 @@ public class SettingsViewModel : BaseViewModel
         {
             if (!SetProperty(ref _startWithWindows, value)) return;
             if (value)
-                StartupHelper.EnableStartup();
+                _ = StartupHelper.EnableStartupAsync();
             else
-                StartupHelper.DisableStartup();
+                _ = StartupHelper.DisableStartupAsync();
             QueueSave();
         }
     }
@@ -877,6 +878,23 @@ public class SettingsViewModel : BaseViewModel
     {
         _settingsManager = settingsManager;
         _queueManager = queueManager;
+
+        if (_queueManager != null)
+        {
+            // Initial population from memory
+            RefreshPerAppConfig();
+            RefreshMutedAppEntries();
+
+            _queueManager.NotificationAdded += _ =>
+            {
+                // Dispatch to UI thread since NotificationAdded usually fires on the listener thread
+                System.Windows.Application.Current?.Dispatcher.InvokeAsync(() =>
+                {
+                    RefreshPerAppConfig();
+                    RefreshMutedAppEntries();
+                });
+            };
+        }
 
         _saveDebounce = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _saveDebounce.Tick += (_, _) =>

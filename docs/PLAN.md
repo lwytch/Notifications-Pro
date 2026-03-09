@@ -380,6 +380,21 @@ Nice-to-have:
 - [x] Full keyboard navigation audit — tab mnemonics (Alt+A/B/F/L/O/R/Y/U/P/H), Escape closes, Cycle navigation on TabControl
 - [x] Screen reader / AutomationProperties audit — AutomationProperties.Name on Window, TabControl, all TabItems, notification cards
 
+### Milestone 14: Bug Fixes & Refinements
+**Status: Complete**
+
+Addressed post-release feedback to improve reliability and visual consistency:
+- [x] Settings popup minimize to tray — added window controls (Minimize/Close) when settings are in default Popup mode.
+- [x] Standardized MSIX app icons — regenerated white "N" logo for Start Menu tiles and splash screen to match the system tray icon.
+- [x] Help tab layout fix — corrected margin alignment in the Privacy section of the Help tab.
+- [x] Settings tab visual polish — replaced plain text headers with embedded Lucide SVG icons (no external scripts).
+- [x] "Startup with Windows" package fix — migrated from Registry Run key to MSIX `desktop:StartupTask` API so the toggle works securely inside the container.
+- [x] "Per-App Muting" initialization fix — fixed "No apps seen yet" by populating the known apps list immediately upon opening settings instead of waiting for a new notification.
+- [x] Improved out-of-box defaults:
+  - Animation speed increased to 1200ms.
+  - Max visible notifications increased to 40.
+  - Default overlay height dynamically matches the primary monitor's total height on first run.
+
 ## Current Focus
 All Milestone 13 items complete including nice-to-have features.
 

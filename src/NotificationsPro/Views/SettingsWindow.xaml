@@ -128,7 +128,17 @@
                     <TextBlock Text="Preview" FontFamily="{StaticResource UIFont}" FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding ShowPreviewCard}"
-                                  ToolTip="Show or hide the live preview card"/>
+                                  ToolTip="Show or hide the live preview card" Margin="0,0,16,0"/>
+
+                    <Border Width="1" Height="16" Background="{DynamicResource BorderBrush}" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                    <!-- Window Controls (needed when in Popup mode) -->
+                    <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+                            Style="{StaticResource SecondaryButton}" Padding="8,6" Margin="0,0,4,0"
+                            Click="OnMinimizeClick" ToolTip="Minimize to tray"/>
+                    <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+                            Style="{StaticResource SecondaryButton}" Padding="8,6"
+                            Click="OnCloseClick" ToolTip="Close"/>
                 </StackPanel>
                 <TextBlock Text="Notifications Pro" FontFamily="{StaticResource UIFont}"
                            FontSize="20" FontWeight="SemiBold"
@@ -231,7 +241,22 @@
 
             <!-- ═══ PROFILES TAB ═══ -->
             <!-- ═══ APPEARANCE TAB ═══ -->
-            <TabItem Header="Appearance" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Appearance settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Appearance settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- palette -->
+                        <Viewbox Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent"/>
+                                <Ellipse Canvas.Left="13" Canvas.Top="6" Width="2" Height="2" Fill="{DynamicResource TextPrimaryBrush}"/>
+                                <Ellipse Canvas.Left="17" Canvas.Top="10" Width="2" Height="2" Fill="{DynamicResource TextPrimaryBrush}"/>
+                                <Ellipse Canvas.Left="6" Canvas.Top="12" Width="2" Height="2" Fill="{DynamicResource TextPrimaryBrush}"/>
+                                <Ellipse Canvas.Left="8" Canvas.Top="7" Width="2" Height="2" Fill="{DynamicResource TextPrimaryBrush}"/>
+                            </Canvas>
+                        </Viewbox>
+                        <TextBlock Text="Appearance"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -812,7 +837,15 @@
             </TabItem>
 
             <!-- ═══ BEHAVIOR TAB ═══ -->
-            <TabItem Header="Behavior" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Behavior settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Behavior settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- settings -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                        <TextBlock Text="Behavior"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1093,7 +1126,15 @@
             </TabItem>
 
             <!-- ═══ FILTERING TAB ═══ -->
-            <TabItem Header="Filtering" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Filtering settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Filtering settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- filter -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+                        <TextBlock Text="Filtering"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1334,7 +1375,15 @@
             </TabItem>
 
             <!-- ═══ LAYOUT TAB ═══ -->
-            <TabItem Header="Layout" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Layout settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Layout settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- layout-template -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M4 3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4zm-1 11a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6zm13-1a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-3z" />
+                        <TextBlock Text="Layout"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1481,7 +1530,15 @@
                 </ScrollViewer>
             </TabItem>
             <!-- ═══ SOUNDS TAB ═══ -->
-            <TabItem Header="Sounds" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Sounds settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Sounds settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- volume-2 -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z M16 9a5 5 0 0 1 0 6 M19.364 18.364a9 9 0 0 0 0-12.728" />
+                        <TextBlock Text="Sounds"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1527,7 +1584,15 @@
             </TabItem>
 
             <!-- ═══ STREAMING TAB ═══ -->
-            <TabItem Header="Streaming" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Streaming settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Streaming settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- video -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5 M4 6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4z" />
+                        <TextBlock Text="Streaming"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1679,7 +1744,15 @@
                 </ScrollViewer>
             </TabItem>
             <!-- ═══ ACCESSIBILITY TAB ═══ -->
-            <TabItem Header="Accessibility" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Accessibility settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Accessibility settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- accessibility -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M16 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0z m2 15 1-7-6 1 m-8-5 3-3 5.5 3-2.36 3.5 M4.24 14.5a5 5 0 0 0 6.88 6 M13.76 17.5a5 5 0 0 0-6.88-6" />
+                        <TextBlock Text="Accessibility"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1815,7 +1888,15 @@
                 </ScrollViewer>
             </TabItem>
             <!-- ═══ UI STYLING TAB ═══ -->
-            <TabItem Header="UI Styling" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="UI Styling settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="UI Styling settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- brush -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="m11 10 3 3 M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031" />
+                        <TextBlock Text="UI Styling"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -1989,7 +2070,15 @@
             </TabItem>
 
             <!-- ═══ PROFILES TAB ═══ -->
-            <TabItem Header="Profiles" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Profiles settings tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Profiles settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- users -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 3.128a4 4 0 0 1 0 7.744 M22 21v-2a4 4 0 0 0-3-3.87 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                        <TextBlock Text="Profiles"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -2047,7 +2136,15 @@
             </TabItem>
 
             <!-- ═══ HELP TAB ═══ -->
-            <TabItem Header="Help" Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Help tab">
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Help tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- circle-help -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3 M12 17h.01" />
+                        <TextBlock Text="Help"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
@@ -2132,12 +2229,12 @@
                             <Run FontWeight="SemiBold" Text="• Safety — "/>
                             <Run Text="an always-on-top overlay with clickable URLs increases the risk of accidental clicks and phishing. URLs render as plain text only."/>
                         </TextBlock>
-                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                        <TextBlock TextWrapping="Wrap" Margin="0,4,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                             <Run FontWeight="SemiBold" Text="• Predictability — "/>
                             <Run Text="Windows toasts include action buttons and rich media. The overlay is intentionally passive (read / dismiss / copy) so behaviour is consistent across both the WinRT and accessibility capture paths."/>
                         </TextBlock>
-                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                        <TextBlock TextWrapping="Wrap" Margin="0,4,0,8"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                             <Run FontWeight="SemiBold" Text="• Privacy — "/>
                             <Run Text="rendering images from notification payloads would require decoding potentially remote content."/>

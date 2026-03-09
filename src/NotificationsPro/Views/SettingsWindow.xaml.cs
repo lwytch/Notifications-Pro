@@ -245,4 +245,14 @@ public partial class SettingsWindow : Window
         return string.Equals(_settingsManager.Settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase)
                || WindowStyle == WindowStyle.None;
     }
+
+    private void OnMinimizeClick(object sender, RoutedEventArgs e)
+    {
+        Hide();
+    }
+
+    private void OnCloseClick(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }

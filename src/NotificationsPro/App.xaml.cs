@@ -162,14 +162,25 @@ public partial class App : Application
         _themeScheduleTimer.Start();
         OnThemeScheduleTimerTick(null, EventArgs.Empty);
 
-        // Show first-run balloon tip
-        if (!_settingsManager.Settings.HasShownWelcome && _trayIcon != null)
+        // Show first-run balloon tip & set defaults
+        if (!_settingsManager.Settings.HasShownWelcome)
         {
-            _trayIcon.ShowBalloonTip(
-                5000,
-                "Notifications Pro",
-                "Notifications Pro is running in the tray. Right-click for settings, quick theme switching, and focus mode.",
-                WinForms.ToolTipIcon.Info);
+            // Set default overlay height to monitor height
+            var primaryScreen = WinForms.Screen.PrimaryScreen;
+            if (primaryScreen != null)
+            {
+                _settingsManager.Settings.OverlayMaxHeight = primaryScreen.WorkingArea.Height;
+                _settingsManager.Save();
+            }
+
+            if (_trayIcon != null)
+            {
+                _trayIcon.ShowBalloonTip(
+                    5000,
+                    "Notifications Pro",
+                    "Notifications Pro is running in the tray. Right-click for settings, quick theme switching, and focus mode.",
+                    WinForms.ToolTipIcon.Info);
+            }
         }
 
         // Initialize notification listener — will prompt for permission on first run
@@ -244,16 +255,16 @@ public partial class App : Application
         ApplyThemeByName(targetTheme);
     }
 
-    private void SyncStartupRegistryState()
+    private async void SyncStartupRegistryState()
     {
         if (_settingsManager == null) return;
         var shouldStart = _settingsManager.Settings.StartWithWindows;
-        var isRegistered = StartupHelper.IsStartupEnabled();
+        var isRegistered = await StartupHelper.IsStartupEnabledAsync();
 
         if (shouldStart && !isRegistered)
-            StartupHelper.EnableStartup();
+            await StartupHelper.EnableStartupAsync();
         else if (!shouldStart && isRegistered)
-            StartupHelper.DisableStartup();
+            await StartupHelper.DisableStartupAsync();
     }
 
     private void ApplyHighContrastIfNeeded()

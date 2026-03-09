@@ -10,7 +10,7 @@
   <Identity
     Name="NotificationsPro"
     Publisher="CN=LiamWytcherley"
-    Version="1.0.1.0" />
+    Version="1.1.2.0" />
 
   <Properties>
     <DisplayName>Notifications Pro</DisplayName>
@@ -43,6 +43,9 @@
       </uap:VisualElements>
       <Extensions>
         <desktop:Extension Category="windows.fullTrustProcess" Executable="NotificationsPro.exe" />
+        <desktop:Extension Category="windows.startupTask" Executable="NotificationsPro.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="NotificationsProStartupId" Enabled="false" DisplayName="Notifications Pro" />
+        </desktop:Extension>
       </Extensions>
     </Application>
   </Applications>
@@ -51,4 +54,5 @@
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
+
 
