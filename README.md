@@ -3,7 +3,7 @@
   
   # Notifications Pro
 
-  **The ultimate open-source, highly-customizable Windows notification overlay.**
+  **The ultimate open-source, highly-customisable Windows notification overlay.**
   
   [![Platform](https://img.shields.io/badge/Platform-Windows_10%20%7C%2011-blue.svg)]()
   [![Framework](https://img.shields.io/badge/Framework-.NET_8%20%7C%20WPF-purple.svg)]()
@@ -13,7 +13,7 @@
 
 ---
 
-A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customizable, always-on-top overlay widget. Stop missing important messages when the 5-second default popup vanishes—read every notification in full, without ever clicking or switching apps.
+A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay widget. Stop missing important messages when the 5-second default popup vanishes—read every notification in full, without ever clicking or switching apps.
 
 > Still in active development. I use it every day. More updates coming.
 
@@ -21,11 +21,11 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 | Role | Why You Need It |
 |------|-----------------|
-| <img src="https://unpkg.com/lucide-static@0.344.0/icons/gamepad-2.svg" width="18" height="18" alt="Streamers" style="vertical-align: middle;"/> **Streamers & Creators** | Read chat and alerts on a single monitor while maintaining full-screen gaming focus. Use OBS Chroma-key integration for seamless stream overlays. |
-| <img src="https://unpkg.com/lucide-static@0.344.0/icons/code-xml.svg" width="18" height="18" alt="Developers" style="vertical-align: middle;"/> **Developers & Engineers** | Catch CI/CD build failures, PR reviews, or server alerts while deep in focus mode. Texts aren't truncated like default Windows toasts. |
-| <img src="https://unpkg.com/lucide-static@0.344.0/icons/brain-circuit.svg" width="18" height="18" alt="Neurodivergent" style="vertical-align: middle;"/> **ADHD & Neurodivergent** | Never lose a thought. Persistent notifications ensure you decide when a reminder disappears, not an arbitrary 5-second timer. |
-| <img src="https://unpkg.com/lucide-static@0.344.0/icons/briefcase.svg" width="18" height="18" alt="Professionals" style="vertical-align: middle;"/> **Professionals** | Filter noise. Auto-mute Slack during meetings, but highlight "urgent" emails in red so you only break focus for emergencies. |
-| <img src="https://unpkg.com/lucide-static@0.344.0/icons/message-circle-heart.svg" width="18" height="18" alt="Social Media" style="vertical-align: middle;"/> **Social & Community Managers** | Monitor brand mentions, DMs, and engagement across platforms like X (Twitter), Discord, and Reddit without drowning in browser tabs. |
+| <img src="https://api.iconify.design/lucide:gamepad-2.svg?color=white" width="18" height="18" alt="Streamers" style="vertical-align: middle;"/> **Streamers & Creators** | Read chat and alerts on a single monitor while maintaining full-screen gaming focus. Use OBS Chroma-key integration for seamless stream overlays. |
+| <img src="https://api.iconify.design/lucide:code-xml.svg?color=white" width="18" height="18" alt="Developers" style="vertical-align: middle;"/> **Developers & Engineers** | Catch CI/CD build failures, PR reviews, or server alerts while deep in focus mode. Texts aren't truncated like default Windows toasts. |
+| <img src="https://api.iconify.design/lucide:brain-circuit.svg?color=white" width="18" height="18" alt="Neurodivergent" style="vertical-align: middle;"/> **ADHD & Neurodivergent** | Never lose a thought. Persistent notifications ensure you decide when a reminder disappears, not an arbitrary 5-second timer. |
+| <img src="https://api.iconify.design/lucide:briefcase.svg?color=white" width="18" height="18" alt="Professionals" style="vertical-align: middle;"/> **Professionals** | Filter noise. Auto-mute Slack during meetings, but highlight "urgent" emails in red so you only break focus for emergencies. |
+| <img src="https://api.iconify.design/lucide:message-circle-heart.svg?color=white" width="18" height="18" alt="Social Media" style="vertical-align: middle;"/> **Social & Community Managers** | Monitor brand mentions, DMs, and engagement across platforms like X (Twitter), Discord, and Reddit without drowning in browser tabs. |
 
 ---
 
@@ -70,7 +70,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Import / export** — share a complete settings profile as a JSON file. Position and session state are preserved on the receiving machine.
 - **Typography** — independently configure font family, size, and weight for app name, title, and body text. Line spacing control.
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
-- **Colors** — independent hex colours for title, app name, body text, background, and accent stripe.
+- **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
 - **Background opacity** — from fully opaque to near-transparent.
 - **Card shape** — corner radius, internal padding, card gap, outer margin.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
@@ -80,7 +80,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts padding and spacing in one click.
 
-### Behavior & Control
+### Behaviour & Control
 - **Notification duration** — configurable display time in seconds; each card has its own timer.
 - **Persistent notifications** — disable auto-expiry; cards stay until manually dismissed.
 - **Auto-duration** — extends display time based on notification length (configurable base seconds + seconds-per-line).
