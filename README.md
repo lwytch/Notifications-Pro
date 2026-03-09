@@ -237,7 +237,7 @@ To install it for the first time:
 4. Double-click the `.msix` file to install the app natively.
 
 > **Note on Windows Defender / SmartScreen:** 
-> Because this is a new, indie open-source app targeting low-level UI Automation, Microsoft Defender or "Attack Surface Reduction" tools may flag it initially. This is a false positive completely expected for newly compiled binaries. You can safely "Run Anyway" or whitelist the WindowsApps folder path.
+> Because this is a new, indie open-source app targeting low-level UI Automation, Microsoft Defender or "Attack Surface Reduction" tools may flag it initially. This is a false positive completely expected for newly compiled binaries. You can safely click "More info" and "Run Anyway". If Defender continually blocks it, do not whitelist the entire WindowsApps folder; instead, add a specific exclusion for the `NotificationsPro.exe` process.
 
 ---
 
