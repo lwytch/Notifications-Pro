@@ -118,7 +118,7 @@
                     <Border Cursor="SizeAll" Background="Transparent" Padding="8,4" Margin="0,0,8,0"
                             PreviewMouseLeftButtonDown="OnDragHandleMouseDown"
                             ToolTip="Drag to move this window">
-                        <TextBlock Text="&#xE769;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                        <TextBlock Text="&#xE7C2;" FontFamily="Segoe MDL2 Assets" FontSize="14"
                                    Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                     </Border>
                     <Button Content="&#xE10E;" FontFamily="Segoe MDL2 Assets" FontSize="12"
@@ -2291,6 +2291,61 @@
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                                 <Run FontWeight="SemiBold" Text="Privacy — "/>
                                 <Run Text="rendering images from notification payloads would require decoding potentially remote content."/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SETTINGS WINDOW CONTROLS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="The top-right corner of this window contains several useful actions:"/>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE7C2; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Drag Handle — "/>
+                                <Run Text="Click and drag to freely move this popup window anywhere on your screen. The original anchor position restores on next restart."/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE10E; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Undo — "/>
+                                <Run Text="Reverts the last settings change you made."/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE10D; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Redo — "/>
+                                <Run Text="Re-applies the last undone setting change."/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE8BB; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Close — "/>
+                                <Run Text="Closes the Settings Window. The application will continue running in the background."/>
                             </TextBlock>
                         </Grid>
 
