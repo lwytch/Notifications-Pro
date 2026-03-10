@@ -2435,7 +2435,7 @@
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="This project is open source and actively maintained on GitHub."/>
-                        <StackPanel Orientation="Horizontal" Margin="12,4,0,8">
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
                             <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Text="Repository: "/>
                             <TextBlock Cursor="Hand" TextDecorations="Underline" FontSize="12"
                                        Foreground="{DynamicResource AccentBrush}">
@@ -2444,7 +2444,7 @@
                                 </Hyperlink>
                             </TextBlock>
                         </StackPanel>
-                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,12"
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="Check the repository for new updates, to report bugs, or to request new features!"/>
 

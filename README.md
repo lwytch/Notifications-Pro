@@ -297,3 +297,16 @@ The tray menu also has **Grant Notification Access** and **Retry Access Check** 
 
 **Notifications Pro is strictly provided "AS IS", without warranty of any kind.**  
 While extensively tested, this software hooks into Windows UI Automation and notification systems. The authors and contributors cannot be held liable for any claim, damages, data loss, or other liability, whether in an action of contract, tort or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software. Please refer to the `LICENSE` file for the full legal text.
+
+---
+
+<details>
+<summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.2.2
+- **UI Consistency Pass**: Fixed visual height mismatch between TextBoxes and ComboBoxes across the Settings UI.
+- **Layout Alignment**: Re-aligned the "Quick Position" buttons and the "Support & Updates" Help block to match standard panel padding.
+- **Keyword Highlighting Redesign**: Overhauled the Keyword Highlighting settings block to use a neat, grid-based layout.
+- **Build Pipeline Fixes**: Overhauled the native build script to forcibly bust the `.NET` publication cache to guarantee packaged artifacts are strictly up-to-date.
+
+</details>
