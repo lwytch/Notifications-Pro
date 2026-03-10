@@ -10,7 +10,7 @@
   <Identity
     Name="NotificationsPro"
     Publisher="CN=LiamWytcherley"
-    Version="1.1.2.7" />
+    Version="1.1.2.8" />
 
   <Properties>
     <DisplayName>Notifications Pro</DisplayName>
@@ -54,6 +54,7 @@
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
+
 
 
 
