@@ -2186,12 +2186,25 @@
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="On first run, Notifications Pro requests notification access from Windows. If it was denied or not granted:"/>
-                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,4"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="1. Open Windows Settings → System → Notifications (search 'notification access' if needed)."/>
-                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,4"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="2. Find the Notification Access section and enable access for Notifications Pro."/>
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="1. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Open Windows Settings → System → Notifications (search 'notification access' if needed)."/>
+                        </Grid>
+                        
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="2. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Find the Notification Access section and enable access for Notifications Pro."/>
+                        </Grid>
                         <TextBlock TextWrapping="Wrap" Margin="0,4,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
                                    Text="The tray menu also has 'Grant Notification Access' and 'Retry Access Check' for troubleshooting. Even without WinRT access, an accessibility fallback captures notifications automatically."/>
@@ -2239,21 +2252,41 @@
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="This is intentional for three reasons:"/>
-                        <TextBlock TextWrapping="Wrap" Margin="0,4,0,4"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
-                            <Run FontWeight="SemiBold" Text="• Safety — "/>
-                            <Run Text="an always-on-top overlay with clickable URLs increases the risk of accidental clicks and phishing. URLs render as plain text only."/>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap" Margin="0,4,0,4"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
-                            <Run FontWeight="SemiBold" Text="• Predictability — "/>
-                            <Run Text="Windows toasts include action buttons and rich media. The overlay is intentionally passive (read / dismiss / copy) so behaviour is consistent across both the WinRT and accessibility capture paths."/>
-                        </TextBlock>
-                        <TextBlock TextWrapping="Wrap" Margin="0,4,0,8"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
-                            <Run FontWeight="SemiBold" Text="• Privacy — "/>
-                            <Run Text="rendering images from notification payloads would require decoding potentially remote content."/>
-                        </TextBlock>
+                        <Grid Margin="4,4,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Safety — "/>
+                                <Run Text="an always-on-top overlay with clickable URLs increases the risk of accidental clicks and phishing. URLs render as plain text only."/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Grid Margin="4,4,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Predictability — "/>
+                                <Run Text="Windows toasts include action buttons and rich media. The overlay is intentionally passive (read / dismiss / copy) so behaviour is consistent across both the WinRT and accessibility capture paths."/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Grid Margin="4,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                                <Run FontWeight="SemiBold" Text="Privacy — "/>
+                                <Run Text="rendering images from notification payloads would require decoding potentially remote content."/>
+                            </TextBlock>
+                        </Grid>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="TROUBLESHOOTING" Style="{StaticResource SectionHeader}"/>
