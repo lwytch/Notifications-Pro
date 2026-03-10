@@ -303,6 +303,9 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.2.8
+- **UI Clarifications**: Fixed the incorrect GitHub repository URL in the "About" dialog to point to the correct `lwytch` namespace.
+
 ### Release v1.1.2.7
 - **Help Tab Polish**: Top-aligned the icons in the 'Settings Window Controls' section to prevent vertical misalignment when text wraps.
 - **Comprehensive Documentation**: Added a full 'Settings Reference' section to the Help tab detailing the purpose of all nine configuration tabs.
