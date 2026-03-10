@@ -21,7 +21,7 @@ public class AppSettings
     public string AccentColor { get; set; } = "#0078D4";
 
     // Appearance — Card Shape
-    public double CornerRadius { get; set; } = 12;
+    public double CornerRadius { get; set; } = 20;
     public double Padding { get; set; } = 16;
     public double CardGap { get; set; } = 8;
     public double OuterMargin { get; set; } = 4;
@@ -174,7 +174,7 @@ public class AppSettings
     // Settings window display mode (M9.5)
     public string SettingsDisplayMode { get; set; } = "Popup"; // "Window" or "Popup"
     public bool PopupAutoClose { get; set; } = false;
-    public double SettingsWindowCornerRadius { get; set; } = 12;
+    public double SettingsWindowCornerRadius { get; set; } = 20;
 
     // Time-based theme switching (M13 nice-to-have)
     public bool ThemeScheduleEnabled { get; set; } = false;

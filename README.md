@@ -303,6 +303,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.2.5
+- **Settings Popup Polish**: Added a grab handle next to the top-right controls allowing users to temporary click-and-drag the settings panel around their screens.
+- **Visual Softening**: Updated the default corner radius of both the overlay and the settings popup to 20px.
+
 ### Release v1.1.2.4
 - **List Indentation Polish**: Applied the exact same Grid-based indentation logic to the remainder of the Help tab, ensuring all numbered steps and bulleted lists align perfectly beneath their starting character when text wraps.
 

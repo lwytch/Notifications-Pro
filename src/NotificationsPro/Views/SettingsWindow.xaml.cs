@@ -110,6 +110,14 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private void OnDragHandleMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+        {
+            this.DragMove();
+        }
+    }
+
     private void OnPickColorClick(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: string propertyName }) return;

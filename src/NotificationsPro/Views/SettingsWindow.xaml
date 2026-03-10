@@ -115,6 +115,12 @@
                 <Image Source="{Binding TrayIconImage}" Width="28" Height="28"
                        Margin="0,0,12,0" VerticalAlignment="Top"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <Border Cursor="SizeAll" Background="Transparent" Padding="8,4" Margin="0,0,8,0"
+                            PreviewMouseLeftButtonDown="OnDragHandleMouseDown"
+                            ToolTip="Drag to move this window">
+                        <TextBlock Text="&#xE769;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                    </Border>
                     <Button Content="&#xE10E;" FontFamily="Segoe MDL2 Assets" FontSize="12"
                             Style="{StaticResource SecondaryButton}" Padding="6,4" Margin="0,0,4,0"
                             Command="{Binding UndoCommand}"
