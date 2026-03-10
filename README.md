@@ -303,6 +303,9 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.2.3
+- **Help Tab Polish**: Upgraded the Privacy section bullet points to use grid-based layouts, guaranteeing symmetrical and clean text indentation when wrapping.
+
 ### Release v1.1.2.2
 - **UI Consistency Pass**: Fixed visual height mismatch between TextBoxes and ComboBoxes across the Settings UI.
 - **Layout Alignment**: Re-aligned the "Quick Position" buttons and the "Support & Updates" Help block to match standard panel padding.

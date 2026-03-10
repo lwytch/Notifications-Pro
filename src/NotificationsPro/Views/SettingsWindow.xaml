@@ -2419,15 +2419,35 @@
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="Notifications Pro is designed to avoid persisting notification content:"/>
-                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,4"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="• No notification title or body is ever written to disk — no database, no cache, no logs."/>
-                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,4"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="• Notification content exists only in RAM while displayed, and is released immediately after dismissal or expiry."/>
-                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="• The app makes no network calls and includes no telemetry."/>
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="No notification title or body is ever written to disk — no database, no cache, no logs."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Notification content exists only in RAM while displayed, and is released immediately after dismissal or expiry."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="The app makes no network calls and includes no telemetry."/>
+                        </Grid>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SUPPORT &amp; UPDATES" Style="{StaticResource SectionHeader}"/>
