@@ -394,6 +394,9 @@ Addressed post-release feedback to improve reliability and visual consistency:
   - Animation speed increased to 1200ms.
   - Max visible notifications increased to 40.
   - Default overlay height dynamically matches the primary monitor's total height on first run.
+- [x] UI scaling fixes for textboxes, comboboxes, and position buttons.
+- [x] Keyword highlight layout realignment.
+- [x] Added GitHub link to the Help tab.
 
 ## Current Focus
 All Milestone 13 items complete including nice-to-have features.

@@ -1167,29 +1167,44 @@
                         </Border>
 
                         <TextBlock Text="Default highlight color" Style="{StaticResource SettingLabel}" ToolTip="Default accent color applied to new keywords. Each keyword can have its own color."/>
-                        <DockPanel Margin="0,4,0,0">
-                            <Border DockPanel.Dock="Left" Width="28" Height="28" CornerRadius="6"
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Border Grid.Column="0" Width="28" Height="28" CornerRadius="6"
                                     Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
                                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                     Margin="0,0,8,0"/>
-                            <Button DockPanel.Dock="Right" Content="Pick"
-                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
-                                    Tag="HighlightColor" Click="OnPickColorClick"
-                                    ToolTip="Open color picker for the default highlight color"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}"
+                            
+                            <TextBox Grid.Column="1" Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding HighlightColor, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Hex color used as default for new keywords"
-                                     MaxLength="7"/>
-                        </DockPanel>
+                                     MaxLength="7" Margin="0,0,8,0"/>
+                                     
+                            <Button Grid.Column="2" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" MinHeight="36"
+                                    Tag="HighlightColor" Click="OnPickColorClick"
+                                    ToolTip="Open color picker for the default highlight color"/>
+                        </Grid>
 
-                        <DockPanel Margin="0,4,0,8">
-                            <Button DockPanel.Dock="Right" Content="Add Keyword" Style="{StaticResource SecondaryButton}"
-                                    MinWidth="110" Margin="8,0,0,0" Command="{Binding AddHighlightKeywordCommand}"
-                                    ToolTip="Add the entered keyword to highlight matching notifications"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}"
+                        <Grid Margin="0,8,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
                                      Text="{Binding NewHighlightKeyword, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Type a keyword and press Add"/>
-                        </DockPanel>
+                                     ToolTip="Type a keyword and press Add" Margin="0,0,8,0"/>
+                                     
+                            <Button Grid.Column="1" Content="Add Keyword" Style="{StaticResource SecondaryButton}"
+                                    MinWidth="110" Command="{Binding AddHighlightKeywordCommand}"
+                                    ToolTip="Add the entered keyword to highlight matching notifications"/>
+                        </Grid>
+                        
                         <ItemsControl ItemsSource="{Binding HighlightKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -1409,7 +1424,7 @@
                             <TextBlock Text="QUICK POSITION" Style="{StaticResource SectionHeader}"
                                        ToolTip="Move overlay to common positions on the selected monitor."/>
                         </Border>
-                        <UniformGrid Columns="3" Margin="0,4,0,8">
+                        <UniformGrid Columns="3" Margin="0,4,0,0">
                             <Button Content="Top Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="top-left"/>
                             <Button Content="Top Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
@@ -1422,11 +1437,11 @@
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-center"/>
                             <Button Content="Middle Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="middle-right"/>
-                            <Button Content="Bottom Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                            <Button Content="Bottom Left" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-left"/>
-                            <Button Content="Bottom Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                            <Button Content="Bottom Center" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-center"/>
-                            <Button Content="Bottom Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,0"
+                            <Button Content="Bottom Right" Style="{StaticResource SecondaryButton}" Margin="0,0,0,8"
                                     Command="{Binding MoveOverlayPresetCommand}" CommandParameter="bottom-right"/>
                         </UniformGrid>
 
@@ -2413,6 +2428,25 @@
                         <TextBlock TextWrapping="Wrap" Margin="12,0,0,12"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="• The app makes no network calls and includes no telemetry."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SUPPORT &amp; UPDATES" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="This project is open source and actively maintained on GitHub."/>
+                        <StackPanel Orientation="Horizontal" Margin="12,4,0,8">
+                            <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Text="Repository: "/>
+                            <TextBlock Cursor="Hand" TextDecorations="Underline" FontSize="12"
+                                       Foreground="{DynamicResource AccentBrush}">
+                                <Hyperlink NavigateUri="https://github.com/lwytch/Notifications-Pro">
+                                    github.com/lwytch/Notifications-Pro
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                        <TextBlock TextWrapping="Wrap" Margin="12,0,0,12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Check the repository for new updates, to report bugs, or to request new features!"/>
 
                     </StackPanel>
                 </ScrollViewer>
