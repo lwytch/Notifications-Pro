@@ -250,11 +250,14 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Accessibility master toggle + section descriptions in Accessibility tab
 - [x] Fullscreen overlay mode with configurable opacity
 - [x] Settings window dynamic theming (Windows Dark/Light, High Contrast, System, or Custom colors)
+- [x] True Frosted Glass settings opacity layered transparency (applies alpha channel to surfaces)
 - [x] StaticResource→DynamicResource conversion for live theme switching (Theme.xaml + SettingsWindow.xaml)
 - [x] SettingsThemeService for runtime Application.Resources brush updates
 - [x] Overlay scrollbar controls (show/hide, width 4-20px, opacity)
 - [x] Toast suppression toggle (remove Windows toast after capture, WinRT only, safe on exit)
 - [x] Settings window popup display mode (Window vs Popup anchored to toast corner on the taskbar monitor, auto-close option)
+- [x] Settings window compact display mode (Shrink the width of the panel for a lighter footprint)
+- [x] Settings Export & Import serialization preservation across app restarts
 - [x] Per-app notification sounds (system sounds + custom WAV, per-app overrides)
 - [x] Per-app notification icons (10 built-in vector presets, icon size slider 16-48px, per-app overrides)
 - [x] IconService, SoundService, IconPreset, AppIconConverter

@@ -176,6 +176,7 @@ public class AppSettings
     public string SettingsDisplayMode { get; set; } = "Popup"; // "Window" or "Popup"
     public bool PopupAutoClose { get; set; } = false;
     public double SettingsWindowCornerRadius { get; set; } = 20;
+    public bool CompactSettingsWindow { get; set; } = true;
 
     // Time-based theme switching (M13 nice-to-have)
     public bool ThemeScheduleEnabled { get; set; } = false;

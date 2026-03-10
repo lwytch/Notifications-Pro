@@ -4,11 +4,24 @@
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
         Icon="{Binding TrayIconImage}"
-        Width="780" Height="560" MinWidth="620" MinHeight="480"
+        Height="560" MinHeight="480"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
         ResizeMode="CanResize"
         AutomationProperties.Name="Notifications Pro Settings">
+
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="Width" Value="780"/>
+            <Setter Property="MinWidth" Value="620"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CompactSettingsWindow}" Value="True">
+                    <Setter Property="Width" Value="560"/>
+                    <Setter Property="MinWidth" Value="560"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
 
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
@@ -1941,6 +1954,13 @@
                                           IsChecked="{Binding PopupAutoClose}"
                                           ToolTip="Automatically close the popup when you click elsewhere"/>
                             <TextBlock Text="Auto-Close Popup on Deactivate" Style="{StaticResource SettingLabel}" ToolTip="In Popup mode, automatically closes the settings panel when it loses focus"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding CompactSettingsWindow}"
+                                          ToolTip="Enable a slimmer, more compact settings panel."/>
+                            <TextBlock Text="Compact Window Layout" Style="{StaticResource SettingLabel}" ToolTip="Uses a thinner width for the settings panel to consume less screen real estate"/>
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">

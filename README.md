@@ -303,6 +303,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.3.0
+- **Compact Settings Window Layout**: Added a new styling toggle on the UI Styling tab. With a single click, you can shrink down the width of the Settings Window so that it consumes far less screen real estate, retaining full functionality in a much tighter frame.
+- **Glass Transparency Layering**: The "Frosted Glass" Settings Opacity slider now flawlessly communicates its alpha transparency to visually lower the opacity of inner UI surfaces (like buttons, cards, and text box backgrounds) for a truly impressive glass aesthetic.
+- **Settings Import Reliability Fixes**: Solved an internal bug where newly-introduced properties occasionally lost their values when a stored JSON file was imported. Furthermore, introduced a new built-in AI maintenance checklist (`maintain-settings-sync` skill) to structurally prevent this bug from reoccurring during future development.
+
 ### Release v1.1.2.9
 - **Frosted Glass UI Control**: Added a brand new "Settings Background Opacity" slider to the UI Styling tab. This fixes the previously broken opacity mismatch for the "Frosted Glass" theme preset on the popup window, and allows users fine-grained control over how aggressively the settings window blends into the desktop behind it.
 

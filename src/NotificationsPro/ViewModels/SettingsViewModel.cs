@@ -522,6 +522,9 @@ public class SettingsViewModel : BaseViewModel
     private double _settingsWindowCornerRadius = 12;
     public double SettingsWindowCornerRadius { get => _settingsWindowCornerRadius; set { if (SetProperty(ref _settingsWindowCornerRadius, value)) QueueSave(); } }
 
+    private bool _compactSettingsWindow = true;
+    public bool CompactSettingsWindow { get => _compactSettingsWindow; set { if (SetProperty(ref _compactSettingsWindow, value)) QueueSave(); } }
+
     private bool _linkOverlayThemeAndUiTheme;
     public bool LinkOverlayThemeAndUiTheme { get => _linkOverlayThemeAndUiTheme; set { if (SetProperty(ref _linkOverlayThemeAndUiTheme, value)) QueueSave(); } }
 
@@ -682,6 +685,7 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowTextMuted = SettingsWindowTextMuted,
             SettingsWindowBorder = SettingsWindowBorder,
             SettingsWindowOpacity = SettingsWindowOpacity,
+            CompactSettingsWindow = CompactSettingsWindow,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
         };
     }
@@ -1077,6 +1081,7 @@ public class SettingsViewModel : BaseViewModel
         _popupAutoClose = s.PopupAutoClose;
         _settingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(s.SettingsThemeMode);
         _settingsWindowBg = s.SettingsWindowBg;
+        _settingsWindowOpacity = s.SettingsWindowOpacity;
         _settingsWindowSurface = s.SettingsWindowSurface;
         _settingsWindowSurfaceLight = s.SettingsWindowSurfaceLight;
         _settingsWindowSurfaceHover = s.SettingsWindowSurfaceHover;
@@ -1086,6 +1091,7 @@ public class SettingsViewModel : BaseViewModel
         _settingsWindowAccent = s.SettingsWindowAccent;
         _settingsWindowBorder = s.SettingsWindowBorder;
         _settingsWindowCornerRadius = s.SettingsWindowCornerRadius;
+        _compactSettingsWindow = s.CompactSettingsWindow;
         _linkOverlayThemeAndUiTheme = s.LinkOverlayThemeAndUiTheme;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
