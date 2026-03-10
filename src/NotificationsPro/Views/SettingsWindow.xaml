@@ -4,7 +4,7 @@
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
         Icon="{Binding TrayIconImage}"
-        Height="680" MinHeight="600"
+        Height="740" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
         ResizeMode="CanResize"
@@ -16,8 +16,8 @@
             <Setter Property="MinWidth" Value="620"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CompactSettingsWindow}" Value="True">
-                    <Setter Property="Width" Value="560"/>
-                    <Setter Property="MinWidth" Value="560"/>
+                    <Setter Property="Width" Value="620"/>
+                    <Setter Property="MinWidth" Value="620"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -123,17 +123,12 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Padding="24,20">
+        <Border Grid.Row="0" Padding="24,20" Background="Transparent" 
+                PreviewMouseLeftButtonDown="OnTitleBarMouseDown" Cursor="SizeAll">
             <DockPanel LastChildFill="True">
                 <Image Source="{Binding TrayIconImage}" Width="28" Height="28"
                        Margin="0,0,12,0" VerticalAlignment="Top"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
-                    <Border Cursor="SizeAll" Background="Transparent" Padding="8,4" Margin="0,0,8,0"
-                            PreviewMouseLeftButtonDown="OnDragHandleMouseDown"
-                            ToolTip="Drag to move this window">
-                        <TextBlock Text="&#xE7C2;" FontFamily="Segoe MDL2 Assets" FontSize="14"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    </Border>
                     <Button Content="&#xE10E;" FontFamily="Segoe MDL2 Assets" FontSize="12"
                             Style="{StaticResource SecondaryButton}" Padding="6,4" Margin="0,0,4,0"
                             Command="{Binding UndoCommand}"

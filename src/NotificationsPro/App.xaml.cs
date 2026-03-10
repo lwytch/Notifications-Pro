@@ -559,94 +559,30 @@ public partial class App : Application
         _settingsWindow.Activate();
     }
 
-    /// <summary>
-    /// Finds the screen rectangle of the Windows system tray notification area.
-    /// </summary>
-    private static System.Drawing.Rectangle? GetTrayNotificationAreaRect()
-    {
-        var taskbar = FindWindow("Shell_TrayWnd", null);
-        if (taskbar == IntPtr.Zero) return null;
-
-        var trayNotify = FindWindowEx(taskbar, IntPtr.Zero, "TrayNotifyWnd", null);
-        if (trayNotify == IntPtr.Zero) return null;
-
-        if (!GetWindowRect(trayNotify, out var rect)) return null;
-
-        return new System.Drawing.Rectangle(
-            rect.Left, rect.Top,
-            rect.Right - rect.Left, rect.Bottom - rect.Top);
-    }
-
-    private static System.Drawing.Rectangle? GetTaskbarRect()
-    {
-        var taskbar = FindWindow("Shell_TrayWnd", null);
-        if (taskbar == IntPtr.Zero) return null;
-        if (!GetWindowRect(taskbar, out var rect)) return null;
-
-        return new System.Drawing.Rectangle(
-            rect.Left, rect.Top,
-            rect.Right - rect.Left, rect.Bottom - rect.Top);
-    }
-
     public static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight)
     {
-        const double margin = 12;
-
-        var trayRect = GetTrayNotificationAreaRect();
-        var taskbarRect = GetTaskbarRect();
-        var anchorRect = trayRect ?? taskbarRect;
-
         var screens = WinForms.Screen.AllScreens;
-        var screen = anchorRect.HasValue
-            ? WinForms.Screen.FromRectangle(anchorRect.Value)
-            : (WinForms.Screen.PrimaryScreen ?? (screens.Length > 0 ? screens[0] : null));
+        var screen = WinForms.Screen.PrimaryScreen ?? (screens.Length > 0 ? screens[0] : null);
+        
         if (screen == null)
             return new Rect(0, 0, Math.Max(320, requestedWidth), Math.Max(280, requestedHeight));
+            
         var workArea = screen.WorkingArea;
 
         var preferredWidth = requestedWidth > 0 ? requestedWidth : 640;
-        var maxWidth = Math.Max(320, workArea.Width - (margin * 2));
+        var maxWidth = Math.Max(320, workArea.Width - 24);
         var minWidth = Math.Min(400, maxWidth);
         var width = Math.Clamp(preferredWidth, minWidth, maxWidth);
 
         var preferredHeight = Math.Max(requestedHeight, workArea.Height * 0.55);
-        var maxHeight = Math.Max(280, workArea.Height - (margin * 2));
+        var maxHeight = Math.Max(280, workArea.Height - 24);
         var minHeight = Math.Min(380, maxHeight);
         var height = Math.Clamp(preferredHeight, minHeight, maxHeight);
 
-        var left = workArea.Right - width - margin;
-        var top = workArea.Bottom - height - margin;
-
-        if (taskbarRect.HasValue)
-        {
-            var edge = DetectTaskbarEdge(screen.Bounds, taskbarRect.Value);
-            if (edge == TaskbarEdge.Top)
-                top = workArea.Top + margin;
-            else if (edge == TaskbarEdge.Left)
-                left = workArea.Left + margin;
-            else if (edge == TaskbarEdge.Right)
-                left = workArea.Right - width - margin;
-        }
-
-        left = Math.Clamp(left, workArea.Left + 2, workArea.Right - width - 2);
-        top = Math.Clamp(top, workArea.Top + 2, workArea.Bottom - height - 2);
+        var left = workArea.Left + (workArea.Width - width) / 2.0;
+        var top = workArea.Top + (workArea.Height - height) / 2.0;
 
         return new Rect(left, top, width, height);
-    }
-
-    private static TaskbarEdge DetectTaskbarEdge(System.Drawing.Rectangle screenBounds, System.Drawing.Rectangle taskbarRect)
-    {
-        var horizontalTaskbar = taskbarRect.Width >= taskbarRect.Height;
-        if (horizontalTaskbar)
-        {
-            var distanceToTop = Math.Abs(taskbarRect.Top - screenBounds.Top);
-            var distanceToBottom = Math.Abs(screenBounds.Bottom - taskbarRect.Bottom);
-            return distanceToTop <= distanceToBottom ? TaskbarEdge.Top : TaskbarEdge.Bottom;
-        }
-
-        var distanceToLeft = Math.Abs(taskbarRect.Left - screenBounds.Left);
-        var distanceToRight = Math.Abs(screenBounds.Right - taskbarRect.Right);
-        return distanceToLeft <= distanceToRight ? TaskbarEdge.Left : TaskbarEdge.Right;
     }
 
     private void OnSettingsWindowDeactivated(object? sender, EventArgs e)

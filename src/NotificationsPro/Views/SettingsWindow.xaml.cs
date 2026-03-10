@@ -58,9 +58,37 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private double _preCompactWidth = double.NaN;
+
     private void OnCompactToggleClicked(object sender, RoutedEventArgs e)
     {
-        ClearValue(WidthProperty);
+        if (DataContext is SettingsViewModel vm)
+        {
+            if (vm.CompactSettingsWindow)
+            {
+                // Toggled TO compact. Save current width if it's explicitly set.
+                var explicitWidth = ReadLocalValue(WidthProperty);
+                if (explicitWidth != DependencyProperty.UnsetValue)
+                {
+                    _preCompactWidth = (double)explicitWidth;
+                }
+                ClearValue(WidthProperty);
+            }
+            else
+            {
+                // Toggled FROM compact to large.
+                ClearValue(WidthProperty);
+                if (!double.IsNaN(_preCompactWidth))
+                {
+                    Width = _preCompactWidth;
+                    _preCompactWidth = double.NaN;
+                }
+            }
+        }
+        else
+        {
+            ClearValue(WidthProperty);
+        }
     }
 
     private void OnKeyDown(object sender, WpfInput.KeyEventArgs e)
@@ -94,7 +122,7 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private void OnDragHandleMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void OnTitleBarMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
         {
