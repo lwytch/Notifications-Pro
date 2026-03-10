@@ -32,6 +32,7 @@ public partial class SettingsWindow : Window
         Loaded += OnLoaded;
         Closing += OnClosing;
         KeyDown += OnKeyDown;
+        SizeChanged += OnSizeChanged;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -40,43 +41,26 @@ public partial class SettingsWindow : Window
             return;
 
         ApplyWindowedTitleBarTheme();
-
-        // Restore saved window position
-        if (_settingsManager != null)
-        {
-            var s = _settingsManager.Settings;
-            if (s.SettingsWindowLeft.HasValue && s.SettingsWindowTop.HasValue)
-            {
-                // Validate position is on a visible screen
-                var targetLeft = s.SettingsWindowLeft.Value;
-                var targetTop = s.SettingsWindowTop.Value;
-                var screen = WinForms.Screen.FromPoint(
-                    new System.Drawing.Point((int)targetLeft, (int)targetTop));
-                var workArea = screen.WorkingArea;
-
-                if (targetLeft >= workArea.Left - 50 && targetLeft < workArea.Right &&
-                    targetTop >= workArea.Top - 50 && targetTop < workArea.Bottom)
-                {
-                    WindowStartupLocation = WindowStartupLocation.Manual;
-                    Left = targetLeft;
-                    Top = targetTop;
-                }
-            }
-        }
     }
 
     private void OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
-        if (IsPopupDisplayMode())
-            return;
+        // Settings position is intentionally not saved, so it always defaults to CenterScreen on launch.
+    }
 
-        // Save window position
-        if (_settingsManager != null)
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (IsPopupDisplayMode() && IsLoaded)
         {
-            _settingsManager.Settings.SettingsWindowLeft = Left;
-            _settingsManager.Settings.SettingsWindowTop = Top;
-            _settingsManager.Save();
+            var bounds = App.CalculateSettingsPopupBounds(e.NewSize.Width, e.NewSize.Height);
+            Left = bounds.Left;
+            Top = bounds.Top;
         }
+    }
+
+    private void OnCompactToggleClicked(object sender, RoutedEventArgs e)
+    {
+        ClearValue(WidthProperty);
     }
 
     private void OnKeyDown(object sender, WpfInput.KeyEventArgs e)

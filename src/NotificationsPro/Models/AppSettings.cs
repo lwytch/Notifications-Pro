@@ -162,6 +162,8 @@ public class AppSettings
     public string SettingsThemeMode { get; set; } = "Windows Dark";
     public string SettingsWindowBg { get; set; } = "#111111";
     public double SettingsWindowOpacity { get; set; } = 0.95;
+    public double SettingsSurfaceOpacity { get; set; } = 1.0;
+    public double SettingsElementOpacity { get; set; } = 1.0;
     public string SettingsWindowSurface { get; set; } = "#1C1C1C";
     public string SettingsWindowSurfaceLight { get; set; } = "#262626";
     public string SettingsWindowSurfaceHover { get; set; } = "#303030";

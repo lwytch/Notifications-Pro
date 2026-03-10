@@ -81,19 +81,21 @@ public static class SettingsThemeService
 
         var bgAlpha = (byte)Math.Clamp(settings.SettingsWindowOpacity * 255.0, 0, 255);
         SetBrush(resources, "WindowBgBrush", WithAlpha(colors[0], bgAlpha));
-        SetBrush(resources, "SurfaceBgBrush", colors[1]);
-        SetBrush(resources, "SurfaceLightBrush", colors[2]);
-        SetBrush(resources, "SurfaceHoverBrush", colors[3]);
+        var surfaceAlpha = (byte)Math.Clamp(settings.SettingsSurfaceOpacity * 255.0, 0, 255);
+        SetBrush(resources, "SurfaceBgBrush", WithAlpha(colors[1], surfaceAlpha));
+        SetBrush(resources, "SurfaceLightBrush", WithAlpha(colors[2], surfaceAlpha));
+        SetBrush(resources, "SurfaceHoverBrush", WithAlpha(colors[3], surfaceAlpha));
+        var elementAlpha = (byte)Math.Clamp(settings.SettingsElementOpacity * 255.0, 0, 255);
         SetBrush(resources, "TextPrimaryBrush", colors[4]);
         SetBrush(resources, "TextSecondaryBrush", colors[5]);
         SetBrush(resources, "TextMutedBrush", colors[6]);
-        SetBrush(resources, "AccentBrush", colors[7]);
-        SetBrush(resources, "BorderBrush", colors[8]);
+        SetBrush(resources, "AccentBrush", WithAlpha(colors[7], elementAlpha));
+        SetBrush(resources, "BorderBrush", WithAlpha(colors[8], elementAlpha));
 
         // Derived brushes
-        SetBrush(resources, "AccentHoverBrush", LightenColor(colors[7], 0.15));
-        SetBrush(resources, "AccentMutedBrush", WithAlpha(colors[7], 0x33));
-        SetBrush(resources, "BorderLightBrush", LightenColor(colors[8], 0.1));
+        SetBrush(resources, "AccentHoverBrush", WithAlpha(LightenColor(colors[7], 0.15), elementAlpha));
+        SetBrush(resources, "AccentMutedBrush", WithAlpha(colors[7], (byte)Math.Clamp(elementAlpha * 0.2, 0, 255)));
+        SetBrush(resources, "BorderLightBrush", WithAlpha(LightenColor(colors[8], 0.1), elementAlpha));
         SetBrush(resources, "PrimaryButtonForegroundBrush", GetReadableTextColor(colors[7]));
     }
 

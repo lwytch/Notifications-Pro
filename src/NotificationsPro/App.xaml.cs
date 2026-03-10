@@ -539,9 +539,12 @@ public partial class App : Application
                 _settingsWindow.Background = System.Windows.Media.Brushes.Transparent;
                 _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
 
-                var popupBounds = CalculateSettingsPopupBounds(_settingsWindow.Width, _settingsWindow.Height);
-                _settingsWindow.Width = popupBounds.Width;
-                _settingsWindow.Height = popupBounds.Height;
+                var expectedWidth = double.IsNaN(_settingsWindow.Width) 
+                    ? (settings.CompactSettingsWindow ? 560.0 : 780.0) 
+                    : _settingsWindow.Width;
+                var expectedHeight = double.IsNaN(_settingsWindow.Height) ? 560.0 : _settingsWindow.Height;
+
+                var popupBounds = CalculateSettingsPopupBounds(expectedWidth, expectedHeight);
                 _settingsWindow.Left = popupBounds.Left;
                 _settingsWindow.Top = popupBounds.Top;
 
@@ -585,7 +588,7 @@ public partial class App : Application
             rect.Right - rect.Left, rect.Bottom - rect.Top);
     }
 
-    private static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight)
+    public static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight)
     {
         const double margin = 12;
 

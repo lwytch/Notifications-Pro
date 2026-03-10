@@ -29,6 +29,8 @@ public class ThemePreset
     public string SettingsWindowAccent { get; set; } = "#0078D4";
     public string SettingsWindowBorder { get; set; } = "#353535";
     public double SettingsWindowOpacity { get; set; } = 0.95;
+    public double SettingsSurfaceOpacity { get; set; } = 1.0;
+    public double SettingsElementOpacity { get; set; } = 1.0;
 
     // Shape
     public double CornerRadius { get; set; } = 12;
@@ -123,6 +125,8 @@ public class ThemePreset
             SettingsWindowAccent = settings.SettingsWindowAccent,
             SettingsWindowBorder = settings.SettingsWindowBorder,
             SettingsWindowOpacity = settings.SettingsWindowOpacity,
+            SettingsSurfaceOpacity = settings.SettingsSurfaceOpacity,
+            SettingsElementOpacity = settings.SettingsElementOpacity,
         };
     }
 
@@ -184,6 +188,7 @@ public class ThemePreset
             SettingsWindowText = "#E7EEF8", SettingsWindowTextSecondary = "#B3C0D4",
             SettingsWindowTextMuted = "#7D8DA8", SettingsWindowAccent = "#60A0FF",
             SettingsWindowBorder = "#3A4B66", SettingsWindowOpacity = 0.85,
+            SettingsSurfaceOpacity = 0.15, SettingsElementOpacity = 0.50,
             CornerRadius = 16, Padding = 18, CardGap = 10, OuterMargin = 6,
             ShowAccent = false, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
         },

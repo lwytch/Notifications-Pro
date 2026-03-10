@@ -4,7 +4,7 @@
         xmlns:converters="clr-namespace:NotificationsPro.Converters"
         Title="Notifications Pro — Settings"
         Icon="{Binding TrayIconImage}"
-        Height="560" MinHeight="480"
+        Height="680" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBgBrush}"
         ResizeMode="CanResize"
@@ -1959,6 +1959,7 @@
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding CompactSettingsWindow}"
+                                          Click="OnCompactToggleClicked"
                                           ToolTip="Enable a slimmer, more compact settings panel."/>
                             <TextBlock Text="Compact Window Layout" Style="{StaticResource SettingLabel}" ToolTip="Uses a thinner width for the settings panel to consume less screen real estate"/>
                         </DockPanel>
@@ -2012,6 +2013,30 @@
                                     Value="{Binding SettingsWindowOpacity}"
                                     Style="{StaticResource SettingsSlider}"
                                     ToolTip="Drag to adjust the background opacity of the settings window"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Inner Surface Opacity" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Controls the transparency of inner panels like the left navigation tabs and tooltips."/>
+                        <DockPanel Margin="0,4,0,16">
+                            <TextBlock DockPanel.Dock="Right" Width="36" TextAlignment="Right"
+                                       Text="{Binding SettingsSurfaceOpacity, StringFormat={}{0:P0}}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            <Slider Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                    Value="{Binding SettingsSurfaceOpacity}"
+                                    Style="{StaticResource SettingsSlider}"
+                                    ToolTip="Drag to adjust the opacity of the inner surface panels."/>
+                        </DockPanel>
+
+                        <TextBlock Text="Interactive Element Opacity" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Controls the transparency of buttons, input borders, and accent highlights."/>
+                        <DockPanel Margin="0,4,0,16">
+                            <TextBlock DockPanel.Dock="Right" Width="36" TextAlignment="Right"
+                                       Text="{Binding SettingsElementOpacity, StringFormat={}{0:P0}}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            <Slider Minimum="0.05" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                    Value="{Binding SettingsElementOpacity}"
+                                    Style="{StaticResource SettingsSlider}"
+                                    ToolTip="Drag to adjust the opacity of interactive UI elements."/>
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">

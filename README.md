@@ -303,6 +303,15 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.3.2
+- **Compact Window Sizing & Toggle Fix:** Addressed user feedback where the Compact Layout toggle failed to seamlessly resize the window when clicked due to conflicting explicit property bindings. The exact layout dimensions are now recalculated on the fly, seamlessly scaling down towards the anchored corner tray edge without detaching into empty space.
+- **Enlarged Settings Window Height:** The default height of the Settings Window across both normal and compact modes has been universally bumped up. This cures the visual issue where the two bottom-most tabs inside the left-hand navigation column were hidden beneath a scrollbar cutoff.
+- **CenterScreen Launch Default:** Cleaned up position caching bindings. Whenever the app launches (or escapes from the anchored Popup mode payload), the Settings Window firmly launches directly in the center of your primary monitor instead of recalling an arbitrary corner.
+
+### Release v1.1.3.1
+- **True Frosted Glass Controls:** Introduced granular `Inner Surface Opacity` and `Interactive Element Opacity` sliders for total precision when building translucent themes. 
+- **Compact Popup Fix:** Resolved a layout sizing restraint that broke Compact Mode while rendering as a Popup.
+
 ### Release v1.1.3.0
 - **Compact Settings Window Layout**: Added a new styling toggle on the UI Styling tab. With a single click, you can shrink down the width of the Settings Window so that it consumes far less screen real estate, retaining full functionality in a much tighter frame.
 - **Glass Transparency Layering**: The "Frosted Glass" Settings Opacity slider now flawlessly communicates its alpha transparency to visually lower the opacity of inner UI surfaces (like buttons, cards, and text box backgrounds) for a truly impressive glass aesthetic.

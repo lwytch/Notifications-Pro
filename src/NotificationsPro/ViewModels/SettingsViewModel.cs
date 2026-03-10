@@ -495,6 +495,12 @@ public class SettingsViewModel : BaseViewModel
     private double _settingsWindowOpacity = 0.95;
     public double SettingsWindowOpacity { get => _settingsWindowOpacity; set { if (SetProperty(ref _settingsWindowOpacity, value)) QueueSave(); } }
 
+    private double _settingsSurfaceOpacity = 1.0;
+    public double SettingsSurfaceOpacity { get => _settingsSurfaceOpacity; set { if (SetProperty(ref _settingsSurfaceOpacity, value)) QueueSave(); } }
+
+    private double _settingsElementOpacity = 1.0;
+    public double SettingsElementOpacity { get => _settingsElementOpacity; set { if (SetProperty(ref _settingsElementOpacity, value)) QueueSave(); } }
+
     private string _settingsWindowSurface = "#1C1C1C";
     public string SettingsWindowSurface { get => _settingsWindowSurface; set => SetSettingsWindowColor(ref _settingsWindowSurface, value); }
 
@@ -685,6 +691,8 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowTextMuted = SettingsWindowTextMuted,
             SettingsWindowBorder = SettingsWindowBorder,
             SettingsWindowOpacity = SettingsWindowOpacity,
+            SettingsSurfaceOpacity = SettingsSurfaceOpacity,
+            SettingsElementOpacity = SettingsElementOpacity,
             CompactSettingsWindow = CompactSettingsWindow,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
         };
@@ -1082,6 +1090,8 @@ public class SettingsViewModel : BaseViewModel
         _settingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(s.SettingsThemeMode);
         _settingsWindowBg = s.SettingsWindowBg;
         _settingsWindowOpacity = s.SettingsWindowOpacity;
+        _settingsSurfaceOpacity = s.SettingsSurfaceOpacity;
+        _settingsElementOpacity = s.SettingsElementOpacity;
         _settingsWindowSurface = s.SettingsWindowSurface;
         _settingsWindowSurfaceLight = s.SettingsWindowSurfaceLight;
         _settingsWindowSurfaceHover = s.SettingsWindowSurfaceHover;
@@ -1402,6 +1412,8 @@ public class SettingsViewModel : BaseViewModel
             SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
             SettingsWindowBg = SettingsWindowBg,
             SettingsWindowOpacity = SettingsWindowOpacity,
+            SettingsSurfaceOpacity = SettingsSurfaceOpacity,
+            SettingsElementOpacity = SettingsElementOpacity,
             SettingsWindowSurface = SettingsWindowSurface,
             SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
             SettingsWindowSurfaceHover = SettingsWindowSurfaceHover,
