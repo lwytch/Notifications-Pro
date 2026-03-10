@@ -161,6 +161,7 @@ public class AppSettings
     // Supports "System", "Custom", or any overlay theme name (built-in/custom).
     public string SettingsThemeMode { get; set; } = "Windows Dark";
     public string SettingsWindowBg { get; set; } = "#111111";
+    public double SettingsWindowOpacity { get; set; } = 0.95;
     public string SettingsWindowSurface { get; set; } = "#1C1C1C";
     public string SettingsWindowSurfaceLight { get; set; } = "#262626";
     public string SettingsWindowSurfaceHover { get; set; } = "#303030";

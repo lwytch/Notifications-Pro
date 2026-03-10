@@ -1982,6 +1982,18 @@
                                        ToolTip="Off (recommended): overlay themes and Settings UI theme are independent. On: applying a theme updates both."/>
                         </DockPanel>
 
+                        <TextBlock Text="Settings Background Opacity" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Fine-tune the transparency of the settings window background (e.g., for Frosted Glass effects)"/>
+                        <DockPanel Margin="0,4,0,16">
+                            <TextBlock DockPanel.Dock="Right" Width="36" TextAlignment="Right"
+                                       Text="{Binding SettingsWindowOpacity, StringFormat={}{0:P0}}"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            <Slider Minimum="0.1" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                    Value="{Binding SettingsWindowOpacity}"
+                                    Style="{StaticResource SettingsSlider}"
+                                    ToolTip="Drag to adjust the background opacity of the settings window"/>
+                        </DockPanel>
+
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="CUSTOM COLORS" Style="{StaticResource SectionHeader}"
                                        ToolTip="Fine-tune settings-window colors. These apply when UI Theme Preset is set to Custom."/>

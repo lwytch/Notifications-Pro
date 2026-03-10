@@ -79,7 +79,8 @@ public static class SettingsThemeService
             };
         }
 
-        SetBrush(resources, "WindowBgBrush", colors[0]);
+        var bgAlpha = (byte)Math.Clamp(settings.SettingsWindowOpacity * 255.0, 0, 255);
+        SetBrush(resources, "WindowBgBrush", WithAlpha(colors[0], bgAlpha));
         SetBrush(resources, "SurfaceBgBrush", colors[1]);
         SetBrush(resources, "SurfaceLightBrush", colors[2]);
         SetBrush(resources, "SurfaceHoverBrush", colors[3]);
@@ -225,3 +226,4 @@ public static class SettingsThemeService
         return false; // Default to dark
     }
 }
+

@@ -303,6 +303,9 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.2.9
+- **Frosted Glass UI Control**: Added a brand new "Settings Background Opacity" slider to the UI Styling tab. This fixes the previously broken opacity mismatch for the "Frosted Glass" theme preset on the popup window, and allows users fine-grained control over how aggressively the settings window blends into the desktop behind it.
+
 ### Release v1.1.2.8
 - **UI Clarifications**: Fixed the incorrect GitHub repository URL in the "About" dialog to point to the correct `lwytch` namespace.
 

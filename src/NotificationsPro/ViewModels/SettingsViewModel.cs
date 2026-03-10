@@ -492,6 +492,9 @@ public class SettingsViewModel : BaseViewModel
     private string _settingsWindowBg = "#111111";
     public string SettingsWindowBg { get => _settingsWindowBg; set => SetSettingsWindowColor(ref _settingsWindowBg, value); }
 
+    private double _settingsWindowOpacity = 0.95;
+    public double SettingsWindowOpacity { get => _settingsWindowOpacity; set { if (SetProperty(ref _settingsWindowOpacity, value)) QueueSave(); } }
+
     private string _settingsWindowSurface = "#1C1C1C";
     public string SettingsWindowSurface { get => _settingsWindowSurface; set => SetSettingsWindowColor(ref _settingsWindowSurface, value); }
 
@@ -625,6 +628,7 @@ public class SettingsViewModel : BaseViewModel
         target.SettingsWindowTextMuted = source.SettingsWindowTextMuted;
         target.SettingsWindowAccent = source.SettingsWindowAccent;
         target.SettingsWindowBorder = source.SettingsWindowBorder;
+        target.SettingsWindowOpacity = source.SettingsWindowOpacity;
     }
 
     private void RefreshSettingsThemeModeOptions()
@@ -676,8 +680,8 @@ public class SettingsViewModel : BaseViewModel
             SettingsWindowText = SettingsWindowText,
             SettingsWindowTextSecondary = SettingsWindowTextSecondary,
             SettingsWindowTextMuted = SettingsWindowTextMuted,
-            SettingsWindowAccent = SettingsWindowAccent,
             SettingsWindowBorder = SettingsWindowBorder,
+            SettingsWindowOpacity = SettingsWindowOpacity,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
         };
     }
@@ -1391,6 +1395,7 @@ public class SettingsViewModel : BaseViewModel
             PopupAutoClose = PopupAutoClose,
             SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
             SettingsWindowBg = SettingsWindowBg,
+            SettingsWindowOpacity = SettingsWindowOpacity,
             SettingsWindowSurface = SettingsWindowSurface,
             SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
             SettingsWindowSurfaceHover = SettingsWindowSurfaceHover,
@@ -2179,3 +2184,4 @@ public class PerAppConfigEntry : BaseViewModel
         _onChanged = onChanged;
     }
 }
+

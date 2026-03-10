@@ -28,6 +28,7 @@ public class ThemePreset
     public string SettingsWindowTextMuted { get; set; } = "#8A8A8A";
     public string SettingsWindowAccent { get; set; } = "#0078D4";
     public string SettingsWindowBorder { get; set; } = "#353535";
+    public double SettingsWindowOpacity { get; set; } = 0.95;
 
     // Shape
     public double CornerRadius { get; set; } = 12;
@@ -76,6 +77,7 @@ public class ThemePreset
         settings.SettingsWindowTextMuted = SettingsWindowTextMuted;
         settings.SettingsWindowAccent = SettingsWindowAccent;
         settings.SettingsWindowBorder = SettingsWindowBorder;
+        settings.SettingsWindowOpacity = SettingsWindowOpacity;
     }
 
     /// <summary>
@@ -120,6 +122,7 @@ public class ThemePreset
             SettingsWindowTextMuted = settings.SettingsWindowTextMuted,
             SettingsWindowAccent = settings.SettingsWindowAccent,
             SettingsWindowBorder = settings.SettingsWindowBorder,
+            SettingsWindowOpacity = settings.SettingsWindowOpacity,
         };
     }
 
@@ -138,7 +141,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#262626", SettingsWindowSurfaceHover = "#303030",
             SettingsWindowText = "#F3F3F3", SettingsWindowTextSecondary = "#C7C7C7",
             SettingsWindowTextMuted = "#8A8A8A", SettingsWindowAccent = "#0078D4",
-            SettingsWindowBorder = "#353535",
+            SettingsWindowBorder = "#353535", SettingsWindowOpacity = 0.98,
             CornerRadius = 12, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = false, BorderThickness = 1,
         },
@@ -152,7 +155,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#282840", SettingsWindowSurfaceHover = "#343450",
             SettingsWindowText = "#E4E4EF", SettingsWindowTextSecondary = "#9898B0",
             SettingsWindowTextMuted = "#6B6B80", SettingsWindowAccent = "#7C5CFC",
-            SettingsWindowBorder = "#363650",
+            SettingsWindowBorder = "#363650", SettingsWindowOpacity = 0.98,
             CornerRadius = 12, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = false, BorderThickness = 1,
         },
@@ -168,7 +171,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#E8E8F0", SettingsWindowSurfaceHover = "#DEDEE8",
             SettingsWindowText = "#222222", SettingsWindowTextSecondary = "#555555",
             SettingsWindowTextMuted = "#888888",
-            SettingsWindowAccent = "#5B7FFF", SettingsWindowBorder = "#D0D0D0",
+            SettingsWindowAccent = "#5B7FFF", SettingsWindowBorder = "#D0D0D0", SettingsWindowOpacity = 0.98,
         },
         new()
         {
@@ -180,7 +183,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#243146", SettingsWindowSurfaceHover = "#2D3E59",
             SettingsWindowText = "#E7EEF8", SettingsWindowTextSecondary = "#B3C0D4",
             SettingsWindowTextMuted = "#7D8DA8", SettingsWindowAccent = "#60A0FF",
-            SettingsWindowBorder = "#3A4B66",
+            SettingsWindowBorder = "#3A4B66", SettingsWindowOpacity = 0.85,
             CornerRadius = 16, Padding = 18, CardGap = 10, OuterMargin = 6,
             ShowAccent = false, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
         },
@@ -194,7 +197,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#101010", SettingsWindowSurfaceHover = "#1A1A1A",
             SettingsWindowText = "#FFFFFF", SettingsWindowTextSecondary = "#FFFF00",
             SettingsWindowTextMuted = "#BFBFBF", SettingsWindowAccent = "#00FFFF",
-            SettingsWindowBorder = "#FFFFFF",
+            SettingsWindowBorder = "#FFFFFF", SettingsWindowOpacity = 1.0,
             CornerRadius = 0, Padding = 14, CardGap = 6, OuterMargin = 2,
             ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 2,
         },
@@ -208,7 +211,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#222234", SettingsWindowSurfaceHover = "#2A2A3D",
             SettingsWindowText = "#E0E0E8", SettingsWindowTextSecondary = "#B0B0C0",
             SettingsWindowTextMuted = "#7A7A8C", SettingsWindowAccent = "#3F3F5E",
-            SettingsWindowBorder = "#2B2B40",
+            SettingsWindowBorder = "#2B2B40", SettingsWindowOpacity = 0.98,
             CornerRadius = 6, Padding = 12, CardGap = 4, OuterMargin = 2,
             ShowAccent = false, AccentThickness = 2, ShowBorder = false, BorderThickness = 1,
         },
@@ -222,7 +225,7 @@ public class ThemePreset
             SettingsWindowSurfaceLight = "#252F4D", SettingsWindowSurfaceHover = "#2F3D63",
             SettingsWindowText = "#F5F5F5", SettingsWindowTextSecondary = "#D0D0D0",
             SettingsWindowTextMuted = "#9EA7BC", SettingsWindowAccent = "#0072B2",
-            SettingsWindowBorder = "#425075",
+            SettingsWindowBorder = "#425075", SettingsWindowOpacity = 0.98,
             CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 1,
         },
