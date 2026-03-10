@@ -303,6 +303,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.2.7
+- **Help Tab Polish**: Top-aligned the icons in the 'Settings Window Controls' section to prevent vertical misalignment when text wraps.
+- **Comprehensive Documentation**: Added a full 'Settings Reference' section to the Help tab detailing the purpose of all nine configuration tabs.
+
 ### Release v1.1.2.6
 - **UI Clarifications**: Swapped the Settings Drag Handle icon from a 'Pause' glyph to a literal 'Gripper' bar (`&#xE7C2;`) to convey proper intent.
 - **Help Tab Completeness**: Added a new "Settings Window Controls" section to the bottom of the Help tab, properly outlining standard UI functions like drag-to-move, undo, redo, minimize, and close using the new grid-styled format.

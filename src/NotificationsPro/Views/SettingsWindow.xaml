@@ -2306,7 +2306,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE7C2; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="&#xE7C2; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                                 <Run FontWeight="SemiBold" Text="Drag Handle — "/>
                                 <Run Text="Click and drag to freely move this popup window anywhere on your screen. The original anchor position restores on next restart."/>
@@ -2318,7 +2318,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE10E; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="&#xE10E; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                                 <Run FontWeight="SemiBold" Text="Undo — "/>
                                 <Run Text="Reverts the last settings change you made."/>
@@ -2330,7 +2330,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE10D; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="&#xE10D; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                                 <Run FontWeight="SemiBold" Text="Redo — "/>
                                 <Run Text="Re-applies the last undone setting change."/>
@@ -2342,11 +2342,108 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE8BB; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="&#xE8BB; " FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,3,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
                                 <Run FontWeight="SemiBold" Text="Close — "/>
                                 <Run Text="Closes the Settings Window. The application will continue running in the background."/>
                             </TextBlock>
+                        </Grid>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SETTINGS REFERENCE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="A comprehensive guide to all available settings tabs:"/>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="General " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Configure fullscreen mode to turn your monitor into a dedicated notification dashbaord with optional background tinting."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Behavior " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Control display duration, visible fields, animations, z-order, deduplication of repeated alerts, and toggle the temporary RAM-only Session Archive."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Filtering " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Mute noisy apps, suppress specific keywords, highlight important keywords with colors, assign custom sounds/icons per app, enable Quiet Hours, or use Burst Limiting to block notification storms."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Layout " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Target specific monitors, configure overlay width/height limits and presets, and adjust screen edge snapping behavior."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Sounds " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Select a default playback sound for notifications or import a custom WAV file. (Individual app overrides are in Filtering)."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Streaming " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Broadcaster tools. Enable Chroma Key (green-screen), lock the overlay size for OBS Window Capture, auto-pause during presentations, and tint cards by app."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Accessibility" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Enable persistent notifications, auto-calculated reading durations, sync with Windows High Contrast / Text Scaling, toggle display density spacing, and bind global Hotkeys."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="UI Styling " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Customize only the visual elements of this Settings window itself, including corner radii, themes, and custom color hex codes."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Profiles " FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Save configurations (e.g., Work, Gaming) to easily swap settings on the fly. You can also import and export JSON configuration files."/>
                         </Grid>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
