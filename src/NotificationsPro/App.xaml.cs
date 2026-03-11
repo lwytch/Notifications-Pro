@@ -9,6 +9,7 @@ using NotificationsPro.Models;
 using NotificationsPro.Services;
 using NotificationsPro.ViewModels;
 using NotificationsPro.Views;
+using Windows.ApplicationModel;
 using WinForms = System.Windows.Forms;
 using Drawing = System.Drawing;
 
@@ -900,22 +901,65 @@ public partial class App : Application
 
     private void ShowAboutDialog()
     {
-        var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-        var versionStr = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "1.0.0";
+        var versionStr = GetCurrentVersionString();
+        var packageIdentity = GetCurrentPackageIdentity();
+        var installPath = GetCurrentInstallPath();
         var listenerMode = _notificationListener != null
             ? (_notificationListener.IsAccessGranted ? "WinRT" : "Accessibility")
             : "Unknown";
+        var listenerStatus = _notificationListener?.StatusMessage ?? "No listener status available";
 
         System.Windows.MessageBox.Show(
             $"Notifications Pro v{versionStr}\n\n" +
             $"A Windows tray app that mirrors toast notifications\ninto a customizable always-on-top overlay.\n\n" +
+            $"Package: {packageIdentity}\n" +
             $"Listener: {listenerMode}\n" +
+            $"Status: {listenerStatus}\n" +
+            $"Install Path: {installPath}\n" +
             $".NET {Environment.Version}\n\n" +
             $"License: MIT\n" +
             $"GitHub: github.com/lwytch/Notifications-Pro",
             "About Notifications Pro",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
+    }
+
+    private static string GetCurrentVersionString()
+    {
+        try
+        {
+            var version = Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+        catch
+        {
+            var assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            return assemblyVersion?.ToString(4) ?? "1.0.0.0";
+        }
+    }
+
+    private static string GetCurrentPackageIdentity()
+    {
+        try
+        {
+            return Package.Current.Id.FullName;
+        }
+        catch
+        {
+            return "Unpackaged / developer run";
+        }
+    }
+
+    private static string GetCurrentInstallPath()
+    {
+        try
+        {
+            return Package.Current.InstalledLocation.Path;
+        }
+        catch
+        {
+            return AppContext.BaseDirectory.TrimEnd(System.IO.Path.DirectorySeparatorChar);
+        }
     }
 
     private void QuitApp()

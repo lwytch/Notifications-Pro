@@ -994,7 +994,6 @@ public class SettingsViewModel : BaseViewModel
     public ICommand AddMuteKeywordCommand { get; }
     public ICommand RemoveMuteKeywordCommand { get; }
     public ICommand ToggleMuteAppCommand { get; }
-    public ICommand ToggleSpokenAppCommand { get; }
     public ICommand ApplyThemeCommand { get; }
     public ICommand SaveCustomThemeCommand { get; }
     public ICommand DeleteCustomThemeCommand { get; }
@@ -1103,7 +1102,6 @@ public class SettingsViewModel : BaseViewModel
         AddMuteKeywordCommand = new RelayCommand(_ => AddMuteKeyword());
         RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
         ToggleMuteAppCommand = new RelayCommand(ToggleMuteApp);
-        ToggleSpokenAppCommand = new RelayCommand(ToggleSpokenApp);
         ApplyThemeCommand = new RelayCommand(ApplyTheme);
         ApplySelectedBuiltInThemeCommand = new RelayCommand(_ =>
         {
@@ -1215,6 +1213,7 @@ public class SettingsViewModel : BaseViewModel
         _titleFontSize = s.TitleFontSize;
         _titleFontWeight = s.TitleFontWeight;
         _lineSpacing = s.LineSpacing;
+        _textAlignment = string.IsNullOrWhiteSpace(s.TextAlignment) ? "Left" : s.TextAlignment;
         _textColor = s.TextColor;
         _titleColor = s.TitleColor;
         _appNameColor = s.AppNameColor;
@@ -1532,6 +1531,7 @@ public class SettingsViewModel : BaseViewModel
             TitleFontSize = TitleFontSize,
             TitleFontWeight = TitleFontWeight,
             LineSpacing = LineSpacing,
+            TextAlignment = TextAlignment,
             TextColor = TextColor,
             TitleColor = TitleColor,
             AppNameColor = AppNameColor,
@@ -1968,20 +1968,11 @@ public class SettingsViewModel : BaseViewModel
             MutedAppEntries.Add(new MutedAppEntry(app, _queueManager.IsAppMuted(app)));
     }
 
-    private void ToggleSpokenApp(object? parameter)
+    private void OnSpokenAppChanged(SpokenAppEntry entry)
     {
-        var appName = parameter switch
-        {
-            SpokenAppEntry entry => entry.AppName,
-            string value => value,
-            _ => string.Empty
-        };
-
-        if (string.IsNullOrWhiteSpace(appName))
-            return;
-
+        var appName = entry.AppName;
         var updated = _settingsManager.Settings.Clone();
-        if (IsSpokenAppMuted(appName))
+        if (entry.IsReadAloudEnabled)
         {
             updated.SpokenMutedApps.RemoveAll(existing => string.Equals(existing, appName, StringComparison.OrdinalIgnoreCase));
         }
@@ -2016,7 +2007,7 @@ public class SettingsViewModel : BaseViewModel
             .OrderBy(app => app, StringComparer.OrdinalIgnoreCase);
 
         foreach (var app in appNames)
-            SpokenAppEntries.Add(new SpokenAppEntry(app, IsSpokenAppMuted(app)));
+            SpokenAppEntries.Add(new SpokenAppEntry(app, !IsSpokenAppMuted(app), OnSpokenAppChanged));
     }
 
     public void RefreshPerAppConfig()
@@ -2584,15 +2575,28 @@ public class PerAppConfigEntry : BaseViewModel
     }
 }
 
-public class SpokenAppEntry
+public class SpokenAppEntry : BaseViewModel
 {
     public string AppName { get; }
-    public bool IsMuted { get; }
-    public string ToggleLabel => IsMuted ? "Speak" : "Skip";
+    private readonly Action<SpokenAppEntry>? _onChanged;
 
-    public SpokenAppEntry(string appName, bool isMuted)
+    private bool _isReadAloudEnabled;
+    public bool IsReadAloudEnabled
+    {
+        get => _isReadAloudEnabled;
+        set
+        {
+            if (!SetProperty(ref _isReadAloudEnabled, value))
+                return;
+
+            _onChanged?.Invoke(this);
+        }
+    }
+
+    public SpokenAppEntry(string appName, bool isReadAloudEnabled, Action<SpokenAppEntry>? onChanged = null)
     {
         AppName = appName;
-        IsMuted = isMuted;
+        _isReadAloudEnabled = isReadAloudEnabled;
+        _onChanged = onChanged;
     }
 }

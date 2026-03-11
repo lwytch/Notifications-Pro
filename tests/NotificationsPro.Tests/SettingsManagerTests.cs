@@ -30,6 +30,7 @@ public class SettingsManagerTests : IDisposable
 
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(14, sm.Settings.FontSize);
+        Assert.Equal("Left", sm.Settings.TextAlignment);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
         Assert.Equal(20, sm.Settings.MaxVisibleNotifications);
@@ -53,6 +54,7 @@ public class SettingsManagerTests : IDisposable
         var sm = CreateManager();
         sm.Settings.FontSize = 22;
         sm.Settings.FontFamily = "Consolas";
+        sm.Settings.TextAlignment = "Right";
         sm.Settings.BackgroundOpacity = 0.5;
         sm.Settings.ReadNotificationsAloudEnabled = true;
         sm.Settings.ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleBodyTimestamp;
@@ -66,6 +68,7 @@ public class SettingsManagerTests : IDisposable
 
         Assert.Equal(22, sm2.Settings.FontSize);
         Assert.Equal("Consolas", sm2.Settings.FontFamily);
+        Assert.Equal("Right", sm2.Settings.TextAlignment);
         Assert.Equal(0.5, sm2.Settings.BackgroundOpacity);
         Assert.True(sm2.Settings.ReadNotificationsAloudEnabled);
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleBodyTimestamp, sm2.Settings.ReadNotificationsAloudMode);
@@ -83,6 +86,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(14, settings.FontSize);
         Assert.Equal("Normal", settings.FontWeight);
         Assert.Equal(1.5, settings.LineSpacing);
+        Assert.Equal("Left", settings.TextAlignment);
         Assert.Equal("#E6E6E6", settings.TextColor);
         Assert.Equal("#FFFFFF", settings.TitleColor);
         Assert.Equal("#C8C8C8", settings.AppNameColor);

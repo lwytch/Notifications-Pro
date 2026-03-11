@@ -69,6 +69,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Built-in theme presets** — select from a dropdown and apply in one click.
 - **Custom themes** — save your current overlay look by name; re-apply or delete any time.
 - **Import / export** — share a complete settings profile as a JSON file. Position and session state are preserved on the receiving machine.
+- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu.
 - **Typography** — independently configure font family, size, and weight for app name, title, and body text. Line spacing control.
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
@@ -108,7 +109,10 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 ### System Integration
 - **Start with Windows** — enables/disables the packaged Windows Startup Task for Notifications Pro.
-- **Notification access recovery** — the System tab shows current capture status and includes buttons to open Windows notification access and retry the direct WinRT access check.
+- **Notification access recovery** — the System tab shows current capture status, includes buttons to open Windows notification access and retry the direct WinRT access check, and exposes `Auto`, `Prefer WinRT`, and `Force Accessibility` capture modes.
+- **Session archive** — optional RAM-only archive for the current app session, with clipboard export and no disk persistence of notification text.
+- **About dialog** — tray menu About shows the installed version, package identity, listener mode/status, runtime version, and project link.
+- **Tray listener health** — tray tooltip surfaces the active listener mode plus current status details for faster troubleshooting.
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
 - **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border).
 - **Settings popup mode** — settings window can float as a popup above the taskbar with optional auto-close.
@@ -119,10 +123,14 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
-- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, and per-app narration skip controls.
+- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, and per-app `Read aloud` checkboxes. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
+
+### Automation & Scheduling
+- **CLI arguments** — `--pause`, `--resume`, `--theme <name>`, `--send-test`, `--hide`, and `--show` can control the app from shortcuts or scripts.
+- **Theme scheduling** — automatically switch between day/night themes on a configured schedule.
 
 ---
 
@@ -273,7 +281,7 @@ In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notificat
 
 Choose from `Body Only`, `Title Only`, `Title + Body`, `Body + Timestamp`, `Title + Timestamp`, or `Title + Body + Timestamp`. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
 
-The same section also lets you mark specific seen apps as `Skip`, so they stay visible on screen but are ignored by narration. Only Windows-installed Microsoft-signed voices appear in the picker.
+The same section also lets you control narration per app with a `Read aloud` checkbox. Unchecked apps still stay visible on screen but are ignored by narration. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
 
 If you want to install more voices, Microsoft’s setup guides are:
 - [Customize Narrator voices](https://support.microsoft.com/windows/chapter-7-customizing-narrator-6e30e2d0-b2f3-b907-d264-a5d30502ad73)
@@ -299,6 +307,8 @@ The tray menu also has **Open Privacy > Notifications...** and **Retry Access Ch
 
 The same recovery controls now appear in **Settings > System > Notification Access**, alongside the current capture-mode status and a manual `Auto` / `Prefer WinRT` / `Force Accessibility` selector.
 
+If live notifications stop appearing while preview/test notifications still work, switch `Capture Mode` to `Force Accessibility` first. That is the intended recovery path for WinRT delivery stalls or false-positive access states.
+
 ---
 
 ## Troubleshooting
@@ -310,7 +320,7 @@ The same recovery controls now appear in **Settings > System > Notification Acce
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
-| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device and ensure notifications are not paused. |
+| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in **Per-App Speech**. |
 | Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
 
 ---
@@ -332,6 +342,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.6.3
+- **Narration Replay Fix**: Visible notifications are now spoken once per card, so when a new card arrives the app no longer re-reads older cards that already finished speaking.
+- **Per-App Speech Checkboxes**: Replaced the earlier `Speak` / `Skip` button wording with explicit `Read aloud` checkboxes in `Settings > Accessibility` for clearer per-app narration control.
+- **About & Persistence Audit**: The tray `About` dialog now shows the full installed package version and listener details, and a settings audit fixed `Text Alignment` persistence while expanding export/import test coverage for narration and capture-mode fields.
 
 ### Release v1.1.6.2
 - **Per-App Spoken Notification Control**: Added per-app `Speak` / `Skip` controls in `Settings > Accessibility`, so you can keep specific apps visual-only while narration stays on globally.

@@ -1,4 +1,5 @@
 using System.IO;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 
@@ -295,9 +296,13 @@ public class ThemeTests : IDisposable
         var original = new AppSettings
         {
             FontSize = 22,
+            TextAlignment = "Center",
             TextColor = "#ABCDEF",
             CornerRadius = 99,
             MaxVisibleNotifications = 5,
+            ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleTimestamp,
+            SpokenMutedApps = new() { "Teams", "Outlook" },
+            NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility,
         };
 
         var filePath = Path.Combine(_tempDir, "export.json");
@@ -306,9 +311,13 @@ public class ThemeTests : IDisposable
 
         Assert.NotNull(imported);
         Assert.Equal(22, imported!.FontSize);
+        Assert.Equal("Center", imported.TextAlignment);
         Assert.Equal("#ABCDEF", imported.TextColor);
         Assert.Equal(99, imported.CornerRadius);
         Assert.Equal(5, imported.MaxVisibleNotifications);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeTitleTimestamp, imported.ReadNotificationsAloudMode);
+        Assert.Equal(new[] { "Teams", "Outlook" }, imported.SpokenMutedApps);
+        Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, imported.NotificationCaptureMode);
     }
 
     [Fact]

@@ -15,8 +15,10 @@
 - Spoken-content fallback now uses the available title/body text if a notification is missing the exact field combination you selected
 - Spoken-notification pause/resume now follows the real app pause state, including tray, hotkeys, and CLI paths
 - Live notification recovery now has a manual capture-mode override and automatically drops back to accessibility capture if WinRT seed/poll fails at runtime
+- Spoken notifications no longer replay cards that already finished speaking when a new notification arrives while multiple cards are visible
 - Settings tab organization pass — moved misplaced controls into logical tabs so styling, behavior, filtering, layout, streaming, accessibility, and system actions are no longer split across unrelated sections
 - Text alignment now renders correctly in stacked cards, compact banners, wrapped banners, and the settings live preview
+- Text alignment settings now persist correctly across save/load and export/import again
 - Global hotkey editor now exposes the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of broken non-existent bindings
 - Hotkey registration failures are now surfaced in Settings > Accessibility when a combo is invalid or already taken
 - Help tab references now match the current tab layout and control locations
@@ -30,10 +32,11 @@
 
 ### Added
 - Expanded spoken notification combinations — Added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp to the Accessibility narration selector
-- Per-app spoken notification controls — Accessibility now lets you mark seen apps as Speak or Skip so narration can stay on globally without reading every source aloud
+- Per-app spoken notification controls — Accessibility now lets you keep per-app `Read aloud` checkboxes on/off so narration can stay on globally without reading every source aloud
 - Built-in spoken notifications — Accessibility tab now includes an on/off narration toggle with Body Only vs Title + Body + Timestamp modes, installed voice selection, rate/volume controls, and an in-app Preview Voice button
 - Help/privacy disclosure for spoken notifications — Help tab and README now explain that spoken audio is audible to nearby people, stays RAM-only, and does not keep overflow text for later playback
 - Microsoft voice setup guidance — Help now links directly to official Microsoft pages for installing and choosing supported Windows voices, and external Help hyperlinks now launch correctly
+- Tray About dialog detail upgrade — About now reports the full installed package version, package identity, listener status, runtime version, and install path
 - **Milestone 13: Functionality & UX Improvements (Essential)**
 - About dialog in tray menu — shows version, listener mode (WinRT/Accessibility), .NET version, license, and GitHub link
 - Listener health status in tray tooltip — "Listening via WinRT/Accessibility" with paused/click-through indicators

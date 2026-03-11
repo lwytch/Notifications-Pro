@@ -1908,22 +1908,23 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <DockPanel Margin="0,0,0,6">
-                                            <Button DockPanel.Dock="Right"
-                                                    Content="{Binding ToggleLabel}"
-                                                    Style="{StaticResource SecondaryButton}"
-                                                    Width="72"
-                                                    Padding="0"
-                                                    Command="{Binding DataContext.ToggleSpokenAppCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                    CommandParameter="{Binding AppName}"
-                                                    ToolTip="Toggle whether Notifications Pro should narrate notifications from this app."/>
                                             <TextBlock Text="{Binding AppName}"
                                                        Style="{StaticResource SettingLabel}"
                                                        VerticalAlignment="Center"/>
+                                            <CheckBox DockPanel.Dock="Right"
+                                                      IsChecked="{Binding IsReadAloudEnabled}"
+                                                      Content="Read aloud"
+                                                      Margin="12,0,0,0"
+                                                      VerticalAlignment="Center"
+                                                      FontFamily="{StaticResource UIFont}"
+                                                      FontSize="12"
+                                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                                      ToolTip="When checked, Notifications Pro will narrate notifications from this app."/>
                                         </DockPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBlock Text="Apps appear here after Notifications Pro sees them. Skipped apps still show on screen but are ignored by narration."
+                            <TextBlock Text="Apps appear here after Notifications Pro sees them. Unchecked apps still show on screen but are ignored by narration. Each visible card is only read once, so new arrivals do not replay cards that already finished speaking."
                                        Style="{StaticResource SettingDesc}"
                                        Margin="0,4,0,0"
                                        Visibility="{Binding SpokenAppEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
@@ -2561,7 +2562,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="2. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Pick any installed Windows voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification."/>
+                                       Text="Pick any installed Windows voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification. Use the Read Aloud checkbox list if you only want certain apps narrated."/>
                         </Grid>
                         <Grid Margin="12,0,0,4">
                             <Grid.ColumnDefinitions>
@@ -2570,7 +2571,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="3. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Only Windows-installed Microsoft-signed voices appear in Notifications Pro. If the voice you want is missing, add it in Windows first, then reopen the app if it still does not appear."/>
+                                       Text="Only Windows-installed Microsoft-signed voices appear in Notifications Pro. If the voice you want is missing, add it in Windows first, then reopen the app if it still does not appear. Finished cards are only read once, so new arrivals do not replay older cards that already spoke."/>
                         </Grid>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
@@ -2768,7 +2769,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is not marked Skip in Per-App Speech."/>
+                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in Per-App Speech."/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"

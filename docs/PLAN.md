@@ -190,6 +190,8 @@ Keyboard & motor accessibility:
 - [x] Hotkey configuration UI in Accessibility tab
 - [x] Spoken notification combinations expanded: Title Only, Title + Body, Body + Timestamp, Title + Timestamp, and Title + Body + Timestamp
 - [x] Per-app spoken notification controls and voice setup help: choose which seen apps are narrated, surface Windows voice-install guidance, and disclose the built-in voice requirements clearly
+- [x] Spoken notification replay guard: visible cards are spoken once, new arrivals no longer replay cards that already finished speaking, and unfinished visible cards can still resume after pause/unmute
+- [x] Spoken app selector clarity: switched from Speak/Skip buttons to explicit Read Aloud checkboxes
 - [ ] Full keyboard navigation audit (deferred)
 
 Cognitive accessibility:
@@ -216,6 +218,8 @@ Settings window polish:
 - [x] "Saved" micro-feedback — brief "Saved" label appears next to "Changes are saved automatically" on each save (1.5s auto-hide)
 - [x] Remember settings window position between opens (save to AppSettings)
 - [x] Ctrl+T keyboard shortcut to send test notification from settings
+- [x] About dialog runtime details: tray About now shows the full 4-part version, package identity, listener status, install path, and runtime version
+- [x] Settings persistence audit: text alignment now round-trips through settings save/load, and export/import tests cover the new narration and capture-mode fields
 
 Tray icon enhancements:
 - [x] Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through)

@@ -19,6 +19,7 @@ public sealed class SpokenNotificationService : IDisposable
     private readonly Dispatcher _dispatcher;
     private readonly Queue<NotificationItem> _pendingItems = new();
     private readonly MediaPlayer _mediaPlayer;
+    private readonly SpokenNotificationPlaybackTracker _playbackTracker = new();
 
     private int _playbackGeneration;
     private bool _isSynthesizing;
@@ -118,7 +119,7 @@ public sealed class SpokenNotificationService : IDisposable
             if (!ShouldSpeakItem(item))
                 return;
 
-            if (ReferenceEquals(_currentItem, item) || _pendingItems.Any(existing => ReferenceEquals(existing, item)))
+            if (!_playbackTracker.TryQueue(item, _currentItem))
                 return;
 
             _pendingItems.Enqueue(item);
@@ -184,6 +185,9 @@ public sealed class SpokenNotificationService : IDisposable
             if (_disposed)
                 return;
 
+            if (_currentItem != null)
+                _playbackTracker.MarkSpoken(_currentItem);
+
             StopCurrentPlayback(clearPending: false);
             TryStartNext();
         });
@@ -227,6 +231,7 @@ public sealed class SpokenNotificationService : IDisposable
             return;
 
         var item = _pendingItems.Dequeue();
+        _playbackTracker.MarkDequeued(item);
         if (!_queueManager.VisibleNotifications.Contains(item) || !ShouldSpeakItem(item))
         {
             TryStartNext();
@@ -326,7 +331,7 @@ public sealed class SpokenNotificationService : IDisposable
             if (!ShouldSpeakItem(item))
                 continue;
 
-            if (ReferenceEquals(_currentItem, item) || _pendingItems.Any(existing => ReferenceEquals(existing, item)))
+            if (!_playbackTracker.TryQueue(item, _currentItem))
                 continue;
 
             _pendingItems.Enqueue(item);
@@ -335,6 +340,8 @@ public sealed class SpokenNotificationService : IDisposable
 
     private void PrunePendingItems()
     {
+        _playbackTracker.Prune(_queueManager.VisibleNotifications);
+
         if (_pendingItems.Count == 0)
             return;
 
@@ -364,7 +371,11 @@ public sealed class SpokenNotificationService : IDisposable
         _isSynthesizing = false;
 
         if (clearPending)
+        {
+            foreach (var item in _pendingItems)
+                _playbackTracker.MarkDequeued(item);
             _pendingItems.Clear();
+        }
     }
 
     public void Dispose()
