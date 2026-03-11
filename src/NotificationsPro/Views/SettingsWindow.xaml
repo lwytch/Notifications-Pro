@@ -122,9 +122,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Padding="24,20" Background="Transparent" 
-                MouseLeftButtonDown="OnTitleBarMouseDown" Cursor="SizeAll">
+        <!-- Header Background Dragger Layer (Z-Index 0) -->
+        <Border Grid.Row="0" Background="Transparent" MouseLeftButtonDown="OnTitleBarMouseDown" Cursor="SizeAll" />
+        
+        <!-- Header Interactive Content (Z-Index 1) -->
+        <Border Grid.Row="0" Padding="24,20" Background="Transparent">
             <DockPanel LastChildFill="True">
                 <Image Source="{Binding TrayIconImage}" Width="28" Height="28"
                        Margin="0,0,12,0" VerticalAlignment="Top"/>
@@ -142,6 +144,7 @@
                     <TextBlock Text="Preview" FontFamily="{StaticResource UIFont}" FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding ShowPreviewCard}"
+                                  Checked="OnPreviewExpanded" Unchecked="OnPreviewCollapsed"
                                   ToolTip="Show or hide the live preview card" Margin="0,0,16,0"/>
 
                     <Border Width="1" Height="16" Background="{DynamicResource BorderBrush}" Margin="0,0,16,0" VerticalAlignment="Center"/>

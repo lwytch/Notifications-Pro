@@ -126,16 +126,21 @@ public partial class SettingsWindow : Window
     {
         if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
         {
-            // If the user clicked on a button (like Undo, Redo, ToggleSwitch), don't start a drag map.
-            var obj = e.OriginalSource as DependencyObject;
-            while (obj != null && obj != sender as DependencyObject)
-            {
-                if (obj is System.Windows.Controls.Primitives.ButtonBase)
-                    return;
-                obj = System.Windows.Media.VisualTreeHelper.GetParent(obj);
-            }
-
             this.DragMove();
+        }
+    }
+
+    private void OnPreviewExpanded(object sender, RoutedEventArgs e)
+    {
+        this.Height += 120;
+    }
+
+    private void OnPreviewCollapsed(object sender, RoutedEventArgs e)
+    {
+        // Don't shrink below a reasonable minimum bound
+        if (this.Height > 600)
+        {
+            this.Height -= 120;
         }
     }
 

@@ -303,6 +303,29 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.3.8
+- **Title Bar Drag Fix**: Decoupled the window dragging logic using Z-Index background layering. The empty title bar space remains fully draggable, but the interactive Header buttons (Undo, Redo, Preview, Settings Controls) now reliably process their clicks without being aggressively blocked by the dragger.
+- **Dynamic Preview Sizing**: Toggling the Live Preview card in the Settings UI now gracefully expands and collapses the physical height of the window natively, rather than squashing or overlapping the panels beneath it.
+- **Repository Maintenance**: Re-aligned the README.md Release Notes backlog.
+
+### Release v1.1.3.7
+- **Header Hit-Testing**: Introduced recursive visual tree hit-testing to prevent the title bar drag events from silencing click events aimed at the Undo/Redo/Close widgets. 
+
+### Release v1.1.3.6
+- **Mouse Event Bubbling**: Reworked `PreviewMouseLeftButtonDown` tunneling behavior to prevent the overlay dragger from eating native click events over interactive widgets.
+
+### Release v1.1.3.5
+- **Taskbar Gap Fix**: Addressed a mathematical gap limitation where bottom-aligned multi-monitor notifications sat 24 pixels above the Windows taskbar. The layout engine now sinks the invisible window padding strictly into the bezel boundaries, ensuring the fully-opaque notification cards rest flawlessly flush against the taskbar edge.
+
+### Release v1.1.3.4
+- **Dynamic Height Anchoring**: Fixed a hardcoded vertical constraint bug where bottom-aligned multi-monitor notifications relied on a 360-pixel fallback height. The app now queries the WPF overlay dimensions natively, mathematically shifting the UI dynamically to ensure pixel-perfect tight bottom layouts.
+
+### Release v1.1.3.3
+- **CenterScreen Launch Default**: Cleaned up position caching bindings. Whenever the app launches (or escapes from the anchored Popup mode payload), the Settings Window firmly launches directly in the center of your primary monitor instead of recalling an arbitrary corner.
+- **Title Bar Dragger**: Replaced the restrictive top-right grab handle with a universally draggable entire title bar logic stream across the WPF Header grid.
+- **Compact Window Memory**: Added an automated tracking routine to remember arbitrary user resizes. If you manually drag the window boundaries to 1200 pixels wide, swapping to Compact Layout shrinks the app tightly—and swapping back flawlessly restores your 1200 pixel preference without resetting to the 900 pixel default.
+- **Tab Interface Expansion**: Expanded the standard window Height scale to natively expose all 9 settings tabs without invoking a scrollbar.
+
 ### Release v1.1.3.2
 - **Compact Window Sizing & Toggle Fix:** Addressed user feedback where the Compact Layout toggle failed to seamlessly resize the window when clicked due to conflicting explicit property bindings. The exact layout dimensions are now recalculated on the fly, seamlessly scaling down towards the anchored corner tray edge without detaching into empty space.
 - **Enlarged Settings Window Height:** The default height of the Settings Window across both normal and compact modes has been universally bumped up. This cures the visual issue where the two bottom-most tabs inside the left-hand navigation column were hidden beneath a scrollbar cutoff.

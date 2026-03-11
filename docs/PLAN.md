@@ -401,6 +401,8 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Keyword highlight layout realignment.
 - [x] Added GitHub link to the Help tab.
 - [x] Fixed Settings popup header buttons not receiving clicks due to title bar drag preview events.
+- [ ] Fixed title bar dragging using independent background Z-Index layer so Cursor/Hover states ignore header buttons.
+- [ ] Fixed Settings Window squashing UI when toggling "Show Preview" by dynamically expanding the Window Height.
 
 ## Current Focus
 All Milestone 13 items complete including nice-to-have features.
