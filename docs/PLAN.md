@@ -34,6 +34,7 @@
 - [x] "Grant Notification Access" always visible in tray menu
 - [x] "Retry Access Check" works even when access already granted
 - [x] Accessibility fallback hardened for Win11 (broader events + shell host detection + live diagnostics)
+- [x] Capture-mode override and recovery: System tab now offers Auto / Prefer WinRT / Force Accessibility, and WinRT seed/poll failures automatically switch to accessibility capture
 - [ ] Align timing with system toast duration when available (deferred — using configurable duration)
 
 ### Milestone 3: Customization Polish
@@ -187,6 +188,8 @@ Keyboard & motor accessibility:
 - [x] Minimum click target sizes on toggle switches (44dp MinWidth/MinHeight)
 - [x] Global hotkeys for overlay control (toggle visibility, dismiss all, toggle DND)
 - [x] Hotkey configuration UI in Accessibility tab
+- [x] Spoken notification combinations expanded: Title Only, Title + Body, Body + Timestamp, Title + Timestamp, and Title + Body + Timestamp
+- [x] Per-app spoken notification controls and voice setup help: choose which seen apps are narrated, surface Windows voice-install guidance, and disclose the built-in voice requirements clearly
 - [ ] Full keyboard navigation audit (deferred)
 
 Cognitive accessibility:
@@ -421,6 +424,7 @@ Addressed post-release feedback to improve reliability and visual consistency:
 **Status: Complete**
 
 - [x] Built-in spoken notification reader — Accessibility tab now includes on/off narration, Body Only vs Title + Body + Timestamp modes, installed-voice selection, speed/volume controls, Preview Voice playback, and privacy disclosures that explain nearby-audio exposure plus RAM-only handling.
+- [x] Expanded spoken content combinations — added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp modes so narration can be tuned more precisely without needing separate features.
 
 ## Current Focus
 Post-release validation for spoken notifications and follow-up UX review for any stricter privacy masking options.

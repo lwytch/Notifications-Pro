@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Navigation;
 using NotificationsPro.Services;
 using WpfInput = System.Windows.Input;
 using NotificationsPro.ViewModels;
@@ -301,5 +303,18 @@ public partial class SettingsWindow : Window
     private void OnCloseClick(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
+        }
+        catch
+        {
+            e.Handled = true;
+        }
     }
 }

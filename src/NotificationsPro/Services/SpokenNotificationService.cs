@@ -115,6 +115,9 @@ public sealed class SpokenNotificationService : IDisposable
             if (!_queueManager.VisibleNotifications.Contains(item))
                 return;
 
+            if (!ShouldSpeakItem(item))
+                return;
+
             if (ReferenceEquals(_currentItem, item) || _pendingItems.Any(existing => ReferenceEquals(existing, item)))
                 return;
 
@@ -160,9 +163,12 @@ public sealed class SpokenNotificationService : IDisposable
             }
 
             _mediaPlayer.Volume = Math.Clamp(_settingsManager.Settings.ReadNotificationsAloudVolume, 0.0, 1.0);
+            PrunePendingItems();
 
-            if (!_wasSpeechEnabled)
-                EnqueueVisibleNotifications();
+            if (_currentItem != null && !ShouldSpeakItem(_currentItem))
+                StopCurrentPlayback(clearPending: false);
+
+            EnqueueVisibleNotifications();
 
             if (_currentItem == null && !_isSynthesizing)
                 TryStartNext();
@@ -202,6 +208,15 @@ public sealed class SpokenNotificationService : IDisposable
             && !settings.NotificationsPaused;
     }
 
+    private bool ShouldSpeakItem(NotificationItem item)
+    {
+        var appName = item.AppName?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(appName))
+            return true;
+
+        return !_settingsManager.Settings.SpokenMutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase);
+    }
+
     private void TryStartNext()
     {
         if (_disposed || !ShouldUseSpeech() || _currentItem != null || _isSynthesizing)
@@ -212,7 +227,7 @@ public sealed class SpokenNotificationService : IDisposable
             return;
 
         var item = _pendingItems.Dequeue();
-        if (!_queueManager.VisibleNotifications.Contains(item))
+        if (!_queueManager.VisibleNotifications.Contains(item) || !ShouldSpeakItem(item))
         {
             TryStartNext();
             return;
@@ -223,7 +238,7 @@ public sealed class SpokenNotificationService : IDisposable
 
     private async void StartSpeaking(NotificationItem item)
     {
-        if (_disposed || !ShouldUseSpeech() || !_queueManager.VisibleNotifications.Contains(item))
+        if (_disposed || !ShouldUseSpeech() || !_queueManager.VisibleNotifications.Contains(item) || !ShouldSpeakItem(item))
             return;
 
         var settings = _settingsManager.Settings;
@@ -308,6 +323,9 @@ public sealed class SpokenNotificationService : IDisposable
     {
         foreach (var item in _queueManager.VisibleNotifications.OrderBy(notification => notification.ReceivedAt))
         {
+            if (!ShouldSpeakItem(item))
+                continue;
+
             if (ReferenceEquals(_currentItem, item) || _pendingItems.Any(existing => ReferenceEquals(existing, item)))
                 continue;
 
@@ -320,7 +338,9 @@ public sealed class SpokenNotificationService : IDisposable
         if (_pendingItems.Count == 0)
             return;
 
-        var remaining = _pendingItems.Where(item => _queueManager.VisibleNotifications.Contains(item)).ToArray();
+        var remaining = _pendingItems
+            .Where(item => _queueManager.VisibleNotifications.Contains(item) && ShouldSpeakItem(item))
+            .ToArray();
         _pendingItems.Clear();
 
         foreach (var item in remaining)

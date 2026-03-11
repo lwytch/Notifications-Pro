@@ -1,3 +1,5 @@
+using NotificationsPro.Helpers;
+
 namespace NotificationsPro.Models;
 
 public class AppSettings
@@ -71,6 +73,7 @@ public class AppSettings
     public Dictionary<string, bool> HighlightKeywordRegexFlags { get; set; } = new();
     public Dictionary<string, bool> MuteKeywordRegexFlags { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
+    public List<string> SpokenMutedApps { get; set; } = new();
 
     // Notification icons (M9.5)
     public bool ShowNotificationIcons { get; set; } = false;
@@ -125,6 +128,9 @@ public class AppSettings
 
     // Accessibility — Voice Access card labels
     public string VoiceAccessReadMode { get; set; } = "Off";
+
+    // System — Notification capture
+    public string NotificationCaptureMode { get; set; } = NotificationCaptureModeHelper.ModeAuto;
 
     // Accessibility — Information density
     public string DensityPreset { get; set; } = "Comfortable";
@@ -214,6 +220,7 @@ public class AppSettings
     {
         var clone = (AppSettings)MemberwiseClone();
         clone.MutedApps = new List<string>(MutedApps);
+        clone.SpokenMutedApps = new List<string>(SpokenMutedApps);
         clone.HighlightKeywords = new List<string>(HighlightKeywords);
         clone.PerKeywordColors = new Dictionary<string, string>(PerKeywordColors);
         clone.HighlightKeywordRegexFlags = new Dictionary<string, bool>(HighlightKeywordRegexFlags);

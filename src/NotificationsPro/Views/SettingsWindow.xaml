@@ -1840,15 +1840,15 @@
                                        ToolTip="When enabled, Notifications Pro narrates visible notifications with a Windows-installed voice."/>
                         </DockPanel>
 
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding ReadNotificationsAloudEnabled, Converter={StaticResource BoolToVis}}">
+                        <StackPanel Visibility="{Binding ReadNotificationsAloudEnabled, Converter={StaticResource BoolToVis}}">
                             <TextBlock Text="Spoken Content" Style="{StaticResource SettingLabel}"
-                                       ToolTip="Choose whether narration reads just the body text or the title, body, and timestamp."/>
+                                       ToolTip="Choose which notification fields narration should read, including concise title/body modes and timestamp-aware combinations."/>
                             <ComboBox Style="{StaticResource SettingsComboBox}"
                                       ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                       ItemsSource="{Binding AvailableReadNotificationsAloudModes}"
                                       SelectedItem="{Binding ReadNotificationsAloudMode}"
                                       Margin="0,4,0,0"
-                                      ToolTip="Body Only keeps narration concise. Title + Body + Timestamp reads the full visible card context."/>
+                                      ToolTip="Choose which notification fields narration should read. Timestamp follows your current timestamp display mode."/>
 
                             <TextBlock Text="Voice" Style="{StaticResource SettingLabel}"
                                        ToolTip="Select which installed Windows voice should speak notifications."/>
@@ -1860,6 +1860,11 @@
                                       SelectedValue="{Binding ReadNotificationsAloudVoiceId}"
                                       Margin="0,4,0,0"
                                       ToolTip="Uses Windows-installed Microsoft-signed voices. Choose System Default to follow your current Windows voice."/>
+                            <TextBlock TextWrapping="Wrap"
+                                       Margin="0,6,0,0"
+                                       Style="{StaticResource SettingDesc}"
+                                       Foreground="{DynamicResource TextMutedBrush}"
+                                       Text="Only Windows-installed Microsoft-signed voices appear here. If your preferred voice is missing, install it in Windows first, then reopen Notifications Pro if needed."/>
 
                             <TextBlock Text="Speech Rate" Style="{StaticResource SettingLabel}"
                                        ToolTip="Controls how quickly the spoken notification is read."/>
@@ -1893,6 +1898,35 @@
                                         Margin="0,0,8,0"
                                         ToolTip="Speak a sample notification using the current voice, speed, volume, and spoken-content mode."/>
                             </WrapPanel>
+
+                            <Border Style="{StaticResource SectionHeaderPanel}">
+                                <TextBlock Text="PER-APP SPEECH" Style="{StaticResource SectionHeader}"
+                                           ToolTip="Choose which seen apps should be spoken aloud and which should stay visual-only."/>
+                            </Border>
+
+                            <ItemsControl ItemsSource="{Binding SpokenAppEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,0,0,6">
+                                            <Button DockPanel.Dock="Right"
+                                                    Content="{Binding ToggleLabel}"
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    Width="72"
+                                                    Padding="0"
+                                                    Command="{Binding DataContext.ToggleSpokenAppCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding AppName}"
+                                                    ToolTip="Toggle whether Notifications Pro should narrate notifications from this app."/>
+                                            <TextBlock Text="{Binding AppName}"
+                                                       Style="{StaticResource SettingLabel}"
+                                                       VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Apps appear here after Notifications Pro sees them. Skipped apps still show on screen but are ignored by narration."
+                                       Style="{StaticResource SettingDesc}"
+                                       Margin="0,4,0,0"
+                                       Visibility="{Binding SpokenAppEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
                         </StackPanel>
 
                         <TextBlock TextWrapping="Wrap"
@@ -2259,11 +2293,20 @@
                                     ToolTip="Retry the direct WinRT access check without leaving the settings window."/>
                         </WrapPanel>
 
+                        <TextBlock Text="Capture Mode" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Auto tries WinRT first and falls back to accessibility. Prefer WinRT still falls back if the direct path fails. Force Accessibility skips WinRT completely."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableNotificationCaptureModes}"
+                                  SelectedItem="{Binding NotificationCaptureMode}"
+                                  Margin="0,4,0,0"
+                                  ToolTip="Use Force Accessibility if live notifications stop appearing even though test notifications still work."/>
+
                         <TextBlock TextWrapping="Wrap"
-                                   Margin="0,0,0,8"
+                                   Margin="0,6,0,8"
                                    Style="{StaticResource SettingDesc}"
                                    Foreground="{DynamicResource TextMutedBrush}"
-                                   Text="Direct WinRT access depends on Windows notification permission. If it is unavailable, Notifications Pro can still fall back to accessibility capture when possible."/>
+                                   Text="Direct WinRT access depends on Windows notification permission. Auto is the safest default. Prefer WinRT still falls back automatically, and Force Accessibility is the quickest recovery option if live toasts stop appearing."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
@@ -2509,7 +2552,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="1. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Choose Body Only if you want quick narration, or Title + Body + Timestamp if you want the full card context read aloud."/>
+                                       Text="Choose the spoken fields you want: concise modes like Body Only or Title Only, mixed modes like Title + Body, or timestamp-aware modes such as Body + Timestamp, Title + Timestamp, or Title + Body + Timestamp."/>
                         </Grid>
                         <Grid Margin="12,0,0,4">
                             <Grid.ColumnDefinitions>
@@ -2527,11 +2570,21 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="3. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Narration plays through your default Windows audio output. Anyone nearby may hear it, so treat it as an audible accessibility aid rather than a private channel."/>
+                                       Text="Only Windows-installed Microsoft-signed voices appear in Notifications Pro. If the voice you want is missing, add it in Windows first, then reopen the app if it still does not appear."/>
                         </Grid>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                            <Run Text="Microsoft setup links: "/>
+                            <Hyperlink NavigateUri="https://support.microsoft.com/windows/chapter-7-customizing-narrator-6e30e2d0-b2f3-b907-d264-a5d30502ad73"
+                                       RequestNavigate="OnRequestNavigate">Customize Narrator voices</Hyperlink>
+                            <Run Text=" and "/>
+                            <Hyperlink NavigateUri="https://support.microsoft.com/windows/appendix-a-supported-languages-and-voices-for-narrator-448ec015-eb18-4ac2-8d0d-fac74d441e3b"
+                                       RequestNavigate="OnRequestNavigate">Supported Narrator voices list</Hyperlink>
+                            <Run Text="."/>
+                        </TextBlock>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
-                                   Text="Privacy: spoken notifications are generated from the live in-memory queue only. Notifications Pro never saves notification text to disk, never builds an overflow speech backlog, and does not send the text over the network."/>
+                                   Text="Privacy: spoken notifications are generated from the live in-memory queue only. Notifications Pro never saves notification text to disk, never builds an overflow speech backlog, and does not send the text over the network. Narration plays through your default Windows audio output, so anyone nearby may hear it."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="VOICE ACCESS" Style="{StaticResource SectionHeader}"/>
@@ -2542,6 +2595,13 @@
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="Configure it in Settings → Accessibility → Microsoft Voice Access. Choose Off, Body Only, or Title + Body + Timestamp based on how much notification text you want Voice Access to reference."/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
+                            <Run Text="Microsoft setup guide: "/>
+                            <Hyperlink NavigateUri="https://support.microsoft.com/windows/use-voice-access-to-control-your-pc-author-text-with-your-voice-fec94565-c4bd-329d-e59a-af033fa5689f"
+                                       RequestNavigate="OnRequestNavigate">Use Voice Access to control your PC</Hyperlink>
+                            <Run Text="."/>
+                        </TextBlock>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
                                    Text="Transparency: this affects the on-screen card's Windows accessibility label only. The selected text is available while the notification is visible, stays in RAM only, and is never written to disk, logged, or sent over the network."/>
@@ -2678,7 +2738,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Verify permission, then use tray 'Retry Access Check'. The app falls back to accessibility capture automatically."/>
+                                       Text="Verify permission, then use tray 'Retry Access Check'. If test notifications work but live ones do not, switch Settings → System → Notification Access → Capture Mode to Force Accessibility."/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Can't drag the overlay" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
@@ -2708,7 +2768,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device and ensure notifications are not paused."/>
+                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is not marked Skip in Per-App Speech."/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
@@ -2901,7 +2961,8 @@
                             <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Text="Repository: "/>
                             <TextBlock Cursor="Hand" TextDecorations="Underline" FontSize="12"
                                        Foreground="{DynamicResource AccentBrush}">
-                                <Hyperlink NavigateUri="https://github.com/lwytch/Notifications-Pro">
+                                <Hyperlink NavigateUri="https://github.com/lwytch/Notifications-Pro"
+                                           RequestNavigate="OnRequestNavigate">
                                     github.com/lwytch/Notifications-Pro
                                 </Hyperlink>
                             </TextBlock>

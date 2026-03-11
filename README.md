@@ -41,6 +41,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 ### Notification Capture
 - **WinRT listener** (`UserNotificationListener`) — the primary capture path, requires a one-time permission grant via Windows Settings.
 - **Accessibility fallback** — uses `SetWinEventHook` + UI Automation to read toast text when the WinRT path is unavailable (e.g. unpackaged app restrictions). Simultaneous notifications are split into individual entries rather than merged.
+- **Capture mode selector** — `Settings > System > Notification Access` now offers `Auto`, `Prefer WinRT`, and `Force Accessibility` so you can recover quickly if live notifications stop flowing through the direct path.
 - **Polling guard** — a 2-second polling loop supplements the event-driven path for reliability; a flag prevents overlapping polls.
 - **Toast suppression** (optional) — after capturing a notification, the app can remove the native Windows toast popup so only the overlay shows. Requires the WinRT path. Off by default.
 
@@ -118,7 +119,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
-- **Spoken notifications** — built-in narration can read `Body Only` or `Title + Body + Timestamp`, using any installed Windows voice with adjustable speed and volume plus a preview button.
+- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, and per-app narration skip controls.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
@@ -270,7 +271,13 @@ Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to
 ### Spoken Notifications
 In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notifications Aloud** to make Notifications Pro narrate captured notifications itself.
 
-Choose `Body Only` for shorter speech or `Title + Body + Timestamp` for the full notification context. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
+Choose from `Body Only`, `Title Only`, `Title + Body`, `Body + Timestamp`, `Title + Timestamp`, or `Title + Body + Timestamp`. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
+
+The same section also lets you mark specific seen apps as `Skip`, so they stay visible on screen but are ignored by narration. Only Windows-installed Microsoft-signed voices appear in the picker.
+
+If you want to install more voices, Microsoft’s setup guides are:
+- [Customize Narrator voices](https://support.microsoft.com/windows/chapter-7-customizing-narrator-6e30e2d0-b2f3-b907-d264-a5d30502ad73)
+- [Supported Narrator languages and voices](https://support.microsoft.com/windows/appendix-a-supported-languages-and-voices-for-narrator-448ec015-eb18-4ac2-8d0d-fac74d441e3b)
 
 This is the app's own text-to-speech feature. Audio plays through your default Windows output and can be heard by people nearby. Notifications Pro does not write spoken text to disk and does not keep overflow notification content for later playback.
 
@@ -290,7 +297,7 @@ On first run, Windows will prompt for notification access. If you denied it or i
 
 The tray menu also has **Open Privacy > Notifications...** and **Retry Access Check** for troubleshooting.
 
-The same recovery controls now appear in **Settings > System > Notification Access**, alongside the current capture-mode status.
+The same recovery controls now appear in **Settings > System > Notification Access**, alongside the current capture-mode status and a manual `Auto` / `Prefer WinRT` / `Force Accessibility` selector.
 
 ---
 
@@ -298,7 +305,7 @@ The same recovery controls now appear in **Settings > System > Notification Acce
 
 | Symptom | Fix |
 |---------|-----|
-| No notifications captured | Verify permission, then use tray "Retry Access Check". The app falls back to accessibility capture automatically when WinRT access is unavailable. |
+| No notifications captured | Verify permission, then use tray "Retry Access Check". If test notifications work but live ones do not, open **Settings > System > Notification Access** and switch **Capture Mode** to `Force Accessibility`. |
 | Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > System. |
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
@@ -325,6 +332,15 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.6.2
+- **Per-App Spoken Notification Control**: Added per-app `Speak` / `Skip` controls in `Settings > Accessibility`, so you can keep specific apps visual-only while narration stays on globally.
+- **Capture Recovery Upgrade**: Added a `System > Notification Access > Capture Mode` selector with `Auto`, `Prefer WinRT`, and `Force Accessibility`, and WinRT seed/poll failures now switch to accessibility capture automatically.
+- **Voice Setup Help Links**: Added Microsoft voice-setup links in the Help tab, clarified that only Windows-installed Microsoft-signed voices appear in the picker, and fixed external Help/GitHub hyperlinks so they open reliably.
+
+### Release v1.1.6.1
+- **Expanded Spoken Content Modes**: Added `Title Only`, `Title + Body`, `Body + Timestamp`, and `Title + Timestamp` to the spoken-notification selector so you can choose the exact narration mix you want.
+- **Fallback Speech Logic**: If a notification is missing the requested title or body field, narration now falls back to the available text instead of speaking an unhelpful partial result.
 
 ### Release v1.1.6.0
 - **Built-in Spoken Notifications**: Added a separate Accessibility feature that can narrate notifications aloud with `Body Only` or `Title + Body + Timestamp` modes, installed Windows voice selection, speed/volume controls, and a `Preview Voice` button.

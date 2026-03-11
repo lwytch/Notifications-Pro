@@ -56,7 +56,9 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.BackgroundOpacity = 0.5;
         sm.Settings.ReadNotificationsAloudEnabled = true;
         sm.Settings.ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleBodyTimestamp;
+        sm.Settings.SpokenMutedApps.Add("Teams");
         sm.Settings.VoiceAccessReadMode = VoiceAccessTextFormatter.ModeBodyOnly;
+        sm.Settings.NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility;
         sm.Save();
 
         var sm2 = CreateManager();
@@ -67,7 +69,9 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(0.5, sm2.Settings.BackgroundOpacity);
         Assert.True(sm2.Settings.ReadNotificationsAloudEnabled);
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleBodyTimestamp, sm2.Settings.ReadNotificationsAloudMode);
+        Assert.Equal(new[] { "Teams" }, sm2.Settings.SpokenMutedApps);
         Assert.Equal(VoiceAccessTextFormatter.ModeBodyOnly, sm2.Settings.VoiceAccessReadMode);
+        Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, sm2.Settings.NotificationCaptureMode);
     }
 
     [Fact]
@@ -129,6 +133,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Empty(settings.HighlightKeywords);
         Assert.Empty(settings.MuteKeywords);
         Assert.Equal("#FFD700", settings.HighlightColor);
+        Assert.Empty(settings.SpokenMutedApps);
         Assert.False(settings.QuietHoursEnabled);
         Assert.Equal("22:00", settings.QuietHoursStart);
         Assert.Equal("08:00", settings.QuietHoursEnd);
@@ -149,6 +154,7 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.OverlayVisible);
         Assert.False(settings.NotificationsPaused);
         Assert.Equal(VoiceAccessTextFormatter.ModeOff, settings.VoiceAccessReadMode);
+        Assert.Equal(NotificationCaptureModeHelper.ModeAuto, settings.NotificationCaptureMode);
     }
 
     [Fact]
@@ -169,18 +175,22 @@ public class SettingsManagerTests : IDisposable
     {
         var original = new AppSettings();
         original.MutedApps.Add("Teams");
+        original.SpokenMutedApps.Add("Outlook");
         original.HighlightKeywords.Add("urgent");
         original.MuteKeywords.Add("spam");
 
         var clone = original.Clone();
         clone.MutedApps.Add("Slack");
+        clone.SpokenMutedApps.Add("Discord");
         clone.HighlightKeywords.Add("critical");
         clone.MuteKeywords.Add("ad");
 
         Assert.Single(original.MutedApps);
+        Assert.Single(original.SpokenMutedApps);
         Assert.Single(original.HighlightKeywords);
         Assert.Single(original.MuteKeywords);
         Assert.Equal(2, clone.MutedApps.Count);
+        Assert.Equal(2, clone.SpokenMutedApps.Count);
         Assert.Equal(2, clone.HighlightKeywords.Count);
         Assert.Equal(2, clone.MuteKeywords.Count);
     }

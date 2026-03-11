@@ -43,8 +43,9 @@
 - Notification cards now expose meaningful UI Automation names instead of the raw `NotificationsPro.Models.NotificationItem` class name
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
-- Accessibility tab now includes built-in spoken notifications with on/off toggle, body-only vs full-card narration modes, installed voice selection, speed/volume controls, and a Preview Voice button
-- System tab now exposes current notification-access status plus Open Windows Notification Access and Retry Access Check controls
+- Accessibility tab now includes built-in spoken notifications with on/off toggle, multiple title/body/timestamp combinations, installed voice selection, speed/volume controls, per-app Speak/Skip controls, and a Preview Voice button
+- Accessibility Help now links to official Microsoft voice-setup pages and explains that only Windows-installed Microsoft-signed voices appear in the picker
+- System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
 - Per-keyword highlight colors — each keyword can have its own color with inline color picker
 - Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
@@ -136,7 +137,7 @@
   - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
   - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
   - Global hotkeys — system-wide keyboard shortcuts for show/hide overlay, dismiss all, toggle DND
-  - Spoken notifications — built-in narration supports Body Only or Title + Body + Timestamp with installed voice selection, speed/volume controls, and preview playback
+  - Spoken notifications — built-in narration supports multiple title/body/timestamp combinations with installed voice selection, speed/volume controls, and preview playback
   - Microsoft Voice Access card labels — opt-in modes for Off, Body Only, or Title + Body + Timestamp via the Accessibility tab
   - Hotkey registration diagnostics — invalid or occupied combos are surfaced directly in the Accessibility tab
   - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
@@ -236,7 +237,7 @@
 - Solution-level `dotnet build` against `NotificationsPro.slnx` currently fails in this environment due a solution parser error; building the app and tests by project works
 
 ## Known Issues / Troubleshooting
-- **UserNotificationListener** may report "Allowed" but not deliver notifications for unpackaged apps. Workaround: open Windows Settings > Privacy > Notifications, ensure the app has access. Use "Retry Access Check" in the tray menu to restart the listener.
+- **UserNotificationListener** may report "Allowed" but not deliver notifications reliably on some systems. Workaround: open Windows Settings > Privacy > Notifications, ensure the app has access, then use "Retry Access Check". If test notifications work but live ones do not, switch Settings > System > Notification Access > Capture Mode to `Force Accessibility`.
 - If overlay cannot be dragged, check click-through state first. Click-through intentionally blocks mouse interaction; use tray menu item "Disable Click-Through (Allow Dragging)".
 - The tray status line shows diagnostic info (WinRT poll metrics or accessibility captured/candidate/event counters) to help debug listener visibility.
 
@@ -315,6 +316,9 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Screen reader: Windows Narrator announces tab names and control labels
 - [ ] "Quit" closes everything cleanly
 - [ ] Settings persist after restart
+- [ ] Spoken notifications: per-app Speak/Skip controls correctly include/exclude selected apps without affecting visual display
+- [ ] Spoken notifications: Help tab voice setup links open Microsoft support pages
+- [ ] Notification Access: switching Capture Mode to Force Accessibility restores live notifications when WinRT is not delivering
 - [ ] Notification slides in from each configured direction (Left/Right/Top/Bottom)
 - [ ] Click a notification card to dismiss it instantly
 - [ ] Hover over overlay pauses all expiry timers; moving away resumes them
@@ -354,7 +358,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Global Hotkeys toggle + key combo fields register system-wide shortcuts
 - [ ] Ctrl+Alt+N toggles overlay visibility, Ctrl+Alt+D dismisses all, Ctrl+Alt+P toggles DND
 - [ ] Invalid or already-used hotkey combos surface an in-app registration error in Settings → Accessibility
-- [ ] Spoken notification controls allow on/off narration, body-only vs full-card speech, installed voice selection, rate/volume tuning, and Preview Voice playback
+- [ ] Spoken notification controls allow on/off narration, multiple title/body/timestamp speech combinations, installed voice selection, rate/volume tuning, and Preview Voice playback
 - [ ] Microsoft Voice Access selector offers Off, Body Only, and Title + Body + Timestamp options
 - [ ] Notification cards expose a generic UI Automation name when Voice Access is Off and content-based names when a Voice Access label mode is enabled
 - [ ] System tab shows notification access status plus Open Windows Notification Access and Retry Access Check controls

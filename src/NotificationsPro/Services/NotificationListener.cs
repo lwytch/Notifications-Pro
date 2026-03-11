@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Automation;
 using System.Windows.Threading;
+using NotificationsPro.Helpers;
 using Windows.UI.Notifications;
 using Windows.UI.Notifications.Management;
 
@@ -24,6 +25,7 @@ public class NotificationListener
     private readonly QueueManager _queueManager;
     private readonly Dispatcher _dispatcher;
     private readonly SettingsManager _settingsManager;
+    private string _configuredCaptureMode;
 
     // WinRT API
     private UserNotificationListener? _listener;
@@ -110,6 +112,8 @@ public class NotificationListener
         _queueManager = queueManager;
         _dispatcher = dispatcher;
         _settingsManager = settingsManager;
+        _configuredCaptureMode = NotificationCaptureModeHelper.NormalizeMode(_settingsManager.Settings.NotificationCaptureMode);
+        _settingsManager.SettingsChanged += OnSettingsChanged;
     }
 
     // ========================
@@ -118,6 +122,17 @@ public class NotificationListener
 
     public async Task<bool> InitializeAsync()
     {
+        _configuredCaptureMode = NotificationCaptureModeHelper.NormalizeMode(_settingsManager.Settings.NotificationCaptureMode);
+
+        if (string.Equals(_configuredCaptureMode, NotificationCaptureModeHelper.ModeAccessibility, StringComparison.OrdinalIgnoreCase))
+        {
+            IsAccessGranted = false;
+            StatusMessage = "Capture mode is forced to accessibility";
+            StatusChanged?.Invoke();
+            StartAccessibilityCapture("Listening via forced accessibility mode");
+            return true;
+        }
+
         // Try the WinRT API first
         try
         {
@@ -162,6 +177,7 @@ public class NotificationListener
     private void StartWinRTListening()
     {
         if (_listener == null || _isRunning) return;
+        _usingAccessibility = false;
         _isRunning = true;
 
         _listener.NotificationChanged += OnNotificationChanged;
@@ -183,8 +199,8 @@ public class NotificationListener
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Seed failed ({ex.GetType().Name})";
-            StatusChanged?.Invoke();
+            SwitchToAccessibility($"WinRT seed failed ({ex.GetType().Name})");
+            return;
         }
 
         _pollTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
@@ -226,8 +242,7 @@ public class NotificationListener
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Poll #{_pollCount} error: {ex.GetType().Name}";
-            StatusChanged?.Invoke();
+            SwitchToAccessibility($"WinRT poll failed ({ex.GetType().Name})");
         }
         finally
         {
@@ -296,9 +311,10 @@ public class NotificationListener
     //  Accessibility fallback
     // ========================
 
-    private void StartAccessibilityCapture()
+    private void StartAccessibilityCapture(string? statusPrefix = null)
     {
         _usingAccessibility = true;
+        IsAccessGranted = false;
         _isRunning = true;
 
         // SetWinEventHook must be called on a thread with a message loop.
@@ -313,11 +329,15 @@ public class NotificationListener
         if (_winEventHook != IntPtr.Zero)
         {
             StartAccessibilityStatusTimer();
-            UpdateAccessibilityStatus("Listening via accessibility mode");
+            UpdateAccessibilityStatus(string.IsNullOrWhiteSpace(statusPrefix)
+                ? "Listening via accessibility mode"
+                : statusPrefix);
         }
         else
         {
-            StatusMessage = "Failed to start accessibility listener";
+            StatusMessage = string.IsNullOrWhiteSpace(statusPrefix)
+                ? "Failed to start accessibility listener"
+                : $"{statusPrefix} — failed to start accessibility listener";
             StatusChanged?.Invoke();
         }
     }
@@ -729,6 +749,40 @@ public class NotificationListener
     // ========================
     //  Shared
     // ========================
+
+    private void OnSettingsChanged()
+    {
+        var normalizedMode = NotificationCaptureModeHelper.NormalizeMode(_settingsManager.Settings.NotificationCaptureMode);
+        if (string.Equals(normalizedMode, _configuredCaptureMode, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        _configuredCaptureMode = normalizedMode;
+        _dispatcher.InvokeAsync(async () => await RetryAccessAsync());
+    }
+
+    private void SwitchToAccessibility(string reason)
+    {
+        if (_usingAccessibility)
+        {
+            UpdateAccessibilityStatus(reason);
+            return;
+        }
+
+        _pollTimer?.Stop();
+        _pollTimer = null;
+        _isPolling = false;
+
+        if (_listener != null)
+            _listener.NotificationChanged -= OnNotificationChanged;
+
+        _seenIds.Clear();
+        _isRunning = false;
+        _usingAccessibility = false;
+        IsAccessGranted = false;
+        StatusMessage = $"{reason} — switching to accessibility mode";
+        StatusChanged?.Invoke();
+        StartAccessibilityCapture(reason);
+    }
 
     private void StartWinRTRetryTimer()
     {

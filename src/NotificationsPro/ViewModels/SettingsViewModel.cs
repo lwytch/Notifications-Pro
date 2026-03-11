@@ -254,6 +254,7 @@ public class SettingsViewModel : BaseViewModel
     public ObservableCollection<KeywordHighlightEntry> HighlightKeywordEntries { get; } = new();
     public ObservableCollection<MuteKeywordEntry> MuteKeywordEntries { get; } = new();
     public ObservableCollection<MutedAppEntry> MutedAppEntries { get; } = new();
+    public ObservableCollection<SpokenAppEntry> SpokenAppEntries { get; } = new();
 
     // Notification icons (M9.5)
     private bool _showNotificationIcons;
@@ -518,6 +519,17 @@ public class SettingsViewModel : BaseViewModel
     }
 
     private Func<Task>? _retryNotificationAccessAsync;
+
+    private string _notificationCaptureMode = NotificationCaptureModeHelper.ModeAuto;
+    public string NotificationCaptureMode
+    {
+        get => _notificationCaptureMode;
+        set
+        {
+            if (SetProperty(ref _notificationCaptureMode, NormalizeNotificationCaptureMode(value)))
+                QueueSave();
+        }
+    }
 
     // Streaming & Presentation (M10)
     private bool _chromaKeyEnabled;
@@ -828,6 +840,11 @@ public class SettingsViewModel : BaseViewModel
         return string.IsNullOrWhiteSpace(voiceId) ? string.Empty : voiceId.Trim();
     }
 
+    private static string NormalizeNotificationCaptureMode(string? mode)
+    {
+        return NotificationCaptureModeHelper.NormalizeMode(mode);
+    }
+
     // Settings window display mode (M9.5)
     private string _settingsDisplayMode = "Popup";
     public string SettingsDisplayMode { get => _settingsDisplayMode; set { if (SetProperty(ref _settingsDisplayMode, value)) QueueSave(); } }
@@ -950,10 +967,21 @@ public class SettingsViewModel : BaseViewModel
     public List<string> AvailableReadNotificationsAloudModes { get; } = new()
     {
         SpokenNotificationTextFormatter.ModeBodyOnly,
+        SpokenNotificationTextFormatter.ModeTitleOnly,
+        SpokenNotificationTextFormatter.ModeTitleBody,
+        SpokenNotificationTextFormatter.ModeBodyTimestamp,
+        SpokenNotificationTextFormatter.ModeTitleTimestamp,
         SpokenNotificationTextFormatter.ModeTitleBodyTimestamp
     };
 
     public ObservableCollection<NarrationVoiceOption> AvailableNarrationVoices { get; } = new();
+
+    public List<string> AvailableNotificationCaptureModes { get; } = new()
+    {
+        NotificationCaptureModeHelper.ModeAuto,
+        NotificationCaptureModeHelper.ModeWinRt,
+        NotificationCaptureModeHelper.ModeAccessibility
+    };
 
     // Commands
     public ICommand PreviewNotificationCommand { get; }
@@ -966,6 +994,7 @@ public class SettingsViewModel : BaseViewModel
     public ICommand AddMuteKeywordCommand { get; }
     public ICommand RemoveMuteKeywordCommand { get; }
     public ICommand ToggleMuteAppCommand { get; }
+    public ICommand ToggleSpokenAppCommand { get; }
     public ICommand ApplyThemeCommand { get; }
     public ICommand SaveCustomThemeCommand { get; }
     public ICommand DeleteCustomThemeCommand { get; }
@@ -1033,6 +1062,7 @@ public class SettingsViewModel : BaseViewModel
             // Initial population from memory
             RefreshPerAppConfig();
             RefreshMutedAppEntries();
+            RefreshSpokenAppEntries();
 
             _queueManager.NotificationAdded += _ =>
             {
@@ -1041,6 +1071,7 @@ public class SettingsViewModel : BaseViewModel
                 {
                     RefreshPerAppConfig();
                     RefreshMutedAppEntries();
+                    RefreshSpokenAppEntries();
                 });
             };
         }
@@ -1072,6 +1103,7 @@ public class SettingsViewModel : BaseViewModel
         AddMuteKeywordCommand = new RelayCommand(_ => AddMuteKeyword());
         RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
         ToggleMuteAppCommand = new RelayCommand(ToggleMuteApp);
+        ToggleSpokenAppCommand = new RelayCommand(ToggleSpokenApp);
         ApplyThemeCommand = new RelayCommand(ApplyTheme);
         ApplySelectedBuiltInThemeCommand = new RelayCommand(_ =>
         {
@@ -1136,23 +1168,35 @@ public class SettingsViewModel : BaseViewModel
 
         if (string.Equals(normalizedMode, "Accessibility", StringComparison.OrdinalIgnoreCase))
         {
+            if (string.Equals(NotificationCaptureMode, NotificationCaptureModeHelper.ModeAccessibility, StringComparison.OrdinalIgnoreCase))
+            {
+                NotificationAccessStatusSummary = "Capture mode: Forced accessibility";
+                NotificationAccessStatusDetail =
+                    $"Notifications Pro is set to skip direct WinRT capture and read visible notifications through Windows accessibility APIs instead. Use Auto or Prefer WinRT if you want to retry direct notification access later. Current status: {detail}";
+                return;
+            }
+
             NotificationAccessStatusSummary = "Capture mode: Accessibility fallback";
             NotificationAccessStatusDetail =
-                $"Windows direct notification access is unavailable right now, so Notifications Pro is reading visible notifications through Windows accessibility APIs. Open Windows Settings > Privacy > Notifications if you want to restore direct WinRT capture, then use Retry Access Check. Current status: {detail}";
+                $"Windows direct notification access is unavailable right now, so Notifications Pro is reading visible notifications through Windows accessibility APIs. If live notifications stop appearing, switch Settings > System > Notification Access > Capture Mode to Force Accessibility or open Windows Settings > Privacy > Notifications, then use Retry Access Check. Current status: {detail}";
             return;
         }
 
         if (isAccessGranted)
         {
-            NotificationAccessStatusSummary = "Capture mode: WinRT notification access granted";
+            NotificationAccessStatusSummary = string.Equals(NotificationCaptureMode, NotificationCaptureModeHelper.ModeWinRt, StringComparison.OrdinalIgnoreCase)
+                ? "Capture mode: Prefer WinRT (active)"
+                : "Capture mode: WinRT notification access granted";
             NotificationAccessStatusDetail =
                 $"Notifications Pro can read notifications directly through Windows notification APIs. Current status: {detail}";
             return;
         }
 
-        NotificationAccessStatusSummary = "Capture mode: Checking Windows notification access";
+        NotificationAccessStatusSummary = string.Equals(NotificationCaptureMode, NotificationCaptureModeHelper.ModeWinRt, StringComparison.OrdinalIgnoreCase)
+            ? "Capture mode: Prefer WinRT"
+            : "Capture mode: Checking Windows notification access";
         NotificationAccessStatusDetail =
-            $"Notifications Pro is still checking Windows notification access. If direct access is not available, it can fall back to accessibility capture. Current status: {detail}";
+            $"Notifications Pro is still checking Windows notification access. If direct access is not available, it can fall back to accessibility capture automatically. Current status: {detail}";
     }
 
     public void UpdateHotkeyRegistrationError(string? registrationError)
@@ -1255,6 +1299,7 @@ public class SettingsViewModel : BaseViewModel
         _readNotificationsAloudRate = Math.Clamp(s.ReadNotificationsAloudRate, 0.5, 6.0);
         _readNotificationsAloudVolume = Math.Clamp(s.ReadNotificationsAloudVolume, 0.0, 1.0);
         _voiceAccessReadMode = NormalizeVoiceAccessReadMode(s.VoiceAccessReadMode);
+        _notificationCaptureMode = NormalizeNotificationCaptureMode(s.NotificationCaptureMode);
         _densityPreset = s.DensityPreset;
         _chromaKeyEnabled = s.ChromaKeyEnabled;
         _chromaKeyColor = s.ChromaKeyColor;
@@ -1316,6 +1361,7 @@ public class SettingsViewModel : BaseViewModel
         PresentationApps.Clear();
         foreach (var app in s.PresentationApps) PresentationApps.Add(app);
         RefreshMutedAppEntries();
+        RefreshSpokenAppEntries();
         RefreshNarrationVoices();
 
         _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
@@ -1542,6 +1588,7 @@ public class SettingsViewModel : BaseViewModel
                 .Where(e => e.IsRegex)
                 .ToDictionary(e => e.Keyword, _ => true),
             MutedApps = _settingsManager.Settings.MutedApps,
+            SpokenMutedApps = new List<string>(_settingsManager.Settings.SpokenMutedApps),
             ShowNotificationIcons = ShowNotificationIcons,
             IconSize = IconSize,
             DefaultIconPreset = DefaultIconPreset,
@@ -1582,6 +1629,7 @@ public class SettingsViewModel : BaseViewModel
             ReadNotificationsAloudRate = ReadNotificationsAloudRate,
             ReadNotificationsAloudVolume = ReadNotificationsAloudVolume,
             VoiceAccessReadMode = NormalizeVoiceAccessReadMode(VoiceAccessReadMode),
+            NotificationCaptureMode = NormalizeNotificationCaptureMode(NotificationCaptureMode),
             DensityPreset = DensityPreset,
             OverlayWidth = resolvedOverlayWidth,
             LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
@@ -1918,6 +1966,57 @@ public class SettingsViewModel : BaseViewModel
         MutedAppEntries.Clear();
         foreach (var app in _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase))
             MutedAppEntries.Add(new MutedAppEntry(app, _queueManager.IsAppMuted(app)));
+    }
+
+    private void ToggleSpokenApp(object? parameter)
+    {
+        var appName = parameter switch
+        {
+            SpokenAppEntry entry => entry.AppName,
+            string value => value,
+            _ => string.Empty
+        };
+
+        if (string.IsNullOrWhiteSpace(appName))
+            return;
+
+        var updated = _settingsManager.Settings.Clone();
+        if (IsSpokenAppMuted(appName))
+        {
+            updated.SpokenMutedApps.RemoveAll(existing => string.Equals(existing, appName, StringComparison.OrdinalIgnoreCase));
+        }
+        else
+        {
+            updated.SpokenMutedApps.Add(appName);
+        }
+
+        updated.SpokenMutedApps = updated.SpokenMutedApps
+            .Where(app => !string.IsNullOrWhiteSpace(app))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(app => app, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        _settingsManager.Apply(updated);
+        RefreshSpokenAppEntries();
+    }
+
+    private bool IsSpokenAppMuted(string appName)
+    {
+        return _settingsManager.Settings.SpokenMutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase);
+    }
+
+    public void RefreshSpokenAppEntries()
+    {
+        SpokenAppEntries.Clear();
+
+        var appNames = _queueManager.SeenAppNames
+            .Concat(_settingsManager.Settings.SpokenMutedApps)
+            .Where(app => !string.IsNullOrWhiteSpace(app))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(app => app, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var app in appNames)
+            SpokenAppEntries.Add(new SpokenAppEntry(app, IsSpokenAppMuted(app)));
     }
 
     public void RefreshPerAppConfig()
@@ -2482,5 +2581,18 @@ public class PerAppConfigEntry : BaseViewModel
         _sound = sound;
         _icon = icon;
         _onChanged = onChanged;
+    }
+}
+
+public class SpokenAppEntry
+{
+    public string AppName { get; }
+    public bool IsMuted { get; }
+    public string ToggleLabel => IsMuted ? "Speak" : "Skip";
+
+    public SpokenAppEntry(string appName, bool isMuted)
+    {
+        AppName = appName;
+        IsMuted = isMuted;
     }
 }
