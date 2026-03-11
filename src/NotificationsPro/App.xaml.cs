@@ -114,11 +114,14 @@ public partial class App : Application
 
         _queueManager = new QueueManager(_settingsManager);
 
-        _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager);
-        _settingsViewModel = new SettingsViewModel(_settingsManager, _queueManager);
-
         _notificationListener = new NotificationListener(_queueManager, Dispatcher, _settingsManager);
         _notificationListener.StatusChanged += UpdateStatusItem;
+
+        _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager);
+        _settingsViewModel = new SettingsViewModel(_settingsManager, _queueManager);
+        _settingsViewModel.ConfigureRetryNotificationAccess(() =>
+            _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
+        UpdateSettingsDiagnostics();
 
         // Play notification sounds
         _queueManager.NotificationAdded += appName =>
@@ -299,14 +302,21 @@ public partial class App : Application
         _hotkeyManager = null;
 
         if (_settingsManager == null || !_settingsManager.Settings.GlobalHotkeysEnabled)
+        {
+            UpdateSettingsDiagnostics();
             return;
+        }
 
         // Need an HWND from the overlay window
         var hwnd = _overlayWindow != null && _overlayWindow.IsLoaded
             ? new System.Windows.Interop.WindowInteropHelper(_overlayWindow).Handle
             : IntPtr.Zero;
 
-        if (hwnd == IntPtr.Zero) return;
+        if (hwnd == IntPtr.Zero)
+        {
+            UpdateSettingsDiagnostics();
+            return;
+        }
 
         _hotkeyManager = new HotkeyManager();
         _hotkeyManager.ToggleOverlayRequested += () => Dispatcher.Invoke(ToggleOverlay);
@@ -315,6 +325,7 @@ public partial class App : Application
 
         var s = _settingsManager.Settings;
         _hotkeyManager.Register(hwnd, s.HotkeyToggleOverlay, s.HotkeyDismissAll, s.HotkeyToggleDnd);
+        UpdateSettingsDiagnostics();
     }
 
     private void SetupTrayIcon()
@@ -526,6 +537,9 @@ public partial class App : Application
         if (_settingsWindow == null || !_settingsWindow.IsLoaded)
         {
             _settingsViewModel = new SettingsViewModel(_settingsManager!, _queueManager!);
+            _settingsViewModel.ConfigureRetryNotificationAccess(() =>
+                _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
+            UpdateSettingsDiagnostics();
             _settingsWindow = new SettingsWindow(_settingsViewModel, _settingsManager);
             _settingsWindow.Closed += (_, _) => _settingsWindow = null;
 
@@ -624,8 +638,32 @@ public partial class App : Application
                 _trayIcon.Text = tooltip;
             }
 
+            UpdateSettingsDiagnostics();
             UpdateMenuLabels();
         });
+    }
+
+    private void UpdateSettingsDiagnostics()
+    {
+        if (_settingsViewModel == null)
+            return;
+
+        if (_notificationListener != null)
+        {
+            _settingsViewModel.UpdateNotificationAccessStatus(
+                _notificationListener.IsAccessGranted,
+                _notificationListener.ListenerMode,
+                _notificationListener.StatusMessage);
+        }
+        else
+        {
+            _settingsViewModel.UpdateNotificationAccessStatus(
+                false,
+                "Initializing",
+                "Notification listener not initialized.");
+        }
+
+        _settingsViewModel.UpdateHotkeyRegistrationError(_hotkeyManager?.RegistrationError);
     }
 
     private void OpenNotificationSettings()

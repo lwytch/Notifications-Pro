@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -411,9 +412,51 @@ public class SettingsViewModel : BaseViewModel
     private string _hotkeyToggleDnd = "Ctrl+Alt+P";
     public string HotkeyToggleDnd { get => _hotkeyToggleDnd; set { if (SetProperty(ref _hotkeyToggleDnd, value)) QueueSave(); } }
 
+    private string _globalHotkeyRegistrationError = string.Empty;
+    public string GlobalHotkeyRegistrationError
+    {
+        get => _globalHotkeyRegistrationError;
+        private set
+        {
+            if (SetProperty(ref _globalHotkeyRegistrationError, value))
+                OnPropertyChanged(nameof(HasGlobalHotkeyRegistrationError));
+        }
+    }
+
+    public bool HasGlobalHotkeyRegistrationError => !string.IsNullOrWhiteSpace(GlobalHotkeyRegistrationError);
+
+    // Accessibility — Microsoft Voice Access
+    private string _voiceAccessReadMode = VoiceAccessTextFormatter.ModeOff;
+    public string VoiceAccessReadMode
+    {
+        get => _voiceAccessReadMode;
+        set
+        {
+            if (SetProperty(ref _voiceAccessReadMode, NormalizeVoiceAccessReadMode(value)))
+                QueueSave();
+        }
+    }
+
     // Accessibility — Density
     private string _densityPreset = "Comfortable";
     public string DensityPreset { get => _densityPreset; set => SetProperty(ref _densityPreset, value); }
+
+    private string _notificationAccessStatusSummary = "Checking Windows notification access...";
+    public string NotificationAccessStatusSummary
+    {
+        get => _notificationAccessStatusSummary;
+        private set => SetProperty(ref _notificationAccessStatusSummary, value);
+    }
+
+    private string _notificationAccessStatusDetail =
+        "Notifications Pro uses direct WinRT notification access when Windows allows it, and falls back to accessibility capture when needed.";
+    public string NotificationAccessStatusDetail
+    {
+        get => _notificationAccessStatusDetail;
+        private set => SetProperty(ref _notificationAccessStatusDetail, value);
+    }
+
+    private Func<Task>? _retryNotificationAccessAsync;
 
     // Streaming & Presentation (M10)
     private bool _chromaKeyEnabled;
@@ -706,17 +749,12 @@ public class SettingsViewModel : BaseViewModel
 
     private static string NormalizeTimestampDisplayMode(string? mode)
     {
-        if (string.IsNullOrWhiteSpace(mode))
-            return "Relative";
+        return TimestampTextFormatter.NormalizeMode(mode);
+    }
 
-        if (string.Equals(mode, "Relative", StringComparison.OrdinalIgnoreCase))
-            return "Relative";
-        if (string.Equals(mode, "Time", StringComparison.OrdinalIgnoreCase))
-            return "Time";
-        if (string.Equals(mode, "DateTime", StringComparison.OrdinalIgnoreCase))
-            return "DateTime";
-
-        return "Relative";
+    private static string NormalizeVoiceAccessReadMode(string? mode)
+    {
+        return VoiceAccessTextFormatter.NormalizeMode(mode);
     }
 
     // Settings window display mode (M9.5)
@@ -831,6 +869,13 @@ public class SettingsViewModel : BaseViewModel
         "Relative", "Time", "DateTime"
     };
 
+    public List<string> AvailableVoiceAccessReadModes { get; } = new()
+    {
+        VoiceAccessTextFormatter.ModeOff,
+        VoiceAccessTextFormatter.ModeBodyOnly,
+        VoiceAccessTextFormatter.ModeTitleBodyTimestamp
+    };
+
     // Commands
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
@@ -857,6 +902,8 @@ public class SettingsViewModel : BaseViewModel
     public ICommand BrowseCustomIconCommand { get; }
     public ICommand ApplyStreamingPresetCommand { get; }
     public ICommand ViewSessionArchiveCommand { get; }
+    public ICommand OpenNotificationAccessSettingsCommand { get; }
+    public ICommand RetryNotificationAccessCommand { get; }
     public ICommand SetFontPresetCommand { get; }
     public ICommand UndoCommand { get; }
     public ICommand RedoCommand { get; }
@@ -965,6 +1012,8 @@ public class SettingsViewModel : BaseViewModel
         BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
         ApplyStreamingPresetCommand = new RelayCommand(_ => ApplyStreamingPreset());
         ViewSessionArchiveCommand = new RelayCommand(_ => ViewSessionArchive());
+        OpenNotificationAccessSettingsCommand = new RelayCommand(OpenNotificationAccessSettings);
+        RetryNotificationAccessCommand = new RelayCommand(RetryNotificationAccess);
         SetFontPresetCommand = new RelayCommand(o => FontFamily = o as string ?? "Segoe UI");
         UndoCommand = new RelayCommand(_ => Undo(), _ => _undoStack.Count > 0);
         RedoCommand = new RelayCommand(_ => Redo(), _ => _redoStack.Count > 0);
@@ -988,6 +1037,46 @@ public class SettingsViewModel : BaseViewModel
         // Show first-run tip if welcome hasn't been shown yet
         if (!_settingsManager.Settings.HasShownWelcome)
             ShowFirstRunTip = true;
+    }
+
+    public void ConfigureRetryNotificationAccess(Func<Task>? retryNotificationAccessAsync)
+    {
+        _retryNotificationAccessAsync = retryNotificationAccessAsync;
+    }
+
+    public void UpdateNotificationAccessStatus(bool isAccessGranted, string? listenerMode, string? statusMessage)
+    {
+        var normalizedMode = string.IsNullOrWhiteSpace(listenerMode)
+            ? "Unknown"
+            : listenerMode.Trim();
+        var detail = string.IsNullOrWhiteSpace(statusMessage)
+            ? "No additional status reported yet."
+            : statusMessage.Trim();
+
+        if (string.Equals(normalizedMode, "Accessibility", StringComparison.OrdinalIgnoreCase))
+        {
+            NotificationAccessStatusSummary = "Capture mode: Accessibility fallback";
+            NotificationAccessStatusDetail =
+                $"Windows direct notification access is unavailable right now, so Notifications Pro is reading visible notifications through Windows accessibility APIs. Open Windows Settings > Privacy > Notifications if you want to restore direct WinRT capture, then use Retry Access Check. Current status: {detail}";
+            return;
+        }
+
+        if (isAccessGranted)
+        {
+            NotificationAccessStatusSummary = "Capture mode: WinRT notification access granted";
+            NotificationAccessStatusDetail =
+                $"Notifications Pro can read notifications directly through Windows notification APIs. Current status: {detail}";
+            return;
+        }
+
+        NotificationAccessStatusSummary = "Capture mode: Checking Windows notification access";
+        NotificationAccessStatusDetail =
+            $"Notifications Pro is still checking Windows notification access. If direct access is not available, it can fall back to accessibility capture. Current status: {detail}";
+    }
+
+    public void UpdateHotkeyRegistrationError(string? registrationError)
+    {
+        GlobalHotkeyRegistrationError = registrationError?.Trim() ?? string.Empty;
     }
 
     private void LoadFromSettings()
@@ -1079,6 +1168,7 @@ public class SettingsViewModel : BaseViewModel
         _hotkeyToggleOverlay = s.HotkeyToggleOverlay;
         _hotkeyDismissAll = s.HotkeyDismissAll;
         _hotkeyToggleDnd = s.HotkeyToggleDnd;
+        _voiceAccessReadMode = NormalizeVoiceAccessReadMode(s.VoiceAccessReadMode);
         _densityPreset = s.DensityPreset;
         _chromaKeyEnabled = s.ChromaKeyEnabled;
         _chromaKeyColor = s.ChromaKeyColor;
@@ -1399,6 +1489,7 @@ public class SettingsViewModel : BaseViewModel
             HotkeyToggleOverlay = HotkeyToggleOverlay,
             HotkeyDismissAll = HotkeyDismissAll,
             HotkeyToggleDnd = HotkeyToggleDnd,
+            VoiceAccessReadMode = NormalizeVoiceAccessReadMode(VoiceAccessReadMode),
             DensityPreset = DensityPreset,
             OverlayWidth = resolvedOverlayWidth,
             LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
@@ -2102,6 +2193,41 @@ public class SettingsViewModel : BaseViewModel
         System.Windows.Clipboard.SetText(text);
         System.Windows.MessageBox.Show($"{archive.Count} archived notification(s) copied to clipboard.\n\nThis data exists only in RAM and will be cleared when the app closes.",
             "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void OpenNotificationAccessSettings()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo("ms-settings:privacy-notifications") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(
+                $"Could not open Windows notification access settings.\n\n{ex.Message}",
+                "Notification Access",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+    }
+
+    private async void RetryNotificationAccess()
+    {
+        if (_retryNotificationAccessAsync == null)
+            return;
+
+        try
+        {
+            await _retryNotificationAccessAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(
+                $"Could not retry the notification access check.\n\n{ex.Message}",
+                "Notification Access",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 
     public void RefreshMonitors()

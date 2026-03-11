@@ -1828,6 +1828,32 @@
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="MICROSOFT VOICE ACCESS" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Control the card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications."/>
+                        </Border>
+
+                        <TextBlock Text="Voice Access Card Labels" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Off keeps a generic card label. The other modes expose the selected text through Windows UI Automation while the notification remains visible on screen."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableVoiceAccessReadModes}"
+                                  SelectedItem="{Binding VoiceAccessReadMode}"
+                                  Margin="0,4,0,0"
+                                  ToolTip="Choose whether Microsoft Voice Access should target a generic label, the body only, or the title, body, and timestamp."/>
+
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,8,0,0"
+                                   Style="{StaticResource SettingDesc}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   Text="Transparency: this changes the card's Windows UI Automation label for Microsoft Voice Access and similar assistive tools. The selected text is exposed only while the notification is visible, stays in RAM only, and is never written to disk, logged, or sent over the network."/>
+
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,6,0,8"
+                                   Style="{StaticResource SettingDesc}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   Text="This is an accessibility integration, not a separate text-to-speech engine inside Notifications Pro. Off removes the rich card label, but visible text remains available to Windows accessibility tools while it is on screen."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="INFORMATION DENSITY" Style="{StaticResource SectionHeader}"
                                        ToolTip="Choose how much information fits on screen at once. Compact shows more notifications, Spacious is easier to read."/>
                         </Border>
@@ -1872,9 +1898,20 @@
                                      Text="{Binding HotkeyToggleDnd, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Use a modifier+key combo like Ctrl+Alt+P"/>
 
+                            <TextBlock TextWrapping="Wrap"
+                                       Margin="0,8,0,0"
+                                       Style="{StaticResource SettingDesc}"
+                                       Foreground="{DynamicResource ErrorBrush}"
+                                       Visibility="{Binding HasGlobalHotkeyRegistrationError, Converter={StaticResource BoolToVis}}"
+                                       Text="{Binding GlobalHotkeyRegistrationError}"/>
+
                             <TextBlock Text="Hotkeys save automatically. Use modifier+key combos like Ctrl+Alt+N or Shift+F12."
                                        Style="{StaticResource SettingDesc}" Foreground="{DynamicResource TextMutedBrush}"
                                        Margin="0,8,0,0" TextWrapping="Wrap"/>
+
+                            <TextBlock Text="If a combo is invalid or already used by Windows or another app, the current registration issue appears here after settings are applied."
+                                       Style="{StaticResource SettingDesc}" Foreground="{DynamicResource TextMutedBrush}"
+                                       Margin="0,6,0,0" TextWrapping="Wrap"/>
                         </StackPanel>
 
                     </StackPanel>
@@ -2120,6 +2157,35 @@
                     <StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="NOTIFICATION ACCESS" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Open the Windows notification access page or retry the direct WinRT access check from inside the app."/>
+                        </Border>
+
+                        <TextBlock Text="{Binding NotificationAccessStatusSummary}" Style="{StaticResource SettingLabel}"/>
+                        <TextBlock Text="{Binding NotificationAccessStatusDetail}"
+                                   Margin="0,6,0,8"
+                                   TextWrapping="Wrap"
+                                   Style="{StaticResource SettingDesc}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+
+                        <WrapPanel Margin="0,0,0,8">
+                            <Button Content="Open Windows Notification Access" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8"
+                                    Command="{Binding OpenNotificationAccessSettingsCommand}"
+                                    ToolTip="Open Windows Settings → Privacy → Notifications for Notifications Pro."/>
+                            <Button Content="Retry Access Check" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8"
+                                    Command="{Binding RetryNotificationAccessCommand}"
+                                    ToolTip="Retry the direct WinRT access check without leaving the settings window."/>
+                        </WrapPanel>
+
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,0,0,8"
+                                   Style="{StaticResource SettingDesc}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   Text="Direct WinRT access depends on Windows notification permission. If it is unavailable, Notifications Pro can still fall back to accessibility capture when possible."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
                         </Border>
 
@@ -2351,6 +2417,19 @@
                         </Grid>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="VOICE ACCESS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Notifications Pro can expose a card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications."/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Configure it in Settings → Accessibility → Microsoft Voice Access. Choose Off, Body Only, or Title + Body + Timestamp based on how much notification text you want Voice Access to reference."/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
+                                   Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
+                                   Text="Transparency: this affects the on-screen card's Windows accessibility label only. The selected text is available while the notification is visible, stays in RAM only, and is never written to disk, logged, or sent over the network."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="WHY CAN'T I CLICK NOTIFICATIONS TO OPEN APPS?" Style="{StaticResource SectionHeader}"/>
                         </Border>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
@@ -2475,6 +2554,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="No notifications captured" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
@@ -2506,9 +2586,14 @@
                             <TextBlock Grid.Row="5" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                        Text="Check the hotkey format (e.g. Ctrl+Alt+N) and ensure 'Enable Global Hotkeys' is on in Settings → Accessibility."/>
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Overlay too large on screen" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Set Settings → Accessibility → Microsoft Voice Access to Body Only or Title + Body + Timestamp if you want Voice Access to reference notification content instead of a generic card label."/>
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Overlay too large on screen" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                        Text="Use Settings → Layout to reduce width or max height. Height presets match common display resolutions."/>
                         </Grid>
@@ -2607,7 +2692,7 @@
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="0" Text="Accessibility" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Accessibility mode, persistent notifications, auto-duration, Windows accessibility integration, density presets, and global hotkeys"
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Accessibility mode, persistent notifications, auto-duration, Windows accessibility integration, Microsoft Voice Access card labels, density presets, and global hotkeys"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
@@ -2661,6 +2746,16 @@
                             <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                        Text="The app makes no network calls and includes no telemetry."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label and never stores that text to disk."/>
                         </Grid>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">

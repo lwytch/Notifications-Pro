@@ -411,8 +411,14 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Detached "Replace Mode" so it can be used globally outside of single-line structures.
 - [x] Settings information architecture pass — audit every tab, move misplaced controls into logical homes, fix the broken text-alignment path, repair the hotkey editor, and refresh in-app help/documentation to match the revised layout.
 
+### Milestone 15: Voice Access & Accessibility Hardening
+**Status: Complete**
+
+- [x] Microsoft Voice Access card labels — added an opt-in Accessibility-tab setting with Off, Body Only, and Title + Body + Timestamp modes; verified cards expose meaningful UI Automation names instead of class names; documented the privacy/accessibility implications in Help and release notes.
+- [x] Post-reorg diagnostics hardening — System tab now exposes in-app notification access recovery (open settings + retry check), and Accessibility now surfaces hotkey registration failures for invalid or already-taken combos.
+
 ## Current Focus
-All Milestone 13 and Milestone 14 items complete including nice-to-have features.
+Post-release regression checks after Milestone 15: confirm packaged install behavior and watch for follow-up feedback on settings organization/accessibility.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

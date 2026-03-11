@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 
@@ -355,6 +356,9 @@ public class OverlayViewModel : BaseViewModel
     private string _timestampColor = "#C8C8C8";
     public string TimestampColor { get => _timestampColor; set => SetProperty(ref _timestampColor, value); }
 
+    private string _voiceAccessReadMode = VoiceAccessTextFormatter.ModeOff;
+    public string VoiceAccessReadMode { get => _voiceAccessReadMode; set => SetProperty(ref _voiceAccessReadMode, value); }
+
     private bool _singleLineAutoFullWidth;
     public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set => SetProperty(ref _singleLineAutoFullWidth, value); }
 
@@ -512,7 +516,7 @@ public class OverlayViewModel : BaseViewModel
         _timestampTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
         _timestampTimer.Tick += (_, _) =>
         {
-            if (!ShowTimestamp) return;
+            if (!ShowTimestamp && !VoiceAccessTextFormatter.IncludesTimestamp(VoiceAccessReadMode)) return;
             foreach (var n in _queueManager.VisibleNotifications)
                 n.NotifyTimestampChanged();
         };
@@ -610,6 +614,7 @@ public class OverlayViewModel : BaseViewModel
         TimestampDisplayMode = string.IsNullOrWhiteSpace(s.TimestampDisplayMode) ? "Relative" : s.TimestampDisplayMode;
         TimestampFontWeight = string.IsNullOrWhiteSpace(s.TimestampFontWeight) ? "Normal" : s.TimestampFontWeight;
         TimestampColor = string.IsNullOrWhiteSpace(s.TimestampColor) ? "#C8C8C8" : s.TimestampColor;
+        VoiceAccessReadMode = VoiceAccessTextFormatter.NormalizeMode(s.VoiceAccessReadMode);
         ChromaKeyEnabled = s.ChromaKeyEnabled;
         ChromaKeyColor = s.ChromaKeyColor;
         PerAppTintEnabled = s.PerAppTintEnabled;

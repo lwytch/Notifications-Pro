@@ -48,23 +48,29 @@ public class HotkeyManager : IDisposable
         if (TryParseHotkey(hotkeyToggle, out var mod1, out var vk1))
         {
             if (!RegisterHotKey(hwnd, HOTKEY_TOGGLE_OVERLAY, mod1 | MOD_NOREPEAT, vk1))
-                errors.Add($"Toggle Overlay ({hotkeyToggle})");
+                errors.Add($"Toggle Overlay: already in use or unavailable ({hotkeyToggle})");
         }
+        else
+            errors.Add($"Toggle Overlay: invalid format ({hotkeyToggle})");
 
         if (TryParseHotkey(hotkeyDismiss, out var mod2, out var vk2))
         {
             if (!RegisterHotKey(hwnd, HOTKEY_DISMISS_ALL, mod2 | MOD_NOREPEAT, vk2))
-                errors.Add($"Dismiss All ({hotkeyDismiss})");
+                errors.Add($"Dismiss All: already in use or unavailable ({hotkeyDismiss})");
         }
+        else
+            errors.Add($"Dismiss All: invalid format ({hotkeyDismiss})");
 
         if (TryParseHotkey(hotkeyDnd, out var mod3, out var vk3))
         {
             if (!RegisterHotKey(hwnd, HOTKEY_TOGGLE_DND, mod3 | MOD_NOREPEAT, vk3))
-                errors.Add($"Toggle DND ({hotkeyDnd})");
+                errors.Add($"Toggle DND: already in use or unavailable ({hotkeyDnd})");
         }
+        else
+            errors.Add($"Toggle DND: invalid format ({hotkeyDnd})");
 
         RegistrationError = errors.Count > 0
-            ? $"Failed to register: {string.Join(", ", errors)}"
+            ? $"Hotkey issue: {string.Join("; ", errors)}"
             : null;
 
         _registered = true;

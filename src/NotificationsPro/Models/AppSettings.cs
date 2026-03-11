@@ -116,6 +116,9 @@ public class AppSettings
     public string HotkeyDismissAll { get; set; } = "Ctrl+Alt+D";
     public string HotkeyToggleDnd { get; set; } = "Ctrl+Alt+P";
 
+    // Accessibility — Voice Access card labels
+    public string VoiceAccessReadMode { get; set; } = "Off";
+
     // Accessibility — Information density
     public string DensityPreset { get; set; } = "Comfortable";
 

@@ -22,12 +22,12 @@
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <converters:AppIconConverter x:Key="AppIconConverter"/>
         <converters:TimestampTextConverter x:Key="TimestampText"/>
+        <converters:VoiceAccessAutomationNameConverter x:Key="VoiceAccessAutomationName"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- Notification card template -->
         <DataTemplate x:Key="NotificationCardTemplate">
             <Border x:Name="Card"
-                    AutomationProperties.Name="{Binding AppName, StringFormat='Notification from {0}'}"
                     Margin="{Binding DataContext.CardMargin, RelativeSource={RelativeSource AncestorType=Window}}"
                     CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
                     BorderBrush="{Binding DataContext.BorderColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
@@ -451,7 +451,26 @@
 
                 <!-- Notification items -->
                 <ItemsControl ItemsSource="{Binding NotificationsView}"
+                              AutomationProperties.Name="Visible notifications"
                               ItemTemplate="{StaticResource NotificationCardTemplate}">
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Focusable" Value="True"/>
+                            <Setter Property="AutomationProperties.Name">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource VoiceAccessAutomationName}">
+                                        <Binding Path="Title"/>
+                                        <Binding Path="Body"/>
+                                        <Binding Path="RelativeTimeText"/>
+                                        <Binding Path="ReceivedAt"/>
+                                        <Binding Path="DataContext.VoiceAccessReadMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="AutomationProperties.HelpText" Value="Notification overlay item"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
                     <ItemsControl.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>

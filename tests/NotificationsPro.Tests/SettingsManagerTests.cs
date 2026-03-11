@@ -1,4 +1,5 @@
 using System.IO;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 
@@ -53,6 +54,7 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.FontSize = 22;
         sm.Settings.FontFamily = "Consolas";
         sm.Settings.BackgroundOpacity = 0.5;
+        sm.Settings.VoiceAccessReadMode = VoiceAccessTextFormatter.ModeBodyOnly;
         sm.Save();
 
         var sm2 = CreateManager();
@@ -61,6 +63,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(22, sm2.Settings.FontSize);
         Assert.Equal("Consolas", sm2.Settings.FontFamily);
         Assert.Equal(0.5, sm2.Settings.BackgroundOpacity);
+        Assert.Equal(VoiceAccessTextFormatter.ModeBodyOnly, sm2.Settings.VoiceAccessReadMode);
     }
 
     [Fact]
@@ -136,6 +139,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(20, settings.SnapDistance);
         Assert.True(settings.OverlayVisible);
         Assert.False(settings.NotificationsPaused);
+        Assert.Equal(VoiceAccessTextFormatter.ModeOff, settings.VoiceAccessReadMode);
     }
 
     [Fact]

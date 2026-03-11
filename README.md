@@ -106,7 +106,8 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Test button** — play the current default sound immediately.
 
 ### System Integration
-- **Start with Windows** — adds/removes a registry entry under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
+- **Start with Windows** — enables/disables the packaged Windows Startup Task for Notifications Pro.
+- **Notification access recovery** — the System tab shows current capture status and includes buttons to open Windows notification access and retry the direct WinRT access check.
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
 - **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border).
 - **Settings popup mode** — settings window can float as a popup above the taskbar with optional auto-close.
@@ -117,6 +118,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
+- **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
 
@@ -149,6 +151,7 @@ Avoid distraction without missing urgent messages:
 - Use **Auto-duration** so you are never rushed to read a long notification.
 - Enable **Density: Spacious** for larger tap targets and more breathing room between elements.
 - Use **Timestamps** in DateTime mode to track when notifications arrived.
+- Use **Settings > Accessibility > Microsoft Voice Access** to expose either a generic card label, the notification body only, or the title + body + timestamp through Windows accessibility APIs.
 
 ### Monitoring & Alerts
 - Set up **Keyword highlight** for terms like `failed`, `down`, `critical`, `error`, `urgent`.
@@ -188,6 +191,7 @@ Notifications Pro is designed to avoid persisting notification content:
 - **No notification title or body is ever written to disk** — no database, no cache, no logs of notification text.
 - Notification content exists only in RAM while displayed, and is released immediately after dismissal or expiry.
 - The app makes **no network calls** and includes **no telemetry**.
+- Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label only; it does not save or transmit the text.
 
 Windows may keep notification history in the Action Center independently. The optional toast-suppression feature removes captured notifications from the Action Center; leave it off to preserve Windows default behaviour.
 
@@ -260,6 +264,11 @@ Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-t
 ### Settings
 Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview your styling without waiting for a real notification.
 
+### Microsoft Voice Access
+In **Settings > Accessibility > Microsoft Voice Access**, choose `Off`, `Body Only`, or `Title + Body + Timestamp` to control the card-level Windows UI Automation label that Microsoft Voice Access can reference for visible notifications.
+
+This is an accessibility integration, not a separate text-to-speech engine inside Notifications Pro. The selected text is only exposed while the card is on screen, stays in RAM only, and is never written to disk, logged, or sent over the network.
+
 ---
 
 ## Notification Access
@@ -270,6 +279,8 @@ On first run, Windows will prompt for notification access. If you denied it or i
 3. Enable access for **Notifications Pro**.
 
 The tray menu also has **Open Privacy > Notifications...** and **Retry Access Check** for troubleshooting.
+
+The same recovery controls now appear in **Settings > System > Notification Access**, alongside the current capture-mode status.
 
 ---
 
@@ -282,6 +293,7 @@ The tray menu also has **Open Privacy > Notifications...** and **Retry Access Ch
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
+| Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
 
 ---
 
@@ -302,6 +314,12 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.5.0
+- **Microsoft Voice Access Labels**: Added an opt-in Accessibility control with `Off`, `Body Only`, and `Title + Body + Timestamp` modes so Voice Access can target visible notification cards more naturally.
+- **Privacy Transparency Upgrade**: Expanded the Accessibility and Help text to explain exactly what Voice Access exposes, when it is exposed, and that the text remains RAM-only and never goes to disk, logs, or the network.
+- **System Recovery Controls**: Added an in-app `System > Notification Access` section that shows current capture status and provides `Open Windows Notification Access` plus `Retry Access Check` buttons.
+- **Hotkey Failure Feedback**: Accessibility now shows when a hotkey is invalid or already taken instead of failing silently.
 
 ### Release v1.1.4.5
 - **Settings IA Pass**: Reorganized the Settings tabs so controls now live in more logical places. Appearance now stays visual-only, Behavior owns card display/layout rules, Filtering owns Quiet Hours and Burst Limiting, Layout owns Fullscreen Overlay, Streaming owns Presentation Mode and app tinting, and Accessibility now owns Global Hotkeys.

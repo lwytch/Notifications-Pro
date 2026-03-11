@@ -15,7 +15,9 @@
 - Settings tab organization pass — moved misplaced controls into logical tabs so styling, behavior, filtering, layout, streaming, accessibility, and system actions are no longer split across unrelated sections
 - Text alignment now renders correctly in stacked cards, compact banners, wrapped banners, and the settings live preview
 - Global hotkey editor now exposes the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of broken non-existent bindings
+- Hotkey registration failures are now surfaced in Settings > Accessibility when a combo is invalid or already taken
 - Help tab references now match the current tab layout and control locations
+- Notification cards now expose meaningful Windows UI Automation names instead of the raw model class name
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
 - Memory leak: OverlayWindow now unsubscribes from SettingsChanged event on close (prevents GC retention)
 - Crash guard: 0-monitor fallback in popup positioning handles empty Screen.AllScreens safely
@@ -29,6 +31,8 @@
 - WinRT auto-retry — retries WinRT initialization every 60s when using accessibility fallback, auto-upgrades when access granted
 - Streaming preset button — one-click "Apply OBS Streaming Preset" enables chroma key (green), fixed window mode, and per-app tinting
 - Keyboard shortcut hints in tray menu — Show/Hide Overlay and Pause items display assigned hotkey combos when global hotkeys are enabled
+- Microsoft Voice Access card labels — opt-in Accessibility setting offers Off, Body Only, or Title + Body + Timestamp label modes for visible notifications, with privacy disclosures in the app Help
+- In-app notification access recovery — System tab now shows live capture status plus Open Windows Notification Access and Retry Access Check controls
 - **Milestone 13: High Value UX Improvements**
 - Copy All to Clipboard — right-click overlay context menu copies all visible notifications as text
 - "Settings for [app]..." — right-click card context menu opens settings Filtering tab for quick per-app configuration

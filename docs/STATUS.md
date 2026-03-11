@@ -32,7 +32,7 @@
   - Layout now owns fullscreen overlay mode alongside monitor/size controls
   - Streaming now owns presentation mode and per-app tinting
   - Accessibility now owns the real global hotkey editor
-  - System now owns toast suppression, session archive, overlay window toggles, and startup
+  - System now owns notification access recovery, toast suppression, session archive, overlay window toggles, and startup
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Settings header icon treatment simplified (no padded badge container) and app icon palette is now monochrome white/black
@@ -40,7 +40,10 @@
 - Settings control spacing refined (labels, inputs, and descriptions) to reduce cramped text/field layout
 - Section headers now render as boxed panels across tabs to improve category scanning in long scrollable pages
 - Text alignment now renders correctly in stacked cards, compact banners, wrapped banners, and the live preview card
+- Notification cards now expose meaningful UI Automation names instead of the raw `NotificationsPro.Models.NotificationItem` class name
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
+- Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
+- System tab now exposes current notification-access status plus Open Windows Notification Access and Retry Access Check controls
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
 - Per-keyword highlight colors — each keyword can have its own color with inline color picker
 - Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
@@ -132,6 +135,8 @@
   - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
   - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
   - Global hotkeys — system-wide keyboard shortcuts for show/hide overlay, dismiss all, toggle DND
+  - Microsoft Voice Access card labels — opt-in modes for Off, Body Only, or Title + Body + Timestamp via the Accessibility tab
+  - Hotkey registration diagnostics — invalid or occupied combos are surfaced directly in the Accessibility tab
   - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
   - Information density presets (Compact / Comfortable / Spacious) — one-click font/spacing bundles
   - Color-Blind Safe built-in theme (Wong palette, WCAG AA compliant)
@@ -222,7 +227,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app name headers
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 145 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 150 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -335,7 +340,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Profiles tab provides Import/Export for full settings snapshots
 - [ ] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
-- [ ] Accessibility tab appears in Settings with timing, system integration, density, and hotkey sections
+- [ ] Accessibility tab appears in Settings with timing, system integration, Microsoft Voice Access, density, and hotkey sections
 - [ ] Persistent Notifications toggle keeps cards visible until manually dismissed
 - [ ] Auto-Duration toggle extends display time for longer notifications
 - [ ] Duration slider now goes up to 120s
@@ -346,6 +351,10 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Respect Text Scaling scales overlay font sizes to match Windows text size
 - [ ] Global Hotkeys toggle + key combo fields register system-wide shortcuts
 - [ ] Ctrl+Alt+N toggles overlay visibility, Ctrl+Alt+D dismisses all, Ctrl+Alt+P toggles DND
+- [ ] Invalid or already-used hotkey combos surface an in-app registration error in Settings → Accessibility
+- [ ] Microsoft Voice Access selector offers Off, Body Only, and Title + Body + Timestamp options
+- [ ] Notification cards expose a generic UI Automation name when Voice Access is Off and content-based names when a Voice Access label mode is enabled
+- [ ] System tab shows notification access status plus Open Windows Notification Access and Retry Access Check controls
 - [ ] Compact/Comfortable/Spacious density presets adjust font sizes, padding, spacing at once
 - [ ] Color-Blind Safe theme appears in built-in theme list and passes WCAG AA
 - [ ] Focus indicators visible when tabbing through settings controls
