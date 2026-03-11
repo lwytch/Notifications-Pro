@@ -405,9 +405,13 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Fixed Settings Window squashing UI when toggling "Show Preview" by adding mathematical `SizeChanged` WPF event.
 - [x] Fixed Preview failing to shrink the window automatically when collapsed due to WPF hiding SizeChanged quirk. 
 - [x] Fixed `Undo` memory action failing to visibly update the UI by adding explicit C# reflection `OnPropertyChanged` loop for all inputs.
+- [x] Settings UI structural overhaul — migrated layout controls to "Appearance", OS controls to new "System" tab, and functional configuration to "Behavior".
+- [x] Text Alignment rendering controls (Left, Center, Right) for all Notification components.
+- [x] Single-Line Banner mode natively renders the timestamp inline.
+- [x] Detached "Replace Mode" so it can be used globally outside of single-line structures.
 
 ## Current Focus
-All Milestone 13 items complete including nice-to-have features.
+All Milestone 13 and Milestone 14 items complete including nice-to-have features.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.
