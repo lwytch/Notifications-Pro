@@ -130,18 +130,13 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private void OnPreviewExpanded(object sender, RoutedEventArgs e)
+    private void OnPreviewSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        this.Height += 120;
-    }
-
-    private void OnPreviewCollapsed(object sender, RoutedEventArgs e)
-    {
-        // Don't shrink below a reasonable minimum bound
-        if (this.Height > 600)
-        {
-            this.Height -= 120;
-        }
+        if (!this.IsLoaded) return;
+        if (!e.HeightChanged) return;
+        
+        double delta = e.NewSize.Height - e.PreviousSize.Height;
+        this.Height += delta;
     }
 
     private void OnPickColorClick(object sender, RoutedEventArgs e)

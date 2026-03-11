@@ -303,6 +303,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.3.9
+- **Window Drag Logic**: Removed the experimental Z-Index background layering on the Settings popup header. By stripping out the explicit custom cursor, native `IsEnabled="False"` cursors gracefully return so you intuitively know when Undo/Redo operations are natively unavailable without feeling your clicks are being eaten by the title bar.
+- **Dynamic Preview Sizing**: Exchanged the arbitrary 120-pixel size change for a mathematical UI container `SizeChanged` event. Toggling to show or hide the preview card now algorithmically extracts the exact pixel differential before committing the new window size, resulting in perfectly precise window scaling.
+
 ### Release v1.1.3.8
 - **Title Bar Drag Fix**: Decoupled the window dragging logic using Z-Index background layering. The empty title bar space remains fully draggable, but the interactive Header buttons (Undo, Redo, Preview, Settings Controls) now reliably process their clicks without being aggressively blocked by the dragger.
 - **Dynamic Preview Sizing**: Toggling the Live Preview card in the Settings UI now gracefully expands and collapses the physical height of the window natively, rather than squashing or overlapping the panels beneath it.
