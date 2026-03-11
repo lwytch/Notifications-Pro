@@ -833,18 +833,20 @@ public partial class OverlayWindow : Window
 
     private double ClampToWorkAreaX(double left, Rect workArea)
     {
-        var maxLeft = workArea.Right - ActualWidth;
-        if (maxLeft < workArea.Left)
-            maxLeft = workArea.Left;
-        return Math.Max(workArea.Left, Math.Min(left, maxLeft));
+        var maxLeft = workArea.Right - ActualWidth + 8;
+        var minLeft = workArea.Left - 8;
+        if (maxLeft < minLeft)
+            maxLeft = minLeft;
+        return Math.Max(minLeft, Math.Min(left, maxLeft));
     }
 
     private double ClampToWorkAreaY(double top, Rect workArea)
     {
-        var maxTop = workArea.Bottom - ActualHeight;
-        if (maxTop < workArea.Top)
-            maxTop = workArea.Top;
-        return Math.Max(workArea.Top, Math.Min(top, maxTop));
+        var maxTop = workArea.Bottom - ActualHeight + 24;
+        var minTop = workArea.Top - 8;
+        if (maxTop < minTop)
+            maxTop = minTop;
+        return Math.Max(minTop, Math.Min(top, maxTop));
     }
 
     private static Rect ToRect(Drawing.Rectangle rect)
@@ -923,8 +925,8 @@ public partial class OverlayWindow : Window
             settings.LastManualOverlayWidth = Math.Max(MinWidth, settings.OverlayWidth);
 
         var workArea = GetCurrentWorkArea();
-        var targetWidth = Math.Max(MinWidth, workArea.Width - (OverlayMargin * 2));
-        var targetLeft = workArea.Left + OverlayMargin;
+        var targetWidth = Math.Max(MinWidth, workArea.Width + 16);
+        var targetLeft = workArea.Left - 8;
 
         var widthChanged = Math.Abs(targetWidth - Width) > 0.5;
         var leftChanged = Math.Abs(targetLeft - Left) > 0.5;

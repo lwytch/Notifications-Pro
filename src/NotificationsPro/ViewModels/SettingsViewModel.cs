@@ -1478,34 +1478,35 @@ public class SettingsViewModel : BaseViewModel
         updated.MonitorIndex = SelectedMonitorIndex;
         updated.SelectedMonitorIndex = SelectedMonitorIndex;
         var workArea = GetWorkAreaForMonitor(SelectedMonitorIndex);
-        const double margin = 16;
 
+        // Calculate boundary edges safely using exact internal padding metrics.
+        // OuterContentMargin=8px on all sides, Bottom Item Margin=16px.
         var targetWidth = Math.Clamp(updated.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
         if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
-            targetWidth = Math.Clamp(workArea.Width - (margin * 2), OverlayWidthMin, OverlayWidthMax);
+            targetWidth = Math.Clamp(workArea.Width + 16, OverlayWidthMin, OverlayWidthMax);
 
         var overlayWindow = System.Windows.Application.Current.Windows.OfType<NotificationsPro.Views.OverlayWindow>().FirstOrDefault();
-        var actualHeight = overlayWindow?.ActualHeight > 0 ? overlayWindow.ActualHeight : Math.Min(360, workArea.Height - (margin * 2));
+        var actualHeight = overlayWindow?.ActualHeight > 0 ? overlayWindow.ActualHeight : Math.Min(360, workArea.Height - 16);
 
-        var targetTop = workArea.Top + margin;
-        var targetLeft = workArea.Left + margin;
+        var targetTop = workArea.Top - 8;
+        var targetLeft = workArea.Left - 8;
 
         switch (preset.Trim().ToLowerInvariant())
         {
             case "top-left":
-                targetLeft = workArea.Left + margin;
-                targetTop = workArea.Top + margin;
+                targetLeft = workArea.Left - 8;
+                targetTop = workArea.Top - 8;
                 break;
             case "top-center":
                 targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
-                targetTop = workArea.Top + margin;
+                targetTop = workArea.Top - 8;
                 break;
             case "top-right":
-                targetLeft = workArea.Right - targetWidth - margin;
-                targetTop = workArea.Top + margin;
+                targetLeft = workArea.Right - targetWidth + 8;
+                targetTop = workArea.Top - 8;
                 break;
             case "middle-left":
-                targetLeft = workArea.Left + margin;
+                targetLeft = workArea.Left - 8;
                 targetTop = workArea.Top + ((workArea.Height - actualHeight) / 2);
                 break;
             case "middle-center":
@@ -1513,32 +1514,32 @@ public class SettingsViewModel : BaseViewModel
                 targetTop = workArea.Top + ((workArea.Height - actualHeight) / 2);
                 break;
             case "middle-right":
-                targetLeft = workArea.Right - targetWidth - margin;
+                targetLeft = workArea.Right - targetWidth + 8;
                 targetTop = workArea.Top + ((workArea.Height - actualHeight) / 2);
                 break;
             case "bottom-left":
-                targetLeft = workArea.Left + margin;
-                targetTop = workArea.Bottom - actualHeight - margin;
+                targetLeft = workArea.Left - 8;
+                targetTop = workArea.Bottom - actualHeight + 24;
                 break;
             case "bottom-center":
                 targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
-                targetTop = workArea.Bottom - actualHeight - margin;
+                targetTop = workArea.Bottom - actualHeight + 24;
                 break;
             case "bottom-right":
-                targetLeft = workArea.Right - targetWidth - margin;
-                targetTop = workArea.Bottom - actualHeight - margin;
+                targetLeft = workArea.Right - targetWidth + 8;
+                targetTop = workArea.Bottom - actualHeight + 24;
                 break;
             default:
                 return;
         }
 
-        var minLeft = workArea.Left;
-        var maxLeft = workArea.Right - targetWidth;
+        var minLeft = workArea.Left - 8;
+        var maxLeft = workArea.Right - targetWidth + 8;
         if (maxLeft < minLeft)
             maxLeft = minLeft;
 
-        var minTop = workArea.Top;
-        var maxTop = workArea.Bottom - actualHeight;
+        var minTop = workArea.Top - 8;
+        var maxTop = workArea.Bottom - actualHeight + 24;
         if (maxTop < minTop)
             maxTop = minTop;
 

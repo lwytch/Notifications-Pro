@@ -400,6 +400,7 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] UI scaling fixes for textboxes, comboboxes, and position buttons.
 - [x] Keyword highlight layout realignment.
 - [x] Added GitHub link to the Help tab.
+- [x] Fixed Settings popup header buttons not receiving clicks due to title bar drag preview events.
 
 ## Current Focus
 All Milestone 13 items complete including nice-to-have features.

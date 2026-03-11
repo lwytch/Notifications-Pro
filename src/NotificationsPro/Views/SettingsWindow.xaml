@@ -124,7 +124,7 @@
 
         <!-- Header -->
         <Border Grid.Row="0" Padding="24,20" Background="Transparent" 
-                PreviewMouseLeftButtonDown="OnTitleBarMouseDown" Cursor="SizeAll">
+                MouseLeftButtonDown="OnTitleBarMouseDown" Cursor="SizeAll">
             <DockPanel LastChildFill="True">
                 <Image Source="{Binding TrayIconImage}" Width="28" Height="28"
                        Margin="0,0,12,0" VerticalAlignment="Top"/>

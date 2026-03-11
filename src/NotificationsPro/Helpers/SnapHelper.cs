@@ -15,20 +15,20 @@ public static class SnapHelper
         double snappedTop = top;
 
         // Snap left edge
-        if (Math.Abs(left - workArea.Left) <= snapDistance)
-            snappedLeft = workArea.Left;
+        if (Math.Abs(left - (workArea.Left - 8)) <= snapDistance)
+            snappedLeft = workArea.Left - 8;
 
         // Snap right edge
-        if (Math.Abs((left + width) - workArea.Right) <= snapDistance)
-            snappedLeft = workArea.Right - width;
+        if (Math.Abs((left + width) - (workArea.Right + 8)) <= snapDistance)
+            snappedLeft = workArea.Right - width + 8;
 
         // Snap top edge
-        if (Math.Abs(top - workArea.Top) <= snapDistance)
-            snappedTop = workArea.Top;
+        if (Math.Abs(top - (workArea.Top - 8)) <= snapDistance)
+            snappedTop = workArea.Top - 8;
 
         // Snap bottom edge
-        if (Math.Abs((top + height) - workArea.Bottom) <= snapDistance)
-            snappedTop = workArea.Bottom - height;
+        if (Math.Abs((top + height) - (workArea.Bottom + 24)) <= snapDistance)
+            snappedTop = workArea.Bottom - height + 24;
 
         return new Point(snappedLeft, snappedTop);
     }
