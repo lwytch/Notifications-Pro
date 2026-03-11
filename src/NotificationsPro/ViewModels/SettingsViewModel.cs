@@ -1484,7 +1484,9 @@ public class SettingsViewModel : BaseViewModel
         if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
             targetWidth = Math.Clamp(workArea.Width - (margin * 2), OverlayWidthMin, OverlayWidthMax);
 
-        var fallbackHeight = Math.Min(360, workArea.Height - (margin * 2));
+        var overlayWindow = System.Windows.Application.Current.Windows.OfType<NotificationsPro.Views.OverlayWindow>().FirstOrDefault();
+        var actualHeight = overlayWindow?.ActualHeight > 0 ? overlayWindow.ActualHeight : Math.Min(360, workArea.Height - (margin * 2));
+
         var targetTop = workArea.Top + margin;
         var targetLeft = workArea.Left + margin;
 
@@ -1504,27 +1506,27 @@ public class SettingsViewModel : BaseViewModel
                 break;
             case "middle-left":
                 targetLeft = workArea.Left + margin;
-                targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                targetTop = workArea.Top + ((workArea.Height - actualHeight) / 2);
                 break;
             case "middle-center":
                 targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
-                targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                targetTop = workArea.Top + ((workArea.Height - actualHeight) / 2);
                 break;
             case "middle-right":
                 targetLeft = workArea.Right - targetWidth - margin;
-                targetTop = workArea.Top + ((workArea.Height - fallbackHeight) / 2);
+                targetTop = workArea.Top + ((workArea.Height - actualHeight) / 2);
                 break;
             case "bottom-left":
                 targetLeft = workArea.Left + margin;
-                targetTop = workArea.Bottom - fallbackHeight - margin;
+                targetTop = workArea.Bottom - actualHeight - margin;
                 break;
             case "bottom-center":
                 targetLeft = workArea.Left + ((workArea.Width - targetWidth) / 2);
-                targetTop = workArea.Bottom - fallbackHeight - margin;
+                targetTop = workArea.Bottom - actualHeight - margin;
                 break;
             case "bottom-right":
                 targetLeft = workArea.Right - targetWidth - margin;
-                targetTop = workArea.Bottom - fallbackHeight - margin;
+                targetTop = workArea.Bottom - actualHeight - margin;
                 break;
             default:
                 return;
@@ -1536,7 +1538,7 @@ public class SettingsViewModel : BaseViewModel
             maxLeft = minLeft;
 
         var minTop = workArea.Top;
-        var maxTop = workArea.Bottom - fallbackHeight;
+        var maxTop = workArea.Bottom - actualHeight;
         if (maxTop < minTop)
             maxTop = minTop;
 
