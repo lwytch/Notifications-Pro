@@ -12,6 +12,7 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Spoken-notification pause/resume now follows the real app pause state, including tray, hotkeys, and CLI paths
 - Settings tab organization pass — moved misplaced controls into logical tabs so styling, behavior, filtering, layout, streaming, accessibility, and system actions are no longer split across unrelated sections
 - Text alignment now renders correctly in stacked cards, compact banners, wrapped banners, and the settings live preview
 - Global hotkey editor now exposes the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of broken non-existent bindings
@@ -25,6 +26,8 @@
 - Resource leak: HwndSource properly disposed in HotkeyManager.Unregister()
 
 ### Added
+- Built-in spoken notifications — Accessibility tab now includes an on/off narration toggle with Body Only vs Title + Body + Timestamp modes, installed voice selection, rate/volume controls, and an in-app Preview Voice button
+- Help/privacy disclosure for spoken notifications — Help tab and README now explain that spoken audio is audible to nearby people, stays RAM-only, and does not keep overflow text for later playback
 - **Milestone 13: Functionality & UX Improvements (Essential)**
 - About dialog in tray menu — shows version, listener mode (WinRT/Accessibility), .NET version, license, and GitHub link
 - Listener health status in tray tooltip — "Listening via WinRT/Accessibility" with paused/click-through indicators

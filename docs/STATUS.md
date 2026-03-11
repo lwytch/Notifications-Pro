@@ -43,6 +43,7 @@
 - Notification cards now expose meaningful UI Automation names instead of the raw `NotificationsPro.Models.NotificationItem` class name
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
+- Accessibility tab now includes built-in spoken notifications with on/off toggle, body-only vs full-card narration modes, installed voice selection, speed/volume controls, and a Preview Voice button
 - System tab now exposes current notification-access status plus Open Windows Notification Access and Retry Access Check controls
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
 - Per-keyword highlight colors — each keyword can have its own color with inline color picker
@@ -135,6 +136,7 @@
   - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
   - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
   - Global hotkeys — system-wide keyboard shortcuts for show/hide overlay, dismiss all, toggle DND
+  - Spoken notifications — built-in narration supports Body Only or Title + Body + Timestamp with installed voice selection, speed/volume controls, and preview playback
   - Microsoft Voice Access card labels — opt-in modes for Off, Body Only, or Title + Body + Timestamp via the Accessibility tab
   - Hotkey registration diagnostics — invalid or occupied combos are surfaced directly in the Accessibility tab
   - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
@@ -340,7 +342,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Profiles tab provides Import/Export for full settings snapshots
 - [ ] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
-- [ ] Accessibility tab appears in Settings with timing, system integration, Microsoft Voice Access, density, and hotkey sections
+- [ ] Accessibility tab appears in Settings with timing, system integration, spoken notifications, Microsoft Voice Access, density, and hotkey sections
 - [ ] Persistent Notifications toggle keeps cards visible until manually dismissed
 - [ ] Auto-Duration toggle extends display time for longer notifications
 - [ ] Duration slider now goes up to 120s
@@ -352,6 +354,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Global Hotkeys toggle + key combo fields register system-wide shortcuts
 - [ ] Ctrl+Alt+N toggles overlay visibility, Ctrl+Alt+D dismisses all, Ctrl+Alt+P toggles DND
 - [ ] Invalid or already-used hotkey combos surface an in-app registration error in Settings → Accessibility
+- [ ] Spoken notification controls allow on/off narration, body-only vs full-card speech, installed voice selection, rate/volume tuning, and Preview Voice playback
 - [ ] Microsoft Voice Access selector offers Off, Body Only, and Title + Body + Timestamp options
 - [ ] Notification cards expose a generic UI Automation name when Voice Access is Off and content-based names when a Voice Access label mode is enabled
 - [ ] System tab shows notification access status plus Open Windows Notification Access and Retry Access Check controls

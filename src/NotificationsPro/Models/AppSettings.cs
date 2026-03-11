@@ -116,6 +116,13 @@ public class AppSettings
     public string HotkeyDismissAll { get; set; } = "Ctrl+Alt+D";
     public string HotkeyToggleDnd { get; set; } = "Ctrl+Alt+P";
 
+    // Accessibility — Spoken notifications
+    public bool ReadNotificationsAloudEnabled { get; set; } = false;
+    public string ReadNotificationsAloudMode { get; set; } = "Body Only";
+    public string ReadNotificationsAloudVoiceId { get; set; } = string.Empty;
+    public double ReadNotificationsAloudRate { get; set; } = 1.0;
+    public double ReadNotificationsAloudVolume { get; set; } = 1.0;
+
     // Accessibility — Voice Access card labels
     public string VoiceAccessReadMode { get; set; } = "Off";
 

@@ -417,8 +417,13 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Microsoft Voice Access card labels — added an opt-in Accessibility-tab setting with Off, Body Only, and Title + Body + Timestamp modes; verified cards expose meaningful UI Automation names instead of class names; documented the privacy/accessibility implications in Help and release notes.
 - [x] Post-reorg diagnostics hardening — System tab now exposes in-app notification access recovery (open settings + retry check), and Accessibility now surfaces hotkey registration failures for invalid or already-taken combos.
 
+### Milestone 16: Spoken Notifications
+**Status: Complete**
+
+- [x] Built-in spoken notification reader — Accessibility tab now includes on/off narration, Body Only vs Title + Body + Timestamp modes, installed-voice selection, speed/volume controls, Preview Voice playback, and privacy disclosures that explain nearby-audio exposure plus RAM-only handling.
+
 ## Current Focus
-Post-release regression checks after Milestone 15: confirm packaged install behavior and watch for follow-up feedback on settings organization/accessibility.
+Post-release validation for spoken notifications and follow-up UX review for any stricter privacy masking options.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

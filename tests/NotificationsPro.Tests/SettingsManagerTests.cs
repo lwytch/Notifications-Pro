@@ -54,6 +54,8 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.FontSize = 22;
         sm.Settings.FontFamily = "Consolas";
         sm.Settings.BackgroundOpacity = 0.5;
+        sm.Settings.ReadNotificationsAloudEnabled = true;
+        sm.Settings.ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleBodyTimestamp;
         sm.Settings.VoiceAccessReadMode = VoiceAccessTextFormatter.ModeBodyOnly;
         sm.Save();
 
@@ -63,6 +65,8 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(22, sm2.Settings.FontSize);
         Assert.Equal("Consolas", sm2.Settings.FontFamily);
         Assert.Equal(0.5, sm2.Settings.BackgroundOpacity);
+        Assert.True(sm2.Settings.ReadNotificationsAloudEnabled);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeTitleBodyTimestamp, sm2.Settings.ReadNotificationsAloudMode);
         Assert.Equal(VoiceAccessTextFormatter.ModeBodyOnly, sm2.Settings.VoiceAccessReadMode);
     }
 
@@ -137,6 +141,11 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
+        Assert.False(settings.ReadNotificationsAloudEnabled);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeBodyOnly, settings.ReadNotificationsAloudMode);
+        Assert.Equal(string.Empty, settings.ReadNotificationsAloudVoiceId);
+        Assert.Equal(1.0, settings.ReadNotificationsAloudRate);
+        Assert.Equal(1.0, settings.ReadNotificationsAloudVolume);
         Assert.True(settings.OverlayVisible);
         Assert.False(settings.NotificationsPaused);
         Assert.Equal(VoiceAccessTextFormatter.ModeOff, settings.VoiceAccessReadMode);

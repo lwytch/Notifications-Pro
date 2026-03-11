@@ -118,6 +118,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
+- **Spoken notifications** — built-in narration can read `Body Only` or `Title + Body + Timestamp`, using any installed Windows voice with adjustable speed and volume plus a preview button.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
@@ -150,6 +151,7 @@ Avoid distraction without missing urgent messages:
 - Increase body/title font size for large monitors or vision needs.
 - Use **Auto-duration** so you are never rushed to read a long notification.
 - Enable **Density: Spacious** for larger tap targets and more breathing room between elements.
+- Turn on **Settings > Accessibility > Read Notifications Aloud** if you want Notifications Pro itself to narrate incoming notifications.
 - Use **Timestamps** in DateTime mode to track when notifications arrived.
 - Use **Settings > Accessibility > Microsoft Voice Access** to expose either a generic card label, the notification body only, or the title + body + timestamp through Windows accessibility APIs.
 
@@ -191,6 +193,7 @@ Notifications Pro is designed to avoid persisting notification content:
 - **No notification title or body is ever written to disk** — no database, no cache, no logs of notification text.
 - Notification content exists only in RAM while displayed, and is released immediately after dismissal or expiry.
 - The app makes **no network calls** and includes **no telemetry**.
+- If **Spoken Notifications** is enabled, the text is spoken through your selected Windows audio output and may be audible to people nearby. Notifications Pro still keeps that text in RAM only and never saves spoken content to disk.
 - Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label only; it does not save or transmit the text.
 
 Windows may keep notification history in the Action Center independently. The optional toast-suppression feature removes captured notifications from the Action Center; leave it off to preserve Windows default behaviour.
@@ -264,6 +267,13 @@ Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-t
 ### Settings
 Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview your styling without waiting for a real notification.
 
+### Spoken Notifications
+In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notifications Aloud** to make Notifications Pro narrate captured notifications itself.
+
+Choose `Body Only` for shorter speech or `Title + Body + Timestamp` for the full notification context. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
+
+This is the app's own text-to-speech feature. Audio plays through your default Windows output and can be heard by people nearby. Notifications Pro does not write spoken text to disk and does not keep overflow notification content for later playback.
+
 ### Microsoft Voice Access
 In **Settings > Accessibility > Microsoft Voice Access**, choose `Off`, `Body Only`, or `Title + Body + Timestamp` to control the card-level Windows UI Automation label that Microsoft Voice Access can reference for visible notifications.
 
@@ -293,6 +303,7 @@ The same recovery controls now appear in **Settings > System > Notification Acce
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
+| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device and ensure notifications are not paused. |
 | Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
 
 ---
@@ -314,6 +325,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.6.0
+- **Built-in Spoken Notifications**: Added a separate Accessibility feature that can narrate notifications aloud with `Body Only` or `Title + Body + Timestamp` modes, installed Windows voice selection, speed/volume controls, and a `Preview Voice` button.
+- **Pause-State Reliability**: Pausing notifications from the tray, hotkeys, or CLI now flows through the same settings pipeline, so spoken notifications stop and resume consistently with the rest of the app.
+- **Transparency & Help Refresh**: Expanded the Accessibility tab, Help tab, README, and privacy notes so the difference between built-in narration and Microsoft Voice Access is explicit, including nearby-audio disclosure and RAM-only handling details.
 
 ### Release v1.1.5.0
 - **Microsoft Voice Access Labels**: Added an opt-in Accessibility control with `Off`, `Body Only`, and `Title + Body + Timestamp` modes so Voice Access can target visible notification cards more naturally.

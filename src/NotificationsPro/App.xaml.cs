@@ -26,6 +26,7 @@ public partial class App : Application
 
     private NotificationListener? _notificationListener;
     private HotkeyManager? _hotkeyManager;
+    private SpokenNotificationService? _spokenNotificationService;
 
     private WinForms.ToolStripMenuItem? _showHideItem;
     private WinForms.ToolStripMenuItem? _pauseResumeItem;
@@ -113,6 +114,7 @@ public partial class App : Application
         SyncStartupRegistryState();
 
         _queueManager = new QueueManager(_settingsManager);
+        _spokenNotificationService = new SpokenNotificationService(_queueManager, _settingsManager, Dispatcher);
 
         _notificationListener = new NotificationListener(_queueManager, Dispatcher, _settingsManager);
         _notificationListener.StatusChanged += UpdateStatusItem;
@@ -922,6 +924,7 @@ public partial class App : Application
         _focusTimer?.Stop();
         if (_highContrastHandler != null)
             SystemParameters.StaticPropertyChanged -= _highContrastHandler;
+        _spokenNotificationService?.Dispose();
         _hotkeyManager?.Dispose();
         _notificationListener?.Stop();
         _settingsManager?.Save();
@@ -933,6 +936,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _spokenNotificationService?.Dispose();
         _trayIcon?.Dispose();
         base.OnExit(e);
     }

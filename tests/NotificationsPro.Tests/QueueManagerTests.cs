@@ -157,6 +157,30 @@ public class QueueManagerTests
     }
 
     [Fact]
+    public void Pause_RaisesSettingsChanged()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProQueue_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var settings = new SettingsManager(tempDir);
+            var queue = new QueueManager(settings);
+            var settingsChanged = false;
+            settings.SettingsChanged += () => settingsChanged = true;
+
+            queue.Pause();
+
+            Assert.True(settingsChanged);
+            Assert.True(settings.Settings.NotificationsPaused);
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, true); } catch { }
+        }
+    }
+
+    [Fact]
     public void ClearAll_RemovesEverything()
     {
         var queue = new QueueManager(CreateSettings());

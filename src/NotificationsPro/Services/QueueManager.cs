@@ -54,6 +54,12 @@ public class QueueManager : BaseViewModel
     /// </summary>
     public event Action<string>? NotificationAdded;
 
+    /// <summary>
+    /// Fires after a notification becomes visible in the overlay.
+    /// Used by spoken-notification features without persisting any extra content.
+    /// </summary>
+    public event Action<NotificationItem>? NotificationDisplayed;
+
     public QueueManager(SettingsManager settingsManager)
     {
         _settingsManager = settingsManager;
@@ -162,6 +168,7 @@ public class QueueManager : BaseViewModel
         }
 
         NotificationAdded?.Invoke(appName);
+        NotificationDisplayed?.Invoke(item);
     }
 
     /// <summary>
@@ -269,31 +276,47 @@ public class QueueManager : BaseViewModel
         OverflowCount = 0;
     }
 
-    public void Pause() => _settingsManager.Settings.NotificationsPaused = true;
+    public void Pause()
+    {
+        if (_settingsManager.Settings.NotificationsPaused)
+            return;
 
-    public void Resume() => _settingsManager.Settings.NotificationsPaused = false;
+        var updated = _settingsManager.Settings.Clone();
+        updated.NotificationsPaused = true;
+        _settingsManager.Apply(updated);
+    }
+
+    public void Resume()
+    {
+        if (!_settingsManager.Settings.NotificationsPaused)
+            return;
+
+        var updated = _settingsManager.Settings.Clone();
+        updated.NotificationsPaused = false;
+        _settingsManager.Apply(updated);
+    }
 
     public bool IsPaused => _settingsManager.Settings.NotificationsPaused;
 
     public void MuteApp(string appName)
     {
         if (string.IsNullOrWhiteSpace(appName)) return;
-        var list = _settingsManager.Settings.MutedApps;
-        if (!list.Contains(appName, StringComparer.OrdinalIgnoreCase))
-        {
-            list.Add(appName);
-            _settingsManager.Save();
-        }
+        if (_settingsManager.Settings.MutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase))
+            return;
+
+        var updated = _settingsManager.Settings.Clone();
+        updated.MutedApps.Add(appName);
+        _settingsManager.Apply(updated);
     }
 
     public void UnmuteApp(string appName)
     {
-        var list = _settingsManager.Settings.MutedApps;
-        var idx = list.FindIndex(a => string.Equals(a, appName, StringComparison.OrdinalIgnoreCase));
+        var updated = _settingsManager.Settings.Clone();
+        var idx = updated.MutedApps.FindIndex(a => string.Equals(a, appName, StringComparison.OrdinalIgnoreCase));
         if (idx >= 0)
         {
-            list.RemoveAt(idx);
-            _settingsManager.Save();
+            updated.MutedApps.RemoveAt(idx);
+            _settingsManager.Apply(updated);
         }
     }
 

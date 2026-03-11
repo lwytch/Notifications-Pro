@@ -1828,6 +1828,86 @@
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SPOKEN NOTIFICATIONS" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Built-in narration reads visible notifications aloud using a Windows-installed voice."/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ReadNotificationsAloudEnabled}"
+                                          ToolTip="Speak currently visible notifications aloud through your default audio device."/>
+                            <TextBlock Text="Read Notifications Aloud" Style="{StaticResource SettingLabel}"
+                                       ToolTip="When enabled, Notifications Pro narrates visible notifications with a Windows-installed voice."/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding ReadNotificationsAloudEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Spoken Content" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Choose whether narration reads just the body text or the title, body, and timestamp."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableReadNotificationsAloudModes}"
+                                      SelectedItem="{Binding ReadNotificationsAloudMode}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="Body Only keeps narration concise. Title + Body + Timestamp reads the full visible card context."/>
+
+                            <TextBlock Text="Voice" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Select which installed Windows voice should speak notifications."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableNarrationVoices}"
+                                      DisplayMemberPath="DisplayLabel"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding ReadNotificationsAloudVoiceId}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="Uses Windows-installed Microsoft-signed voices. Choose System Default to follow your current Windows voice."/>
+
+                            <TextBlock Text="Speech Rate" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Controls how quickly the spoken notification is read."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding ReadNotificationsAloudRate, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.5" Maximum="6.0"
+                                        Value="{Binding ReadNotificationsAloudRate}"
+                                        TickFrequency="0.25" IsSnapToTickEnabled="False"
+                                        ToolTip="1.0x is the normal voice speed for the selected Windows voice."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Speech Volume" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Controls the narration loudness relative to your system volume."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding ReadNotificationsAloudVolume, StringFormat='{}{0:P0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.0" Maximum="1.0"
+                                        Value="{Binding ReadNotificationsAloudVolume}"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="False"
+                                        ToolTip="100% matches the selected voice's default loudness before your system volume is applied."/>
+                            </DockPanel>
+
+                            <WrapPanel Margin="0,12,0,0">
+                                <Button Content="Preview Voice" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding TestNarrationCommand}"
+                                        Margin="0,0,8,0"
+                                        ToolTip="Speak a sample notification using the current voice, speed, volume, and spoken-content mode."/>
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,8,0,0"
+                                   Style="{StaticResource SettingDesc}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   Text="Transparency: this is built-in narration inside Notifications Pro, not Microsoft Voice Access. Audio can be heard by anyone nearby, so treat it as an accessibility/convenience feature rather than a private listening channel."/>
+
+                        <TextBlock TextWrapping="Wrap"
+                                   Margin="0,6,0,8"
+                                   Style="{StaticResource SettingDesc}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   Text="Privacy: spoken notifications come only from Notifications Pro's live in-memory queue. The app never writes spoken text to disk, never keeps overflow content for later playback, and only retains the current live cards in RAM."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="MICROSOFT VOICE ACCESS" Style="{StaticResource SectionHeader}"
                                        ToolTip="Control the card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications."/>
                         </Border>
@@ -2417,11 +2497,48 @@
                         </Grid>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SPOKEN NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Notifications Pro can narrate captured notifications directly with a Windows-installed voice. This is separate from Microsoft Voice Access and works by simply turning on Settings → Accessibility → Read Notifications Aloud."/>
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="1. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Choose Body Only if you want quick narration, or Title + Body + Timestamp if you want the full card context read aloud."/>
+                        </Grid>
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="2. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Pick any installed Windows voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification."/>
+                        </Grid>
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="3. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Narration plays through your default Windows audio output. Anyone nearby may hear it, so treat it as an audible accessibility aid rather than a private channel."/>
+                        </Grid>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
+                                   Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
+                                   Text="Privacy: spoken notifications are generated from the live in-memory queue only. Notifications Pro never saves notification text to disk, never builds an overflow speech backlog, and does not send the text over the network."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="VOICE ACCESS" Style="{StaticResource SectionHeader}"/>
                         </Border>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="Notifications Pro can expose a card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications."/>
+                                   Text="Notifications Pro can expose a card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications. This does not make the app speak on its own."/>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                    Text="Configure it in Settings → Accessibility → Microsoft Voice Access. Choose Off, Body Only, or Title + Body + Timestamp based on how much notification text you want Voice Access to reference."/>
@@ -2555,6 +2672,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="No notifications captured" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
@@ -2586,14 +2704,19 @@
                             <TextBlock Grid.Row="5" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                        Text="Check the hotkey format (e.g. Ctrl+Alt+N) and ensure 'Enable Global Hotkeys' is on in Settings → Accessibility."/>
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Notifications are not read aloud" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Set Settings → Accessibility → Microsoft Voice Access to Body Only or Title + Body + Timestamp if you want Voice Access to reference notification content instead of a generic card label."/>
-                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Overlay too large on screen" FontWeight="SemiBold"
+                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device and ensure notifications are not paused."/>
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Set Settings → Accessibility → Microsoft Voice Access to Body Only or Title + Body + Timestamp if you want Voice Access to reference notification content instead of a generic card label."/>
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Overlay too large on screen" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="8" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                        Text="Use Settings → Layout to reduce width or max height. Height presets match common display resolutions."/>
                         </Grid>
@@ -2692,7 +2815,7 @@
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="0" Text="Accessibility" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Accessibility mode, persistent notifications, auto-duration, Windows accessibility integration, Microsoft Voice Access card labels, density presets, and global hotkeys"
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Accessibility mode, persistent notifications, spoken notifications, Windows accessibility integration, Microsoft Voice Access card labels, density presets, and global hotkeys"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
@@ -2748,12 +2871,22 @@
                                        Text="The app makes no network calls and includes no telemetry."/>
                         </Grid>
 
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,4,0" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="If spoken notifications are enabled, the text is heard through your chosen audio output and may be audible to people nearby. The audio is generated from RAM-only notification text and is never saved to disk."/>
+                        </Grid>
+
                         <Grid Margin="12,0,0,12">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,4,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
                                        Text="Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label and never stores that text to disk."/>
                         </Grid>

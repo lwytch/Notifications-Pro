@@ -425,6 +425,67 @@ public class SettingsViewModel : BaseViewModel
 
     public bool HasGlobalHotkeyRegistrationError => !string.IsNullOrWhiteSpace(GlobalHotkeyRegistrationError);
 
+    // Accessibility — Spoken notifications
+    private bool _readNotificationsAloudEnabled;
+    public bool ReadNotificationsAloudEnabled { get => _readNotificationsAloudEnabled; set { if (SetProperty(ref _readNotificationsAloudEnabled, value)) QueueSave(); } }
+
+    private string _readNotificationsAloudMode = SpokenNotificationTextFormatter.ModeBodyOnly;
+    public string ReadNotificationsAloudMode
+    {
+        get => _readNotificationsAloudMode;
+        set
+        {
+            if (SetProperty(ref _readNotificationsAloudMode, NormalizeReadNotificationsAloudMode(value)))
+                QueueSave();
+        }
+    }
+
+    private string _readNotificationsAloudVoiceId = string.Empty;
+    public string ReadNotificationsAloudVoiceId
+    {
+        get => _readNotificationsAloudVoiceId;
+        set
+        {
+            if (SetProperty(ref _readNotificationsAloudVoiceId, NormalizeReadNotificationsAloudVoiceId(value)))
+                QueueSave();
+        }
+    }
+
+    private double _readNotificationsAloudRate = 1.0;
+    public double ReadNotificationsAloudRate
+    {
+        get => _readNotificationsAloudRate;
+        set
+        {
+            if (SetProperty(ref _readNotificationsAloudRate, Math.Clamp(value, 0.5, 6.0)))
+                QueueSave();
+        }
+    }
+
+    private double _readNotificationsAloudVolume = 1.0;
+    public double ReadNotificationsAloudVolume
+    {
+        get => _readNotificationsAloudVolume;
+        set
+        {
+            if (SetProperty(ref _readNotificationsAloudVolume, Math.Clamp(value, 0.0, 1.0)))
+                QueueSave();
+        }
+    }
+
+    private bool _isNarrationPreviewInProgress;
+    public bool IsNarrationPreviewInProgress
+    {
+        get => _isNarrationPreviewInProgress;
+        private set
+        {
+            if (!SetProperty(ref _isNarrationPreviewInProgress, value))
+                return;
+
+            CommandManager.InvalidateRequerySuggested();
+        }
+    }
+
     // Accessibility — Microsoft Voice Access
     private string _voiceAccessReadMode = VoiceAccessTextFormatter.ModeOff;
     public string VoiceAccessReadMode
@@ -757,6 +818,16 @@ public class SettingsViewModel : BaseViewModel
         return VoiceAccessTextFormatter.NormalizeMode(mode);
     }
 
+    private static string NormalizeReadNotificationsAloudMode(string? mode)
+    {
+        return SpokenNotificationTextFormatter.NormalizeMode(mode);
+    }
+
+    private static string NormalizeReadNotificationsAloudVoiceId(string? voiceId)
+    {
+        return string.IsNullOrWhiteSpace(voiceId) ? string.Empty : voiceId.Trim();
+    }
+
     // Settings window display mode (M9.5)
     private string _settingsDisplayMode = "Popup";
     public string SettingsDisplayMode { get => _settingsDisplayMode; set { if (SetProperty(ref _settingsDisplayMode, value)) QueueSave(); } }
@@ -876,6 +947,14 @@ public class SettingsViewModel : BaseViewModel
         VoiceAccessTextFormatter.ModeTitleBodyTimestamp
     };
 
+    public List<string> AvailableReadNotificationsAloudModes { get; } = new()
+    {
+        SpokenNotificationTextFormatter.ModeBodyOnly,
+        SpokenNotificationTextFormatter.ModeTitleBodyTimestamp
+    };
+
+    public ObservableCollection<NarrationVoiceOption> AvailableNarrationVoices { get; } = new();
+
     // Commands
     public ICommand PreviewNotificationCommand { get; }
     public ICommand ResetToDefaultsCommand { get; }
@@ -898,6 +977,7 @@ public class SettingsViewModel : BaseViewModel
     public ICommand AddPresentationAppCommand { get; }
     public ICommand RemovePresentationAppCommand { get; }
     public ICommand TestSoundCommand { get; }
+    public ICommand TestNarrationCommand { get; }
     public ICommand BrowseCustomSoundCommand { get; }
     public ICommand BrowseCustomIconCommand { get; }
     public ICommand ApplyStreamingPresetCommand { get; }
@@ -1008,6 +1088,7 @@ public class SettingsViewModel : BaseViewModel
         AddPresentationAppCommand = new RelayCommand(_ => AddPresentationApp());
         RemovePresentationAppCommand = new RelayCommand(RemovePresentationApp);
         TestSoundCommand = new RelayCommand(_ => TestSound());
+        TestNarrationCommand = new RelayCommand(_ => TestNarration(), _ => !IsNarrationPreviewInProgress);
         BrowseCustomSoundCommand = new RelayCommand(_ => BrowseCustomSound());
         BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
         ApplyStreamingPresetCommand = new RelayCommand(_ => ApplyStreamingPreset());
@@ -1168,6 +1249,11 @@ public class SettingsViewModel : BaseViewModel
         _hotkeyToggleOverlay = s.HotkeyToggleOverlay;
         _hotkeyDismissAll = s.HotkeyDismissAll;
         _hotkeyToggleDnd = s.HotkeyToggleDnd;
+        _readNotificationsAloudEnabled = s.ReadNotificationsAloudEnabled;
+        _readNotificationsAloudMode = NormalizeReadNotificationsAloudMode(s.ReadNotificationsAloudMode);
+        _readNotificationsAloudVoiceId = NormalizeReadNotificationsAloudVoiceId(s.ReadNotificationsAloudVoiceId);
+        _readNotificationsAloudRate = Math.Clamp(s.ReadNotificationsAloudRate, 0.5, 6.0);
+        _readNotificationsAloudVolume = Math.Clamp(s.ReadNotificationsAloudVolume, 0.0, 1.0);
         _voiceAccessReadMode = NormalizeVoiceAccessReadMode(s.VoiceAccessReadMode);
         _densityPreset = s.DensityPreset;
         _chromaKeyEnabled = s.ChromaKeyEnabled;
@@ -1230,6 +1316,7 @@ public class SettingsViewModel : BaseViewModel
         PresentationApps.Clear();
         foreach (var app in s.PresentationApps) PresentationApps.Add(app);
         RefreshMutedAppEntries();
+        RefreshNarrationVoices();
 
         _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
         _overlayMaxHeight = Math.Clamp(s.OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax);
@@ -1489,6 +1576,11 @@ public class SettingsViewModel : BaseViewModel
             HotkeyToggleOverlay = HotkeyToggleOverlay,
             HotkeyDismissAll = HotkeyDismissAll,
             HotkeyToggleDnd = HotkeyToggleDnd,
+            ReadNotificationsAloudEnabled = ReadNotificationsAloudEnabled,
+            ReadNotificationsAloudMode = NormalizeReadNotificationsAloudMode(ReadNotificationsAloudMode),
+            ReadNotificationsAloudVoiceId = NormalizeReadNotificationsAloudVoiceId(ReadNotificationsAloudVoiceId),
+            ReadNotificationsAloudRate = ReadNotificationsAloudRate,
+            ReadNotificationsAloudVolume = ReadNotificationsAloudVolume,
             VoiceAccessReadMode = NormalizeVoiceAccessReadMode(VoiceAccessReadMode),
             DensityPreset = DensityPreset,
             OverlayWidth = resolvedOverlayWidth,
@@ -1947,6 +2039,20 @@ public class SettingsViewModel : BaseViewModel
         OnPropertyChanged(nameof(SelectedWindowsSound));
     }
 
+    private void RefreshNarrationVoices()
+    {
+        AvailableNarrationVoices.Clear();
+        foreach (var voice in SpokenNotificationService.GetInstalledVoices())
+            AvailableNarrationVoices.Add(voice);
+
+        if (!string.IsNullOrWhiteSpace(_readNotificationsAloudVoiceId)
+            && !AvailableNarrationVoices.Any(voice => string.Equals(voice.Id, _readNotificationsAloudVoiceId, StringComparison.Ordinal)))
+        {
+            _readNotificationsAloudVoiceId = string.Empty;
+            OnPropertyChanged(nameof(ReadNotificationsAloudVoiceId));
+        }
+    }
+
     private void ExportSettings()
     {
         _saveDebounce.Stop();
@@ -2095,6 +2201,33 @@ public class SettingsViewModel : BaseViewModel
         _saveDebounce.Stop();
         SaveSettings();
         Services.SoundService.PlaySound("__test__", _settingsManager.Settings);
+    }
+
+    private async void TestNarration()
+    {
+        if (IsNarrationPreviewInProgress)
+            return;
+
+        _saveDebounce.Stop();
+        SaveSettings();
+        IsNarrationPreviewInProgress = true;
+
+        try
+        {
+            await SpokenNotificationService.PlayPreviewAsync(_settingsManager.Settings);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(
+                $"Could not play the narration preview.\n\n{ex.Message}",
+                "Spoken Notifications",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsNarrationPreviewInProgress = false;
+        }
     }
 
     private void BrowseCustomSound()
