@@ -278,12 +278,38 @@ public partial class SettingsWindow : Window
         for (var i = 0; i < MainTabControl.Items.Count; i++)
         {
             if (MainTabControl.Items[i] is System.Windows.Controls.TabItem tab
-                && string.Equals(tab.Header?.ToString(), tabHeader, StringComparison.OrdinalIgnoreCase))
+                && string.Equals(GetTabHeaderText(tab.Header), tabHeader, StringComparison.OrdinalIgnoreCase))
             {
                 MainTabControl.SelectedIndex = i;
                 return;
             }
         }
+    }
+
+    private static string? GetTabHeaderText(object? header)
+    {
+        switch (header)
+        {
+            case string text:
+                return text;
+
+            case System.Windows.Controls.TextBlock textBlock:
+                return textBlock.Text;
+
+            case System.Windows.Controls.ContentControl contentControl:
+                return GetTabHeaderText(contentControl.Content);
+
+            case System.Windows.Controls.Panel panel:
+                foreach (var child in panel.Children)
+                {
+                    var text = GetTabHeaderText(child);
+                    if (!string.IsNullOrWhiteSpace(text))
+                        return text;
+                }
+                break;
+        }
+
+        return header?.ToString();
     }
 
     private bool IsPopupDisplayMode()

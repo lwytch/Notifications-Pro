@@ -12,6 +12,9 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Default-value drift resolved across `AppSettings`, the settings viewmodel, tests, docs, and `settings.example.json`, so first-run/reset defaults now consistently use 40 visible notifications and 1200ms animation speed
+- Overflow summary semantics corrected so skipped notifications are reported honestly as `not shown` instead of behaving like a hidden expandable queue
+- Settings-window programmatic tab navigation now resolves the real tab labels again after the left-nav header rework
 - Spoken-content fallback now uses the available title/body text if a notification is missing the exact field combination you selected
 - Spoken-notification pause/resume now follows the real app pause state, including tray, hotkeys, and CLI paths
 - Live notification recovery now has a manual capture-mode override and automatically drops back to accessibility capture if WinRT seed/poll fails at runtime
@@ -31,6 +34,8 @@
 - Resource leak: HwndSource properly disposed in HotkeyManager.Unregister()
 
 ### Added
+- App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls
+- Overflow badge recovery affordance — clicking the `+N not shown` summary now offers to raise the visible-notification limit for future cards, while clearly disclosing that skipped content was not retained
 - Expanded spoken notification combinations — Added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp to the Accessibility narration selector
 - Per-app spoken notification controls — Accessibility now lets you keep per-app `Read aloud` checkboxes on/off so narration can stay on globally without reading every source aloud
 - Built-in spoken notifications — Accessibility tab now includes an on/off narration toggle with Body Only vs Title + Body + Timestamp modes, installed voice selection, rate/volume controls, and an in-app Preview Voice button

@@ -21,7 +21,7 @@ public class M95Tests
         Assert.Equal("None", s.DefaultSound);
         Assert.NotNull(s.PerAppSounds);
         Assert.Empty(s.PerAppSounds);
-        Assert.Equal(20, s.MaxVisibleNotifications);
+        Assert.Equal(40, s.MaxVisibleNotifications);
         Assert.False(s.SuppressToastPopups);
         Assert.Equal("Popup", s.SettingsDisplayMode);
         Assert.False(s.PopupAutoClose);
@@ -38,6 +38,8 @@ public class M95Tests
         Assert.False(s.FullscreenOverlayMode);
         Assert.Equal(0.5, s.FullscreenOverlayOpacity);
         Assert.False(s.AccessibilityModeEnabled);
+        Assert.Equal("Framed Group", s.AppGroupingStyle);
+        Assert.True(s.ShowAppGroupCounts);
     }
 
     // ---- Clone / deep-copy ----

@@ -19,7 +19,7 @@ App.xaml.cs (Entry Point)
 ├── OverlayWindow            Transparent overlay window
 │   └── OverlayViewModel     Binds queue state + settings to overlay rendering
 └── SettingsWindow           Tabbed settings UI:
-    - Themes / Appearance / Behavior / Filtering / Position / Streaming / Accessibility / UI Styling
+    - Appearance / Behavior / Filtering / Layout / Sounds / Streaming / Accessibility / UI Styling / System / Profiles / Help
     └── SettingsViewModel    Binds settings with debounced auto-save + import/export + theme apply
 ```
 
@@ -70,7 +70,7 @@ Import/export:
 
 ## Queue Logic
 
-- Configurable max visible notifications (default 3, range 1–40) with an overflow "+N more" indicator
+- Configurable max visible notifications (default 40, range 1–40) with an overflow `+N not shown` summary
 - Overflow never stores content (count only)
 - Deduplication window is configurable; duplicate notifications within the window are suppressed
 - Filtering occurs before enqueue:

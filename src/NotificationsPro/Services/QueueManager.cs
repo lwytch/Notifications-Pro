@@ -236,9 +236,7 @@ public class QueueManager : BaseViewModel
     {
         _visibleNotifications.Remove(item);
         _expiryTimers.Remove(item);
-
-        if (OverflowCount > 0)
-            OverflowCount--;
+        ResetOverflowSummaryIfQueueCleared();
     }
 
     public void DismissNotification(NotificationItem item)
@@ -250,9 +248,7 @@ public class QueueManager : BaseViewModel
         }
 
         _visibleNotifications.Remove(item);
-
-        if (OverflowCount > 0)
-            OverflowCount--;
+        ResetOverflowSummaryIfQueueCleared();
     }
 
     public void PauseAllTimers()
@@ -424,6 +420,8 @@ public class QueueManager : BaseViewModel
 
             _visibleNotifications.RemoveAt(oldestIndex);
         }
+
+        ResetOverflowSummaryIfQueueCleared();
     }
 
     private void ReorderByConfiguredDirection()
@@ -443,5 +441,11 @@ public class QueueManager : BaseViewModel
         _visibleNotifications.Clear();
         foreach (var notification in reordered)
             _visibleNotifications.Add(notification);
+    }
+
+    private void ResetOverflowSummaryIfQueueCleared()
+    {
+        if (_visibleNotifications.Count == 0 && OverflowCount > 0)
+            OverflowCount = 0;
     }
 }

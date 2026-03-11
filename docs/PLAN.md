@@ -430,8 +430,15 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Built-in spoken notification reader — Accessibility tab now includes on/off narration, Body Only vs Title + Body + Timestamp modes, installed-voice selection, speed/volume controls, Preview Voice playback, and privacy disclosures that explain nearby-audio exposure plus RAM-only handling.
 - [x] Expanded spoken content combinations — added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp modes so narration can be tuned more precisely without needing separate features.
 
+### Milestone 17: Default UX & Grouping Polish
+**Status: Complete**
+
+- [x] Default settings alignment: unify the shipped first-run/reset defaults for visible-card count, animation timing, and related docs/example files so the out-of-box experience matches the intended UX.
+- [x] Overflow affordance hardening: make the overflow badge actionable without retaining discarded notification content, and update the wording so it no longer implies hidden cards can be expanded later.
+- [x] Grouping customization pass: move information density into Appearance, keep app-grouping behavior in its logical tab, and replace the hardcoded app banner with a properly styleable grouping presentation.
+
 ## Current Focus
-Post-release validation for spoken notifications and follow-up UX review for any stricter privacy masking options.
+Post-release validation of the refreshed defaults, overflow summary, and new grouping styles, plus follow-up UX review for any stricter privacy masking options.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

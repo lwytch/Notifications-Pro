@@ -36,7 +36,7 @@ public class AppSettings
 
     // Behavior
     public double NotificationDuration { get; set; } = 5;
-    public int MaxVisibleNotifications { get; set; } = 20;
+    public int MaxVisibleNotifications { get; set; } = 40;
     public bool ShowAppName { get; set; } = true;
     public bool ShowNotificationTitle { get; set; } = true;
     public bool ShowNotificationBody { get; set; } = true;
@@ -206,6 +206,8 @@ public class AppSettings
 
     // Notification grouping (M13 nice-to-have)
     public bool GroupByApp { get; set; } = false;
+    public string AppGroupingStyle { get; set; } = "Framed Group";
+    public bool ShowAppGroupCounts { get; set; } = true;
 
     // Session archive (M13) — opt-in, RAM-only, never persisted to disk
     public bool SessionArchiveEnabled { get; set; } = false;

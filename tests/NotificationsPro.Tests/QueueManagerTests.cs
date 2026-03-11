@@ -222,6 +222,37 @@ public class QueueManagerTests
     }
 
     [Fact]
+    public void OverflowCount_RemainsUntilVisibleBatchClears()
+    {
+        var queue = new QueueManager(CreateSettings(maxVisible: 1));
+        queue.AddNotification("A", "1");
+        queue.AddNotification("B", "2");
+
+        Assert.Equal(1, queue.OverflowCount);
+
+        queue.DismissNotification(queue.VisibleNotifications[0]);
+
+        Assert.Empty(queue.VisibleNotifications);
+        Assert.Equal(0, queue.OverflowCount);
+    }
+
+    [Fact]
+    public void OverflowCount_DoesNotPretendSkippedNotificationsWillExpand()
+    {
+        var queue = new QueueManager(CreateSettings(maxVisible: 2));
+        queue.AddNotification("A", "1");
+        queue.AddNotification("B", "2");
+        queue.AddNotification("C", "3");
+
+        Assert.Equal(1, queue.OverflowCount);
+
+        queue.DismissNotification(queue.VisibleNotifications[0]);
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal(1, queue.OverflowCount);
+    }
+
+    [Fact]
     public void SettingsChange_TrimsVisibleNotificationsToNewLimit()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProQueue_" + Guid.NewGuid().ToString("N"));

@@ -300,6 +300,8 @@ public class ThemeTests : IDisposable
             TextColor = "#ABCDEF",
             CornerRadius = 99,
             MaxVisibleNotifications = 5,
+            AppGroupingStyle = "Minimal Label",
+            ShowAppGroupCounts = false,
             ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleTimestamp,
             SpokenMutedApps = new() { "Teams", "Outlook" },
             NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility,
@@ -315,6 +317,8 @@ public class ThemeTests : IDisposable
         Assert.Equal("#ABCDEF", imported.TextColor);
         Assert.Equal(99, imported.CornerRadius);
         Assert.Equal(5, imported.MaxVisibleNotifications);
+        Assert.Equal("Minimal Label", imported.AppGroupingStyle);
+        Assert.False(imported.ShowAppGroupCounts);
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleTimestamp, imported.ReadNotificationsAloudMode);
         Assert.Equal(new[] { "Teams", "Outlook" }, imported.SpokenMutedApps);
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, imported.NotificationCaptureMode);

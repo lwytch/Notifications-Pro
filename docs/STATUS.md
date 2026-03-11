@@ -69,15 +69,17 @@
 - Layout tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
 - Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen overlay controls
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
-- Visible-notification default increased to `15` (configurable 1-40)
+- Visible-notification default increased to `40` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
 - Appearance tab includes per-field typography controls (font size + weight for app name, title, body independently)
+- Appearance tab now includes density presets (Compact / Comfortable / Spacious) because they are visual layout controls rather than accessibility-only controls
 - Appearance tab includes timestamp appearance controls (display mode, size, weight, color)
 - Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
+- Appearance tab now includes grouping appearance controls (Framed Group / Header Chip / Minimal Label, plus optional group counts)
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
-- Overflow badge now inherits card theme (background color, text color, font, corner radius)
+- Overflow badge now inherits card theme (background color, text color, font, corner radius), reports `+N not shown`, and clicking it offers a privacy-safe way to raise the visible-limit setting for future cards
 - Deduplication is now configurable (on/off toggle + adjustable time window) via Behavior tab
 - QueueManager: configurable max visible count, overflow count, deduplication, expiry timers
 - SettingsManager: load/save to %AppData%\NotificationsPro\settings.json (isolated temp dirs for tests)
@@ -144,7 +146,6 @@
   - Microsoft Voice Access card labels — opt-in modes for Off, Body Only, or Title + Body + Timestamp via the Accessibility tab
   - Hotkey registration diagnostics — invalid or occupied combos are surfaced directly in the Accessibility tab
   - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
-  - Information density presets (Compact / Comfortable / Spacious) — one-click font/spacing bundles
   - Color-Blind Safe built-in theme (Wong palette, WCAG AA compliant)
   - WCAG 2.1 contrast ratio helpers (ContrastHelper + XAML converters)
   - Keyboard focus indicators on PrimaryButton, SecondaryButton, ToggleSwitch, Slider, ComboBox
@@ -230,10 +231,10 @@
   - Dyslexia-friendly font preset: bundled OpenDyslexic font with quick-select buttons in Appearance > Typography
   - Undo/redo for settings: Ctrl+Z/Ctrl+Y with 50-entry history stack, undo/redo buttons in settings header
   - Named profiles: save/load/delete named configuration profiles in Profiles tab, tray menu "Switch Profile" submenu
-  - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app name headers
+  - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 150 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 170 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration + overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and new grouping settings), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -265,7 +266,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] "Send Test Notification" shows a notification card in the overlay
 - [ ] Notification slides in from the left
 - [ ] Notification fades out after configured duration
-- [ ] Sending more than the visible limit (default 15) shows "+N more" overflow indicator
+- [ ] Sending more than the visible limit (default 40) shows a `+N not shown` overflow summary and clicking it offers to raise the limit for future notifications
 - [ ] "Visible Notifications" slider changes how many cards persist on screen
 - [ ] "Show App Name / Show Title / Show Body Text" toggles update cards immediately
 - [ ] "Limit Text Lines (Truncate)" off shows full multi-line wrapped text in stacked mode
@@ -351,7 +352,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Profiles tab provides Import/Export for full settings snapshots
 - [ ] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
-- [ ] Accessibility tab appears in Settings with timing, system integration, spoken notifications, Microsoft Voice Access, density, and hotkey sections
+- [ ] Accessibility tab appears in Settings with timing, system integration, spoken notifications, Microsoft Voice Access, and hotkey sections
 - [ ] Persistent Notifications toggle keeps cards visible until manually dismissed
 - [ ] Auto-Duration toggle extends display time for longer notifications
 - [ ] Duration slider now goes up to 120s
@@ -367,7 +368,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Microsoft Voice Access selector offers Off, Body Only, and Title + Body + Timestamp options
 - [ ] Notification cards expose a generic UI Automation name when Voice Access is Off and content-based names when a Voice Access label mode is enabled
 - [ ] System tab shows notification access status plus Open Windows Notification Access and Retry Access Check controls
-- [ ] Compact/Comfortable/Spacious density presets adjust font sizes, padding, spacing at once
+- [ ] Compact/Comfortable/Spacious density presets adjust font sizes, padding, spacing, and line limits from the Appearance tab
 - [ ] Color-Blind Safe theme appears in built-in theme list and passes WCAG AA
 - [ ] Focus indicators visible when tabbing through settings controls
 - [ ] Toggle switches have minimum 44dp hit area

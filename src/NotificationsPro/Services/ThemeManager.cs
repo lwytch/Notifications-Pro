@@ -104,7 +104,7 @@ public class ThemeManager
     /// <summary>Clamp imported settings to valid ranges to prevent corrupt/malicious values.</summary>
     private static void SanitizeImportedSettings(AppSettings s)
     {
-        s.MaxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, 100);
+        s.MaxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, 40);
         s.NotificationDuration = Math.Clamp(s.NotificationDuration, 1, 300);
         s.OverlayWidth = double.IsNaN(s.OverlayWidth) ? 340 : Math.Clamp(s.OverlayWidth, 220, 7680);
         s.OverlayMaxHeight = double.IsNaN(s.OverlayMaxHeight) ? 800 : Math.Clamp(s.OverlayMaxHeight, 200, 4320);

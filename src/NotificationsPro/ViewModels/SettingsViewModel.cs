@@ -151,7 +151,7 @@ public class SettingsViewModel : BaseViewModel
     private double _notificationDuration = 5;
     public double NotificationDuration { get => _notificationDuration; set { if (SetProperty(ref _notificationDuration, value)) QueueSave(); } }
 
-    private int _maxVisibleNotifications = 15;
+    private int _maxVisibleNotifications = 40;
     public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, Math.Max(1, value))) QueueSave(); } }
 
     private bool _showAppName = true;
@@ -231,7 +231,7 @@ public class SettingsViewModel : BaseViewModel
     private string _slideInDirection = "Left";
     public string SlideInDirection { get => _slideInDirection; set { if (SetProperty(ref _slideInDirection, value)) QueueSave(); } }
 
-    private double _animationDurationMs = 300;
+    private double _animationDurationMs = 1200;
     public double AnimationDurationMs { get => _animationDurationMs; set { if (SetProperty(ref _animationDurationMs, value)) QueueSave(); } }
 
     // Deduplication
@@ -341,6 +341,20 @@ public class SettingsViewModel : BaseViewModel
     // Notification grouping
     private bool _groupByApp;
     public bool GroupByApp { get => _groupByApp; set { if (SetProperty(ref _groupByApp, value)) QueueSave(); } }
+
+    private string _appGroupingStyle = "Framed Group";
+    public string AppGroupingStyle
+    {
+        get => _appGroupingStyle;
+        set
+        {
+            if (SetProperty(ref _appGroupingStyle, NormalizeAppGroupingStyle(value)))
+                QueueSave();
+        }
+    }
+
+    private bool _showAppGroupCounts = true;
+    public bool ShowAppGroupCounts { get => _showAppGroupCounts; set { if (SetProperty(ref _showAppGroupCounts, value)) QueueSave(); } }
 
     // Scheduling
     private bool _quietHoursEnabled;
@@ -499,9 +513,9 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    // Accessibility — Density
+    // Appearance — Density
     private string _densityPreset = "Comfortable";
-    public string DensityPreset { get => _densityPreset; set => SetProperty(ref _densityPreset, value); }
+    public string DensityPreset { get => _densityPreset; set { if (SetProperty(ref _densityPreset, value)) QueueSave(); } }
 
     private string _notificationAccessStatusSummary = "Checking Windows notification access...";
     public string NotificationAccessStatusSummary
@@ -840,6 +854,17 @@ public class SettingsViewModel : BaseViewModel
         return string.IsNullOrWhiteSpace(voiceId) ? string.Empty : voiceId.Trim();
     }
 
+    private static string NormalizeAppGroupingStyle(string? style)
+    {
+        return style switch
+        {
+            "Framed Group" => "Framed Group",
+            "Header Chip" => "Header Chip",
+            "Minimal Label" => "Minimal Label",
+            _ => "Framed Group"
+        };
+    }
+
     private static string NormalizeNotificationCaptureMode(string? mode)
     {
         return NotificationCaptureModeHelper.NormalizeMode(mode);
@@ -955,6 +980,13 @@ public class SettingsViewModel : BaseViewModel
     public List<string> AvailableTimestampDisplayModes { get; } = new()
     {
         "Relative", "Time", "DateTime"
+    };
+
+    public List<string> AvailableAppGroupingStyles { get; } = new()
+    {
+        "Framed Group",
+        "Header Chip",
+        "Minimal Label"
     };
 
     public List<string> AvailableVoiceAccessReadModes { get; } = new()
@@ -1274,6 +1306,8 @@ public class SettingsViewModel : BaseViewModel
         _dayStartTime = s.DayStartTime;
         _nightStartTime = s.NightStartTime;
         _groupByApp = s.GroupByApp;
+        _appGroupingStyle = NormalizeAppGroupingStyle(s.AppGroupingStyle);
+        _showAppGroupCounts = s.ShowAppGroupCounts;
         _quietHoursEnabled = s.QuietHoursEnabled;
         _quietHoursStart = s.QuietHoursStart;
         _quietHoursEnd = s.QuietHoursEnd;
@@ -1605,6 +1639,8 @@ public class SettingsViewModel : BaseViewModel
             DayStartTime = DayStartTime,
             NightStartTime = NightStartTime,
             GroupByApp = GroupByApp,
+            AppGroupingStyle = NormalizeAppGroupingStyle(AppGroupingStyle),
+            ShowAppGroupCounts = ShowAppGroupCounts,
             QuietHoursEnabled = QuietHoursEnabled,
             QuietHoursStart = QuietHoursStart,
             QuietHoursEnd = QuietHoursEnd,
@@ -1882,6 +1918,15 @@ public class SettingsViewModel : BaseViewModel
             return;
 
         _settingsManager.ResetToDefaults();
+        var primaryScreen = WinForms.Screen.PrimaryScreen;
+        if (primaryScreen != null)
+        {
+            _settingsManager.Settings.OverlayMaxHeight = Math.Clamp(
+                primaryScreen.WorkingArea.Height,
+                OverlayMaxHeightMin,
+                OverlayMaxHeightMax);
+            _settingsManager.Save();
+        }
         LoadFromSettings();
 
         // Notify all properties changed

@@ -501,6 +501,27 @@
                                   Margin="0,4,0,0"/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="DENSITY PRESETS" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Quickly rebalance typography and spacing. This is a visual layout control, so it lives in Appearance."/>
+                        </Border>
+
+                        <WrapPanel Margin="0,0,0,8">
+                            <Button Content="Compact" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Compact"
+                                    ToolTip="Smaller text, tighter spacing, and lower line counts so more cards fit on screen"/>
+                            <Button Content="Comfortable" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Comfortable"
+                                    ToolTip="Balanced default density for most desktop setups"/>
+                            <Button Content="Spacious" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                                    Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Spacious"
+                                    ToolTip="Larger text and looser spacing for easier reading at a distance"/>
+                        </WrapPanel>
+
+                        <TextBlock Text="{Binding DensityPreset, StringFormat='Current preset: {0}'}"
+                                   Style="{StaticResource SettingDesc}"
+                                   Margin="0,0,0,8"/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="TIMESTAMP APPEARANCE" Style="{StaticResource SectionHeader}"
                                        ToolTip="Control how timestamp text looks. Timestamp visibility is toggled in Behavior &gt; Content."/>
                         </Border>
@@ -752,6 +773,32 @@
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="GROUPING APPEARANCE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Controls how app-group headers look when Group Notifications by App is enabled in Behavior."/>
+                        </Border>
+
+                        <TextBlock Text="Grouping Style" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Choose whether grouped apps appear inside a framed section, a filled header chip, or a minimal label."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableAppGroupingStyles}"
+                                  SelectedItem="{Binding AppGroupingStyle}"
+                                  Margin="0,4,0,0"
+                                  ToolTip="Framed Group feels like a section, Header Chip is compact, and Minimal Label keeps things light."/>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowAppGroupCounts}"
+                                          ToolTip="Append the visible notification count to each group header."/>
+                            <TextBlock Text="Show Group Counts" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Adds a live count such as 'Teams (3)' to each grouped header."/>
+                        </DockPanel>
+
+                        <TextBlock Text="Grouping reuses your current Accent, Border, Title, Body, and Corner Radius settings, so you can restyle it through the normal Appearance controls instead of managing a separate color system."
+                                   Style="{StaticResource SettingDesc}"
+                                   Margin="0,0,0,8"/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="NOTIFICATION ICONS" Style="{StaticResource SectionHeader}"/>
                         </Border>
 
@@ -892,9 +939,9 @@
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding GroupByApp}"
-                                          ToolTip="Group notifications under app name headers in the overlay"/>
+                                          ToolTip="Organize visible notifications under app-name headers. Style those headers in Appearance &gt; Grouping Appearance."/>
                             <TextBlock Text="Group Notifications by App" Style="{StaticResource SettingLabel}"
-                                       ToolTip="When enabled, notifications from the same app are grouped under a shared header"/>
+                                       ToolTip="When enabled, notifications from the same app are grouped under a shared header instead of appearing as one flat list."/>
                         </DockPanel>
 
                         <DockPanel Margin="0,0,0,8" Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
@@ -994,7 +1041,7 @@
                                     ToolTip="How long each notification stays visible before fading out"/>
                         </DockPanel>
 
-                        <TextBlock Text="Visible Notifications" Style="{StaticResource SettingLabel}" ToolTip="Default is 15. Lower counts reduce noise; higher counts keep more recent context visible."/>
+                        <TextBlock Text="Visible Notifications" Style="{StaticResource SettingLabel}" ToolTip="Default is 40. Lower counts keep the overlay shorter; higher counts preserve more live context and reduce skipped notifications."/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
                                 <Run Text="{Binding MaxVisibleNotifications, StringFormat='{}{0:0}'}"/>
@@ -1004,6 +1051,9 @@
                                     TickFrequency="1" IsSnapToTickEnabled="True"
                                     ToolTip="Maximum number of notification cards shown at once"/>
                         </DockPanel>
+                        <TextBlock Text="If the overlay fills up, extra notifications are marked as 'not shown' and discarded immediately for privacy. Click that overflow badge if you want to raise the visible limit for future cards."
+                                   Style="{StaticResource SettingDesc}"
+                                   Margin="0,6,0,8"/>
 
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -1032,7 +1082,7 @@
                                   ToolTip="Which direction cards slide in from"
                                   Margin="0,4,0,0"/>
 
-                        <TextBlock Text="Animation Speed" Style="{StaticResource SettingLabel}" ToolTip="0 means instant transitions; higher values feel smoother"/>
+                        <TextBlock Text="Animation Speed" Style="{StaticResource SettingLabel}" ToolTip="Default is 1200ms. 0 means instant transitions; higher values feel smoother and make the entry animation easier to notice."/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
                                 <Run Text="{Binding AnimationDurationMs, StringFormat='{}{0:0}'}"/><Run Text="ms"/>
@@ -1040,7 +1090,7 @@
                             <Slider Style="{StaticResource SettingsSlider}"
                                     Minimum="0" Maximum="1200" Value="{Binding AnimationDurationMs}"
                                     TickFrequency="25" IsSnapToTickEnabled="True"
-                                    ToolTip="Duration of slide/fade animations in milliseconds"/>
+                                    ToolTip="Duration of slide/fade animations in milliseconds. 1200ms is the recommended default."/>
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -1969,23 +2019,6 @@
                                    Text="This is an accessibility integration, not a separate text-to-speech engine inside Notifications Pro. Off removes the rich card label, but visible text remains available to Windows accessibility tools while it is on screen."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="INFORMATION DENSITY" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Choose how much information fits on screen at once. Compact shows more notifications, Spacious is easier to read."/>
-                        </Border>
-
-                        <WrapPanel Margin="0,0,0,8">
-                            <Button Content="Compact" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Compact"
-                                    ToolTip="Smaller text, tighter spacing — fits more notifications on screen"/>
-                            <Button Content="Comfortable" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Comfortable"
-                                    ToolTip="Default balanced layout with readable sizing"/>
-                            <Button Content="Spacious" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
-                                    Command="{Binding ApplyDensityPresetCommand}" CommandParameter="Spacious"
-                                    ToolTip="Larger text, generous spacing — easier to read at a distance"/>
-                        </WrapPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"
                                        ToolTip="Keyboard shortcuts provide an accessible way to control the overlay without the mouse."/>
                         </Border>
@@ -2852,11 +2885,11 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Appearance" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Overlay themes, theme scheduling, font presets, typography, timestamp styling, colors, card shape, icons, and scrollbar styling"
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Overlay themes, theme scheduling, font presets, density presets, typography, timestamp styling, colors, card shape, grouping appearance, icons, and scrollbar styling"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Behavior" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Content visibility, replace or banner modes, stacked layout rules, timing, animations, and deduplication"
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Content visibility, replace or banner modes, stacked layout rules, app grouping behavior, timing, animations, and deduplication"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Filtering" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
@@ -2876,7 +2909,7 @@
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="0" Text="Accessibility" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Accessibility mode, persistent notifications, spoken notifications, Windows accessibility integration, Microsoft Voice Access card labels, density presets, and global hotkeys"
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="Accessibility mode, persistent notifications, spoken notifications, Windows accessibility integration, Microsoft Voice Access card labels, and global hotkeys"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>

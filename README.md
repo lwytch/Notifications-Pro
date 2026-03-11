@@ -61,7 +61,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Stacked cards** — each notification is a separate card, scrollable when many accumulate.
 - **Single-line banner mode** — all text compressed to a single line per notification, with optional wrapping and a configurable max-line count.
 - **Newest-on-top** toggle — controls whether new notifications appear at the top or bottom.
-- **Max visible** — configurable 1–40 visible cards. Additional notifications increment an overflow counter ("+N more") without storing their content.
+- **Max visible** — configurable 1–40 visible cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards.
 - **Max overlay height** — the overlay expands vertically up to this limit, then shows a scrollbar. Clamped to the active monitor work area.
 - **Width / height presets** — quick buttons for 1080p / 2K / 4K / 8K display sizes.
 
@@ -75,18 +75,20 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
 - **Background opacity** — from fully opaque to near-transparent.
 - **Card shape** — corner radius, internal padding, card gap, outer margin.
+- **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
 - **Optional border** — thin border around each card, configurable colour and thickness.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
-- **Information density presets** — Compact / Comfortable / Spacious — adjusts padding and spacing in one click.
+- **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
 
 ### Behaviour & Control
 - **Notification duration** — configurable display time in seconds; each card has its own timer.
+- **App grouping** — optional grouping by source app, with a separate appearance control so the grouping behaviour lives in `Behavior` and the styling lives in `Appearance`.
 - **Persistent notifications** — disable auto-expiry; cards stay until manually dismissed.
 - **Auto-duration** — extends display time based on notification length (configurable base seconds + seconds-per-line).
-- **Animations** — slide-in from Left / Right / Top / Bottom or fade-only, with configurable duration.
+- **Animations** — slide-in from Left / Right / Top / Bottom or fade-only, with configurable duration up to `1200ms` and that full range used as the default so the animation is actually visible out of the box.
 - **Deduplication** — suppress identical notifications within a configurable time window.
 - **Always-on-top** — toggle without restarting; also available from the tray menu.
 
@@ -342,6 +344,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.6.4
+- **Default UX Repair**: Re-aligned the shipped defaults so new installs and reset-to-default flows now consistently start with `40` visible notifications and the full `1200ms` animation timing, instead of the mixed `3` / `15` / `20` and `300ms` drift that had built up across files.
+- **Overflow Summary Fix**: The overflow badge now reports `+N not shown` instead of implying a hidden expandable queue, and clicking it offers a privacy-safe way to raise the visible limit for future notifications without retaining discarded content.
+- **Grouping & Appearance Cleanup**: `Information Density` moved into `Appearance`, grouped notifications now support `Framed Group`, `Header Chip`, and `Minimal Label` styles with optional counts, and the grouping visuals now follow the normal accent/border/corner styling instead of a hardcoded banner.
 
 ### Release v1.1.6.3
 - **Narration Replay Fix**: Visible notifications are now spoken once per card, so when a new card arrives the app no longer re-reads older cards that already finished speaking.

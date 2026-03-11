@@ -33,7 +33,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Left", sm.Settings.TextAlignment);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
-        Assert.Equal(20, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
         Assert.True(sm.Settings.ShowAppName);
         Assert.True(sm.Settings.ShowNotificationTitle);
         Assert.True(sm.Settings.ShowNotificationBody);
@@ -61,6 +61,8 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.SpokenMutedApps.Add("Teams");
         sm.Settings.VoiceAccessReadMode = VoiceAccessTextFormatter.ModeBodyOnly;
         sm.Settings.NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility;
+        sm.Settings.AppGroupingStyle = "Header Chip";
+        sm.Settings.ShowAppGroupCounts = false;
         sm.Save();
 
         var sm2 = CreateManager();
@@ -75,6 +77,8 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(new[] { "Teams" }, sm2.Settings.SpokenMutedApps);
         Assert.Equal(VoiceAccessTextFormatter.ModeBodyOnly, sm2.Settings.VoiceAccessReadMode);
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, sm2.Settings.NotificationCaptureMode);
+        Assert.Equal("Header Chip", sm2.Settings.AppGroupingStyle);
+        Assert.False(sm2.Settings.ShowAppGroupCounts);
     }
 
     [Fact]
@@ -107,7 +111,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(1, settings.BorderThickness);
         Assert.Equal("#0078D4", settings.AccentColor);
         Assert.Equal(5, settings.NotificationDuration);
-        Assert.Equal(20, settings.MaxVisibleNotifications);
+        Assert.Equal(40, settings.MaxVisibleNotifications);
         Assert.True(settings.ShowAppName);
         Assert.True(settings.ShowNotificationTitle);
         Assert.True(settings.ShowNotificationBody);
@@ -159,6 +163,8 @@ public class SettingsManagerTests : IDisposable
         Assert.False(settings.NotificationsPaused);
         Assert.Equal(VoiceAccessTextFormatter.ModeOff, settings.VoiceAccessReadMode);
         Assert.Equal(NotificationCaptureModeHelper.ModeAuto, settings.NotificationCaptureMode);
+        Assert.Equal("Framed Group", settings.AppGroupingStyle);
+        Assert.True(settings.ShowAppGroupCounts);
     }
 
     [Fact]
@@ -212,6 +218,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(14, sm.Settings.FontSize);
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
+        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
     }
 
     [Fact]

@@ -473,18 +473,92 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.GroupStyle>
                         <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <Border Padding="6,3" Margin="0,4,0,2" CornerRadius="4"
-                                            Background="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                            Opacity="0.85">
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                   FontSize="{Binding DataContext.AppNameFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                   FontWeight="SemiBold" Foreground="White"/>
-                                    </Border>
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="GroupItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GroupItem">
+                                                <Border x:Name="GroupContainer"
+                                                        Margin="0"
+                                                        Padding="10,10,10,2"
+                                                        CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        BorderBrush="{Binding DataContext.BorderColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                                        BorderThickness="1"
+                                                        Background="Transparent">
+                                                    <StackPanel>
+                                                        <StackPanel Margin="0,0,0,8">
+                                                            <Grid HorizontalAlignment="Left">
+                                                                <Border x:Name="NeutralHeaderSurface"
+                                                                        CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                        BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                                                        BorderThickness="1">
+                                                                    <Border.Background>
+                                                                        <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
+                                                                            <Binding Path="DataContext.BackgroundColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                                            <Binding Path="DataContext.BackgroundOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Background>
+                                                                </Border>
+
+                                                                <Border x:Name="AccentHeaderSurface"
+                                                                        Visibility="Collapsed"
+                                                                        CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                        Background="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                                                        BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                                                        BorderThickness="1"/>
+
+                                                                <StackPanel Orientation="Horizontal" Margin="10,6">
+                                                                    <TextBlock x:Name="GroupHeaderText"
+                                                                               Text="{Binding Name}"
+                                                                               FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               FontSize="{Binding DataContext.AppNameFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                                                                    <TextBlock x:Name="GroupHeaderCount"
+                                                                               Text="{Binding ItemCount, StringFormat='{} ({0})'}"
+                                                                               Margin="6,0,0,0"
+                                                                               FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                               Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                                                               Visibility="{Binding DataContext.ShowAppGroupCounts, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"/>
+                                                                </StackPanel>
+                                                            </Grid>
+
+                                                            <Border x:Name="GroupHeaderDivider"
+                                                                    Height="1"
+                                                                    Margin="0,6,0,0"
+                                                                    Visibility="Collapsed"
+                                                                    Background="{Binding DataContext.BorderColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"/>
+                                                        </StackPanel>
+
+                                                        <ItemsPresenter/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext.AppGroupingStyle, RelativeSource={RelativeSource AncestorType=Window}}" Value="Header Chip">
+                                                        <Setter TargetName="GroupContainer" Property="BorderThickness" Value="0"/>
+                                                        <Setter TargetName="GroupContainer" Property="Padding" Value="0"/>
+                                                        <Setter TargetName="NeutralHeaderSurface" Property="Visibility" Value="Collapsed"/>
+                                                        <Setter TargetName="AccentHeaderSurface" Property="Visibility" Value="Visible"/>
+                                                        <Setter TargetName="GroupHeaderText" Property="Foreground" Value="White"/>
+                                                        <Setter TargetName="GroupHeaderCount" Property="Foreground" Value="White"/>
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding DataContext.AppGroupingStyle, RelativeSource={RelativeSource AncestorType=Window}}" Value="Minimal Label">
+                                                        <Setter TargetName="GroupContainer" Property="BorderThickness" Value="0"/>
+                                                        <Setter TargetName="GroupContainer" Property="Padding" Value="0"/>
+                                                        <Setter TargetName="NeutralHeaderSurface" Property="Visibility" Value="Collapsed"/>
+                                                        <Setter TargetName="AccentHeaderSurface" Property="Visibility" Value="Collapsed"/>
+                                                        <Setter TargetName="GroupHeaderDivider" Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
                         </GroupStyle>
                     </ItemsControl.GroupStyle>
                 </ItemsControl>
@@ -505,7 +579,7 @@
                                FontSize="{Binding FontSize}"
                                FontFamily="{Binding FontFamily}">
                         <Run Text="+"/><Run Text="{Binding Queue.OverflowCount, Mode=OneWay}"/>
-                        <Run Text="more"/>
+                        <Run Text=" not shown"/>
                     </TextBlock>
                 </Border>
             </StackPanel>

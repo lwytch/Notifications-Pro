@@ -134,6 +134,14 @@ public partial class OverlayWindow : Window
             case WM_NCLBUTTONUP:
                 if (_ncMouseDownTracked && !_dragOccurredSinceMouseDown)
                 {
+                    if (IsOverflowBadgeHit(lParam))
+                    {
+                        HandleOverflowBadgeClick();
+                        handled = true;
+                        _ncMouseDownTracked = false;
+                        return IntPtr.Zero;
+                    }
+
                     var clickItem = FindNotificationAtScreenPoint(lParam);
                     if (clickItem != null && DataContext is OverlayViewModel clickVm)
                     {
@@ -163,6 +171,41 @@ public partial class OverlayWindow : Window
         }
 
         return IntPtr.Zero;
+    }
+
+    private void HandleOverflowBadgeClick()
+    {
+        if (DataContext is not OverlayViewModel vm || !vm.Queue.HasOverflow)
+            return;
+
+        var currentLimit = Math.Max(1, _settingsManager.Settings.MaxVisibleNotifications);
+        var suggestedLimit = Math.Min(40, currentLimit + vm.Queue.OverflowCount);
+
+        if (suggestedLimit > currentLimit)
+        {
+            var result = System.Windows.MessageBox.Show(
+                $"{vm.Queue.OverflowCount} notification(s) were not shown because the visible limit is currently {currentLimit}.\n\n" +
+                "Overflow content is discarded immediately for privacy, so it cannot be expanded later.\n\n" +
+                $"Increase the visible limit to {suggestedLimit} for future notifications?",
+                "Overflow Summary",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            var updated = _settingsManager.Settings.Clone();
+            updated.MaxVisibleNotifications = suggestedLimit;
+            _settingsManager.Apply(updated);
+            return;
+        }
+
+        System.Windows.MessageBox.Show(
+            $"{vm.Queue.OverflowCount} notification(s) were not shown while the overlay was already at its maximum visible limit of 40.\n\n" +
+            "Overflow content is discarded immediately for privacy, so it cannot be expanded later.",
+            "Overflow Summary",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -537,9 +580,7 @@ public partial class OverlayWindow : Window
 
     private NotificationItem? FindNotificationAtScreenPoint(IntPtr lParam)
     {
-        var screenX = unchecked((short)(lParam.ToInt64() & 0xFFFF));
-        var screenY = unchecked((short)((lParam.ToInt64() >> 16) & 0xFFFF));
-        var point = PointFromScreen(new System.Windows.Point(screenX, screenY));
+        var point = PointFromScreen(GetScreenPointFromLParam(lParam));
 
         var result = VisualTreeHelper.HitTest(this, point);
         if (result?.VisualHit == null) return null;
@@ -552,6 +593,25 @@ public partial class OverlayWindow : Window
             current = VisualTreeHelper.GetParent(current);
         }
         return null;
+    }
+
+    private bool IsOverflowBadgeHit(IntPtr lParam)
+    {
+        var point = PointFromScreen(GetScreenPointFromLParam(lParam));
+        var result = VisualTreeHelper.HitTest(this, point);
+        if (result?.VisualHit == null)
+            return false;
+
+        DependencyObject? current = result.VisualHit;
+        while (current != null)
+        {
+            if (current is FrameworkElement fe && (ReferenceEquals(fe, OverflowBadge) || fe.Name == "OverflowBadge"))
+                return true;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return false;
     }
 
     private void ShowCardContextMenu(IntPtr lParam)
@@ -874,6 +934,13 @@ public partial class OverlayWindow : Window
             return fallback;
 
         return (int)Math.Round(value);
+    }
+
+    private static System.Windows.Point GetScreenPointFromLParam(IntPtr lParam)
+    {
+        var screenX = unchecked((short)(lParam.ToInt64() & 0xFFFF));
+        var screenY = unchecked((short)((lParam.ToInt64() >> 16) & 0xFFFF));
+        return new System.Windows.Point(screenX, screenY);
     }
 
     private void ApplyEffectiveMaxHeight(AppSettings settings)

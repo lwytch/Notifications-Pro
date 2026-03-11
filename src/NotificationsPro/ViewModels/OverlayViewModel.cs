@@ -196,7 +196,7 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
-    private double _animationDurationMs = 300;
+    private double _animationDurationMs = 1200;
     public double AnimationDurationMs
     {
         get => _animationDurationMs;
@@ -464,6 +464,12 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
+    private string _appGroupingStyle = "Framed Group";
+    public string AppGroupingStyle { get => _appGroupingStyle; set => SetProperty(ref _appGroupingStyle, NormalizeAppGroupingStyle(value)); }
+
+    private bool _showAppGroupCounts = true;
+    public bool ShowAppGroupCounts { get => _showAppGroupCounts; set => SetProperty(ref _showAppGroupCounts, value); }
+
     private ICollectionView? _notificationsView;
     public ICollectionView NotificationsView
     {
@@ -623,6 +629,8 @@ public class OverlayViewModel : BaseViewModel
         FullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
         FullscreenOverlayColor = s.FullscreenOverlayColor;
         GroupByApp = s.GroupByApp;
+        AppGroupingStyle = s.AppGroupingStyle;
+        ShowAppGroupCounts = s.ShowAppGroupCounts;
 
         // Notify all computed properties
         OnPropertyChanged(nameof(AppNameLineHeight));
@@ -664,5 +672,16 @@ public class OverlayViewModel : BaseViewModel
         if (ms <= 0)
             return new Duration(TimeSpan.Zero);
         return new Duration(TimeSpan.FromMilliseconds(ms));
+    }
+
+    private static string NormalizeAppGroupingStyle(string? style)
+    {
+        return style switch
+        {
+            "Framed Group" => "Framed Group",
+            "Header Chip" => "Header Chip",
+            "Minimal Label" => "Minimal Label",
+            _ => "Framed Group"
+        };
     }
 }
