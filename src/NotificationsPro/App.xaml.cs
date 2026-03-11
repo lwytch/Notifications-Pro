@@ -834,7 +834,7 @@ public partial class App : Application
         if (archive.Count == 0)
         {
             System.Windows.MessageBox.Show(
-                "No archived notifications yet.\n\nEnable Session Archive in Settings > Behavior to start recording notifications in memory.",
+                "No archived notifications yet.\n\nEnable Session Archive in Settings > System to start recording notifications in memory.",
                 "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }

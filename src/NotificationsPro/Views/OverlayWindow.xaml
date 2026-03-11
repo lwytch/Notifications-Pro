@@ -95,7 +95,8 @@
                                    FontWeight="{Binding DataContext.AppNameFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
-                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.AppNameEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
@@ -127,7 +128,8 @@
                                    FontWeight="{Binding DataContext.TitleFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
-                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.TitleEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
@@ -159,7 +161,8 @@
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
-                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.BodyEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
@@ -191,6 +194,8 @@
                                    FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    Opacity="0.7"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Margin="0,4,0,0">
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource TimestampText}">
@@ -205,101 +210,73 @@
                     <!-- One-line banner mode -->
                     <Grid x:Name="SingleLineContent"
                           Visibility="{Binding DataContext.SingleLineContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
-                        <Grid x:Name="SingleLineCompactBlock"
-                              Visibility="{Binding DataContext.SingleLineCompactVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock x:Name="SingleLineApp"
-                                       Grid.Column="0"
-                                       TextWrapping="NoWrap"
-                                       TextTrimming="None"
-                                       FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontSize="{Binding DataContext.AppNameFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontWeight="{Binding DataContext.AppNameFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                       VerticalAlignment="Center">
-                                <TextBlock.Text>
-                                    <Binding Path="AppName"/>
-                                </TextBlock.Text>
-                                <TextBlock.Visibility>
-                                    <MultiBinding Converter="{StaticResource NotificationTextVisibility}">
+                        <TextBlock x:Name="SingleLineCompactBlock"
+                                   Visibility="{Binding DataContext.SingleLineCompactVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   VerticalAlignment="Center">
+                            <Run Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                <Run.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:app" Mode="OneWay">
                                         <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
                                         <Binding Path="AppName"/>
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
                                     </MultiBinding>
-                                </TextBlock.Visibility>
-                            </TextBlock>
-
-                            <TextBlock x:Name="SingleLineBody"
-                                       Grid.Column="1"
-                                       Margin="8,0,0,0"
-                                       TextWrapping="NoWrap"
-                                       TextTrimming="CharacterEllipsis"
-                                       FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       VerticalAlignment="Center">
-                                <Run Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
-                                    <Run.Text>
-                                        <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:title" Mode="OneWay">
-                                            <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                            <Binding Path="Title"/>
-                                            <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                            <Binding Path="Body"/>
+                                </Run.Text>
+                            </Run>
+                            <Run Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                <Run.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:title" Mode="OneWay">
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
+                                    </MultiBinding>
+                                </Run.Text>
+                            </Run>
+                            <Run Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
+                                <Run.Text>
+                                    <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:body" Mode="OneWay">
+                                        <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Title"/>
+                                        <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        <Binding Path="Body"/>
+                                    </MultiBinding>
+                                </Run.Text>
+                            </Run>
+                            <Run Text=" " />
+                            <InlineUIContainer BaselineAlignment="Center">
+                                <TextBlock Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                           Opacity="0.7">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource TimestampText}">
+                                            <Binding Path="RelativeTimeText"/>
+                                            <Binding Path="ReceivedAt"/>
+                                            <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
                                         </MultiBinding>
-                                    </Run.Text>
-                                </Run>
-                                <Run Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
-                                    <Run.Text>
-                                        <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:body" Mode="OneWay">
-                                            <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                            <Binding Path="Title"/>
-                                            <Binding Path="DataContext.ShowNotificationBody" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                            <Binding Path="Body"/>
-                                        </MultiBinding>
-                                    </Run.Text>
-                                </Run>
-                                <!-- Inline Timestamp -->
-                                <Run Text=" " />
-                                <InlineUIContainer BaselineAlignment="Center">
-                                    <TextBlock Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
-                                               FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                               FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                               FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                               Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                               Opacity="0.7"
-                                               Margin="0,0,0,0">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource TimestampText}">
-                                                <Binding Path="RelativeTimeText"/>
-                                                <Binding Path="ReceivedAt"/>
-                                                <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </InlineUIContainer>
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DataContext.ShowAppName, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
-                                                <Setter Property="Margin" Value="0,0,0,0"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding AppName}" Value="">
-                                                <Setter Property="Margin" Value="0,0,0,0"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </InlineUIContainer>
+                        </TextBlock>
 
                         <TextBlock x:Name="SingleLineWrappedText"
                                    Visibility="{Binding DataContext.SingleLineWrappedVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
                                    TextWrapping="Wrap"
                                    TextTrimming="None"
-                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"

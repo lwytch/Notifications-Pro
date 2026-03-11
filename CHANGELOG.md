@@ -12,6 +12,10 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Settings tab organization pass — moved misplaced controls into logical tabs so styling, behavior, filtering, layout, streaming, accessibility, and system actions are no longer split across unrelated sections
+- Text alignment now renders correctly in stacked cards, compact banners, wrapped banners, and the settings live preview
+- Global hotkey editor now exposes the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of broken non-existent bindings
+- Help tab references now match the current tab layout and control locations
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
 - Memory leak: OverlayWindow now unsubscribes from SettingsChanged event on close (prevents GC retention)
 - Crash guard: 0-monitor fallback in popup positioning handles empty Screen.AllScreens safely
@@ -28,10 +32,10 @@
 - **Milestone 13: High Value UX Improvements**
 - Copy All to Clipboard — right-click overlay context menu copies all visible notifications as text
 - "Settings for [app]..." — right-click card context menu opens settings Filtering tab for quick per-app configuration
-- Position + Size tabs consolidated into single "Layout" tab (Monitor, Quick Position, Size, Snapping, Startup)
+- Position + Size tabs consolidated into single "Layout" tab (Monitor, Quick Position, Size, Fullscreen Overlay, Snapping)
 - **Regex keyword matching** — per-keyword ".*" toggle treats the keyword as a regex pattern (supports highlight and mute keywords, with timeout protection and invalid-regex safety)
 - **Overlay search/filter** — right-click "Search..." on overlay toggles a search bar that filters visible notifications by text content (app name, title, body)
-- **Session-only notification archive** — opt-in RAM-only archive (Settings > Behavior) keeps up to 1000 notifications in memory for the current session. Never persisted to disk. "View Session Archive" available in tray menu and settings, copies to clipboard.
+- **Session-only notification archive** — opt-in RAM-only archive (Settings > System) keeps up to 1000 notifications in memory for the current session. Never persisted to disk. "View Session Archive" available in tray menu and settings, copies to clipboard.
 - 8 new unit tests: regex mute/highlight matching, invalid regex safety, session archive enable/disable/max items/RAM-only
 - Version info added to project (v1.0.0)
 - SECURITY.md — privacy guarantee, security design, threat model, vulnerability reporting instructions

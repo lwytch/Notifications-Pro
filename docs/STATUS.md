@@ -23,14 +23,24 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: ten sections (Appearance, Behavior, Filtering, Layout, Sounds, Streaming, Accessibility, UI Styling, Profiles, Help) with a Windows-style dark default theme
+- Settings window: eleven sections (Appearance, Behavior, Filtering, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
+- Settings information architecture refreshed so each tab owns a single concern:
+  - Appearance now focuses on visual styling only
+  - Behavior now holds content/display and layout-mode behavior
+  - Filtering now owns quiet hours and burst limiting
+  - Layout now owns fullscreen overlay mode alongside monitor/size controls
+  - Streaming now owns presentation mode and per-app tinting
+  - Accessibility now owns the real global hotkey editor
+  - System now owns toast suppression, session archive, overlay window toggles, and startup
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Settings header icon treatment simplified (no padded badge container) and app icon palette is now monochrome white/black
 - Windowed settings mode now applies immersive dark title-bar styling (removes the light-gray native chrome mismatch)
 - Settings control spacing refined (labels, inputs, and descriptions) to reduce cramped text/field layout
 - Section headers now render as boxed panels across tabs to improve category scanning in long scrollable pages
+- Text alignment now renders correctly in stacked cards, compact banners, wrapped banners, and the live preview card
+- Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
 - Per-keyword highlight colors — each keyword can have its own color with inline color picker
 - Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
@@ -46,10 +56,10 @@
   - stacked-order toggle (newest at top vs newest at bottom)
   - fade-only animation toggle and wider animation speed range (0-1200ms)
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
-- Position tab includes quick preset buttons for top/side placement
-- Position tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
-- Position tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
-- Size tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), and manual-resize toggle
+- Layout tab includes quick preset buttons for top/side placement
+- Layout tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
+- Layout tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
+- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen overlay controls
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
 - Visible-notification default increased to `15` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
@@ -72,7 +82,7 @@
   - Seeds existing notifications on startup (marks as seen, doesn't display old ones)
   - Trims seen ID set at 5000 to prevent unbounded growth
   - Status indicator in tray context menu with diagnostic info (captured count, system count, poll #)
-  - "Grant Notification Access" always visible in tray menu
+  - "Open Privacy > Notifications..." always visible in tray menu
   - "Retry Access Check" works even when access already granted (for troubleshooting)
 - Accessibility fallback capture path improved for Windows 11:
   - listens to a broader accessibility event range
@@ -100,7 +110,7 @@
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
-  - New Filtering tab in Settings with per-app toggles, keyword management, quiet hours, burst limit
+  - Filtering tab now includes per-app toggles, keyword management, quiet hours, burst limit, and per-app sound/icon overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
@@ -121,7 +131,7 @@
   - Respect Reduce Motion — auto-forces fade-only transitions when Windows "Reduce Motion" is active
   - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
   - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
-  - Global hotkeys — system-wide keyboard shortcuts for toggle overlay, dismiss all, toggle DND
+  - Global hotkeys — system-wide keyboard shortcuts for show/hide overlay, dismiss all, toggle DND
   - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
   - Information density presets (Compact / Comfortable / Spacious) — one-click font/spacing bundles
   - Color-Blind Safe built-in theme (Wong palette, WCAG AA compliant)
@@ -146,7 +156,7 @@
 - **System Integration & Multi-Monitor (Milestone 9)**:
   - Start with Windows toggle — adds/removes registry Run key automatically
   - Startup registry state synced on app launch for consistency
-  - Multi-monitor picker in Position tab with detected monitor list (resolution + primary label)
+  - Multi-monitor picker in Layout tab with detected monitor list (resolution + primary label)
   - Move overlay to selected monitor with one click
   - Refresh button to re-detect monitors without restarting
   - Position presets (top-left, center, etc.) target the selected monitor
@@ -158,9 +168,9 @@
   - Default presentation apps: PowerPoint, Zoom, Google Meet, Microsoft Teams (user-configurable list)
   - Per-app color tinting — subtle deterministic background tint derived from app name hash (FNV-1a, 10-color palette)
   - Per-app tint intensity slider (5%-40%)
-  - New Streaming tab in Settings window with Chroma Key, OBS Window Capture, Presentation Mode, and Per-App Tinting sections
+  - Streaming tab includes Chroma Key, OBS Window Capture, Presentation Mode, and Per-App Tinting sections
 - **Enhanced Settings, Sounds, Icons & Theming (Milestone 9.5)**:
-  - Width text input box in Position tab for precise pixel entry alongside slider
+  - Width text input box in Layout tab for precise pixel entry alongside slider
   - Accessibility master toggle — one-click enable of recommended accessibility bundle
   - Fullscreen overlay mode — fill-screen background with configurable opacity
   - Settings window dynamic theming — Windows Dark/Light, High Contrast, System, or Custom palette
@@ -175,7 +185,7 @@
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
   - Per-app sound and icon assignment UI in Filtering tab (stacked row layout to prevent label/combobox clipping)
   - Fullscreen overlay background color picker (in addition to opacity)
-  - Fullscreen overlay section moved from Behavior to Position tab for logical grouping
+  - Fullscreen overlay section now lives in Layout for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
   - Primary button text foreground now auto-selects black/white for contrast against the active accent color (improves high-contrast readability)
@@ -201,7 +211,7 @@
 - **Functionality & UX (Milestone 13 High Value)**:
   - Regex keyword matching — per-keyword ".*" toggle treats keywords as regex patterns (both highlight and mute, with timeout + invalid-regex safety)
   - Overlay search/filter reverted — ICollectionView binding caused display breakage over time. Search bar UI remains but filtering disabled pending safer implementation.
-  - Session-only notification archive — opt-in RAM-only archive (Settings > Behavior) keeps up to 1000 notifications for the current session, "View Archive" in tray menu and settings
+  - Session-only notification archive — opt-in RAM-only archive (Settings > System) keeps up to 1000 notifications for the current session, "View Archive" in tray menu and settings
   - Copy All to Clipboard, "Settings for [app]..." card action, Layout tab consolidation (completed in previous session)
 - **Functionality & UX (Milestone 13 Nice-to-Have)**:
   - CLI arguments: --pause, --resume, --theme <name>, --send-test, --hide, --show (processed after initialization)
@@ -215,11 +225,11 @@
 - 145 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration), SettingsManager (with round-trip, corruption, deep-copy), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
-- Installer/packaging (Milestone 11)
 - Toast duration alignment (using configurable duration instead)
+- Solution-level `dotnet build` against `NotificationsPro.slnx` currently fails in this environment due a solution parser error; building the app and tests by project works
 
 ## Known Issues / Troubleshooting
-- **UserNotificationListener** may report "Allowed" but not deliver notifications for unpackaged apps. Workaround: open Windows Settings > Notifications, ensure the app has access. Use "Retry Access Check" in the tray menu to restart the listener.
+- **UserNotificationListener** may report "Allowed" but not deliver notifications for unpackaged apps. Workaround: open Windows Settings > Privacy > Notifications, ensure the app has access. Use "Retry Access Check" in the tray menu to restart the listener.
 - If overlay cannot be dragged, check click-through state first. Click-through intentionally blocks mouse interaction; use tray menu item "Disable Click-Through (Allow Dragging)".
 - The tray status line shows diagnostic info (WinRT poll metrics or accessibility captured/candidate/event counters) to help debug listener visibility.
 
@@ -227,13 +237,13 @@
 
 ### Build and Run
 ```bash
-dotnet build
+dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
 ```
 
 ### Run Tests
 ```bash
-dotnet test
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 ```
 
 ### Manual Test Checklist
@@ -308,7 +318,7 @@ dotnet test
 - [ ] Timestamp style selector in Appearance > Timestamp Appearance switches between Relative, Time, and DateTime formats
 - [ ] Timestamp size slider in Appearance > Timestamp Appearance updates timestamp readability without affecting title/body sizes
 - [ ] Timestamp font-weight selector and color picker in Appearance > Timestamp Appearance update timestamp styling immediately
-- [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit sections
+- [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit, and per-app sound/icon sections
 - [ ] Muting an app from card context menu suppresses future notifications from that app
 - [ ] Unmuting an app from Filtering tab restores notifications
 - [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color
@@ -325,7 +335,7 @@ dotnet test
 - [ ] Profiles tab provides Import/Export for full settings snapshots
 - [ ] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
-- [ ] Accessibility tab appears in Settings with timing, system integration, hotkeys, and density sections
+- [ ] Accessibility tab appears in Settings with timing, system integration, density, and hotkey sections
 - [ ] Persistent Notifications toggle keeps cards visible until manually dismissed
 - [ ] Auto-Duration toggle extends display time for longer notifications
 - [ ] Duration slider now goes up to 120s
@@ -351,15 +361,15 @@ dotnet test
 - [ ] Tray menu toggle items (Pause, Always on Top, Click-Through) show checkmarks
 - [ ] Tray icon dims when notifications are paused
 - [ ] Tray icon shows red count badge when notifications are active
-- [ ] Position tab shows Monitor section with detected monitors ComboBox
+- [ ] Layout tab shows Monitor section with detected monitors ComboBox
 - [ ] Selecting a different monitor and clicking "Move" repositions the overlay on that monitor
 - [ ] "Refresh" button updates the monitor list after connecting/disconnecting a display
 - [ ] Position presets (top/middle/bottom left/center/right) target the selected monitor
-- [ ] Size tab exposes overlay width/max-height sliders, numeric width entry, and 1080p/2K/4K/8K preset buttons
+- [ ] Layout tab exposes overlay width/max-height sliders, numeric width entry, fullscreen controls, and 1080p/2K/4K/8K preset buttons
 - [ ] Start with Windows toggle adds a registry Run key for automatic startup
 - [ ] Disabling Start with Windows removes the registry Run key
 - [ ] App launches at Windows startup when the toggle is on
-- [ ] Streaming tab appears in Settings between Size and Accessibility
+- [ ] Streaming tab appears in Settings between Sounds and Accessibility
 - [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
 - [ ] In Window mode, settings title bar uses dark styling (no light-gray native caption clash)
 - [ ] Fullscreen overlay mode covers the full monitor area including taskbar region
@@ -385,5 +395,5 @@ dotnet test
 - [ ] When hotkeys are enabled, tray menu items show keyboard shortcut hints (e.g., "Show Overlay    Ctrl+Alt+N")
 
 ## Known Limitations
-- No installer — run from source or publish manually
+- Signed MSIX packaging is the supported install path; unpackaged source runs may have limited WinRT notification access
 - Unpackaged desktop apps may have limited UserNotificationListener support

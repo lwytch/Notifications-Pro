@@ -126,8 +126,8 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 ### Streaming / OBS
 Keep notifications readable on-stream without disrupting your layout:
-1. Settings > Appearance — enable **Chroma Key**, pick a key colour (Green / Blue / Magenta).
-2. Settings > Streaming — enable **OBS Fixed Window Mode**, set width and height to match your capture dimensions.
+1. Settings > Streaming — enable **Chroma Key**, pick a key colour (Green / Blue / Magenta).
+2. Settings > Streaming — enable **OBS Fixed Window Mode**, then set width and height to match your capture dimensions.
 3. In OBS, add a **Window Capture** source for the overlay, then add a **Chroma Key** filter using the matching colour.
 4. Use **Per-app icons** and **Per-app tint** so viewers can instantly identify which app each notification is from.
 
@@ -213,9 +213,9 @@ Under `%AppData%\NotificationsPro\`:
 
 ```bash
 dotnet restore
-dotnet build
+dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 ```
 
 ## Publish (self-contained)
@@ -246,7 +246,7 @@ To install it for the first time:
 ## How To Use
 
 ### Tray Icon
-Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-top, click-through, focus mode timer, quick mute, theme quick-switch, clear all, grant notification access, retry access check, settings, quit.
+Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-top, click-through, focus mode timer, quick mute, theme quick-switch, clear all, open notification-access settings, retry access check, settings, quit.
 
 ### Overlay Interaction
 | Action | Effect |
@@ -265,11 +265,11 @@ Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to
 ## Notification Access
 
 On first run, Windows will prompt for notification access. If you denied it or it was not granted:
-1. Open **Windows Settings → System → Notifications** (search "notification access" if you cannot find it).
+1. Open **Windows Settings → Privacy → Notifications** (or search for `notification access`).
 2. Find the notification listener / notification access section.
 3. Enable access for **Notifications Pro**.
 
-The tray menu also has **Grant Notification Access** and **Retry Access Check** for troubleshooting.
+The tray menu also has **Open Privacy > Notifications...** and **Retry Access Check** for troubleshooting.
 
 ---
 
@@ -278,10 +278,10 @@ The tray menu also has **Grant Notification Access** and **Retry Access Check** 
 | Symptom | Fix |
 |---------|-----|
 | No notifications captured | Verify permission, then use tray "Retry Access Check". The app falls back to accessibility capture automatically when WinRT access is unavailable. |
-| Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > Behavior. |
-| Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings. |
+| Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > System. |
+| Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
-| Overlay disappears off-screen | Use Settings > Position > Quick Position presets to move it back. |
+| Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
 
 ---
 
@@ -302,6 +302,12 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.4.5
+- **Settings IA Pass**: Reorganized the Settings tabs so controls now live in more logical places. Appearance now stays visual-only, Behavior owns card display/layout rules, Filtering owns Quiet Hours and Burst Limiting, Layout owns Fullscreen Overlay, Streaming owns Presentation Mode and app tinting, and Accessibility now owns Global Hotkeys.
+- **Text Alignment Fix**: Repaired the text-alignment pipeline so Left / Center / Right now render correctly in stacked cards, compact banner cards, wrapped banner cards, and the live preview.
+- **Hotkey Editor Repair**: Replaced the broken hotkey editor bindings with the three real shortcut fields used by the app: Show/Hide Overlay, Dismiss All, and Toggle Do Not Disturb.
+- **Help Tab Refresh**: Updated the in-app Help content so troubleshooting and tab descriptions now match the current Settings layout and controls.
 
 ### Release v1.1.4.4
 - **System Tab Missing Fix**: Restored the `System` tab to the UI layout which was fully constructed in memory but failed to render on-screen in version `1.1.4.3`. All OS-integrations are now perfectly accessible in the Settings window.

@@ -38,6 +38,9 @@ public class OverlayViewModel : BaseViewModel
     private double _lineSpacing = 1.5;
     public double LineSpacing { get => _lineSpacing; set => SetProperty(ref _lineSpacing, value); }
 
+    private string _textAlignment = "Left";
+    public string TextAlignment { get => _textAlignment; set => SetProperty(ref _textAlignment, value); }
+
     // Typography — body
     private double _fontSize = 14;
     public double FontSize { get => _fontSize; set => SetProperty(ref _fontSize, value); }
@@ -534,6 +537,7 @@ public class OverlayViewModel : BaseViewModel
         TitleFontSize = s.TitleFontSize;
         TitleFontWeight = s.TitleFontWeight;
         LineSpacing = s.LineSpacing;
+        TextAlignment = string.IsNullOrWhiteSpace(s.TextAlignment) ? "Left" : s.TextAlignment;
 
         // Apply text scaling from system if enabled
         if (s.RespectTextScaling)

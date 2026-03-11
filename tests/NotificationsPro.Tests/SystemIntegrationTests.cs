@@ -66,10 +66,10 @@ public class SystemIntegrationTests
     // --- StartupHelper ---
 
     [Fact]
-    public void StartupHelper_IsStartupEnabled_DoesNotThrow()
+    public async Task StartupHelper_IsStartupEnabled_DoesNotThrow()
     {
         // Just verify the method works without throwing
-        var result = StartupHelper.IsStartupEnabled();
+        var result = await StartupHelper.IsStartupEnabledAsync();
         Assert.IsType<bool>(result);
     }
 

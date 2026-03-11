@@ -81,7 +81,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("SemiBold", settings.AppNameFontWeight);
         Assert.Equal(16, settings.TitleFontSize);
         Assert.Equal("SemiBold", settings.TitleFontWeight);
-        Assert.Equal(12, settings.CornerRadius);
+        Assert.Equal(20, settings.CornerRadius);
         Assert.Equal(16, settings.Padding);
         Assert.Equal(8, settings.CardGap);
         Assert.Equal(4, settings.OuterMargin);

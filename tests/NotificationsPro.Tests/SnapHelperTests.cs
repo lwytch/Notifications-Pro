@@ -11,29 +11,29 @@ public class SnapHelperTests
     [Fact]
     public void SnapToEdges_SnapsToLeftEdge()
     {
-        var result = SnapHelper.SnapToEdges(15, 500, 380, 300, WorkArea, 20);
-        Assert.Equal(0, result.X);
+        var result = SnapHelper.SnapToEdges(10, 500, 380, 300, WorkArea, 20);
+        Assert.Equal(-8, result.X);
     }
 
     [Fact]
     public void SnapToEdges_SnapsToTopEdge()
     {
         var result = SnapHelper.SnapToEdges(500, 10, 380, 300, WorkArea, 20);
-        Assert.Equal(0, result.Y);
+        Assert.Equal(-8, result.Y);
     }
 
     [Fact]
     public void SnapToEdges_SnapsToRightEdge()
     {
         var result = SnapHelper.SnapToEdges(1920 - 380 - 5, 500, 380, 300, WorkArea, 20);
-        Assert.Equal(1920 - 380, result.X);
+        Assert.Equal(1920 - 380 + 8, result.X);
     }
 
     [Fact]
     public void SnapToEdges_SnapsToBottomEdge()
     {
-        var result = SnapHelper.SnapToEdges(500, 1080 - 300 - 10, 380, 300, WorkArea, 20);
-        Assert.Equal(1080 - 300, result.Y);
+        var result = SnapHelper.SnapToEdges(500, 790, 380, 300, WorkArea, 20);
+        Assert.Equal(1080 - 300 + 24, result.Y);
     }
 
     [Fact]
@@ -48,8 +48,8 @@ public class SnapHelperTests
     public void SnapToEdges_SnapsToCorner()
     {
         var result = SnapHelper.SnapToEdges(5, 8, 380, 300, WorkArea, 20);
-        Assert.Equal(0, result.X);
-        Assert.Equal(0, result.Y);
+        Assert.Equal(-8, result.X);
+        Assert.Equal(-8, result.Y);
     }
 
     [Fact]

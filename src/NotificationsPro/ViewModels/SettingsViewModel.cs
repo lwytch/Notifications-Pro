@@ -18,8 +18,8 @@ public class SettingsViewModel : BaseViewModel
     public const double OverlayMaxHeightMin = 200;
     public const double OverlayMaxHeightMax = 4320;
 
-    private readonly SettingsManager _settingsManager;
-    private readonly QueueManager _queueManager;
+    private readonly SettingsManager _settingsManager = null!;
+    private readonly QueueManager _queueManager = null!;
     private readonly DispatcherTimer _saveDebounce;
     private bool _overlayWidthDirty;
 
@@ -2225,4 +2225,3 @@ public class PerAppConfigEntry : BaseViewModel
         _onChanged = onChanged;
     }
 }
-

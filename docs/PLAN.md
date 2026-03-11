@@ -409,6 +409,7 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Text Alignment rendering controls (Left, Center, Right) for all Notification components.
 - [x] Single-Line Banner mode natively renders the timestamp inline.
 - [x] Detached "Replace Mode" so it can be used globally outside of single-line structures.
+- [x] Settings information architecture pass — audit every tab, move misplaced controls into logical homes, fix the broken text-alignment path, repair the hotkey editor, and refresh in-app help/documentation to match the revised layout.
 
 ## Current Focus
 All Milestone 13 and Milestone 14 items complete including nice-to-have features.
