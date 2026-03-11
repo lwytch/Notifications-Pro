@@ -274,6 +274,139 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                     <StackPanel>
 
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="LAYOUT &amp; CONTENT" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowAppName}"
+                                          ToolTip="Display the source app name on each card"/>
+                            <TextBlock Text="Show App Name" Style="{StaticResource SettingLabel}" ToolTip="Useful when multiple apps notify at once and you need source context quickly"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowNotificationTitle}"
+                                          ToolTip="Display the notification title line"/>
+                            <TextBlock Text="Show Title" Style="{StaticResource SettingLabel}" ToolTip="Primary headline line from each notification"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowNotificationBody}"
+                                          ToolTip="Display the notification body content"/>
+                            <TextBlock Text="Show Body Text" Style="{StaticResource SettingLabel}" ToolTip="Long-form notification content; automatically kept on if all fields are turned off"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowTimestamp}"
+                                          ToolTip="Show timestamp text on each notification card"/>
+                            <TextBlock Text="Show Timestamp" Style="{StaticResource SettingLabel}" ToolTip="Show when each notification arrived. Configure timestamp style and color in Appearance &gt; Timestamp Appearance."/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding NewestOnTop}"
+                                              ToolTip="When on, newest notifications appear first at the top. Turn off for chronological top-to-bottom flow."/>
+                                <TextBlock Text="Newest on Top" Style="{StaticResource SettingLabel}" ToolTip="Turn off to let new notifications appear underneath older ones."/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding GroupByApp}"
+                                              ToolTip="Group notifications under app name headers in the overlay"/>
+                                <TextBlock Text="Group Notifications by App" Style="{StaticResource SettingLabel}"
+                                           ToolTip="When enabled, notifications from the same app are grouped under a shared header"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding LimitTextLines}"
+                                              ToolTip="Limit text height and truncate long notifications with ellipsis"/>
+                                <TextBlock Text="Limit Text Lines (Truncate)" Style="{StaticResource SettingLabel}" ToolTip="Turn this off for full multi-line word wrap with no truncation in stacked mode"/>
+                            </DockPanel>
+
+                            <StackPanel Margin="12,0,0,0" Visibility="{Binding LimitTextLines, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="App Name Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Limit source app text height before truncation in stacked mode"/>
+                                <DockPanel Margin="0,4,0,0">
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                        <Run Text="{Binding MaxAppNameLines, StringFormat='{}{0:0}'}"/>
+                                    </TextBlock>
+                                    <Slider Style="{StaticResource SettingsSlider}"
+                                            Minimum="1" Maximum="4" Value="{Binding MaxAppNameLines}"
+                                            TickFrequency="1" IsSnapToTickEnabled="True"
+                                            ToolTip="Maximum displayed lines for app-name text in stacked mode"/>
+                                </DockPanel>
+
+                                <TextBlock Text="Title Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Keeps title cards compact while still showing key context"/>
+                                <DockPanel Margin="0,4,0,0">
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                        <Run Text="{Binding MaxTitleLines, StringFormat='{}{0:0}'}"/>
+                                    </TextBlock>
+                                    <Slider Style="{StaticResource SettingsSlider}"
+                                            Minimum="1" Maximum="6" Value="{Binding MaxTitleLines}"
+                                            TickFrequency="1" IsSnapToTickEnabled="True"
+                                            ToolTip="Maximum displayed lines for notification titles in stacked mode"/>
+                                </DockPanel>
+
+                                <TextBlock Text="Body Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Controls how much message text is shown before truncating with ellipsis"/>
+                                <DockPanel Margin="0,4,0,0">
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                        <Run Text="{Binding MaxBodyLines, StringFormat='{}{0:0}'}"/>
+                                    </TextBlock>
+                                    <Slider Style="{StaticResource SettingsSlider}"
+                                            Minimum="1" Maximum="10" Value="{Binding MaxBodyLines}"
+                                            TickFrequency="1" IsSnapToTickEnabled="True"
+                                            ToolTip="Maximum displayed lines for notification body text in stacked mode"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ReplaceMode}"
+                                          ToolTip="New notifications replace the current one instead of stacking"/>
+                            <TextBlock Text="Replace Mode" Style="{StaticResource SettingLabel}"
+                                       ToolTip="When enabled, each new notification replaces all current ones (useful for live tickers or latest-only display)"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SingleLineMode}"
+                                          ToolTip="Render each notification as a single horizontal banner line"/>
+                            <TextBlock Text="Single-Line Banner Mode" Style="{StaticResource SettingLabel}" ToolTip="Compacts notifications into one line per card. Turn off for stacked multi-line cards."/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding SingleLineMode, Converter={StaticResource BoolToVis}}">
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding SingleLineWrapText}"
+                                              ToolTip="Allow one-line banner content to wrap instead of truncating"/>
+                                <TextBlock Text="Wrap Banner Text" Style="{StaticResource SettingLabel}" ToolTip="Useful on smaller monitors: preserves content by wrapping onto additional lines."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Banner Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Lower values keep more cards visible at once; higher values show more text per card."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding SingleLineMaxLines, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="12" Value="{Binding SingleLineMaxLines}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Maximum wrapped lines per banner card in single-line mode"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding SingleLineAutoFullWidth}"
+                                              ToolTip="Automatically expand banner width to near full monitor width"/>
+                                <TextBlock Text="Auto Full-Width Banner" Style="{StaticResource SettingLabel}" ToolTip="When enabled, single-line mode spans almost the full monitor width automatically."/>
+                            </DockPanel>
+                        </StackPanel>
+
                         <!-- OVERLAY THEMES section -->
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="OVERLAY THEMES" Style="{StaticResource SectionHeader}"
@@ -921,156 +1054,6 @@
                                     ToolTip="Maximum number of notification cards shown at once"/>
                         </DockPanel>
 
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="CONTENT" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ShowAppName}"
-                                          ToolTip="Display the source app name on each card"/>
-                            <TextBlock Text="Show App Name" Style="{StaticResource SettingLabel}" ToolTip="Useful when multiple apps notify at once and you need source context quickly"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ShowNotificationTitle}"
-                                          ToolTip="Display the notification title line"/>
-                            <TextBlock Text="Show Title" Style="{StaticResource SettingLabel}" ToolTip="Primary headline line from each notification"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ShowNotificationBody}"
-                                          ToolTip="Display the notification body content"/>
-                            <TextBlock Text="Show Body Text" Style="{StaticResource SettingLabel}" ToolTip="Long-form notification content; automatically kept on if all fields are turned off"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ShowTimestamp}"
-                                          ToolTip="Show timestamp text on each notification card"/>
-                            <TextBlock Text="Show Timestamp" Style="{StaticResource SettingLabel}" ToolTip="Show when each notification arrived. Configure timestamp style and color in Appearance &gt; Timestamp Appearance."/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding IsStackedLayout, Converter={StaticResource BoolToVis}}">
-                            <DockPanel Margin="0,0,0,8">
-                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding NewestOnTop}"
-                                              ToolTip="When on, newest notifications appear first at the top. Turn off for chronological top-to-bottom flow."/>
-                                <TextBlock Text="Newest on Top" Style="{StaticResource SettingLabel}" ToolTip="Turn off to let new notifications appear underneath older ones."/>
-                            </DockPanel>
-
-                            <DockPanel Margin="0,0,0,8">
-                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding GroupByApp}"
-                                              ToolTip="Group notifications under app name headers in the overlay"/>
-                                <TextBlock Text="Group Notifications by App" Style="{StaticResource SettingLabel}"
-                                           ToolTip="When enabled, notifications from the same app are grouped under a shared header"/>
-                            </DockPanel>
-
-                            <DockPanel Margin="0,0,0,8">
-                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding LimitTextLines}"
-                                              ToolTip="Limit text height and truncate long notifications with ellipsis"/>
-                                <TextBlock Text="Limit Text Lines (Truncate)" Style="{StaticResource SettingLabel}" ToolTip="Turn this off for full multi-line word wrap with no truncation in stacked mode"/>
-                            </DockPanel>
-
-                            <StackPanel Margin="12,0,0,0" Visibility="{Binding LimitTextLines, Converter={StaticResource BoolToVis}}">
-                                <TextBlock Text="App Name Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Limit source app text height before truncation in stacked mode"/>
-                                <DockPanel Margin="0,4,0,0">
-                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                        <Run Text="{Binding MaxAppNameLines, StringFormat='{}{0:0}'}"/>
-                                    </TextBlock>
-                                    <Slider Style="{StaticResource SettingsSlider}"
-                                            Minimum="1" Maximum="4" Value="{Binding MaxAppNameLines}"
-                                            TickFrequency="1" IsSnapToTickEnabled="True"
-                                            ToolTip="Maximum displayed lines for app-name text in stacked mode"/>
-                                </DockPanel>
-
-                                <TextBlock Text="Title Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Keeps title cards compact while still showing key context"/>
-                                <DockPanel Margin="0,4,0,0">
-                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                        <Run Text="{Binding MaxTitleLines, StringFormat='{}{0:0}'}"/>
-                                    </TextBlock>
-                                    <Slider Style="{StaticResource SettingsSlider}"
-                                            Minimum="1" Maximum="6" Value="{Binding MaxTitleLines}"
-                                            TickFrequency="1" IsSnapToTickEnabled="True"
-                                            ToolTip="Maximum displayed lines for notification titles in stacked mode"/>
-                                </DockPanel>
-
-                                <TextBlock Text="Body Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Controls how much message text is shown before truncating with ellipsis"/>
-                                <DockPanel Margin="0,4,0,0">
-                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                        <Run Text="{Binding MaxBodyLines, StringFormat='{}{0:0}'}"/>
-                                    </TextBlock>
-                                    <Slider Style="{StaticResource SettingsSlider}"
-                                            Minimum="1" Maximum="10" Value="{Binding MaxBodyLines}"
-                                            TickFrequency="1" IsSnapToTickEnabled="True"
-                                            ToolTip="Maximum displayed lines for notification body text in stacked mode"/>
-                                </DockPanel>
-                            </StackPanel>
-                        </StackPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ReplaceMode}"
-                                          ToolTip="New notifications replace the current one instead of stacking"/>
-                            <TextBlock Text="Replace Mode" Style="{StaticResource SettingLabel}"
-                                       ToolTip="When enabled, each new notification replaces all current ones (useful for live tickers or latest-only display)"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding SingleLineMode}"
-                                          ToolTip="Render each notification as a single horizontal banner line"/>
-                            <TextBlock Text="Single-Line Banner Mode" Style="{StaticResource SettingLabel}" ToolTip="Compacts notifications into one line per card. Turn off for stacked multi-line cards."/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding SingleLineMode, Converter={StaticResource BoolToVis}}">
-                            <DockPanel Margin="0,0,0,8">
-                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding SingleLineWrapText}"
-                                              ToolTip="Allow one-line banner content to wrap instead of truncating"/>
-                                <TextBlock Text="Wrap Banner Text" Style="{StaticResource SettingLabel}" ToolTip="Useful on smaller monitors: preserves content by wrapping onto additional lines."/>
-                            </DockPanel>
-
-                            <TextBlock Text="Banner Max Lines" Style="{StaticResource SettingLabel}" ToolTip="Lower values keep more cards visible at once; higher values show more text per card."/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding SingleLineMaxLines, StringFormat='{}{0:0}'}"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="1" Maximum="12" Value="{Binding SingleLineMaxLines}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True"
-                                        ToolTip="Maximum wrapped lines per banner card in single-line mode"/>
-                            </DockPanel>
-
-                            <DockPanel Margin="0,0,0,8">
-                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding SingleLineAutoFullWidth}"
-                                              ToolTip="Automatically expand banner width to near full monitor width"/>
-                                <TextBlock Text="Auto Full-Width Banner" Style="{StaticResource SettingLabel}" ToolTip="When enabled, single-line mode spans almost the full monitor width automatically."/>
-                            </DockPanel>
-                        </StackPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding AlwaysOnTop}"
-                                          ToolTip="Keep the overlay above all other windows"/>
-                            <TextBlock Text="Always on Top" Style="{StaticResource SettingLabel}" ToolTip="When enabled, the overlay floats above all other windows including full-screen apps"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ClickThrough}"
-                                          ToolTip="Allow mouse clicks to pass through the overlay"/>
-                            <TextBlock Text="Click-Through Mode" Style="{StaticResource SettingLabel}" ToolTip="Mouse clicks pass through the overlay so you can interact with windows behind it. Disable to drag/resize the overlay."/>
-                        </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="ANIMATIONS" Style="{StaticResource SectionHeader}"/>
@@ -1189,35 +1172,6 @@
                                         TickFrequency="0.5" IsSnapToTickEnabled="True"
                                         ToolTip="Time window in seconds for burst detection"/>
                             </DockPanel>
-                        </StackPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Control the overlay from anywhere using system-wide keyboard shortcuts."/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding GlobalHotkeysEnabled}"
-                                          ToolTip="Register system-wide keyboard shortcuts"/>
-                            <TextBlock Text="Enable Global Hotkeys" Style="{StaticResource SettingLabel}" ToolTip="Register system-wide keyboard shortcuts to control the overlay without the mouse"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding GlobalHotkeysEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Toggle Overlay" Style="{StaticResource SettingLabel}" ToolTip="Show or hide the notification overlay"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding HotkeyToggleOverlay, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Keyboard combo to show/hide the overlay (e.g. Ctrl+Alt+N)"/>
-
-                            <TextBlock Text="Dismiss All" Style="{StaticResource SettingLabel}" ToolTip="Clear all visible notifications at once"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding HotkeyDismissAll, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Keyboard combo to clear all visible notifications (e.g. Ctrl+Alt+D)"/>
-
-                            <TextBlock Text="Toggle Do Not Disturb" Style="{StaticResource SettingLabel}" ToolTip="Pause or resume notification delivery"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding HotkeyToggleDnd, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Keyboard combo to pause/resume notifications (e.g. Ctrl+Alt+P)"/>
                         </StackPanel>
 
                     </StackPanel>
@@ -2112,6 +2066,24 @@
                                 Command="{Binding ViewSessionArchiveCommand}"
                                 Margin="0,8,0,0" HorizontalAlignment="Left"
                                 ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AlwaysOnTop}"
+                                          ToolTip="Keep the overlay above all other windows"/>
+                            <TextBlock Text="Always on Top" Style="{StaticResource SettingLabel}" ToolTip="When enabled, the overlay floats above all other windows including full-screen apps"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ClickThrough}"
+                                          ToolTip="Allow mouse clicks to pass through the overlay"/>
+                            <TextBlock Text="Click-Through Mode" Style="{StaticResource SettingLabel}" ToolTip="Mouse clicks pass through the overlay so you can interact with windows behind it. Disable to drag/resize the overlay."/>
+                        </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>

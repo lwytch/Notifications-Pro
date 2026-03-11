@@ -210,7 +210,6 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock x:Name="SingleLineApp"
@@ -262,6 +261,25 @@
                                         </MultiBinding>
                                     </Run.Text>
                                 </Run>
+                                <!-- Inline Timestamp -->
+                                <Run Text=" " />
+                                <InlineUIContainer BaselineAlignment="Center">
+                                    <TextBlock Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                               Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                               Opacity="0.7"
+                                               Margin="0,0,0,0">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource TimestampText}">
+                                                <Binding Path="RelativeTimeText"/>
+                                                <Binding Path="ReceivedAt"/>
+                                                <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </InlineUIContainer>
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
@@ -274,26 +292,6 @@
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>
-                            </TextBlock>
-
-                            <!-- Single Line Timestamp (Compact) -->
-                            <TextBlock x:Name="SingleLineTimestamp"
-                                       Grid.Column="2"
-                                       Margin="8,0,0,0"
-                                       Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                       Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                       Opacity="0.7"
-                                       VerticalAlignment="Center">
-                                <TextBlock.Text>
-                                    <MultiBinding Converter="{StaticResource TimestampText}">
-                                        <Binding Path="RelativeTimeText"/>
-                                        <Binding Path="ReceivedAt"/>
-                                        <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
                             </TextBlock>
                         </Grid>
 
@@ -344,24 +342,24 @@
                                     </MultiBinding>
                                 </Run.Text>
                             </Run>
-                        </TextBlock>
-
-                        <!-- Single Line Timestamp (Wrapped) -->
-                        <TextBlock x:Name="SingleLineWrappedTimestamp"
-                                   Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   Margin="0,4,0,0"
-                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
-                                   Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
-                                   Opacity="0.7">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource TimestampText}">
-                                    <Binding Path="RelativeTimeText"/>
-                                    <Binding Path="ReceivedAt"/>
-                                    <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
+                            <!-- Inline Timestamp -->
+                            <Run Text=" " />
+                            <InlineUIContainer BaselineAlignment="Center">
+                                <TextBlock Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                           Opacity="0.7">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource TimestampText}">
+                                            <Binding Path="RelativeTimeText"/>
+                                            <Binding Path="ReceivedAt"/>
+                                            <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </InlineUIContainer>
                         </TextBlock>
                     </Grid>
                     </Grid>
