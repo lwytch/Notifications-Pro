@@ -218,6 +218,39 @@ public partial class SettingsWindow : Window
         vm.NotifyKeywordColorChanged();
     }
 
+    private void OnPickAppProfileColorClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: string propertyName, DataContext: ViewModels.AppProfileEntry entry })
+            return;
+
+        var property = entry.GetType().GetProperty(
+            propertyName,
+            BindingFlags.Instance | BindingFlags.Public);
+        if (property == null || property.PropertyType != typeof(string))
+            return;
+
+        var currentHex = property.GetValue(entry) as string ?? "#FFFFFF";
+        var start = ParseHex(currentHex);
+
+        using var dialog = new WinForms.ColorDialog
+        {
+            FullOpen = true,
+            AnyColor = true,
+            Color = System.Drawing.Color.FromArgb(start.A, start.R, start.G, start.B)
+        };
+
+        var owner = new WinForms.NativeWindow();
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        if (hwnd != IntPtr.Zero)
+            owner.AssignHandle(hwnd);
+
+        if (dialog.ShowDialog(owner) != WinForms.DialogResult.OK)
+            return;
+
+        var selected = dialog.Color;
+        property.SetValue(entry, $"#{selected.R:X2}{selected.G:X2}{selected.B:X2}");
+    }
+
     private void OnPickChromaPreset(object sender, RoutedEventArgs e)
     {
         if (sender is not System.Windows.Controls.Button { Tag: string propertyName, CommandParameter: string colorValue }) return;

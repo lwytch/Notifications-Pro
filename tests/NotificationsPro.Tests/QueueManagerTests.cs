@@ -1,6 +1,7 @@
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 using System.IO;
+using NotificationsPro.Helpers;
 
 namespace NotificationsPro.Tests;
 
@@ -488,6 +489,79 @@ public class QueueManagerTests
 
         // Invalid regex is silently skipped, notification passes through
         Assert.Single(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_TitleOnlyHighlightRule_IgnoresBodyOnlyMatches()
+    {
+        var settings = CreateSettings();
+        settings.Settings.HighlightRules.Add(new HighlightRuleDefinition
+        {
+            Keyword = "urgent",
+            Scope = NotificationMatchScopeHelper.TitleOnly,
+            Color = "#FF6600"
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Normal title", "urgent body");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.False(queue.VisibleNotifications[0].IsHighlighted);
+    }
+
+    [Fact]
+    public void AddNotification_BodyOnlyMuteRule_SuppressesMatchingBody()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MuteRules.Add(new MuteRuleDefinition
+        {
+            Keyword = "spoiler",
+            Scope = NotificationMatchScopeHelper.BodyOnly
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Regular title", "spoiler inside body");
+
+        Assert.Empty(queue.VisibleNotifications);
+    }
+
+    [Fact]
+    public void AddNotification_AppProfileRoutesNotificationToSecondaryOverlay()
+    {
+        var settings = CreateSettings();
+        settings.Settings.AppProfiles.Add(new AppProfile
+        {
+            AppName = "Codex",
+            OverlayLane = OverlayLaneHelper.Secondary,
+            AccentColor = "#00AAFF"
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("Codex", "Build complete", "Done");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal(OverlayLaneHelper.Secondary, queue.VisibleNotifications[0].OverlayLane);
+        Assert.Equal("#00AAFF", queue.VisibleNotifications[0].AccentColorOverride);
+    }
+
+    [Fact]
+    public void AddNotification_NarrationRuleSetsOverrides()
+    {
+        var settings = CreateSettings();
+        settings.Settings.NarrationRules.Add(new NarrationRuleDefinition
+        {
+            Keyword = "@openai",
+            Scope = NotificationMatchScopeHelper.BodyOnly,
+            Action = NarrationRuleActionHelper.ReadAloud,
+            ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("X", "Title here", "body mentions @openai");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.True(queue.VisibleNotifications[0].ReadAloudEnabledOverride);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeTitleOnly, queue.VisibleNotifications[0].ReadAloudModeOverride);
     }
 
     [Fact]

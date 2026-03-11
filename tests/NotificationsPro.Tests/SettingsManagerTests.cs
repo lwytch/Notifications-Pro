@@ -63,6 +63,41 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility;
         sm.Settings.AppGroupingStyle = "Header Chip";
         sm.Settings.ShowAppGroupCounts = false;
+        sm.Settings.ShowQuickTips = false;
+        sm.Settings.SecondaryOverlayEnabled = true;
+        sm.Settings.SecondaryOverlayMonitorIndex = 1;
+        sm.Settings.SecondaryOverlayPositionPreset = "Bottom Right";
+        sm.Settings.SecondaryOverlayWidth = 512;
+        sm.Settings.SecondaryOverlayMaxHeight = 720;
+        sm.Settings.HighlightRules.Add(new HighlightRuleDefinition
+        {
+            Keyword = "urgent",
+            Color = "#FF8800",
+            Scope = NotificationMatchScopeHelper.TitleOnly,
+            AppFilter = "X"
+        });
+        sm.Settings.MuteRules.Add(new MuteRuleDefinition
+        {
+            Keyword = "spoiler",
+            Scope = NotificationMatchScopeHelper.BodyOnly
+        });
+        sm.Settings.NarrationRules.Add(new NarrationRuleDefinition
+        {
+            Keyword = "@openai",
+            Scope = NotificationMatchScopeHelper.BodyOnly,
+            Action = NarrationRuleActionHelper.ReadAloud,
+            ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly
+        });
+        sm.Settings.AppProfiles.Add(new AppProfile
+        {
+            AppName = "Codex",
+            OverlayLane = OverlayLaneHelper.Secondary,
+            IsReadAloudEnabled = false,
+            Sound = "Default",
+            Icon = "Mail",
+            AccentColor = "#00AAFF",
+            BackgroundImagePath = @"C:\NotificationsPro\backgrounds\codex.png"
+        });
         sm.Save();
 
         var sm2 = CreateManager();
@@ -79,6 +114,21 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, sm2.Settings.NotificationCaptureMode);
         Assert.Equal("Header Chip", sm2.Settings.AppGroupingStyle);
         Assert.False(sm2.Settings.ShowAppGroupCounts);
+        Assert.False(sm2.Settings.ShowQuickTips);
+        Assert.True(sm2.Settings.SecondaryOverlayEnabled);
+        Assert.Equal(1, sm2.Settings.SecondaryOverlayMonitorIndex);
+        Assert.Equal("Bottom Right", sm2.Settings.SecondaryOverlayPositionPreset);
+        Assert.Equal(512, sm2.Settings.SecondaryOverlayWidth);
+        Assert.Equal(720, sm2.Settings.SecondaryOverlayMaxHeight);
+        Assert.Single(sm2.Settings.HighlightRules);
+        Assert.Equal(NotificationMatchScopeHelper.TitleOnly, sm2.Settings.HighlightRules[0].Scope);
+        Assert.Equal("X", sm2.Settings.HighlightRules[0].AppFilter);
+        Assert.Single(sm2.Settings.MuteRules);
+        Assert.Equal(NotificationMatchScopeHelper.BodyOnly, sm2.Settings.MuteRules[0].Scope);
+        Assert.Single(sm2.Settings.NarrationRules);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeTitleOnly, sm2.Settings.NarrationRules[0].ReadMode);
+        Assert.Single(sm2.Settings.AppProfiles);
+        Assert.Equal(OverlayLaneHelper.Secondary, sm2.Settings.AppProfiles[0].OverlayLane);
     }
 
     [Fact]
@@ -151,6 +201,10 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(340, settings.OverlayWidth);
         Assert.Equal(340, settings.LastManualOverlayWidth);
         Assert.Equal(480, settings.OverlayMaxHeight);
+        Assert.False(settings.SecondaryOverlayEnabled);
+        Assert.Equal("Top Left", settings.SecondaryOverlayPositionPreset);
+        Assert.Equal(340, settings.SecondaryOverlayWidth);
+        Assert.Equal(480, settings.SecondaryOverlayMaxHeight);
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
@@ -165,6 +219,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(NotificationCaptureModeHelper.ModeAuto, settings.NotificationCaptureMode);
         Assert.Equal("Framed Group", settings.AppGroupingStyle);
         Assert.True(settings.ShowAppGroupCounts);
+        Assert.True(settings.ShowQuickTips);
     }
 
     [Fact]
@@ -188,21 +243,37 @@ public class SettingsManagerTests : IDisposable
         original.SpokenMutedApps.Add("Outlook");
         original.HighlightKeywords.Add("urgent");
         original.MuteKeywords.Add("spam");
+        original.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "headline" });
+        original.MuteRules.Add(new MuteRuleDefinition { Keyword = "muted" });
+        original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@team" });
+        original.AppProfiles.Add(new AppProfile { AppName = "Codex" });
 
         var clone = original.Clone();
         clone.MutedApps.Add("Slack");
         clone.SpokenMutedApps.Add("Discord");
         clone.HighlightKeywords.Add("critical");
         clone.MuteKeywords.Add("ad");
+        clone.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "body" });
+        clone.MuteRules.Add(new MuteRuleDefinition { Keyword = "regex" });
+        clone.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "voice" });
+        clone.AppProfiles.Add(new AppProfile { AppName = "Antigravity" });
 
         Assert.Single(original.MutedApps);
         Assert.Single(original.SpokenMutedApps);
         Assert.Single(original.HighlightKeywords);
         Assert.Single(original.MuteKeywords);
+        Assert.Single(original.HighlightRules);
+        Assert.Single(original.MuteRules);
+        Assert.Single(original.NarrationRules);
+        Assert.Single(original.AppProfiles);
         Assert.Equal(2, clone.MutedApps.Count);
         Assert.Equal(2, clone.SpokenMutedApps.Count);
         Assert.Equal(2, clone.HighlightKeywords.Count);
         Assert.Equal(2, clone.MuteKeywords.Count);
+        Assert.Equal(2, clone.HighlightRules.Count);
+        Assert.Equal(2, clone.MuteRules.Count);
+        Assert.Equal(2, clone.NarrationRules.Count);
+        Assert.Equal(2, clone.AppProfiles.Count);
     }
 
     [Fact]
@@ -219,6 +290,16 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+    }
+
+    [Theory]
+    [InlineData("Bottom Right", "Bottom Right")]
+    [InlineData("bottom-right", "Bottom Right")]
+    [InlineData("middle center", "Middle Center")]
+    [InlineData("unexpected", "Top Left")]
+    public void SecondaryOverlayPositionHelper_NormalizesValues(string input, string expected)
+    {
+        Assert.Equal(expected, SecondaryOverlayPositionHelper.Normalize(input));
     }
 
     [Fact]

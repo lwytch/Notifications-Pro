@@ -137,6 +137,14 @@ public static class SoundService
         var wavPath = settings.DefaultSound;
         if (!string.IsNullOrWhiteSpace(appName) && settings.PerAppSounds.TryGetValue(appName, out var appSound))
             wavPath = appSound;
+        else if (!string.IsNullOrWhiteSpace(appName))
+        {
+            var profileSound = settings.AppProfiles
+                .FirstOrDefault(profile => string.Equals(profile.AppName, appName, StringComparison.OrdinalIgnoreCase))
+                ?.Sound;
+            if (!string.IsNullOrWhiteSpace(profileSound) && !string.Equals(profileSound, "Default", StringComparison.OrdinalIgnoreCase))
+                wavPath = profileSound;
+        }
 
         PlayWav(wavPath);
     }

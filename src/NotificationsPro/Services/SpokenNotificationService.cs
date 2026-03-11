@@ -214,11 +214,20 @@ public sealed class SpokenNotificationService : IDisposable
 
     private bool ShouldSpeakItem(NotificationItem item)
     {
+        if (item.ReadAloudEnabledOverride.HasValue)
+            return item.ReadAloudEnabledOverride.Value;
+
         var appName = item.AppName?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(appName))
             return true;
 
-        return !_settingsManager.Settings.SpokenMutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase);
+        var settings = _settingsManager.Settings;
+        if (settings.SpokenMutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase))
+            return false;
+
+        var profile = settings.AppProfiles.FirstOrDefault(existing =>
+            string.Equals(existing.AppName, appName, StringComparison.OrdinalIgnoreCase));
+        return profile?.IsReadAloudEnabled ?? true;
     }
 
     private void TryStartNext()
@@ -251,7 +260,9 @@ public sealed class SpokenNotificationService : IDisposable
             item.Title,
             item.Body,
             item.ReceivedAt,
-            settings.ReadNotificationsAloudMode,
+            string.IsNullOrWhiteSpace(item.ReadAloudModeOverride)
+                ? settings.ReadNotificationsAloudMode
+                : item.ReadAloudModeOverride,
             settings.TimestampDisplayMode);
 
         if (string.IsNullOrWhiteSpace(spokenText))
