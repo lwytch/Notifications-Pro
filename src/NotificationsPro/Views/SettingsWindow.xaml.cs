@@ -130,13 +130,31 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private void OnPreviewSizeChanged(object sender, SizeChangedEventArgs e)
+    private double _lastPreviewHeight;
+
+    private void OnPreviewExpanded(object sender, RoutedEventArgs e)
     {
         if (!this.IsLoaded) return;
-        if (!e.HeightChanged) return;
         
-        double delta = e.NewSize.Height - e.PreviousSize.Height;
-        this.Height += delta;
+        // Wait for layout to update so ActualHeight is populated
+        this.Dispatcher.InvokeAsync(() =>
+        {
+            if (PreviewContainer.Visibility == Visibility.Visible && PreviewContainer.ActualHeight > 0)
+            {
+                this.Height += PreviewContainer.ActualHeight;
+                _lastPreviewHeight = PreviewContainer.ActualHeight;
+            }
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
+    }
+
+    private void OnPreviewCollapsed(object sender, RoutedEventArgs e)
+    {
+        if (!this.IsLoaded) return;
+        if (_lastPreviewHeight > 0)
+        {
+            this.Height -= _lastPreviewHeight;
+            _lastPreviewHeight = 0;
+        }
     }
 
     private void OnPickColorClick(object sender, RoutedEventArgs e)

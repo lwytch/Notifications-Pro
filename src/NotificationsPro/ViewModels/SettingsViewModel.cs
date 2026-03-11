@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -1161,6 +1162,7 @@ public class SettingsViewModel : BaseViewModel
         _isUndoRedoOperation = true;
         _settingsManager.Apply(previous);
         LoadFromSettings();
+        NotifyAllPropertiesChanged();
         _isUndoRedoOperation = false;
         UpdateUndoRedoState();
     }
@@ -1173,6 +1175,7 @@ public class SettingsViewModel : BaseViewModel
         _isUndoRedoOperation = true;
         _settingsManager.Apply(next);
         LoadFromSettings();
+        NotifyAllPropertiesChanged();
         _isUndoRedoOperation = false;
         UpdateUndoRedoState();
     }
@@ -1181,6 +1184,18 @@ public class SettingsViewModel : BaseViewModel
     {
         CanUndo = _undoStack.Count > 0;
         CanRedo = _redoStack.Count > 0;
+    }
+
+    private void NotifyAllPropertiesChanged()
+    {
+        var props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var prop in props)
+        {
+            if (prop.CanRead)
+            {
+                OnPropertyChanged(prop.Name);
+            }
+        }
     }
 
     private void RefreshProfiles()

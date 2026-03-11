@@ -141,6 +141,7 @@
                     <TextBlock Text="Preview" FontFamily="{StaticResource UIFont}" FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding ShowPreviewCard}"
+                                  Checked="OnPreviewExpanded" Unchecked="OnPreviewCollapsed"
                                   ToolTip="Show or hide the live preview card" Margin="0,0,16,0"/>
 
                     <Border Width="1" Height="16" Background="{DynamicResource BorderBrush}" Margin="0,0,16,0" VerticalAlignment="Center"/>
@@ -176,9 +177,8 @@
         </Border>
 
         <!-- Live preview card -->
-        <Border Grid.Row="2" Padding="24,12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
-                Visibility="{Binding ShowPreviewCard, Converter={StaticResource BoolToVis}}"
-                SizeChanged="OnPreviewSizeChanged">
+        <Border x:Name="PreviewContainer" Grid.Row="2" Padding="24,12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                Visibility="{Binding ShowPreviewCard, Converter={StaticResource BoolToVis}}">
             <Border x:Name="PreviewCardOuter" CornerRadius="{Binding CornerRadius}">
                 <Border.Style>
                     <Style TargetType="Border">

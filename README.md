@@ -303,6 +303,16 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.4.2
+- **Preview Scaling Logic**: Fixed a layout bug where Live Preview would fail to expand the window on the *second* attempt to enable it. Switching from a native `SizeChanged` dimension hook to an explicit `Dispatcher.InvokeAsync` render delay ensures the software forces the expansion mathematics even if the host UI layout engine hasn't fully cleared its cached bounds from the first toggle.
+
+### Release v1.1.4.1
+- **Preview Scaling Logic**: Fixed a race condition where the Live Preview card failed to physically shrink the window back down when disabled. The WPF display engine was collapsing the element faster than the app could read its height, resulting in it thinking the preview was 0-pixels tall. The software now statically caches the height in memory while the preview is active to mathematically guarantee the correct size is restored.
+
+### Release v1.1.4.0
+- **Undo/Redo Stability**: Fixed an internal data de-sync where pressing the 'Undo' button correctly reverted your setting changes in memory, but failed to visually revert the sliders on your screen. The UI now natively and instantly snaps back to match the data engine.
+- **Preview Scaling**: Repaired a mathematical WPF quirk where the Settings Application flawlessly stretched taller to accommodate the Live Preview component being enabled, but failed to natively shrink the window back down when the Live Preview was disabled.
+
 ### Release v1.1.3.9
 - **Window Drag Logic**: Removed the experimental Z-Index background layering on the Settings popup header. By stripping out the explicit custom cursor, native `IsEnabled="False"` cursors gracefully return so you intuitively know when Undo/Redo operations are natively unavailable without feeling your clicks are being eaten by the title bar.
 - **Dynamic Preview Sizing**: Exchanged the arbitrary 120-pixel size change for a mathematical UI container `SizeChanged` event. Toggling to show or hide the preview card now algorithmically extracts the exact pixel differential before committing the new window size, resulting in perfectly precise window scaling.

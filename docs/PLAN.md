@@ -401,8 +401,10 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Keyword highlight layout realignment.
 - [x] Added GitHub link to the Help tab.
 - [x] Fixed Settings popup header buttons not receiving clicks due to title bar drag preview events.
-- [ ] Fixed title bar dragging using independent background Z-Index layer so Cursor/Hover states ignore header buttons.
-- [ ] Fixed Settings Window squashing UI when toggling "Show Preview" by dynamically expanding the Window Height.
+- [x] Fixed title bar dragging by stripping the explicit `Cursor` logic to prevent move icon overriding native WPF cursors on Undo/Redo.
+- [x] Fixed Settings Window squashing UI when toggling "Show Preview" by adding mathematical `SizeChanged` WPF event.
+- [x] Fixed Preview failing to shrink the window automatically when collapsed due to WPF hiding SizeChanged quirk. 
+- [x] Fixed `Undo` memory action failing to visibly update the UI by adding explicit C# reflection `OnPropertyChanged` loop for all inputs.
 
 ## Current Focus
 All Milestone 13 items complete including nice-to-have features.
