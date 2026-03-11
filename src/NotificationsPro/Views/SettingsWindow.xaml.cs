@@ -126,6 +126,15 @@ public partial class SettingsWindow : Window
     {
         if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
         {
+            // If the user clicked on a button (like Undo, Redo, ToggleSwitch), don't start a drag map.
+            var obj = e.OriginalSource as DependencyObject;
+            while (obj != null && obj != sender as DependencyObject)
+            {
+                if (obj is System.Windows.Controls.Primitives.ButtonBase)
+                    return;
+                obj = System.Windows.Media.VisualTreeHelper.GetParent(obj);
+            }
+
             this.DragMove();
         }
     }
