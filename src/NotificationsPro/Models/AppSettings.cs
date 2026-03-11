@@ -11,6 +11,7 @@ public class AppSettings
     public double TitleFontSize { get; set; } = 16;
     public string TitleFontWeight { get; set; } = "SemiBold";
     public double LineSpacing { get; set; } = 1.5;
+    public string TextAlignment { get; set; } = "Left";
 
     // Appearance — Colors
     public string TextColor { get; set; } = "#E6E6E6";
@@ -45,7 +46,7 @@ public class AppSettings
     public bool SingleLineWrapText { get; set; } = false;
     public int SingleLineMaxLines { get; set; } = 3;
     public bool SingleLineAutoFullWidth { get; set; } = false;
-    public bool SingleLineReplaceMode { get; set; } = false; // Replace existing notification rather than stacking
+    public bool ReplaceMode { get; set; } = false; // Replace existing notification rather than stacking
     public bool ShowTimestamp { get; set; } = true;
     public double TimestampFontSize { get; set; } = 11;
     public string TimestampDisplayMode { get; set; } = "Relative"; // "Relative", "Time", "DateTime"

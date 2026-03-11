@@ -484,6 +484,14 @@
                                     ToolTip="Space between lines of text — increase for readability"/>
                         </DockPanel>
 
+                        <TextBlock Text="Text Alignment" Style="{StaticResource SettingLabel}" ToolTip="Horizontal alignment of words inside notification cards"/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableTextAlignments}"
+                                  SelectedItem="{Binding TextAlignment}"
+                                  ToolTip="Align text to Left, Center, or Right"
+                                  Margin="0,4,0,0"/>
+
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="TIMESTAMP APPEARANCE" Style="{StaticResource SectionHeader}"
                                        ToolTip="Control how timestamp text looks. Timestamp visibility is toggled in Behavior &gt; Content."/>
@@ -625,6 +633,30 @@
                                     TickFrequency="0.05" IsSnapToTickEnabled="True"
                                     ToolTip="How transparent the notification background appears"/>
                         </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="PER-APP COLOR TINTING" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding PerAppTintEnabled}"
+                                          ToolTip="Apply a subtle color tint to notification cards based on the source app"/>
+                            <TextBlock Text="Enable Per-App Color Tint" Style="{StaticResource SettingLabel}" ToolTip="Adds a subtle color tint to each notification card based on the source app name (Teams = blue, Slack = purple, etc.)"/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding PerAppTintEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Tint Intensity" Style="{StaticResource SettingLabel}" ToolTip="Higher values make the per-app color more visible; lower values are more subtle"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding PerAppTintOpacity, StringFormat='{}{0:P0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.05" Maximum="0.40" Value="{Binding PerAppTintOpacity}"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        ToolTip="How strongly the app color tints the card background"/>
+                            </DockPanel>
+                        </StackPanel>
 
                         <!-- SHAPE section -->
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -982,6 +1014,14 @@
 
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ReplaceMode}"
+                                          ToolTip="New notifications replace the current one instead of stacking"/>
+                            <TextBlock Text="Replace Mode" Style="{StaticResource SettingLabel}"
+                                       ToolTip="When enabled, each new notification replaces all current ones (useful for live tickers or latest-only display)"/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding SingleLineMode}"
                                           ToolTip="Render each notification as a single horizontal banner line"/>
                             <TextBlock Text="Single-Line Banner Mode" Style="{StaticResource SettingLabel}" ToolTip="Compacts notifications into one line per card. Turn off for stacked multi-line cards."/>
@@ -1011,14 +1051,6 @@
                                               IsChecked="{Binding SingleLineAutoFullWidth}"
                                               ToolTip="Automatically expand banner width to near full monitor width"/>
                                 <TextBlock Text="Auto Full-Width Banner" Style="{StaticResource SettingLabel}" ToolTip="When enabled, single-line mode spans almost the full monitor width automatically."/>
-                            </DockPanel>
-
-                            <DockPanel Margin="0,0,0,8">
-                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding SingleLineReplaceMode}"
-                                              ToolTip="New notifications replace the current one instead of stacking"/>
-                                <TextBlock Text="Replace Mode" Style="{StaticResource SettingLabel}"
-                                           ToolTip="When enabled, each new notification replaces all current ones (useful for live tickers or latest-only display)"/>
                             </DockPanel>
                         </StackPanel>
 
@@ -1100,40 +1132,93 @@
                         </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
+                            <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
                         </Border>
 
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding SuppressToastPopups}"
-                                          ToolTip="Suppression is only active while Notifications Pro is running. Closing the app immediately restores normal toast behavior."/>
-                            <TextBlock Text="Suppress Toast Popups" Style="{StaticResource SettingLabel}"
-                                       ToolTip="Removes Windows toast popups after capture to prevent duplicates on screen. Also removes notifications from Windows notification center. Only works with WinRT capture mode (not accessibility fallback). Suppression stops immediately when the app closes."/>
+                                          IsChecked="{Binding QuietHoursEnabled}"
+                                          ToolTip="Automatically suppress notifications during specified hours"/>
+                            <TextBlock Text="Enable Quiet Hours" Style="{StaticResource SettingLabel}" ToolTip="Silences all notifications between the start and end times"/>
                         </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding QuietHoursEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Start Time (HH:mm)" Style="{StaticResource SettingLabel}" ToolTip="e.g. 22:00 for 10 PM"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding QuietHoursStart, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Time to begin suppressing notifications (24h format)"
+                                     MaxLength="5"/>
+
+                            <TextBlock Text="End Time (HH:mm)" Style="{StaticResource SettingLabel}" ToolTip="e.g. 08:00 for 8 AM"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding QuietHoursEnd, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Time to stop suppressing notifications (24h format)"
+                                     MaxLength="5"/>
+                        </StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="SESSION ARCHIVE" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Keep a temporary record of notifications received this session. RAM only — never saved to disk, cleared when the app closes."/>
+                            <TextBlock Text="BURST LIMITING" Style="{StaticResource SectionHeader}"/>
                         </Border>
 
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding SessionArchiveEnabled}"
-                                          ToolTip="When enabled, notifications are kept in memory for the duration of this session. Data is never written to disk and is cleared when the app closes."/>
-                            <TextBlock Text="Enable Session Archive" Style="{StaticResource SettingLabel}"
-                                       ToolTip="Temporarily stores notification text in RAM so you can review missed notifications. Never persisted to disk. Cleared on app close."/>
+                                          IsChecked="{Binding BurstLimitEnabled}"
+                                          ToolTip="Auto-suppress when too many notifications arrive in a short window"/>
+                            <TextBlock Text="Enable Burst Limiting" Style="{StaticResource SettingLabel}" ToolTip="Prevents notification storms from flooding the overlay"/>
                         </DockPanel>
 
-                        <TextBlock Text="Max archive items" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Maximum number of notifications to keep in the session archive (10-1000). Oldest entries are removed when the limit is reached."/>
-                        <Slider Minimum="10" Maximum="1000" TickFrequency="10"
-                                Value="{Binding SessionArchiveMaxItems}"
-                                Style="{StaticResource SettingsSlider}" Margin="0,4,0,0"/>
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding BurstLimitEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Max Notifications" Style="{StaticResource SettingLabel}" ToolTip="Number of notifications allowed before suppression kicks in"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding BurstLimitCount, StringFormat='{}{0:0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="2" Maximum="50" Value="{Binding BurstLimitCount}"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        ToolTip="Max notifications allowed within the burst window"/>
+                            </DockPanel>
 
-                        <Button Content="View Archive (Copy to Clipboard)" Style="{StaticResource SecondaryButton}"
-                                Command="{Binding ViewSessionArchiveCommand}"
-                                Margin="0,8,0,0" HorizontalAlignment="Left"
-                                ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
+                            <TextBlock Text="Burst Window" Style="{StaticResource SettingLabel}" ToolTip="How many seconds to count notifications over"/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding BurstLimitWindowSeconds, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="1" Maximum="30" Value="{Binding BurstLimitWindowSeconds}"
+                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                        ToolTip="Time window in seconds for burst detection"/>
+                            </DockPanel>
+                        </StackPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Control the overlay from anywhere using system-wide keyboard shortcuts."/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding GlobalHotkeysEnabled}"
+                                          ToolTip="Register system-wide keyboard shortcuts"/>
+                            <TextBlock Text="Enable Global Hotkeys" Style="{StaticResource SettingLabel}" ToolTip="Register system-wide keyboard shortcuts to control the overlay without the mouse"/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding GlobalHotkeysEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Toggle Overlay" Style="{StaticResource SettingLabel}" ToolTip="Show or hide the notification overlay"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding HotkeyToggleOverlay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Keyboard combo to show/hide the overlay (e.g. Ctrl+Alt+N)"/>
+
+                            <TextBlock Text="Dismiss All" Style="{StaticResource SettingLabel}" ToolTip="Clear all visible notifications at once"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding HotkeyDismissAll, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Keyboard combo to clear all visible notifications (e.g. Ctrl+Alt+D)"/>
+
+                            <TextBlock Text="Toggle Do Not Disturb" Style="{StaticResource SettingLabel}" ToolTip="Pause or resume notification delivery"/>
+                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
+                                     Text="{Binding HotkeyToggleDnd, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Keyboard combo to pause/resume notifications (e.g. Ctrl+Alt+P)"/>
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -1337,67 +1422,7 @@
                         </ItemsControl>
                         <TextBlock Text="No apps seen yet — notifications will populate this list"
                                    Style="{StaticResource SettingDesc}" Margin="0,4,0,0"
-                                   Visibility="{Binding PerAppConfigEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding QuietHoursEnabled}"
-                                          ToolTip="Automatically suppress notifications during specified hours"/>
-                            <TextBlock Text="Enable Quiet Hours" Style="{StaticResource SettingLabel}" ToolTip="Silences all notifications between the start and end times"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding QuietHoursEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Start Time (HH:mm)" Style="{StaticResource SettingLabel}" ToolTip="e.g. 22:00 for 10 PM"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding QuietHoursStart, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Time to begin suppressing notifications (24h format)"
-                                     MaxLength="5"/>
-
-                            <TextBlock Text="End Time (HH:mm)" Style="{StaticResource SettingLabel}" ToolTip="e.g. 08:00 for 8 AM"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding QuietHoursEnd, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Time to stop suppressing notifications (24h format)"
-                                     MaxLength="5"/>
-                        </StackPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="BURST LIMITING" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding BurstLimitEnabled}"
-                                          ToolTip="Auto-suppress when too many notifications arrive in a short window"/>
-                            <TextBlock Text="Enable Burst Limiting" Style="{StaticResource SettingLabel}" ToolTip="Prevents notification storms from flooding the overlay"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding BurstLimitEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Max Notifications" Style="{StaticResource SettingLabel}" ToolTip="Number of notifications allowed before suppression kicks in"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding BurstLimitCount, StringFormat='{}{0:0}'}"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="2" Maximum="50" Value="{Binding BurstLimitCount}"
-                                        TickFrequency="1" IsSnapToTickEnabled="True"
-                                        ToolTip="Max notifications allowed within the burst window"/>
-                            </DockPanel>
-
-                            <TextBlock Text="Burst Window" Style="{StaticResource SettingLabel}" ToolTip="How many seconds to count notifications over"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding BurstLimitWindowSeconds, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="1" Maximum="30" Value="{Binding BurstLimitWindowSeconds}"
-                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
-                                        ToolTip="Time window in seconds for burst detection"/>
-                            </DockPanel>
-                        </StackPanel>
+                                    Visibility="{Binding PerAppConfigEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -1542,17 +1567,6 @@
                                     Minimum="5" Maximum="50" Value="{Binding SnapDistance}"
                                     TickFrequency="5" IsSnapToTickEnabled="True"
                                     ToolTip="How close to a screen edge before the overlay snaps"/>
-                        </DockPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding StartWithWindows}"
-                                          ToolTip="Automatically start Notifications Pro when you sign in to Windows"/>
-                            <TextBlock Text="Start with Windows" Style="{StaticResource SettingLabel}" ToolTip="Automatically launch Notifications Pro when you sign in"/>
                         </DockPanel>
 
                     </StackPanel>
@@ -1706,69 +1720,6 @@
                             </DockPanel>
                         </StackPanel>
 
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="PRESENTATION MODE" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding PresentationModeEnabled}"
-                                          ToolTip="Auto-pause notifications when a presentation app goes fullscreen"/>
-                            <TextBlock Text="Auto-DND on Fullscreen" Style="{StaticResource SettingLabel}" ToolTip="Automatically pauses notifications when a configured app is running fullscreen (PowerPoint, Zoom, etc.)"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding PresentationModeEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Monitored Apps" Style="{StaticResource SettingLabel}" ToolTip="Notifications pause when any of these apps go fullscreen"/>
-
-                            <ItemsControl ItemsSource="{Binding PresentationApps}" Margin="0,0,0,8">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <DockPanel Margin="0,0,0,6">
-                                            <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
-                                                    Width="72" Padding="0"
-                                                    Command="{Binding DataContext.RemovePresentationAppCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}" Margin="8,0,0,0"
-                                                    ToolTip="Remove this app from presentation-mode monitoring"/>
-                                            <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}" VerticalAlignment="Center"/>
-                                        </DockPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <DockPanel Margin="0,0,0,8">
-                                <Button DockPanel.Dock="Right" Content="Add App" Style="{StaticResource SecondaryButton}"
-                                        MinWidth="110" Command="{Binding AddPresentationAppCommand}" Margin="8,0,0,0"
-                                        ToolTip="Add this process name to presentation-mode monitoring"/>
-                                <TextBox Style="{StaticResource SettingsTextBox}"
-                                         Text="{Binding NewPresentationApp, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip="Process name to monitor (e.g. PowerPoint, Zoom)"/>
-                            </DockPanel>
-                        </StackPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="PER-APP COLOR TINTING" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding PerAppTintEnabled}"
-                                          ToolTip="Apply a subtle color tint to notification cards based on the source app"/>
-                            <TextBlock Text="Enable Per-App Color Tint" Style="{StaticResource SettingLabel}" ToolTip="Adds a subtle color tint to each notification card based on the source app name (Teams = blue, Slack = purple, etc.)"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding PerAppTintEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Tint Intensity" Style="{StaticResource SettingLabel}" ToolTip="Higher values make the per-app color more visible; lower values are more subtle"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding PerAppTintOpacity, StringFormat='{}{0:P0}'}"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="0.05" Maximum="0.40" Value="{Binding PerAppTintOpacity}"
-                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        ToolTip="How strongly the app color tints the card background"/>
-                            </DockPanel>
-                        </StackPanel>
-
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -1778,7 +1729,7 @@
                     <StackPanel Orientation="Horizontal" Margin="4,0">
                         <!-- accessibility -->
                         <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
-                              Data="M16 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0z m2 15 1-7-6 1 m-8-5 3-3 5.5 3-2.36 3.5 M4.24 14.5a5 5 0 0 0 6.88 6 M13.76 17.5a5 5 0 0 0-6.88-6" />
+                              Data="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3 M12 17h.01" />
                         <TextBlock Text="Accessibility"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -1866,35 +1817,6 @@
                                           ToolTip="Scale overlay font sizes according to Windows text scaling setting"/>
                             <TextBlock Text="Respect Text Scaling" Style="{StaticResource SettingLabel}" ToolTip="Scales notification text to match your Windows accessibility text size setting"/>
                         </DockPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Control the overlay from anywhere using system-wide keyboard shortcuts."/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding GlobalHotkeysEnabled}"
-                                          ToolTip="Register system-wide keyboard shortcuts"/>
-                            <TextBlock Text="Enable Global Hotkeys" Style="{StaticResource SettingLabel}" ToolTip="Register system-wide keyboard shortcuts to control the overlay without the mouse"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding GlobalHotkeysEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Toggle Overlay" Style="{StaticResource SettingLabel}" ToolTip="Show or hide the notification overlay"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding HotkeyToggleOverlay, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Keyboard combo to show/hide the overlay (e.g. Ctrl+Alt+N)"/>
-
-                            <TextBlock Text="Dismiss All" Style="{StaticResource SettingLabel}" ToolTip="Clear all visible notifications at once"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding HotkeyDismissAll, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Keyboard combo to clear all visible notifications (e.g. Ctrl+Alt+D)"/>
-
-                            <TextBlock Text="Toggle Do Not Disturb" Style="{StaticResource SettingLabel}" ToolTip="Pause or resume notification delivery"/>
-                            <TextBox Style="{StaticResource SettingsTextBox}" Margin="0,4,0,0"
-                                     Text="{Binding HotkeyToggleDnd, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Keyboard combo to pause/resume notifications (e.g. Ctrl+Alt+P)"/>
-                        </StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="INFORMATION DENSITY" Style="{StaticResource SectionHeader}"
@@ -2137,6 +2059,168 @@
                                     Tag="SettingsWindowBorder" Click="OnPickColorClick"/>
                             <TextBox Style="{StaticResource SettingsTextBox}" Text="{Binding SettingsWindowBorder, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ SYSTEM TAB ═══ -->
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="System settings tab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="4,0">
+                        <!-- cpu / system -->
+                        <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
+                              Data="M4 4h16v16H4zm0 4h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16" />
+                        <TextBlock Text="System"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                    <StackPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SuppressToastPopups}"
+                                          ToolTip="Suppression is only active while Notifications Pro is running. Closing the app immediately restores normal toast behavior."/>
+                            <TextBlock Text="Suppress Toast Popups" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Removes Windows toast popups after capture to prevent duplicates on screen. Also removes notifications from Windows notification center. Only works with WinRT capture mode (not accessibility fallback). Suppression stops immediately when the app closes."/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SESSION ARCHIVE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Keep a temporary record of notifications received this session. RAM only — never saved to disk, cleared when the app closes."/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding SessionArchiveEnabled}"
+                                          ToolTip="When enabled, notifications are kept in memory for the duration of this session. Data is never written to disk and is cleared when the app closes."/>
+                            <TextBlock Text="Enable Session Archive" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Temporarily stores notification text in RAM so you can review missed notifications. Never persisted to disk. Cleared on app close."/>
+                        </DockPanel>
+
+                        <TextBlock Text="Max archive items" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Maximum number of notifications to keep in the session archive (10-1000). Oldest entries are removed when the limit is reached."/>
+                        <Slider Minimum="10" Maximum="1000" TickFrequency="10"
+                                Value="{Binding SessionArchiveMaxItems}"
+                                Style="{StaticResource SettingsSlider}" Margin="0,4,0,0"/>
+
+                        <Button Content="View Archive (Copy to Clipboard)" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding ViewSessionArchiveCommand}"
+                                Margin="0,8,0,0" HorizontalAlignment="Left"
+                                ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding StartWithWindows}"
+                                          ToolTip="Automatically start Notifications Pro when you sign in to Windows"/>
+                            <TextBlock Text="Start with Windows" Style="{StaticResource SettingLabel}" ToolTip="Automatically launch Notifications Pro when you sign in"/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="PRESENTATION MODE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding PresentationModeEnabled}"
+                                          ToolTip="Auto-pause notifications when a presentation app goes fullscreen"/>
+                            <TextBlock Text="Auto-DND on Fullscreen" Style="{StaticResource SettingLabel}" ToolTip="Automatically pauses notifications when a configured app is running fullscreen (PowerPoint, Zoom, etc.)"/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding PresentationModeEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Monitored Apps" Style="{StaticResource SettingLabel}" ToolTip="Notifications pause when any of these apps go fullscreen"/>
+
+                            <ItemsControl ItemsSource="{Binding PresentationApps}" Margin="0,0,0,8">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,0,0,6">
+                                            <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
+                                                    Width="72" Padding="0"
+                                                    Command="{Binding DataContext.RemovePresentationAppCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" Margin="8,0,0,0"
+                                                    ToolTip="Remove this app from presentation-mode monitoring"/>
+                                            <TextBlock Text="{Binding}" Style="{StaticResource SettingLabel}" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <Button DockPanel.Dock="Right" Content="Add App" Style="{StaticResource SecondaryButton}"
+                                        MinWidth="110" Command="{Binding AddPresentationAppCommand}" Margin="8,0,0,0"
+                                        ToolTip="Add this process name to presentation-mode monitoring"/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding NewPresentationApp, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Process name to monitor (e.g. PowerPoint, Zoom)"/>
+                            </DockPanel>
+                        </StackPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding GlobalHotkeysEnabled}"
+                                          ToolTip="Register system-wide keyboard shortcuts to control the overlay without the mouse"/>
+                            <TextBlock Text="Enable Global Hotkeys" Style="{StaticResource SettingLabel}" ToolTip="Register system-wide keyboard shortcuts to control the overlay without the mouse"/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding GlobalHotkeysEnabled, Converter={StaticResource BoolToVis}}">
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding ClearAllHotkeyConfig, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Keyboard shortcut to clear all visible notifications"/>
+                                <Button Grid.Column="1" Content="Save" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding UpdateHotkeysCommand}" Margin="8,0,0,0"/>
+                            </Grid>
+                            <TextBlock Text="Clear All Shortcut" Style="{StaticResource SettingDesc}" Margin="0,2,0,8"
+                                       ToolTip="Keyboard shortcut to quickly dismiss all notifications"/>
+
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding PauseHotkeyConfig, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Keyboard shortcut to pause/resume notifications"/>
+                                <Button Grid.Column="1" Content="Save" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding UpdateHotkeysCommand}" Margin="8,0,0,0"/>
+                            </Grid>
+                            <TextBlock Text="Pause/Resume Shortcut" Style="{StaticResource SettingDesc}" Margin="0,2,0,8"
+                                       ToolTip="Keyboard shortcut to toggle notification capture on and off"/>
+
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding ArchiveHotkeyConfig, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Keyboard shortcut to open the active session archive"/>
+                                <Button Grid.Column="1" Content="Save" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding UpdateHotkeysCommand}" Margin="8,0,0,0"/>
+                            </Grid>
+                            <TextBlock Text="View Archive Shortcut" Style="{StaticResource SettingDesc}" Margin="0,2,0,0"
+                                       ToolTip="Keyboard shortcut to instantly open the Session Archive"/>
+
+                            <TextBlock Text="Check the hotkey format (e.g. Ctrl+Alt+N) and ensure 'Enable Global Hotkeys' is on in Settings → Accessibility."
+                                       Style="{StaticResource SettingDesc}" Foreground="{DynamicResource TextMutedBrush}"
+                                       Margin="0,8,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>

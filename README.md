@@ -303,6 +303,15 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.4.4
+- **System Tab Missing Fix**: Restored the `System` tab to the UI layout which was fully constructed in memory but failed to render on-screen in version `1.1.4.3`. All OS-integrations are now perfectly accessible in the Settings window.
+
+### Release v1.1.4.3
+- **Settings Re-organization**: Introduced a foundational `System` tab for all OS-level configurations (Startup, Toast Suppression, Global Hotkeys, Session Archive, etc.) to heavily declutter existing styling tabs.
+- **Global Replace Mode**: Decoupled 'Replace Mode' from the Single-Line layout constraint so the feature is globally available for all banner aesthetics.
+- **Notification Typography**: Introduced `Text Alignment` configurations (Left, Center, Right) across all rendering templates.
+- **Inline Timestamps**: Single-Line notification layouts now dynamically inject `Timestamps` directly beside the textual content when enabled.
+
 ### Release v1.1.4.2
 - **Preview Scaling Logic**: Fixed a layout bug where Live Preview would fail to expand the window on the *second* attempt to enable it. Switching from a native `SizeChanged` dimension hook to an explicit `Dispatcher.InvokeAsync` render delay ensures the software forces the expansion mathematics even if the host UI layout engine hasn't fully cleared its cached bounds from the first toggle.
 

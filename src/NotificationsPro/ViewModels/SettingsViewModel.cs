@@ -93,6 +93,11 @@ public class SettingsViewModel : BaseViewModel
 
     // Colors
     private string _textColor = "#E6E6E6";
+    public IEnumerable<string> AvailableTextAlignments => new[] { "Left", "Center", "Right" };
+
+    private string _textAlignment = "Left";
+    public string TextAlignment { get => _textAlignment; set { if (SetProperty(ref _textAlignment, value)) QueueSave(); } }
+
     public string TextColor { get => _textColor; set { if (SetProperty(ref _textColor, value)) QueueSave(); } }
 
     private string _titleColor = "#FFFFFF";
@@ -139,6 +144,9 @@ public class SettingsViewModel : BaseViewModel
     public double BorderThickness { get => _borderThickness; set { if (SetProperty(ref _borderThickness, value)) QueueSave(); } }
 
     // Behavior
+    private bool _replaceMode;
+    public bool ReplaceMode { get => _replaceMode; set { if (SetProperty(ref _replaceMode, value)) QueueSave(); } }
+
     private double _notificationDuration = 5;
     public double NotificationDuration { get => _notificationDuration; set { if (SetProperty(ref _notificationDuration, value)) QueueSave(); } }
 
@@ -186,9 +194,6 @@ public class SettingsViewModel : BaseViewModel
 
     private bool _singleLineAutoFullWidth;
     public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set { if (SetProperty(ref _singleLineAutoFullWidth, value)) QueueSave(); } }
-
-    private bool _singleLineReplaceMode;
-    public bool SingleLineReplaceMode { get => _singleLineReplaceMode; set { if (SetProperty(ref _singleLineReplaceMode, value)) QueueSave(); } }
 
     private bool _showTimestamp;
     public bool ShowTimestamp { get => _showTimestamp; set { if (SetProperty(ref _showTimestamp, value)) QueueSave(); } }
@@ -1024,7 +1029,7 @@ public class SettingsViewModel : BaseViewModel
         _singleLineWrapText = s.SingleLineWrapText;
         _singleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
         _singleLineAutoFullWidth = s.SingleLineAutoFullWidth;
-        _singleLineReplaceMode = s.SingleLineReplaceMode;
+        _replaceMode = s.ReplaceMode;
         _showTimestamp = s.ShowTimestamp;
         _timestampFontSize = Math.Clamp(s.TimestampFontSize, 8, 32);
         _timestampDisplayMode = NormalizeTimestampDisplayMode(s.TimestampDisplayMode);
@@ -1332,7 +1337,7 @@ public class SettingsViewModel : BaseViewModel
             SingleLineWrapText = SingleLineWrapText,
             SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
             SingleLineAutoFullWidth = SingleLineAutoFullWidth,
-            SingleLineReplaceMode = SingleLineReplaceMode,
+            ReplaceMode = ReplaceMode,
             ShowTimestamp = ShowTimestamp,
             TimestampFontSize = Math.Clamp(TimestampFontSize, 8, 32),
             TimestampDisplayMode = NormalizeTimestampDisplayMode(TimestampDisplayMode),

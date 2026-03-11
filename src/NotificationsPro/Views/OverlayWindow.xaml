@@ -95,6 +95,7 @@
                                    FontWeight="{Binding DataContext.AppNameFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
+                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.AppNameEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
@@ -126,6 +127,7 @@
                                    FontWeight="{Binding DataContext.TitleFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
+                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.TitleEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
@@ -157,6 +159,7 @@
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
+                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.BodyEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
@@ -207,6 +210,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock x:Name="SingleLineApp"
@@ -271,12 +275,33 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
+
+                            <!-- Single Line Timestamp (Compact) -->
+                            <TextBlock x:Name="SingleLineTimestamp"
+                                       Grid.Column="2"
+                                       Margin="8,0,0,0"
+                                       Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                       Opacity="0.7"
+                                       VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource TimestampText}">
+                                        <Binding Path="RelativeTimeText"/>
+                                        <Binding Path="ReceivedAt"/>
+                                        <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                         </Grid>
 
                         <TextBlock x:Name="SingleLineWrappedText"
                                    Visibility="{Binding DataContext.SingleLineWrappedVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
                                    TextWrapping="Wrap"
                                    TextTrimming="None"
+                                   HorizontalAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -319,6 +344,24 @@
                                     </MultiBinding>
                                 </Run.Text>
                             </Run>
+                        </TextBlock>
+
+                        <!-- Single Line Timestamp (Wrapped) -->
+                        <TextBlock x:Name="SingleLineWrappedTimestamp"
+                                   Visibility="{Binding DataContext.TimestampVisibility, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Margin="0,4,0,0"
+                                   FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontSize="{Binding DataContext.TimestampFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   FontWeight="{Binding DataContext.TimestampFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.TimestampColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
+                                   Opacity="0.7">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource TimestampText}">
+                                    <Binding Path="RelativeTimeText"/>
+                                    <Binding Path="ReceivedAt"/>
+                                    <Binding Path="DataContext.TimestampDisplayMode" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                     </Grid>
                     </Grid>
