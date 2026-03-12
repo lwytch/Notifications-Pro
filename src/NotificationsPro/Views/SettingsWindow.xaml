@@ -1064,7 +1064,7 @@
                             <ToggleButton DockPanel.Dock="Right" HorizontalAlignment="Right"
                                           Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding OverlayScrollbarVisible}"
-                                          ToolTip="Show or hide the overlay scrollbar when notifications overflow"/>
+                                          ToolTip="Show or hide the styled overlay scrollbar. When enabled, the scrollbar stays visible so it can be themed consistently and grabbed quickly."/>
                         </DockPanel>
 
                         <TextBlock Text="Scrollbar Width" Style="{StaticResource SettingLabel}" ToolTip="Controls how wide the scrollbar appears in the overlay"/>
@@ -1903,6 +1903,7 @@
                                                     <TextBox Style="{StaticResource SettingsTextBox}"
                                                              Text="{Binding BackgroundImageDisplay, Mode=OneWay}"
                                                              IsReadOnly="True"
+                                                             VerticalContentAlignment="Center"
                                                              ToolTip="{Binding BackgroundImageToolTip}"/>
                                                     <WrapPanel Margin="0,8,0,0" HorizontalAlignment="Right">
                                                         <Button Content="Browse..." Style="{StaticResource InlineSecondaryButton}"

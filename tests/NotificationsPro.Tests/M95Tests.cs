@@ -32,7 +32,7 @@ public class M95Tests
         Assert.Equal("Relative", s.TimestampDisplayMode);
         Assert.Equal("Normal", s.TimestampFontWeight);
         Assert.Equal("#C8C8C8", s.TimestampColor);
-        Assert.True(s.OverlayScrollbarVisible);
+        Assert.False(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);
         Assert.Equal("#141414", s.OverlayScrollbarTrackColor);

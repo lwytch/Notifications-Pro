@@ -120,7 +120,7 @@
   "MonitorIndex": 0,
   "SnapToEdges": true,
   "SnapDistance": 20,
-  "OverlayScrollbarVisible": true,
+  "OverlayScrollbarVisible": false,
   "OverlayScrollbarWidth": 8,
   "OverlayScrollbarOpacity": 1.0,
   "OverlayScrollbarTrackColor": "#141414",

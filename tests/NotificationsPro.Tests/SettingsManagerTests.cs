@@ -47,6 +47,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(3, sm.Settings.SingleLineMaxLines);
         Assert.False(sm.Settings.SingleLineAutoFullWidth);
         Assert.True(sm.Settings.NewestOnTop);
+        Assert.False(sm.Settings.OverlayScrollbarVisible);
     }
 
     [Fact]
@@ -251,7 +252,7 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
-        Assert.True(settings.OverlayScrollbarVisible);
+        Assert.False(settings.OverlayScrollbarVisible);
         Assert.Equal(8, settings.OverlayScrollbarWidth);
         Assert.Equal(1.0, settings.OverlayScrollbarOpacity);
         Assert.Equal("#141414", settings.OverlayScrollbarTrackColor);

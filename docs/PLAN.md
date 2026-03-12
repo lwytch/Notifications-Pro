@@ -68,6 +68,7 @@ Settings UI reorganization (Behavior tab has 6 concerns in one panel):
 - [x] App-specific background assets: Allow specific apps to override the default card background image treatment without reintroducing multi-panel complexity, and add fullscreen-backdrop image support with fit/opacity controls that stay privacy-safe and export/import correctly.
 - [x] Settings ownership cleanup: Add an Apps tab for per-app presentation overrides, and move Quiet Hours plus Burst Limiting out of Filtering into a behavior/scheduling home that matches what they actually do.
 - [x] Overlay scrollbar theming and interaction repair: fix the overlay hit-test split so the scrollbar and search box receive normal client input without losing drag-anywhere behavior elsewhere, add themed track/thumb color plus padding/radius controls in Appearance, and keep theme/export/import coverage aligned with those new style settings.
+- [x] Scrollbar default/visibility cleanup: keep the styled overlay scrollbar disabled by default for a cleaner first impression, fix the live binding so the toggle actually updates the overlay, and make the enabled state render the themed scrollbar consistently instead of waiting for WPF `Auto` visibility.
 
 Previously completed (Milestone 3):
 - [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)

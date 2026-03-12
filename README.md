@@ -395,10 +395,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
-### Release v1.1.10.13
+### Release v1.1.10.14
 - **Startup Repair Follow-Up**: installs that were already stamped during the earlier migration bug now repair their old `3` visible notifications, tiny overlay height, and broken animation timing on the next launch instead of staying stuck in that bad first-run state, even if the broken build had already bumped the stored schema once or left the old values in place under the current schema.
 - **Clickable Themed Scrollbars**: the overlay scrollbar now receives real client input so it can be clicked and dragged properly, while the rest of the overlay keeps its drag-anywhere behavior.
 - **Scrollbar Appearance Controls**: `Settings > Appearance` now includes track/thumb colour, hover colour, inset padding, and corner-radius controls for the overlay scrollbar, and those visuals follow overlay themes and export/import cleanly.
+- **Scrollbar Default & Apps Polish**: the styled overlay scrollbar now starts off by default, enabling it updates the live overlay reliably, and the per-app card-background status field now sits centered instead of looking top-heavy.
 
 ### Release v1.1.10.8
 - **Startup Defaults Migration**: Legacy installs now upgrade their untouched `3` visible notifications, short animation timing, and old overlay-height defaults once at startup instead of resurfacing those older values on later packaged launches.

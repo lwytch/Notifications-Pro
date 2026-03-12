@@ -258,8 +258,16 @@ public class OverlayViewModel : BaseViewModel
     public double OverlayMaxHeight { get => _overlayMaxHeight; set => SetProperty(ref _overlayMaxHeight, value); }
 
     // Scrollbar
-    private bool _overlayScrollbarVisible = true;
-    public bool OverlayScrollbarVisible { get => _overlayScrollbarVisible; set => SetProperty(ref _overlayScrollbarVisible, value); }
+    private bool _overlayScrollbarVisible;
+    public bool OverlayScrollbarVisible
+    {
+        get => _overlayScrollbarVisible;
+        set
+        {
+            if (!SetProperty(ref _overlayScrollbarVisible, value)) return;
+            OnPropertyChanged(nameof(ScrollbarVisibility));
+        }
+    }
 
     private double _overlayScrollbarWidth = 8;
     public double OverlayScrollbarWidth { get => _overlayScrollbarWidth; set => SetProperty(ref _overlayScrollbarWidth, value); }
@@ -299,7 +307,7 @@ public class OverlayViewModel : BaseViewModel
     }
 
     public System.Windows.Controls.ScrollBarVisibility ScrollbarVisibility =>
-        OverlayScrollbarVisible ? System.Windows.Controls.ScrollBarVisibility.Auto : System.Windows.Controls.ScrollBarVisibility.Hidden;
+        OverlayScrollbarVisible ? System.Windows.Controls.ScrollBarVisibility.Visible : System.Windows.Controls.ScrollBarVisibility.Hidden;
     public Thickness OverlayScrollbarPaddingThickness => new(OverlayScrollbarPadding);
     public CornerRadius OverlayScrollbarCornerRadiusValue => new(OverlayScrollbarCornerRadius);
 

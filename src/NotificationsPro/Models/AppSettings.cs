@@ -165,7 +165,7 @@ public class AppSettings
     public double SnapDistance { get; set; } = 20;
 
     // Overlay scrollbar (M9.5)
-    public bool OverlayScrollbarVisible { get; set; } = true;
+    public bool OverlayScrollbarVisible { get; set; } = false;
     public double OverlayScrollbarWidth { get; set; } = 8;
     public double OverlayScrollbarOpacity { get; set; } = 1.0;
     public string OverlayScrollbarTrackColor { get; set; } = "#141414";
