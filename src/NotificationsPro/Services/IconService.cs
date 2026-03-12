@@ -35,14 +35,6 @@ public class IconService
         var iconKey = settings.DefaultIconPreset;
         if (!string.IsNullOrWhiteSpace(appName) && settings.PerAppIcons.TryGetValue(appName, out var appIcon))
             iconKey = appIcon;
-        else if (!string.IsNullOrWhiteSpace(appName))
-        {
-            var profileIcon = settings.AppProfiles
-                .FirstOrDefault(profile => string.Equals(profile.AppName, appName, StringComparison.OrdinalIgnoreCase))
-                ?.Icon;
-            if (!string.IsNullOrWhiteSpace(profileIcon) && !string.Equals(profileIcon, "Default", StringComparison.OrdinalIgnoreCase))
-                iconKey = profileIcon;
-        }
 
         if (string.IsNullOrWhiteSpace(iconKey) || iconKey == "None") return null;
 

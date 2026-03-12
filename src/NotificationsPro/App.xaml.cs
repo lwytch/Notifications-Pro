@@ -19,12 +19,10 @@ public partial class App : Application
 {
     private WinForms.NotifyIcon? _trayIcon;
     private OverlayWindow? _overlayWindow;
-    private OverlayWindow? _secondaryOverlayWindow;
     private SettingsWindow? _settingsWindow;
     private QueueManager? _queueManager;
     private SettingsManager? _settingsManager;
     private OverlayViewModel? _overlayViewModel;
-    private OverlayViewModel? _secondaryOverlayViewModel;
     private SettingsViewModel? _settingsViewModel;
 
     private NotificationListener? _notificationListener;
@@ -110,19 +108,6 @@ public partial class App : Application
 
         _settingsManager = new SettingsManager();
         _settingsManager.Load();
-
-        if (!_settingsManager.Settings.HasShownWelcome)
-        {
-            var primaryScreen = WinForms.Screen.PrimaryScreen;
-            if (primaryScreen != null)
-            {
-                StartupDefaultsHelper.ApplyFirstRunDisplayAwareDefaults(
-                    _settingsManager.Settings,
-                    primaryScreen.WorkingArea.Height);
-                _settingsManager.Save();
-            }
-        }
-
         _themeManager = new ThemeManager();
         _profileManager = new ProfileManager();
 
@@ -135,8 +120,7 @@ public partial class App : Application
         _notificationListener = new NotificationListener(_queueManager, Dispatcher, _settingsManager);
         _notificationListener.StatusChanged += UpdateStatusItem;
 
-        _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager, OverlayLaneHelper.Main);
-        _secondaryOverlayViewModel = new OverlayViewModel(_queueManager, _settingsManager, OverlayLaneHelper.Secondary);
+        _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager);
         _settingsViewModel = new SettingsViewModel(_settingsManager, _queueManager);
         _settingsViewModel.ConfigureRetryNotificationAccess(() =>
             _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
@@ -156,7 +140,6 @@ public partial class App : Application
         Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
         _settingsManager.SettingsChanged += () =>
             Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
-        _settingsManager.SettingsChanged += UpdateSecondaryOverlayWindow;
 
         // Apply High Contrast theme if active and respected
         ApplyHighContrastIfNeeded();
@@ -185,9 +168,17 @@ public partial class App : Application
         _themeScheduleTimer.Start();
         OnThemeScheduleTimerTick(null, EventArgs.Empty);
 
-        // Show first-run balloon tip
+        // Show first-run balloon tip & set defaults
         if (!_settingsManager.Settings.HasShownWelcome)
         {
+            // Set default overlay height to monitor height
+            var primaryScreen = WinForms.Screen.PrimaryScreen;
+            if (primaryScreen != null)
+            {
+                _settingsManager.Settings.OverlayMaxHeight = primaryScreen.WorkingArea.Height;
+                _settingsManager.Save();
+            }
+
             if (_trayIcon != null)
             {
                 _trayIcon.ShowBalloonTip(
@@ -423,10 +414,9 @@ public partial class App : Application
     {
         if (_overlayWindow == null || !_overlayWindow.IsLoaded)
         {
-            _overlayWindow = new OverlayWindow(_overlayViewModel!, _settingsManager!, OverlayLaneHelper.Main);
+            _overlayWindow = new OverlayWindow(_overlayViewModel!, _settingsManager!);
         }
         _overlayWindow.Show();
-        UpdateSecondaryOverlayWindow();
         _settingsManager!.Settings.OverlayVisible = true;
         UpdateMenuLabels();
 
@@ -438,7 +428,6 @@ public partial class App : Application
     private void HideOverlay()
     {
         _overlayWindow?.Hide();
-        _secondaryOverlayWindow?.Hide();
         _settingsManager!.Settings.OverlayVisible = false;
         UpdateMenuLabels();
     }
@@ -449,28 +438,6 @@ public partial class App : Application
             HideOverlay();
         else
             ShowOverlay();
-    }
-
-    private void UpdateSecondaryOverlayWindow()
-    {
-        if (_settingsManager == null)
-            return;
-
-        if (!_settingsManager.Settings.OverlayVisible || !_settingsManager.Settings.SecondaryOverlayEnabled)
-        {
-            _secondaryOverlayWindow?.Hide();
-            return;
-        }
-
-        if (_secondaryOverlayWindow == null || !_secondaryOverlayWindow.IsLoaded)
-        {
-            _secondaryOverlayWindow = new OverlayWindow(
-                _secondaryOverlayViewModel!,
-                _settingsManager,
-                OverlayLaneHelper.Secondary);
-        }
-
-        _secondaryOverlayWindow.Show();
     }
 
     private void TogglePause()
@@ -897,7 +864,7 @@ public partial class App : Application
         ShowSettings();
         if (_settingsWindow != null)
         {
-            _settingsWindow.NavigateToTab("Apps");
+            _settingsWindow.NavigateToTab("Filtering");
         }
     }
 
@@ -1007,7 +974,6 @@ public partial class App : Application
         _settingsManager?.Save();
         _trayIcon?.Dispose();
         _overlayWindow?.Close();
-        _secondaryOverlayWindow?.Close();
         _settingsWindow?.Close();
         Shutdown();
     }

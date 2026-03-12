@@ -12,10 +12,6 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
-- First-run display-aware sizing now applies before the first overlay window is created again, so true first launch honors the primary monitor work area instead of starting clipped
-- Secondary-overlay preset save/load and placement now accept spaced values such as `Bottom Right` instead of collapsing back to `Top Left`
-- Literal rule matching now handles symbolic handles and hashtags such as `@openai` without relying on word-boundary regex behavior
-- `settings.example.json`, README, STATUS, and in-app Help now match the current Apps/Filtering/Accessibility layout and the expanded settings model
 - Default-value drift resolved across `AppSettings`, the settings viewmodel, tests, docs, and `settings.example.json`, so first-run/reset defaults now consistently use 40 visible notifications and 1200ms animation speed
 - Overflow summary semantics corrected so skipped notifications are reported honestly as `not shown` instead of behaving like a hidden expandable queue
 - Settings-window programmatic tab navigation now resolves the real tab labels again after the left-nav header rework
@@ -38,12 +34,6 @@
 - Resource leak: HwndSource properly disposed in HotkeyManager.Unregister()
 
 ### Added
-- Field-scoped highlight, mute, and narration rules with optional app filters and title/body/title+body targeting
-- Dedicated `Apps` tab for per-app read aloud, overlay lane, sounds, icons, colours, and local background-image styling
-- Secondary overlay routing with independent monitor, preset, width, and max-height controls
-- Local background-image styling for app profiles with opacity, hue, and brightness controls
-- Explicit `Show Quick Tips` onboarding toggle in Settings > System
-- README workflow guides for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, including browser-hosted notification guidance for services such as X, Reddit, Codex, and Antigravity
 - App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls
 - Overflow badge recovery affordance — clicking the `+N not shown` summary now offers to raise the visible-notification limit for future cards, while clearly disclosing that skipped content was not retained
 - Expanded spoken notification combinations — Added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp to the Accessibility narration selector

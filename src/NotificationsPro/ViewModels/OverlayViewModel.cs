@@ -14,12 +14,9 @@ public class OverlayViewModel : BaseViewModel
 {
     private readonly QueueManager _queueManager;
     private readonly SettingsManager _settingsManager;
-    private readonly string _overlayLane;
 
     public ReadOnlyObservableCollection<NotificationItem> Notifications => _queueManager.VisibleNotifications;
     public QueueManager Queue => _queueManager;
-    public bool ShowOverflowBadge => string.Equals(_overlayLane, OverlayLaneHelper.Main, StringComparison.OrdinalIgnoreCase);
-    public string OverlayLane => _overlayLane;
 
     // Icon service for per-app icon resolution
     public IconService IconService { get; } = new();
@@ -489,13 +486,8 @@ public class OverlayViewModel : BaseViewModel
 
     private bool FilterNotification(object obj)
     {
+        if (string.IsNullOrWhiteSpace(_searchText)) return true;
         if (obj is not NotificationItem item) return false;
-        if (!string.Equals(OverlayLaneHelper.Normalize(item.OverlayLane), _overlayLane, StringComparison.OrdinalIgnoreCase))
-            return false;
-
-        if (string.IsNullOrWhiteSpace(_searchText))
-            return true;
-
         return item.AppName.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
             || item.Title.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
             || item.Body.Contains(_searchText, StringComparison.OrdinalIgnoreCase);
@@ -513,22 +505,17 @@ public class OverlayViewModel : BaseViewModel
     private Visibility _emptyStateVisibility = Visibility.Visible;
     public Visibility EmptyStateVisibility { get => _emptyStateVisibility; set => SetProperty(ref _emptyStateVisibility, value); }
 
-    public OverlayViewModel(QueueManager queueManager, SettingsManager settingsManager, string overlayLane = OverlayLaneHelper.Main)
+    public OverlayViewModel(QueueManager queueManager, SettingsManager settingsManager)
     {
         _queueManager = queueManager;
         _settingsManager = settingsManager;
-        _overlayLane = OverlayLaneHelper.Normalize(overlayLane);
 
         ApplySettings(_settingsManager.Settings);
         _settingsManager.SettingsChanged += () => ApplySettings(_settingsManager.Settings);
 
         // Track empty state
         ((System.Collections.Specialized.INotifyCollectionChanged)_queueManager.VisibleNotifications)
-            .CollectionChanged += (_, _) =>
-            {
-                _notificationsView?.Refresh();
-                UpdateEmptyState();
-            };
+            .CollectionChanged += (_, _) => UpdateEmptyState();
         UpdateEmptyState();
 
         // Refresh relative timestamps every 15 seconds
@@ -608,12 +595,8 @@ public class OverlayViewModel : BaseViewModel
 
         SlideInDirection = s.SlideInDirection;
         AnimationDurationMs = s.AnimationDurationMs;
-        OverlayWidth = string.Equals(_overlayLane, OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase)
-            ? s.SecondaryOverlayWidth
-            : s.OverlayWidth;
-        OverlayMaxHeight = string.Equals(_overlayLane, OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase)
-            ? s.SecondaryOverlayMaxHeight
-            : s.OverlayMaxHeight;
+        OverlayWidth = s.OverlayWidth;
+        OverlayMaxHeight = s.OverlayMaxHeight;
         OverlayScrollbarVisible = s.OverlayScrollbarVisible;
         OverlayScrollbarWidth = s.OverlayScrollbarWidth;
         OverlayScrollbarOpacity = s.OverlayScrollbarOpacity;
@@ -642,8 +625,7 @@ public class OverlayViewModel : BaseViewModel
         ChromaKeyColor = s.ChromaKeyColor;
         PerAppTintEnabled = s.PerAppTintEnabled;
         PerAppTintOpacity = s.PerAppTintOpacity;
-        FullscreenOverlayMode = s.FullscreenOverlayMode
-            && string.Equals(_overlayLane, OverlayLaneHelper.Main, StringComparison.OrdinalIgnoreCase);
+        FullscreenOverlayMode = s.FullscreenOverlayMode;
         FullscreenOverlayOpacity = s.FullscreenOverlayOpacity;
         FullscreenOverlayColor = s.FullscreenOverlayColor;
         GroupByApp = s.GroupByApp;
@@ -680,10 +662,9 @@ public class OverlayViewModel : BaseViewModel
 
     private void UpdateEmptyState()
     {
-        EmptyStateVisibility = _queueManager.VisibleNotifications.Any(notification =>
-                string.Equals(OverlayLaneHelper.Normalize(notification.OverlayLane), _overlayLane, StringComparison.OrdinalIgnoreCase))
-            ? Visibility.Collapsed
-            : Visibility.Visible;
+        EmptyStateVisibility = _queueManager.VisibleNotifications.Count == 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private static Duration DurationFor(double ms)

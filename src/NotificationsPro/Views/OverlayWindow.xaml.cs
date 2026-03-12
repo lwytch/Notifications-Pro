@@ -18,7 +18,6 @@ namespace NotificationsPro.Views;
 public partial class OverlayWindow : Window
 {
     private readonly SettingsManager _settingsManager;
-    private readonly string _overlayLane;
     private HwndSource? _hwndSource;
     private bool _hookInstalled;
     private bool _isInternalMove;
@@ -54,12 +53,11 @@ public partial class OverlayWindow : Window
     [DllImport("user32.dll")]
     private static extern int SetWindowLong(IntPtr hwnd, int nIndex, int dwNewLong);
 
-    public OverlayWindow(OverlayViewModel viewModel, SettingsManager settingsManager, string overlayLane = OverlayLaneHelper.Main)
+    public OverlayWindow(OverlayViewModel viewModel, SettingsManager settingsManager)
     {
         InitializeComponent();
         DataContext = viewModel;
         _settingsManager = settingsManager;
-        _overlayLane = OverlayLaneHelper.Normalize(overlayLane);
 
         // SourceInitialized fires when the HWND is created — the EARLIEST point
         // we can install the Win32 hook. Loaded fires AFTER the window is shown.
@@ -217,32 +215,23 @@ public partial class OverlayWindow : Window
 
         var settings = _settingsManager.Settings;
 
-        var storedLeft = GetStoredLeft(settings);
-        var storedTop = GetStoredTop(settings);
-        if (storedLeft == null || storedTop == null)
+        if (settings.OverlayLeft == null || settings.OverlayTop == null)
         {
-            if (IsSecondaryOverlay)
-            {
-                ApplySecondaryDefaultPlacement(settings);
-            }
-            else
-            {
-                var workArea = GetWorkAreaForMonitorIndex(settings.MonitorIndex);
-                var pos = SnapHelper.GetDefaultPosition(Width, ActualHeight, workArea);
-                Left = pos.X;
-                Top = pos.Y;
-            }
+            var workArea = GetWorkAreaForMonitorIndex(settings.MonitorIndex);
+            var pos = SnapHelper.GetDefaultPosition(Width, ActualHeight, workArea);
+            Left = pos.X;
+            Top = pos.Y;
         }
         else
         {
-            Left = storedLeft.Value;
-            Top = storedTop.Value;
+            Left = settings.OverlayLeft.Value;
+            Top = settings.OverlayTop.Value;
         }
 
         ApplyObsFixedWindowMode(settings);
         ApplyFullscreenOverlayMode(settings);
 
-        if (!IsFullscreenOverlayActive(settings))
+        if (!settings.FullscreenOverlayMode)
         {
             ApplyEffectiveMaxHeight(settings);
             TryApplySingleLineAutoFullWidth(settings);
@@ -291,7 +280,7 @@ public partial class OverlayWindow : Window
             ApplyObsFixedWindowMode(settings);
             ApplyFullscreenOverlayMode(settings);
 
-            if (!IsFullscreenOverlayActive(settings))
+            if (!settings.FullscreenOverlayMode)
             {
                 ApplyEffectiveMaxHeight(settings);
                 TryApplySingleLineAutoFullWidth(settings);
@@ -333,7 +322,7 @@ public partial class OverlayWindow : Window
 
     private void ApplyFullscreenOverlayMode(AppSettings settings)
     {
-        if (IsFullscreenOverlayActive(settings))
+        if (settings.FullscreenOverlayMode)
         {
             // Save previous position for restore if entering fullscreen for the first time
             if (!_wasFullscreen)
@@ -406,7 +395,7 @@ public partial class OverlayWindow : Window
         if (_isInternalMove)
             return;
 
-        if (IsFullscreenOverlayActive(_settingsManager.Settings))
+        if (_settingsManager.Settings.FullscreenOverlayMode)
             return;
 
         if (_ncMouseDownTracked)
@@ -433,9 +422,10 @@ public partial class OverlayWindow : Window
         }
 
         UpdateEdgeAnchors();
-        SetStoredPosition(_settingsManager.Settings, Left, Top);
+        _settingsManager.Settings.OverlayLeft = Left;
+        _settingsManager.Settings.OverlayTop = Top;
         var currentMonitor = GetCurrentMonitorIndex();
-        SetConfiguredMonitorIndex(_settingsManager.Settings, currentMonitor);
+        _settingsManager.Settings.MonitorIndex = currentMonitor;
 
         if (currentMonitor != previousMonitor)
         {
@@ -451,13 +441,13 @@ public partial class OverlayWindow : Window
         if (_isInternalMove)
             return;
 
-        if (IsFullscreenOverlayActive(_settingsManager.Settings))
+        if (_settingsManager.Settings.FullscreenOverlayMode)
             return;
 
         if (ActualWidth > 0)
         {
-            SetConfiguredWidth(_settingsManager.Settings, ActualWidth);
-            if (!(_settingsManager.Settings.SingleLineMode && _settingsManager.Settings.SingleLineAutoFullWidth) && !IsSecondaryOverlay)
+            _settingsManager.Settings.OverlayWidth = ActualWidth;
+            if (!(_settingsManager.Settings.SingleLineMode && _settingsManager.Settings.SingleLineAutoFullWidth))
                 _settingsManager.Settings.LastManualOverlayWidth = ActualWidth;
         }
 
@@ -504,8 +494,9 @@ public partial class OverlayWindow : Window
             _isInternalMove = false;
         }
 
-        SetStoredPosition(_settingsManager.Settings, Left, Top);
-        SetConfiguredMonitorIndex(_settingsManager.Settings, GetCurrentMonitorIndex());
+        _settingsManager.Settings.OverlayLeft = Left;
+        _settingsManager.Settings.OverlayTop = Top;
+        _settingsManager.Settings.MonitorIndex = GetCurrentMonitorIndex();
         UpdateEdgeAnchors();
     }
 
@@ -814,7 +805,7 @@ public partial class OverlayWindow : Window
 
     private Rect GetCurrentWorkArea()
     {
-        if (IsFullscreenOverlayActive(_settingsManager.Settings))
+        if (_settingsManager.Settings.FullscreenOverlayMode)
             return GetMonitorBoundsForIndex(_settingsManager.Settings.SelectedMonitorIndex);
 
         var width = ResolveDimension(ActualWidth, Width, MinWidth, 380);
@@ -884,7 +875,7 @@ public partial class OverlayWindow : Window
 
     private void ClampToCurrentWorkArea()
     {
-        if (IsFullscreenOverlayActive(_settingsManager.Settings))
+        if (_settingsManager.Settings.FullscreenOverlayMode)
             return;
 
         var workArea = GetCurrentWorkArea();
@@ -954,7 +945,7 @@ public partial class OverlayWindow : Window
 
     private void ApplyEffectiveMaxHeight(AppSettings settings)
     {
-        if (IsFullscreenOverlayActive(settings))
+        if (settings.FullscreenOverlayMode)
         {
             var monitorBounds = GetMonitorBoundsForIndex(settings.SelectedMonitorIndex);
             var maxHeight = Math.Max(120, monitorBounds.Height);
@@ -967,7 +958,7 @@ public partial class OverlayWindow : Window
         }
 
         var workArea = GetCurrentWorkArea();
-        var userMax = Math.Max(120, GetConfiguredMaxHeight(settings));
+        var userMax = Math.Max(120, settings.OverlayMaxHeight);
         var effectiveMax = Math.Min(userMax, Math.Max(120, workArea.Height - (OverlayMargin * 2)));
         var scrollViewerMax = Math.Max(120, effectiveMax - OuterContentMargin);
 
@@ -980,9 +971,7 @@ public partial class OverlayWindow : Window
 
     private void TryApplyStoredPosition(AppSettings settings)
     {
-        var storedLeft = GetStoredLeft(settings);
-        var storedTop = GetStoredTop(settings);
-        if (storedLeft is not double targetLeft || storedTop is not double targetTop)
+        if (settings.OverlayLeft is not double targetLeft || settings.OverlayTop is not double targetTop)
             return;
 
         if (Math.Abs(targetLeft - Left) <= 0.5 && Math.Abs(targetTop - Top) <= 0.5)
@@ -999,7 +988,7 @@ public partial class OverlayWindow : Window
         if (!settings.SingleLineMode || !settings.SingleLineAutoFullWidth)
             return;
 
-        if (!IsSecondaryOverlay && settings.LastManualOverlayWidth <= 0)
+        if (settings.LastManualOverlayWidth <= 0)
             settings.LastManualOverlayWidth = Math.Max(MinWidth, settings.OverlayWidth);
 
         var workArea = GetCurrentWorkArea();
@@ -1016,125 +1005,7 @@ public partial class OverlayWindow : Window
         Left = targetLeft;
         _isInternalMove = false;
 
-        SetConfiguredWidth(settings, targetWidth);
-        SetStoredPosition(settings, targetLeft, Top);
-    }
-
-    private bool IsSecondaryOverlay =>
-        string.Equals(_overlayLane, OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase);
-
-    private bool IsFullscreenOverlayActive(AppSettings settings) =>
-        settings.FullscreenOverlayMode && !IsSecondaryOverlay;
-
-    private double? GetStoredLeft(AppSettings settings) =>
-        IsSecondaryOverlay ? settings.SecondaryOverlayLeft : settings.OverlayLeft;
-
-    private double? GetStoredTop(AppSettings settings) =>
-        IsSecondaryOverlay ? settings.SecondaryOverlayTop : settings.OverlayTop;
-
-    private void SetStoredPosition(AppSettings settings, double left, double top)
-    {
-        if (IsSecondaryOverlay)
-        {
-            settings.SecondaryOverlayLeft = left;
-            settings.SecondaryOverlayTop = top;
-            return;
-        }
-
-        settings.OverlayLeft = left;
-        settings.OverlayTop = top;
-    }
-
-    private int GetConfiguredMonitorIndex(AppSettings settings) =>
-        IsSecondaryOverlay ? settings.SecondaryOverlayMonitorIndex : settings.MonitorIndex;
-
-    private void SetConfiguredMonitorIndex(AppSettings settings, int index)
-    {
-        if (IsSecondaryOverlay)
-        {
-            settings.SecondaryOverlayMonitorIndex = index;
-            return;
-        }
-
-        settings.MonitorIndex = index;
-    }
-
-    private double GetConfiguredMaxHeight(AppSettings settings) =>
-        IsSecondaryOverlay ? settings.SecondaryOverlayMaxHeight : settings.OverlayMaxHeight;
-
-    private void SetConfiguredWidth(AppSettings settings, double width)
-    {
-        if (IsSecondaryOverlay)
-        {
-            settings.SecondaryOverlayWidth = width;
-            return;
-        }
-
-        settings.OverlayWidth = width;
-    }
-
-    private void ApplySecondaryDefaultPlacement(AppSettings settings)
-    {
-        var workArea = GetWorkAreaForMonitorIndex(GetConfiguredMonitorIndex(settings));
-        var width = ActualWidth > 0 ? ActualWidth : Math.Max(MinWidth, settings.SecondaryOverlayWidth);
-        var height = ActualHeight > 0 ? ActualHeight : Math.Min(360, workArea.Height - 16);
-        var (left, top) = GetPresetPosition(
-            settings.SecondaryOverlayPositionPreset,
-            workArea,
-            width,
-            height);
-
-        Left = left;
-        Top = top;
-        SetStoredPosition(settings, left, top);
-    }
-
-    private static (double Left, double Top) GetPresetPosition(string? preset, Rect workArea, double width, double height)
-    {
-        var targetLeft = workArea.Left - 8;
-        var targetTop = workArea.Top - 8;
-
-        switch (SecondaryOverlayPositionHelper.Normalize(preset))
-        {
-            case SecondaryOverlayPositionHelper.TopCenter:
-                targetLeft = workArea.Left + ((workArea.Width - width) / 2);
-                break;
-            case SecondaryOverlayPositionHelper.TopRight:
-                targetLeft = workArea.Right - width + 8;
-                break;
-            case SecondaryOverlayPositionHelper.MiddleLeft:
-                targetTop = workArea.Top + ((workArea.Height - height) / 2);
-                break;
-            case SecondaryOverlayPositionHelper.MiddleCenter:
-                targetLeft = workArea.Left + ((workArea.Width - width) / 2);
-                targetTop = workArea.Top + ((workArea.Height - height) / 2);
-                break;
-            case SecondaryOverlayPositionHelper.MiddleRight:
-                targetLeft = workArea.Right - width + 8;
-                targetTop = workArea.Top + ((workArea.Height - height) / 2);
-                break;
-            case SecondaryOverlayPositionHelper.BottomLeft:
-                targetTop = workArea.Bottom - height + 24;
-                break;
-            case SecondaryOverlayPositionHelper.BottomCenter:
-                targetLeft = workArea.Left + ((workArea.Width - width) / 2);
-                targetTop = workArea.Bottom - height + 24;
-                break;
-            case SecondaryOverlayPositionHelper.BottomRight:
-                targetLeft = workArea.Right - width + 8;
-                targetTop = workArea.Bottom - height + 24;
-                break;
-            default:
-                break;
-        }
-
-        var minLeft = workArea.Left - 8;
-        var maxLeft = Math.Max(minLeft, workArea.Right - width + 8);
-        var minTop = workArea.Top - 8;
-        var maxTop = Math.Max(minTop, workArea.Bottom - height + 24);
-
-        return (
-            Math.Max(minLeft, Math.Min(targetLeft, maxLeft)),
-            Math.Max(minTop, Math.Min(targetTop, maxTop)));
+        settings.OverlayWidth = targetWidth;
+        settings.OverlayLeft = targetLeft;
     }
 }

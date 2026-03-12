@@ -437,37 +437,8 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Overflow affordance hardening: make the overflow badge actionable without retaining discarded notification content, and update the wording so it no longer implies hidden cards can be expanded later.
 - [x] Grouping customization pass: move information density into Appearance, keep app-grouping behavior in its logical tab, and replace the hardcoded app banner with a properly styleable grouping presentation.
 
-### Milestone 18: Targeted Rules, Overlay Routing & Public Readiness
-**Status: In Progress**
-
-Defaulting, sizing, and persistence:
-- [x] First-run sizing regression audit: restored the primary-monitor work-area sizing path before the first overlay/viewmodel is created, aligned the example settings payload with the expanded settings model, and added regression coverage for the shared secondary-overlay preset normalization.
-- [ ] Install/update persistence audit: trace the MSIX update path versus `%AppData%\NotificationsPro\settings.json`, confirm whether upgrades should preserve settings, and document any intentional reset behavior in Help/README so reinstalling never feels random.
-- [x] Quick tips control: added an explicit user-facing toggle so tray/settings first-run guidance can be turned off without relying on the one-time welcome-state flag alone.
-
-Filtering and narration rules:
-- [x] Field-scoped keyword rules: highlight and mute rules now target `Title`, `Body`, or `Title + Body`, preserve regex support/per-rule colours, and can be narrowed to a specific app or browser host.
-- [x] Field-scoped narration triggers: narration rules now react to title/body/title+body matches, can force `Read Aloud` or `Skip Read Aloud`, and support per-rule spoken-content overrides.
-- [x] Social/account targeting model: X/social workflows now support text-pattern targeting for handles, hashtags, account names, and watchwords using literal or regex rules with optional app filters; Windows still exposes text only, not structured account IDs.
-
-Per-app styling and routing:
-- [x] App presentation profiles: the Apps tab now centralizes per-app read aloud, overlay lane, sound, icon, colours, and background-image styling so customisation stops being scattered across unrelated tabs.
-- [x] Initial multi-overlay routing: selected apps can route to a dedicated Secondary Overlay with its own monitor, preset, width, and max-height controls while keeping the same privacy model.
-- [x] Group header styling review: grouped rendering now supports themeable `Framed Group`, `Header Chip`, and `Minimal Label` treatments with optional counts.
-
-Visual customisation:
-- [x] Background image overlays: added optional image-backed card styling with privacy-safe local asset storage plus opacity, hue, brightness, and per-app assignment.
-- [x] Appearance/system settings audit: re-checked the tab layout after the reorganisation so density, grouping appearance, per-app styling, narration, layout, and onboarding controls live in their logical tabs.
-
-Settings sync, docs, and release readiness:
-- [x] Export/import coverage expansion: new rule/profile/background/secondary-overlay settings now round-trip through `AppSettings`, `SettingsViewModel`, export/import JSON, reset defaults, and regression tests.
-- [x] README workflow guides: add dedicated sections for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, covering setup, browser-hosted app limitations, per-app styling and narration, privacy limits, and troubleshooting for services such as X, Reddit, Instagram, Codex, and Antigravity.
-- [x] README/Help gap analysis: updated README, in-app Help, example settings, and status text for advanced narration rules, per-app styling, overlay routing, voice setup, privacy disclosures, defaults, and troubleshooting.
-- [x] README workflow-guide maintenance skill: expand the local repository skill coverage so future X/social/tooling workflow-guide sections automatically stay in sync with shipped functionality.
-- [ ] Public repo sanitisation audit: review the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity that should be removed or deliberately disclosed before the repository is made public.
-
 ## Current Focus
-Install/update persistence verification and public-release sanitisation.
+Post-release validation of the refreshed defaults, overflow summary, and new grouping styles, plus follow-up UX review for any stricter privacy masking options.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

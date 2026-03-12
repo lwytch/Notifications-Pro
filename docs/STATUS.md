@@ -23,13 +23,12 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
+- Settings window: eleven sections (Appearance, Behavior, Filtering, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display and layout-mode behavior
-  - Filtering now owns quiet hours, burst limiting, and targeted highlight/mute/narration rules
-  - Apps now owns per-app narration, routing, sounds, icons, colours, and background images
+  - Filtering now owns quiet hours and burst limiting
   - Layout now owns fullscreen overlay mode alongside monitor/size controls
   - Streaming now owns presentation mode and per-app tinting
   - Accessibility now owns the real global hotkey editor
@@ -44,17 +43,12 @@
 - Notification cards now expose meaningful UI Automation names instead of the raw `NotificationsPro.Models.NotificationItem` class name
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
-- Accessibility tab now includes built-in spoken notifications with on/off toggle, multiple title/body/timestamp combinations, installed voice selection, speed/volume controls, narration-rule targeting, and a Preview Voice button
+- Accessibility tab now includes built-in spoken notifications with on/off toggle, multiple title/body/timestamp combinations, installed voice selection, speed/volume controls, per-app Read Aloud checkboxes, and a Preview Voice button
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that only Windows-installed Microsoft-signed voices appear in the picker
 - System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
 - Tray About dialog now shows the full installed package version, package identity, listener status, runtime version, and install path
 - Settings persistence audit fixed a save/load gap where text alignment was not round-tripping through the viewmodel layer
-- First-run display-aware sizing now applies before the first overlay window is created, so true first launch honors the primary monitor work area again
-- Apps tab now includes per-app profiles for read aloud, overlay lane, sound, icon, colours, and optional background images with opacity/hue/brightness controls
-- Secondary overlay routing now supports its own monitor, preset, width, and max-height settings, and preset values now save/load correctly for spaced names like `Bottom Right`
-- Filtering tab now includes title/body/title+body-scoped highlight, mute, and narration rules with optional app filters
-- Quick Tips can now be disabled explicitly from Settings > System > Onboarding
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
 - Per-keyword highlight colors — each keyword can have its own color with inline color picker
 - Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
@@ -73,7 +67,7 @@
 - Layout tab includes quick preset buttons for top/side placement
 - Layout tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
 - Layout tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
-- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, fullscreen overlay controls, and Secondary Overlay routing controls
+- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen overlay controls
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
 - Visible-notification default increased to `40` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
@@ -121,13 +115,12 @@
   - Show Timestamp toggle in Settings > Behavior > Content, with timestamp appearance controls in Settings > Appearance > Timestamp Appearance
 - **Filtering & Smart Control (Milestone 5)**:
   - Per-app muting — mute/unmute from card context menu, tray Quick Mute submenu, or Filtering settings tab
-  - Keyword highlighting — rules can target Title, Body, or Title + Body, optionally use regex, and optionally restrict to a specific app/browser host before applying a colored accent stripe
-  - Keyword muting — rules can target Title, Body, or Title + Body, optionally use regex, and optionally restrict to a specific app/browser host
-  - Narration rules — title/body/title+body matches can trigger Read Aloud or Skip Read Aloud, with optional spoken-content overrides
+  - Keyword highlighting — notifications matching configured keywords get a colored accent stripe
+  - Keyword muting — silently suppress notifications containing configured keywords
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
-  - Filtering tab now includes per-app mute toggles, targeted rule management, quiet hours, and burst controls
+  - Filtering tab now includes per-app toggles, keyword management, quiet hours, burst limit, and per-app sound/icon overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
@@ -141,7 +134,6 @@
   - Import settings from a JSON file
   - Theme quick-switch submenu in tray menu (built-in + custom themes)
   - Profiles tab in Settings now focuses on import/export of full settings profiles
-  - App profiles in the Apps tab now centralize per-app read aloud, routing, sound, icon, colour, and background-image choices
 - **Accessibility & Inclusivity (Milestone 7)**:
   - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
   - Auto-duration — longer notifications get more display time based on estimated line count
@@ -150,8 +142,7 @@
   - Respect High Contrast — auto-applies High Contrast theme when Windows HC mode activates
   - Respect Text Scaling — scales overlay font sizes to match Windows accessibility text size
   - Global hotkeys — system-wide keyboard shortcuts for show/hide overlay, dismiss all, toggle DND
-  - Spoken notifications — built-in narration supports multiple title/body/timestamp combinations with installed voice selection, speed/volume controls, preview playback, and per-app enablement from the Apps tab
-  - Narration rules — title/body/title+body matching can read or skip notifications without changing the app-wide narration setting
+  - Spoken notifications — built-in narration supports multiple title/body/timestamp combinations with installed voice selection, speed/volume controls, and preview playback
   - Microsoft Voice Access card labels — opt-in modes for Off, Body Only, or Title + Body + Timestamp via the Accessibility tab
   - Hotkey registration diagnostics — invalid or occupied combos are surfaced directly in the Accessibility tab
   - Hotkey configuration UI with customizable key combos (Ctrl+Alt+N, etc.)
@@ -175,13 +166,12 @@
   - Tray icon dimmed/monochrome when notifications are paused
   - Notification count badge on tray icon (red badge with active card count)
 - **System Integration & Multi-Monitor (Milestone 9)**:
-  - Start with Windows toggle — enables/disables the packaged Windows Startup Task
+  - Start with Windows toggle — adds/removes registry Run key automatically
   - Startup registry state synced on app launch for consistency
   - Multi-monitor picker in Layout tab with detected monitor list (resolution + primary label)
   - Move overlay to selected monitor with one click
   - Refresh button to re-detect monitors without restarting
   - Position presets (top-left, center, etc.) target the selected monitor
-  - Secondary overlay lane can target its own monitor and preset independently of the main overlay
   - Per-monitor DPI awareness handled by .NET 8 WPF per-monitor V2 defaults
 - **Streaming & Presentation (Milestone 10)**:
   - Chroma key background — solid green/blue/magenta background for OBS chroma key capture with preset color buttons
@@ -205,8 +195,7 @@
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
-  - Per-app sound and icon assignment now lives in the Apps tab alongside narration, routing, colours, and background images
-  - Local background-image styling for app profiles — images copied into AppData backgrounds with opacity, hue, and brightness controls
+  - Per-app sound and icon assignment UI in Filtering tab (stacked row layout to prevent label/combobox clipping)
   - Fullscreen overlay background color picker (in addition to opacity)
   - Fullscreen overlay section now lives in Layout for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
@@ -245,7 +234,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 178 unit tests covering QueueManager (including field-scoped rules, app-profile routing, narration overrides, regex keywords, session archive + persistent/auto-duration + overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, secondary-overlay settings, rule/profile/background settings, and grouping settings), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 170 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration + overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and new grouping settings), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)

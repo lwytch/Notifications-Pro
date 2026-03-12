@@ -56,7 +56,6 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Manual resize** — drag the left or right edge of the overlay to change its width. Resize anchors to the edge it is near so right-aligned overlays do not jump.
 - **Fullscreen overlay mode** — expands the overlay to cover an entire monitor with a configurable semi-transparent backdrop (colour + opacity). Useful as a dedicated notification monitor or for focus sessions.
 - **OBS fixed-window mode** — locks the overlay to a precise width/height for predictable window-capture in OBS/streaming tools.
-- **Secondary overlay lane** — route selected apps to a second overlay with its own monitor, position preset, width, and max-height controls.
 
 ### Layout Modes
 - **Stacked cards** — each notification is a separate card, scrollable when many accumulate.
@@ -84,12 +83,6 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
 
-### App Profiles & Routing
-- **Apps tab** — manage per-app read aloud, overlay lane, sound, icon, accent/background/title/body/app-name colours, and optional background images from one place.
-- **Per-app profiles** — style X, Codex, Antigravity, Chrome, Edge, or any other source independently without storing notification content.
-- **Secondary overlay routing** — send selected apps to a dedicated visual lane while the main overlay continues handling everything else.
-- **Background images** — optional local-only per-app images with opacity, hue, and brightness controls. Imported files are copied into `%AppData%\NotificationsPro\backgrounds\`.
-
 ### Behaviour & Control
 - **Notification duration** — configurable display time in seconds; each card has its own timer.
 - **App grouping** — optional grouping by source app, with a separate appearance control so the grouping behaviour lives in `Behavior` and the styling lives in `Appearance`.
@@ -101,8 +94,8 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 ### Filtering & Smart Control
 - **Per-app mute** — silence notifications from specific apps. Muted apps are remembered per session; the settings UI shows every app seen this session.
-- **Field-scoped keyword rules** — highlight or mute rules can target `Title`, `Body`, or `Title + Body`, optionally use regex, and optionally limit matching to a specific app or browser host.
-- **Narration rules** — trigger `Read aloud` or `Skip read aloud` from title/body matches, with optional spoken-content overrides for that rule.
+- **Keyword mute** — suppress any notification whose title or body contains a keyword.
+- **Keyword highlight** — flag notifications containing certain keywords with a custom highlight colour.
 - **Quiet hours** — block all notifications between configurable start/end times (supports overnight ranges).
 - **Burst limiting** — cap the number of notifications accepted in a sliding time window.
 - **Focus mode** — a timed DND period (configurable minutes) accessible from the tray menu.
@@ -113,7 +106,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **System sound presets** — Asterisk, Beep, Exclamation, Hand, Question.
   > Note: Windows 11 unified many system sound events, so some system sound choices may produce the same audio. For distinct sounds use a custom WAV file.
 - **Custom WAV files** — browse for any `.wav` file; stored under `%AppData%\NotificationsPro\sounds\`.
-- **Per-app overrides** — assign a different sound to each app from the `Apps` tab.
+- **Per-app overrides** — assign a different sound to each app.
 - **Test button** — play the current default sound immediately.
 
 ### System Integration
@@ -132,8 +125,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
-- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, app-level `Read aloud` checkboxes in `Settings > Apps`, and once-only playback per visible card.
-- **Narration targeting** — `Settings > Filtering > Narration Rules` can read or skip notifications from title/body/title+body matches without relying only on per-app narration choices.
+- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, and per-app `Read aloud` checkboxes. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
@@ -195,64 +187,6 @@ Avoid distraction without missing urgent messages:
 
 ---
 
-## Workflow Guides
-
-### Getting the Most Out of Notifications Pro
-- Start with **Settings > System > Notification Access** and confirm the app is capturing reliably before tuning the visual side. If live notifications ever stall, switch **Capture Mode** to `Force Accessibility` first.
-- Keep the queue readable for your workload. `40` visible cards is the current default, but long-running monitoring setups usually work best when paired with **Auto-duration** or **Persistent Notifications** rather than a lower visible-card limit alone.
-- Use the app controls in layers: start with **Settings > Apps** for per-app lane/style/icon/sound/read-aloud decisions, then use **Settings > Filtering** for title/body-scoped highlight, mute, and narration rules inside noisy shared apps.
-- Build one layout for passive monitoring and one for active work. For example: a wide **Single-Line Banner Mode** profile for streaming or browser-heavy days, and a denser stacked-card profile for operations or moderation work.
-- Route the noisiest source family to the **Secondary Overlay** when one queue is not enough. This works well for keeping ops/agent traffic separate from chat or social notifications.
-- Use tray actions and exports as part of the workflow, not just setup. **Pause**, **Focus Mode**, **Theme/Profile switching**, and **Export Settings** make it easier to move between work, streaming, and monitoring contexts without rebuilding the app each time.
-
-### Getting the Most Out of X
-- Pick the most consistent notification source you can. If X notifications arrive through a dedicated app or wrapper, per-app settings target X directly. If they arrive through **Chrome** or **Edge**, per-app settings apply to the browser host and **keyword rules** become the main way to separate X from the rest of your browser traffic.
-- Use **Settings > Filtering > Keyword Highlighting**, **Keyword Muting**, and **Narration Rules** for account names, handles, campaign names, hashtags, watchwords, or brand terms. Rules can target `Title`, `Body`, or `Title + Body`, can be limited to the X source app/browser host, and can use either literal matches such as `@openai` or full regex patterns.
-- Use **Keyword Muting** for repetitive low-signal phrases that tend to create noise, such as routine engagement wording or campaign traffic that does not need immediate attention.
-- Use **Settings > Apps** to give the X source its own icon, sound, colours, optional background image, and overlay lane so it is visually distinct from other browser-hosted traffic.
-- Turn on **Read Notifications Aloud** globally in `Settings > Accessibility`, then use **Settings > Apps** to enable narration for the X source app and **Filtering > Narration Rules** for targeted spoken callouts.
-- Use **Deduplication** and **Burst Limiting** when you expect spikes around large posts or breaking events. They help keep the overlay readable without implying that discarded overflow content is stored anywhere.
-- Route X to the **Secondary Overlay** if you want social monitoring to stay visible without mixing it into work/tooling traffic on the main lane.
-- If X notifications stop appearing while previews still work, go back to **Settings > System > Notification Access** and try `Force Accessibility`, especially for browser-hosted toasts.
-
-### Other Social Platforms
-
-#### Reddit
-- Track subreddit names, usernames, moderation phrases, and brand mentions with **Keyword Highlighting**.
-- If Reddit notifications arrive through a browser, style the browser host with per-app controls and use subreddit or thread keywords for the real separation.
-- Use **Burst Limiting** to keep fast comment chains or upvote storms from flooding the overlay.
-
-#### Instagram / Facebook / LinkedIn
-- Highlight client names, campaign tags, priority contacts, or product names so high-signal social activity stands out immediately.
-- Use **Quiet Hours** and **Per-app Mute** when you only need business-hour visibility from these platforms.
-- If several services share one browser host, treat the host app as the transport layer and use keyword rules to distinguish each platform or campaign.
-
-#### Discord Communities and Similar Social Feeds
-- Use **Per-app Mute** and **Keyword Highlighting** together so only important channels, community names, or alert words stay noisy.
-- Add a custom **sound** only for the app you actively moderate, and leave lower-priority communities visual-only.
-- Use **Copy Text** from the card context menu when you need to move a notification snippet quickly into another tool or response workflow.
-
-### Common Notification-Heavy Tools
-
-#### Codex / Antigravity / Browser-Based Agent Tooling
-- If these tools notify through a browser, treat **Chrome** or **Edge** as the source app for per-app styling, narration, routing, and sounds, then use **keyword rules** for project names, environments, repo names, agent names, or failure wording.
-- Use a clear **per-app icon**, **colour set**, and optional **background image** so agent/tool notifications are immediately distinct from social traffic arriving from the same host app.
-- Route noisy agent/tool traffic to the **Secondary Overlay** when you want it visible but separated from chat, email, or social notifications.
-- Pair **Read Notifications Aloud** with aggressive keyword filtering if you want spoken updates for builds, completions, or interventions without hearing every low-value event.
-- Use **Persistent Notifications** or longer durations for actions that require a response instead of a glance.
-
-#### GitHub / CI / Issue Trackers / Developer Alerts
-- Highlight words such as `failed`, `blocked`, `review requested`, `incident`, `critical`, or release names that matter to your workflow.
-- Add a distinct **sound** for the delivery app or browser host when build and deploy updates need to cut through ambient noise.
-- Use **Deduplication** when automated systems tend to repeat the same failure or reminder wording.
-
-#### Monitoring / Ops / Support Tooling
-- Use **Persistent Notifications** for anything that must remain visible until acknowledged.
-- Keep **Max Visible** high, but rely on **Burst Limiting** so storms remain readable.
-- Combine **Per-app Mute** and **Quiet Hours** carefully so background systems stay visible when needed without turning the overlay into a permanent wall of noise.
-
----
-
 ## Why No Clickable Links or Images?
 
 This is deliberate:
@@ -285,7 +219,6 @@ Under `%AppData%\NotificationsPro\`:
 | `themes\*.json` | Named custom overlay themes |
 | `icons\` | Optional user-provided icon image files |
 | `sounds\` | Optional custom WAV files |
-| `backgrounds\` | Optional user-provided background images for per-app card styling |
 
 ---
 
@@ -321,8 +254,6 @@ To install it for the first time:
 3. Select **Local Machine**, and explicitly browse to place it in the **"Trusted Root Certification Authorities"** store.
 4. Double-click the `.msix` file to install the app natively.
 
-In-place MSIX updates are expected to preserve `%AppData%\NotificationsPro\settings.json` because the settings file lives outside the packaged install directory.
-
 > **Note on Windows Defender / SmartScreen:** 
 > Because this is a new, indie open-source app targeting low-level UI Automation, Microsoft Defender or "Attack Surface Reduction" tools may flag it initially. This is a false positive completely expected for newly compiled binaries. You can safely click "More info" and "Run Anyway". If Defender continually blocks it, do not whitelist the entire WindowsApps folder; instead, add a specific exclusion for the `NotificationsPro.exe` process.
 > 
@@ -352,7 +283,7 @@ In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notificat
 
 Choose from `Body Only`, `Title Only`, `Title + Body`, `Body + Timestamp`, `Title + Timestamp`, or `Title + Body + Timestamp`. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
 
-Per-app narration lives in **Settings > Apps** via a `Read aloud` checkbox. Use **Settings > Filtering > Narration Rules** when you want only specific title/body/title+body matches read aloud or skipped. Unchecked apps still stay visible on screen but are ignored by narration. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
+The same section also lets you control narration per app with a `Read aloud` checkbox. Unchecked apps still stay visible on screen but are ignored by narration. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
 
 If you want to install more voices, Microsoft’s setup guides are:
 - [Customize Narrator voices](https://support.microsoft.com/windows/chapter-7-customizing-narrator-6e30e2d0-b2f3-b907-d264-a5d30502ad73)
@@ -391,9 +322,8 @@ If live notifications stop appearing while preview/test notifications still work
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
-| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, confirm the source app is still checked in **Settings > Apps**, and review **Filtering > Narration Rules** if you only expected specific matches to speak. |
+| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in **Per-App Speech**. |
 | Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
-| X, Reddit, Antigravity, or other web tools all look like browser notifications | Per-app controls apply to the browser host (`Chrome`, `Edge`, etc.). Use **Keyword Highlighting**, **Keyword Muting**, and browser-host styling to separate the actual services inside that host app. |
 
 ---
 
@@ -414,11 +344,6 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
-
-### Release v1.1.7.0
-- **Targeted Rules & App Profiles**: Added title/body/title+body-scoped highlight, mute, and narration rules with optional app filters, plus a dedicated `Apps` tab for per-app read aloud, overlay lane, sounds, icons, colours, and background images.
-- **Secondary Overlay Routing**: Selected apps can now render in a separate overlay lane with its own monitor, position preset, width, and max-height controls, making it practical to split social, tooling, or ops traffic.
-- **Reliability & Docs Sync**: Restored display-aware first-run sizing before the overlay is created, fixed secondary-overlay preset normalization/placement, refreshed Help/README/status text, and expanded `settings.example.json` to match the shipped settings model.
 
 ### Release v1.1.6.4
 - **Default UX Repair**: Re-aligned the shipped defaults so new installs and reset-to-default flows now consistently start with `40` visible notifications and the full `1200ms` animation timing, instead of the mixed `3` / `15` / `20` and `300ms` drift that had built up across files.

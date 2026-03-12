@@ -12,7 +12,7 @@ using WinForms = System.Windows.Forms;
 
 namespace NotificationsPro.ViewModels;
 
-public partial class SettingsViewModel : BaseViewModel
+public class SettingsViewModel : BaseViewModel
 {
     public const double OverlayWidthMin = 220;
     public const double OverlayWidthMax = 7680;
@@ -1094,7 +1094,6 @@ public partial class SettingsViewModel : BaseViewModel
             RefreshPerAppConfig();
             RefreshMutedAppEntries();
             RefreshSpokenAppEntries();
-            RefreshAppProfileEntries();
 
             _queueManager.NotificationAdded += _ =>
             {
@@ -1104,7 +1103,6 @@ public partial class SettingsViewModel : BaseViewModel
                     RefreshPerAppConfig();
                     RefreshMutedAppEntries();
                     RefreshSpokenAppEntries();
-                    RefreshAppProfileEntries();
                 });
             };
         }
@@ -1159,7 +1157,6 @@ public partial class SettingsViewModel : BaseViewModel
         ViewSessionArchiveCommand = new RelayCommand(_ => ViewSessionArchive());
         OpenNotificationAccessSettingsCommand = new RelayCommand(OpenNotificationAccessSettings);
         RetryNotificationAccessCommand = new RelayCommand(RetryNotificationAccess);
-        InitializeAdvancedCustomization();
         SetFontPresetCommand = new RelayCommand(o => FontFamily = o as string ?? "Segoe UI");
         UndoCommand = new RelayCommand(_ => Undo(), _ => _undoStack.Count > 0);
         RedoCommand = new RelayCommand(_ => Redo(), _ => _redoStack.Count > 0);
@@ -1178,11 +1175,10 @@ public partial class SettingsViewModel : BaseViewModel
         RefreshWindowsSounds(); // After LoadFromSettings so custom WAV paths are already known
         RefreshMonitors();
         RefreshPerAppConfig();
-        RefreshAppProfileEntries();
         RefreshProfiles();
 
         // Show first-run tip if welcome hasn't been shown yet
-        if (!_settingsManager.Settings.HasShownWelcome && ShowQuickTips)
+        if (!_settingsManager.Settings.HasShownWelcome)
             ShowFirstRunTip = true;
     }
 
@@ -1369,7 +1365,6 @@ public partial class SettingsViewModel : BaseViewModel
         _linkOverlayThemeAndUiTheme = s.LinkOverlayThemeAndUiTheme;
         _startWithWindows = s.StartWithWindows;
         _selectedMonitorIndex = s.SelectedMonitorIndex;
-        LoadAdvancedCustomizationFromSettings(s);
 
         RefreshSettingsThemeModeOptions();
 
@@ -1380,41 +1375,19 @@ public partial class SettingsViewModel : BaseViewModel
         }
 
         HighlightKeywordEntries.Clear();
-        var highlightEntries = s.HighlightRules.Count > 0
-            ? s.HighlightRules.Select(rule => new KeywordHighlightEntry(
-                rule.Keyword,
-                string.IsNullOrWhiteSpace(rule.Color) ? s.HighlightColor : rule.Color,
-                rule.IsRegex,
-                rule.Scope,
-                rule.AppFilter))
-            : s.HighlightKeywords.Select(kw => new KeywordHighlightEntry(
-                kw,
-                s.PerKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : s.HighlightColor,
-                s.HighlightKeywordRegexFlags.TryGetValue(kw, out var rf) && rf,
-                NotificationMatchScopeHelper.TitleAndBody,
-                string.Empty));
-
-        foreach (var entry in highlightEntries)
+        foreach (var kw in s.HighlightKeywords)
         {
+            var color = s.PerKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : s.HighlightColor;
+            var isRegex = s.HighlightKeywordRegexFlags.TryGetValue(kw, out var rf) && rf;
+            var entry = new KeywordHighlightEntry(kw, color, isRegex);
             entry.PropertyChanged += (_, _) => QueueSave();
             HighlightKeywordEntries.Add(entry);
         }
-
         MuteKeywordEntries.Clear();
-        var muteEntries = s.MuteRules.Count > 0
-            ? s.MuteRules.Select(rule => new MuteKeywordEntry(
-                rule.Keyword,
-                rule.IsRegex,
-                rule.Scope,
-                rule.AppFilter))
-            : s.MuteKeywords.Select(kw => new MuteKeywordEntry(
-                kw,
-                s.MuteKeywordRegexFlags.TryGetValue(kw, out var rf) && rf,
-                NotificationMatchScopeHelper.TitleAndBody,
-                string.Empty));
-
-        foreach (var entry in muteEntries)
+        foreach (var kw in s.MuteKeywords)
         {
+            var isRegex = s.MuteKeywordRegexFlags.TryGetValue(kw, out var rf) && rf;
+            var entry = new MuteKeywordEntry(kw, isRegex);
             entry.PropertyChanged += (_, _) => QueueSave();
             MuteKeywordEntries.Add(entry);
         }
@@ -1422,7 +1395,6 @@ public partial class SettingsViewModel : BaseViewModel
         foreach (var app in s.PresentationApps) PresentationApps.Add(app);
         RefreshMutedAppEntries();
         RefreshSpokenAppEntries();
-        RefreshAppProfileEntries();
         RefreshNarrationVoices();
 
         _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
@@ -1645,29 +1617,10 @@ public partial class SettingsViewModel : BaseViewModel
             HighlightKeywordRegexFlags = HighlightKeywordEntries
                 .Where(e => e.IsRegex)
                 .ToDictionary(e => e.Keyword, _ => true),
-            HighlightRules = HighlightKeywordEntries
-                .Select(e => new HighlightRuleDefinition
-                {
-                    Keyword = e.Keyword,
-                    Color = e.Color,
-                    IsRegex = e.IsRegex,
-                    Scope = NotificationMatchScopeHelper.Normalize(e.Scope),
-                    AppFilter = e.AppFilter
-                })
-                .ToList(),
             MuteKeywords = MuteKeywordEntries.Select(e => e.Keyword).ToList(),
             MuteKeywordRegexFlags = MuteKeywordEntries
                 .Where(e => e.IsRegex)
                 .ToDictionary(e => e.Keyword, _ => true),
-            MuteRules = MuteKeywordEntries
-                .Select(e => new MuteRuleDefinition
-                {
-                    Keyword = e.Keyword,
-                    IsRegex = e.IsRegex,
-                    Scope = NotificationMatchScopeHelper.Normalize(e.Scope),
-                    AppFilter = e.AppFilter
-                })
-                .ToList(),
             MutedApps = _settingsManager.Settings.MutedApps,
             SpokenMutedApps = new List<string>(_settingsManager.Settings.SpokenMutedApps),
             ShowNotificationIcons = ShowNotificationIcons,
@@ -1729,8 +1682,6 @@ public partial class SettingsViewModel : BaseViewModel
             MonitorIndex = previousSettings.MonitorIndex,
             OverlayVisible = previousSettings.OverlayVisible,
             NotificationsPaused = previousSettings.NotificationsPaused,
-            SecondaryOverlayLeft = previousSettings.SecondaryOverlayLeft,
-            SecondaryOverlayTop = previousSettings.SecondaryOverlayTop,
             ChromaKeyEnabled = ChromaKeyEnabled,
             ChromaKeyColor = ChromaKeyColor,
             ObsFixedWindowMode = ObsFixedWindowMode,
@@ -1763,12 +1714,10 @@ public partial class SettingsViewModel : BaseViewModel
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
             HasShownWelcome = previousSettings.HasShownWelcome,
-            ShowQuickTips = ShowQuickTips,
             SettingsWindowLeft = previousSettings.SettingsWindowLeft,
             SettingsWindowTop = previousSettings.SettingsWindowTop,
         };
 
-        PopulateAdvancedCustomizationSettings(s);
         _settingsManager.Apply(s);
         _overlayWidthDirty = false;
         ShowSavedFeedback();
@@ -1992,7 +1941,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(kw)) return;
         if (!HighlightKeywordEntries.Any(e => string.Equals(e.Keyword, kw, StringComparison.OrdinalIgnoreCase)))
         {
-            var entry = new KeywordHighlightEntry(kw, HighlightColor, scope: NotificationMatchScopeHelper.TitleAndBody);
+            var entry = new KeywordHighlightEntry(kw, HighlightColor);
             entry.PropertyChanged += (_, _) => QueueSave();
             HighlightKeywordEntries.Add(entry);
             QueueSave();
@@ -2024,7 +1973,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(kw)) return;
         if (!MuteKeywordEntries.Any(e => string.Equals(e.Keyword, kw, StringComparison.OrdinalIgnoreCase)))
         {
-            var entry = new MuteKeywordEntry(kw, scope: NotificationMatchScopeHelper.TitleAndBody);
+            var entry = new MuteKeywordEntry(kw);
             entry.PropertyChanged += (_, _) => QueueSave();
             MuteKeywordEntries.Add(entry);
             QueueSave();
@@ -2275,9 +2224,6 @@ public partial class SettingsViewModel : BaseViewModel
         imported.OverlayTop = current.OverlayTop;
         imported.MonitorIndex = current.MonitorIndex;
         imported.SelectedMonitorIndex = current.SelectedMonitorIndex;
-        imported.SecondaryOverlayLeft = current.SecondaryOverlayLeft;
-        imported.SecondaryOverlayTop = current.SecondaryOverlayTop;
-        imported.SecondaryOverlayMonitorIndex = current.SecondaryOverlayMonitorIndex;
         imported.SettingsWindowLeft = current.SettingsWindowLeft;
         imported.SettingsWindowTop = current.SettingsWindowTop;
         imported.HasShownWelcome = current.HasShownWelcome;
@@ -2570,12 +2516,6 @@ public partial class SettingsViewModel : BaseViewModel
         {
             _selectedMonitorIndex = 0;
             OnPropertyChanged(nameof(SelectedMonitorIndex));
-        }
-
-        if (_secondaryOverlayMonitorIndex >= screens.Length)
-        {
-            _secondaryOverlayMonitorIndex = 0;
-            OnPropertyChanged(nameof(SecondaryOverlayMonitorIndex));
         }
     }
 

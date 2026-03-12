@@ -6,16 +6,16 @@ This file acts as a structural guide to help AI coding agents immediately orient
 
 `src/NotificationsPro/`
   `App.xaml(.cs)`               — Entry point, tray icon, and window management.
-  `Models/`                     — Settings, notification, rule, and per-app profile models (`AppSettings`, `NotificationItem`, `AppProfile`, rule definitions).
-  `Services/`                   — Core runtime logic (SettingsManager, QueueManager, NotificationListener, SpokenNotificationService, BackgroundImageService, Theme/Profile managers).
-  `ViewModels/`                 — UI binding logic for settings, narration rules, app profiles, and lane-aware overlays.
-  `Views/`                      — Overlay and settings windows, including routed main/secondary overlay presentation.
-  `Helpers/`                    — Utility classes for snapping, rule matching, overlay lanes, startup defaults, and secondary-overlay positioning.
-  `Converters/`                 — XAML value converters for tinting, contrast, and background-image presentation.
+  `Models/`                     — Data structures (AppSettings, NotificationItem).
+  `Services/`                   — Core logic (SettingsManager, QueueManager, NotificationListener, ThemeManager).
+  `ViewModels/`                 — UI binding logic (OverlayViewModel, SettingsViewModel).
+  `Views/`                      — View templates (OverlayWindow, SettingsWindow).
+  `Helpers/`                    — Utility classes (SnapHelper, IconHelper, etc).
+  `Converters/`                 — XAML value converters.
   `Resources/Theme.xaml`        — Core visual dictionary and styling.
 
 `tests/NotificationsPro.Tests/`
-  Contains xUnit tests for queue/rule logic, settings round-tripping, startup defaults, theming, monitor/system integration, and streaming helpers.
+  Contains xUnit tests for core logic (QueueManager, SettingsManager, SnapHelper, ThemeTests).
 
 ## Packaging & Distribution (MSIX)
 

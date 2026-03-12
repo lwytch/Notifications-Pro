@@ -74,10 +74,6 @@ public class AppSettings
     public Dictionary<string, bool> MuteKeywordRegexFlags { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
     public List<string> SpokenMutedApps { get; set; } = new();
-    public List<HighlightRuleDefinition> HighlightRules { get; set; } = new();
-    public List<MuteRuleDefinition> MuteRules { get; set; } = new();
-    public List<NarrationRuleDefinition> NarrationRules { get; set; } = new();
-    public List<AppProfile> AppProfiles { get; set; } = new();
 
     // Notification icons (M9.5)
     public bool ShowNotificationIcons { get; set; } = false;
@@ -147,13 +143,6 @@ public class AppSettings
     public double OverlayMaxHeight { get; set; } = 480;
     public bool AllowManualResize { get; set; } = true;
     public int MonitorIndex { get; set; } = 0;
-    public bool SecondaryOverlayEnabled { get; set; } = false;
-    public int SecondaryOverlayMonitorIndex { get; set; } = 0;
-    public string SecondaryOverlayPositionPreset { get; set; } = "Top Left";
-    public double? SecondaryOverlayLeft { get; set; }
-    public double? SecondaryOverlayTop { get; set; }
-    public double SecondaryOverlayWidth { get; set; } = 340;
-    public double SecondaryOverlayMaxHeight { get; set; } = 480;
     public bool SnapToEdges { get; set; } = true;
     public double SnapDistance { get; set; } = 20;
 
@@ -226,7 +215,6 @@ public class AppSettings
 
     // UX Polish (M8)
     public bool HasShownWelcome { get; set; } = false;
-    public bool ShowQuickTips { get; set; } = true;
     public double? SettingsWindowLeft { get; set; }
     public double? SettingsWindowTop { get; set; }
 
@@ -240,10 +228,6 @@ public class AppSettings
         clone.HighlightKeywordRegexFlags = new Dictionary<string, bool>(HighlightKeywordRegexFlags);
         clone.MuteKeywordRegexFlags = new Dictionary<string, bool>(MuteKeywordRegexFlags);
         clone.MuteKeywords = new List<string>(MuteKeywords);
-        clone.HighlightRules = HighlightRules.Select(rule => rule.Clone()).ToList();
-        clone.MuteRules = MuteRules.Select(rule => rule.Clone()).ToList();
-        clone.NarrationRules = NarrationRules.Select(rule => rule.Clone()).ToList();
-        clone.AppProfiles = AppProfiles.Select(profile => profile.Clone()).ToList();
         clone.PresentationApps = new List<string>(PresentationApps);
         clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);
         clone.PerAppIcons = new Dictionary<string, string>(PerAppIcons);

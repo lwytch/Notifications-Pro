@@ -9,7 +9,7 @@ namespace NotificationsPro.Converters;
 
 /// <summary>
 /// Blends a per-app tint color into the card background.
-/// Parameters: AppName, PerAppTintEnabled, PerAppTintOpacity, BackgroundColor, BackgroundOpacity, BackgroundColorOverride(optional)
+/// Parameters: AppName, PerAppTintEnabled, PerAppTintOpacity, BackgroundColor, BackgroundOpacity
 /// </summary>
 public class AppTintBrushConverter : IMultiValueConverter
 {
@@ -24,9 +24,6 @@ public class AppTintBrushConverter : IMultiValueConverter
         var tintOpacity = values[2] is double t ? t : 0.15;
         var bgHex = values[3] as string ?? "#202020";
         var bgOpacity = values[4] is double o ? o : 0.94;
-        var overrideBgHex = values.Length > 5 ? values[5] as string : null;
-        if (!string.IsNullOrWhiteSpace(overrideBgHex))
-            bgHex = overrideBgHex;
 
         try
         {

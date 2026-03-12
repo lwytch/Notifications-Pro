@@ -18,9 +18,6 @@
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
         <converters:ColorToOpacityBrushConverter x:Key="ColorToOpacityBrush"/>
         <converters:AppTintBrushConverter x:Key="AppTintBrush"/>
-        <converters:FallbackColorToBrushConverter x:Key="FallbackColorToBrush"/>
-        <converters:FallbackColorToOpacityBrushConverter x:Key="FallbackColorToOpacityBrush"/>
-        <converters:NotificationBackgroundImageSourceConverter x:Key="NotificationBackgroundImageSource"/>
         <converters:NotificationTextVisibilityConverter x:Key="NotificationTextVisibility"/>
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <converters:AppIconConverter x:Key="AppIconConverter"/>
@@ -54,13 +51,8 @@
                 <Border x:Name="AccentBorder"
                         CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
                         Padding="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
+                        BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                         BorderThickness="{Binding DataContext.AccentBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}">
-                    <Border.BorderBrush>
-                        <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                            <Binding Path="AccentColorOverride"/>
-                            <Binding Path="DataContext.AccentColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                        </MultiBinding>
-                    </Border.BorderBrush>
                     <Border.Background>
                         <MultiBinding Converter="{StaticResource AppTintBrush}">
                             <Binding Path="AppName"/>
@@ -68,7 +60,6 @@
                             <Binding Path="DataContext.PerAppTintOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
                             <Binding Path="DataContext.BackgroundColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
                             <Binding Path="DataContext.BackgroundOpacity" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                            <Binding Path="BackgroundColorOverride"/>
                         </MultiBinding>
                     </Border.Background>
 
@@ -77,19 +68,6 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
-                    <Image Stretch="UniformToFill"
-                           Opacity="{Binding BackgroundImageOpacity}"
-                           IsHitTestVisible="False"
-                           Grid.ColumnSpan="2">
-                        <Image.Source>
-                            <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
-                                <Binding Path="BackgroundImagePath"/>
-                                <Binding Path="BackgroundImageHueDegrees"/>
-                                <Binding Path="BackgroundImageBrightness"/>
-                            </MultiBinding>
-                        </Image.Source>
-                    </Image>
 
                     <!-- Icon column -->
                     <Image Grid.Column="0" VerticalAlignment="Top"
@@ -115,6 +93,7 @@
                         <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.AppNameFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.AppNameFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
                                    HorizontalAlignment="Stretch"
                                    TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -122,12 +101,6 @@
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
                                    LineHeight="{Binding DataContext.AppNameLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <TextBlock.Foreground>
-                                <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                    <Binding Path="AppNameColorOverride"/>
-                                    <Binding Path="DataContext.AppNameColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                </MultiBinding>
-                            </TextBlock.Foreground>
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="None"/>
@@ -153,6 +126,7 @@
                         <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.TitleFontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.TitleFontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
                                    HorizontalAlignment="Stretch"
                                    TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -160,12 +134,6 @@
                                    ClipToBounds="True"
                                    Margin="0,0,0,4"
                                    LineHeight="{Binding DataContext.TitleLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <TextBlock.Foreground>
-                                <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                    <Binding Path="TitleColorOverride"/>
-                                    <Binding Path="DataContext.TitleColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                </MultiBinding>
-                            </TextBlock.Foreground>
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="None"/>
@@ -191,18 +159,13 @@
                         <TextBlock FontFamily="{Binding DataContext.FontFamily, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                                    TextWrapping="Wrap"
                                    HorizontalAlignment="Stretch"
                                    TextAlignment="{Binding DataContext.TextAlignment, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.BodyEffectiveMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True"
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <TextBlock.Foreground>
-                                <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                    <Binding Path="TextColorOverride"/>
-                                    <Binding Path="DataContext.TextColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                </MultiBinding>
-                            </TextBlock.Foreground>
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="None"/>
@@ -257,13 +220,7 @@
                                    FontSize="{Binding DataContext.FontSize, RelativeSource={RelativeSource AncestorType=Window}}"
                                    FontWeight="{Binding DataContext.FontWeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    VerticalAlignment="Center">
-                            <Run>
-                                <Run.Foreground>
-                                    <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                        <Binding Path="AppNameColorOverride"/>
-                                        <Binding Path="DataContext.AppNameColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </Run.Foreground>
+                            <Run Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
                                 <Run.Text>
                                     <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:app" Mode="OneWay">
                                         <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
@@ -275,13 +232,7 @@
                                     </MultiBinding>
                                 </Run.Text>
                             </Run>
-                            <Run>
-                                <Run.Foreground>
-                                    <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                        <Binding Path="TitleColorOverride"/>
-                                        <Binding Path="DataContext.TitleColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </Run.Foreground>
+                            <Run Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
                                 <Run.Text>
                                     <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:title" Mode="OneWay">
                                         <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
@@ -291,13 +242,7 @@
                                     </MultiBinding>
                                 </Run.Text>
                             </Run>
-                            <Run>
-                                <Run.Foreground>
-                                    <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                        <Binding Path="TextColorOverride"/>
-                                        <Binding Path="DataContext.TextColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </Run.Foreground>
+                            <Run Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
                                 <Run.Text>
                                     <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:body" Mode="OneWay">
                                         <Binding Path="DataContext.ShowNotificationTitle" RelativeSource="{RelativeSource AncestorType=Window}"/>
@@ -338,13 +283,7 @@
                                    LineHeight="{Binding DataContext.BodyLineHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    MaxHeight="{Binding DataContext.SingleLineWrappedMaxHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                    ClipToBounds="True">
-                            <Run>
-                                <Run.Foreground>
-                                    <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                        <Binding Path="AppNameColorOverride"/>
-                                        <Binding Path="DataContext.AppNameColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </Run.Foreground>
+                            <Run Foreground="{Binding DataContext.AppNameColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
                                 <Run.Text>
                                     <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:app;full" Mode="OneWay">
                                         <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
@@ -356,13 +295,7 @@
                                     </MultiBinding>
                                 </Run.Text>
                             </Run>
-                            <Run>
-                                <Run.Foreground>
-                                    <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                        <Binding Path="TitleColorOverride"/>
-                                        <Binding Path="DataContext.TitleColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </Run.Foreground>
+                            <Run Foreground="{Binding DataContext.TitleColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
                                 <Run.Text>
                                     <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:title;full" Mode="OneWay">
                                         <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
@@ -374,13 +307,7 @@
                                     </MultiBinding>
                                 </Run.Text>
                             </Run>
-                            <Run>
-                                <Run.Foreground>
-                                    <MultiBinding Converter="{StaticResource FallbackColorToBrush}">
-                                        <Binding Path="TextColorOverride"/>
-                                        <Binding Path="DataContext.TextColor" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                    </MultiBinding>
-                                </Run.Foreground>
+                            <Run Foreground="{Binding DataContext.TextColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}">
                                 <Run.Text>
                                     <MultiBinding Converter="{StaticResource NotificationOneLineContent}" ConverterParameter="segment:body;full" Mode="OneWay">
                                         <Binding Path="DataContext.ShowAppName" RelativeSource="{RelativeSource AncestorType=Window}"/>
@@ -638,23 +565,10 @@
 
                 <!-- Overflow indicator -->
                 <Border x:Name="OverflowBadge"
+                        Visibility="{Binding Queue.HasOverflow, Converter={StaticResource BoolToVis}}"
                         Margin="0,0,0,4" Padding="12,8"
                         CornerRadius="{Binding CornerRadius}"
                         HorizontalAlignment="Left">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding ShowOverflowBadge}" Value="True"/>
-                                        <Condition Binding="{Binding Queue.HasOverflow}" Value="True"/>
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
                     <Border.Background>
                         <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
                             <Binding Path="BackgroundColor"/>

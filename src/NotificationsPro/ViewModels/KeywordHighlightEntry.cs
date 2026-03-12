@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using NotificationsPro.Helpers;
 
 namespace NotificationsPro.ViewModels;
 
@@ -22,40 +21,11 @@ public class KeywordHighlightEntry : INotifyPropertyChanged
         set { _isRegex = value; OnPropertyChanged(); }
     }
 
-    private string _scope = NotificationMatchScopeHelper.TitleAndBody;
-    public string Scope
-    {
-        get => _scope;
-        set
-        {
-            _scope = NotificationMatchScopeHelper.Normalize(value);
-            OnPropertyChanged();
-        }
-    }
-
-    private string _appFilter = string.Empty;
-    public string AppFilter
-    {
-        get => _appFilter;
-        set
-        {
-            _appFilter = value?.Trim() ?? string.Empty;
-            OnPropertyChanged();
-        }
-    }
-
-    public KeywordHighlightEntry(
-        string keyword,
-        string color,
-        bool isRegex = false,
-        string? scope = null,
-        string? appFilter = null)
+    public KeywordHighlightEntry(string keyword, string color, bool isRegex = false)
     {
         Keyword = keyword;
         _color = color;
         _isRegex = isRegex;
-        _scope = NotificationMatchScopeHelper.Normalize(scope);
-        _appFilter = appFilter?.Trim() ?? string.Empty;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
