@@ -153,7 +153,7 @@ public partial class SettingsViewModel : BaseViewModel
     public double NotificationDuration { get => _notificationDuration; set { if (SetProperty(ref _notificationDuration, value)) QueueSave(); } }
 
     private int _maxVisibleNotifications = 40;
-    public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, Math.Max(1, value))) QueueSave(); } }
+    public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, Math.Clamp(value, 1, AppSettings.MaxVisibleNotificationsUpperBound))) QueueSave(); } }
 
     private bool _showAppName = true;
     public bool ShowAppName { get => _showAppName; set { if (SetProperty(ref _showAppName, value)) QueueSave(); } }
@@ -987,7 +987,7 @@ public partial class SettingsViewModel : BaseViewModel
     public double SnapDistance { get => _snapDistance; set { if (SetProperty(ref _snapDistance, value)) QueueSave(); } }
 
     // Overlay scrollbar (M9.5)
-    private bool _overlayScrollbarVisible;
+    private bool _overlayScrollbarVisible = true;
     public bool OverlayScrollbarVisible { get => _overlayScrollbarVisible; set { if (SetProperty(ref _overlayScrollbarVisible, value)) QueueSave(); } }
 
     private double _overlayScrollbarWidth = 8;
@@ -1325,7 +1325,7 @@ public partial class SettingsViewModel : BaseViewModel
         _borderColor = s.BorderColor;
         _borderThickness = s.BorderThickness;
         _notificationDuration = s.NotificationDuration;
-        _maxVisibleNotifications = Math.Max(1, s.MaxVisibleNotifications);
+        _maxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         _showAppName = s.ShowAppName;
         _showNotificationTitle = s.ShowNotificationTitle;
         _showNotificationBody = s.ShowNotificationBody;
@@ -1647,7 +1647,7 @@ public partial class SettingsViewModel : BaseViewModel
             BorderThickness = BorderThickness,
             AccentColor = AccentColor,
             NotificationDuration = NotificationDuration,
-            MaxVisibleNotifications = Math.Clamp(MaxVisibleNotifications, 1, 40),
+            MaxVisibleNotifications = Math.Clamp(MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound),
             ShowAppName = showAppName,
             ShowNotificationTitle = showTitle,
             ShowNotificationBody = showBody,

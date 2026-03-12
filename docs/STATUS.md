@@ -33,8 +33,8 @@
 - Startup defaults repair now follows schema version 4 and only fires for the real legacy-default signature, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on the next launch without overriding intentional later choices
 - Overlay scrollbars now receive real client hit-testing over the scrollbar/search areas, so dragging still works across the cards while the scrollbar itself remains clickable and draggable
 - Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, card-to-scrollbar gap, and corner radius, and overlay themes carry those scrollbar settings with the rest of the visual palette
-- Overlay scrollbars now start disabled by default for a cleaner first-run overlay, turn on reliably in the live overlay, stay hidden while the idle `Waiting for notifications...` placeholder is showing, and only appear when the currently visible cards really overflow the overlay height
-- Overflow wording now makes the privacy boundary explicit: scrollbars only apply to currently visible cards, while notifications beyond `Max Visible` are discarded immediately and represented only as `+N not shown`
+- Overlay scrollbars now start enabled by default for fresh installs, stay hidden while the idle `Waiting for notifications...` placeholder is showing, and only appear when the currently retained cards really overflow the overlay height
+- Overflow wording now makes the privacy boundary explicit: scrollbars only apply to currently retained cards, while notifications beyond the retained limit are discarded immediately and represented only as `+N not shown`
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display behavior, timing, deduplication, quiet hours, and burst protection
@@ -72,7 +72,7 @@
 - Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
 - Settings window default height reduced to 680px
 - Behavior tab includes:
-  - configurable visible card count (1-40)
+  - configurable retained card count (1-1000)
   - content field toggles (show app name, title, body)
   - timestamp visibility toggle (show/hide)
   - full-wrap stacked mode toggle (disable line clamping/truncation)
@@ -87,7 +87,7 @@
 - Layout tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
 - Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen backdrop controls (solid color or local image)
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
-- Visible-notification default increased to `40` (configurable 1-40)
+- Retained-notification default increased to `40` (configurable 1-1000)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
 - Appearance tab includes per-field typography controls (font size + weight for app name, title, body independently)
 - Appearance tab now includes density presets (Compact / Comfortable / Spacious) because they are visual layout controls rather than accessibility-only controls
@@ -291,8 +291,8 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] "Send Test Notification" shows a notification card in the overlay
 - [ ] Notification slides in from the left
 - [ ] Notification fades out after configured duration
-- [ ] Sending more than the visible limit (default 40) shows a `+N not shown` overflow summary and clicking it offers to raise the limit for future notifications
-- [ ] "Visible Notifications" slider changes how many cards persist on screen
+- [ ] Sending more than the retained limit (default 40) shows a `+N not shown` overflow summary and clicking it offers to raise the limit for future notifications
+- [ ] "Retained Notifications" slider changes how many cards persist on screen
 - [ ] "Show App Name / Show Title / Show Body Text" toggles update cards immediately
 - [ ] "Limit Text Lines (Truncate)" off shows full multi-line wrapped text in stacked mode
 - [ ] App/Title/Body line-count sliders constrain stacked card text height

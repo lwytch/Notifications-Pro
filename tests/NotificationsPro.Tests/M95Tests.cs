@@ -21,7 +21,7 @@ public class M95Tests
         Assert.Equal("None", s.DefaultSound);
         Assert.NotNull(s.PerAppSounds);
         Assert.Empty(s.PerAppSounds);
-        Assert.Equal(40, s.MaxVisibleNotifications);
+        Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, s.MaxVisibleNotifications);
         Assert.False(s.SuppressToastPopups);
         Assert.Equal("Popup", s.SettingsDisplayMode);
         Assert.False(s.PopupAutoClose);
@@ -32,7 +32,7 @@ public class M95Tests
         Assert.Equal("Relative", s.TimestampDisplayMode);
         Assert.Equal("Normal", s.TimestampFontWeight);
         Assert.Equal("#C8C8C8", s.TimestampColor);
-        Assert.False(s.OverlayScrollbarVisible);
+        Assert.True(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);
         Assert.Equal("#141414", s.OverlayScrollbarTrackColor);

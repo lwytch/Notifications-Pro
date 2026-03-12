@@ -68,7 +68,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Stacked cards** — each notification is a separate card, and the optional scrollbar applies when the currently visible cards need more vertical space.
 - **Single-line banner mode** — all text compressed to a single line per notification, with optional wrapping and a configurable max-line count.
 - **Newest-on-top** toggle — controls whether new notifications appear at the top or bottom.
-- **Max visible** — configurable 1–40 visible cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards. The scrollbar does not resurrect those discarded overflow items.
+- **Retained notifications** — configurable 1–1000 retained cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards. The themed scrollbar is enabled by default for fresh installs but only appears when the retained cards overflow the overlay height; it does not resurrect discarded overflow items.
 - **Max overlay height** — the overlay expands vertically up to this limit, then shows a scrollbar. Clamped to the active monitor work area.
 - **Width / height presets** — quick buttons for 1080p / 2K / 4K / 8K display sizes.
 
@@ -182,7 +182,7 @@ Avoid distraction without missing urgent messages:
 - Set up **Keyword highlight** for terms like `failed`, `down`, `critical`, `error`, `urgent`.
 - Enable **Sounds** for specific apps (e.g., a monitoring tool) while keeping others silent.
 - Use **Burst limiting** so a flood of alerts from a runaway process does not bury the overlay.
-- Set **Max Visible** high and **Duration** long so alerts accumulate until acknowledged.
+- Set **Retained Notifications** high and **Duration** long so alerts accumulate until acknowledged.
 - Use **Persistent Notifications** for critical alerts that must not auto-expire.
 
 ### Daily Communications (Teams / Slack / Discord / Outlook)
@@ -408,6 +408,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.17
+- **Retained Notifications Expanded**: the live overlay can now retain up to `1000` cards instead of capping out at `40`, while keeping the same privacy model where anything beyond your selected retained limit is counted only as `+N not shown`.
+- **Fresh Scrollbar Default**: fresh installs and resets now start with the themed overlay scrollbar enabled, but it still appears only when the retained cards genuinely overflow the overlay height and stays hidden on the idle `Waiting for notifications...` placeholder.
+- **Settings and Docs Sync**: the UI now labels this control as `Retained Notifications`, the tooltips explain that the scrollbar only applies to retained cards, and the README/status/architecture docs now match the shipped behavior.
 
 ### Release v1.1.10.16
 - **Truthful Scrollbar Behavior**: the overlay scrollbar now appears only when the currently visible cards actually exceed the overlay height, so enabling the feature no longer implies that discarded `+N not shown` overflow items can be scrolled back into view.

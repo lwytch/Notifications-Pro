@@ -14,6 +14,7 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Fresh installs now enable the styled overlay scrollbar by default again, while still only surfacing it when the retained cards actually overflow the overlay height
 - Startup defaults repair now follows settings schema version `4`, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on their next launch
 - Overlay hit-testing now treats the real scrollbar and search controls as client input regions, so the scrollbar can be clicked and dragged normally without sacrificing drag-anywhere behavior on the rest of the overlay
 - Overlay scrollbar toggling now updates the live overlay correctly, and the enabled state keeps the themed scrollbar visible instead of relying on WPF `Auto` visibility
@@ -61,9 +62,10 @@
 - Legacy settings/import files that predate `CardBackgroundMode` now upgrade correctly to image-backed cards when they already contain a card background image path, instead of silently normalizing back to `Solid`
 
 ### Added
+- Retained-notification capacity now scales up to `1000` cards, while anything beyond the selected retained limit still stays privacy-safe as `+N not shown`
 - Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, and corner radius, and overlay themes now carry those scrollbar visuals with the rest of the overlay palette
 - Appearance now includes a card-to-scrollbar gap control so the themed scrollbar can be visually separated from stacked notification cards without changing the card padding itself
-- Overlay scrollbars now default to off on fresh settings so the first-run overlay stays visually clean unless the user explicitly enables themed scrollbars
+- Overlay scrollbars now default to on for fresh settings while still staying hidden until the retained cards actually overflow the overlay height
 - `Refresh Voices` action in Accessibility so the narration voice picker can be rescanned without reopening the app after Windows voice changes
 - Settings IA polish pass — `Persistent Notifications` and `Auto-Duration` now live in `Behavior`, app-specific narration moved into `Apps`, overlay window interaction moved into `Layout`, quick tips moved into `Settings Window`, and `System` now includes a `Run Capture Diagnostic` action
 - Apps tab management tools — per-app override search, `Only modified` filtering, `Read aloud` checkboxes, and one-click `Clear Overrides`

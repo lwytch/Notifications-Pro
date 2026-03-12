@@ -701,7 +701,7 @@
                         CornerRadius="{Binding CornerRadius}"
                         HorizontalAlignment="Left"
                         Cursor="Hand"
-                        ToolTip="Scrollbars only help when the currently visible cards exceed the overlay height. Notifications beyond Max Visible are discarded immediately for privacy and only counted here.">
+                        ToolTip="Scrollbars only help when the currently retained cards exceed the overlay height. Notifications beyond the retained limit are discarded immediately for privacy and only counted here.">
                     <Border.Background>
                         <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
                             <Binding Path="BackgroundColor"/>

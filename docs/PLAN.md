@@ -68,13 +68,13 @@ Settings UI reorganization (Behavior tab has 6 concerns in one panel):
 - [x] App-specific background assets: Allow specific apps to override the default card background image treatment without reintroducing multi-panel complexity, and add fullscreen-backdrop image support with fit/opacity controls that stay privacy-safe and export/import correctly.
 - [x] Settings ownership cleanup: Add an Apps tab for per-app presentation overrides, and move Quiet Hours plus Burst Limiting out of Filtering into a behavior/scheduling home that matches what they actually do.
 - [x] Overlay scrollbar theming and interaction repair: fix the overlay hit-test split so the scrollbar and search box receive normal client input without losing drag-anywhere behavior elsewhere, add themed track/thumb color plus padding/radius controls in Appearance, and keep theme/export/import coverage aligned with those new style settings.
-- [x] Scrollbar default/visibility cleanup: keep the styled overlay scrollbar disabled by default for a cleaner first impression, fix the live binding so the toggle actually updates the overlay, and make the enabled state render the themed scrollbar consistently instead of waiting for WPF `Auto` visibility.
+- [x] Scrollbar default/visibility cleanup: keep the styled overlay scrollbar honest about real overflow, default it on for fresh installs, fix the live binding so the toggle actually updates the overlay, and make the enabled state render the themed scrollbar consistently instead of waiting for WPF `Auto` visibility.
 
 Previously completed (Milestone 3):
 - [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)
 - [x] Tray quick toggle for click-through recovery (avoid drag lockout)
 - [x] Notification content controls (show/hide app name, title, body)
-- [x] Configurable max visible notifications (1-40)
+- [x] Configurable retained notifications (1-1000)
 - [x] Overlay auto-size polish (removes ghost backdrop panel and stray scrollbar)
 - [x] One-line banner mode (compact per-notification display)
 - [x] Optional wrapped text in one-line mode (prevents truncation on smaller monitors)

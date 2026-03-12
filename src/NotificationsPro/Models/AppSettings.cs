@@ -4,6 +4,9 @@ namespace NotificationsPro.Models;
 
 public class AppSettings
 {
+    public const int DefaultMaxVisibleNotifications = 40;
+    public const int MaxVisibleNotificationsUpperBound = 1000;
+
     public int? SettingsSchemaVersion { get; set; }
 
     // Appearance — Typography
@@ -49,7 +52,7 @@ public class AppSettings
 
     // Behavior
     public double NotificationDuration { get; set; } = 5;
-    public int MaxVisibleNotifications { get; set; } = 40;
+    public int MaxVisibleNotifications { get; set; } = DefaultMaxVisibleNotifications;
     public bool ShowAppName { get; set; } = true;
     public bool ShowNotificationTitle { get; set; } = true;
     public bool ShowNotificationBody { get; set; } = true;
@@ -165,7 +168,7 @@ public class AppSettings
     public double SnapDistance { get; set; } = 20;
 
     // Overlay scrollbar (M9.5)
-    public bool OverlayScrollbarVisible { get; set; } = false;
+    public bool OverlayScrollbarVisible { get; set; } = true;
     public double OverlayScrollbarWidth { get; set; } = 8;
     public double OverlayScrollbarOpacity { get; set; } = 1.0;
     public string OverlayScrollbarTrackColor { get; set; } = "#141414";

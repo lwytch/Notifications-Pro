@@ -35,6 +35,7 @@ public class OverlayViewModelTests : IDisposable
                     changedProperties.Add(args.PropertyName!);
             };
 
+            viewModel.OverlayScrollbarVisible = false;
             viewModel.OverlayScrollbarVisible = true;
             viewModel.OverlayScrollbarContentGap = 14;
             viewModel.SetScrollableOverflow(true);

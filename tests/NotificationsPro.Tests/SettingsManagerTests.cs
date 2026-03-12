@@ -34,7 +34,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Left", sm.Settings.TextAlignment);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.True(sm.Settings.AlwaysOnTop);
-        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, sm.Settings.MaxVisibleNotifications);
         Assert.True(sm.Settings.ShowAppName);
         Assert.True(sm.Settings.ShowNotificationTitle);
         Assert.True(sm.Settings.ShowNotificationBody);
@@ -47,7 +47,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(3, sm.Settings.SingleLineMaxLines);
         Assert.False(sm.Settings.SingleLineAutoFullWidth);
         Assert.True(sm.Settings.NewestOnTop);
-        Assert.False(sm.Settings.OverlayScrollbarVisible);
+        Assert.True(sm.Settings.OverlayScrollbarVisible);
         Assert.Equal(10, sm.Settings.OverlayScrollbarContentGap);
     }
 
@@ -209,7 +209,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(1, settings.BorderThickness);
         Assert.Equal("#0078D4", settings.AccentColor);
         Assert.Equal(5, settings.NotificationDuration);
-        Assert.Equal(40, settings.MaxVisibleNotifications);
+        Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, settings.MaxVisibleNotifications);
         Assert.True(settings.ShowAppName);
         Assert.True(settings.ShowNotificationTitle);
         Assert.True(settings.ShowNotificationBody);
@@ -255,7 +255,7 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
-        Assert.False(settings.OverlayScrollbarVisible);
+        Assert.True(settings.OverlayScrollbarVisible);
         Assert.Equal(8, settings.OverlayScrollbarWidth);
         Assert.Equal(1.0, settings.OverlayScrollbarOpacity);
         Assert.Equal("#141414", settings.OverlayScrollbarTrackColor);
@@ -295,6 +295,7 @@ public class SettingsManagerTests : IDisposable
         File.WriteAllText(settingsPath,
             """
             {
+              "MaxVisibleNotifications": 5000,
               "CardBackgroundImagePath": "C:\\Users\\demo\\AppData\\Roaming\\NotificationsPro\\backgrounds\\legacy.png",
               "CardBackgroundImageSaturation": 5.0,
               "CardBackgroundImageContrast": -2.0,
@@ -309,6 +310,7 @@ public class SettingsManagerTests : IDisposable
         var sm = CreateManager();
         sm.Load();
 
+        Assert.Equal(AppSettings.MaxVisibleNotificationsUpperBound, sm.Settings.MaxVisibleNotifications);
         Assert.Equal(CardBackgroundModeHelper.Image, sm.Settings.CardBackgroundMode);
         Assert.Equal(2.0, sm.Settings.CardBackgroundImageSaturation);
         Assert.Equal(0.2, sm.Settings.CardBackgroundImageContrast);
@@ -337,7 +339,7 @@ public class SettingsManagerTests : IDisposable
         sm.Load();
 
         Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, sm.Settings.SettingsSchemaVersion);
-        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, sm.Settings.MaxVisibleNotifications);
         Assert.Equal(1200, sm.Settings.AnimationDurationMs);
         Assert.True(sm.Settings.OverlayMaxHeight > 480);
     }
@@ -360,7 +362,7 @@ public class SettingsManagerTests : IDisposable
         sm.Load();
 
         Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, sm.Settings.SettingsSchemaVersion);
-        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, sm.Settings.MaxVisibleNotifications);
         Assert.Equal(1200, sm.Settings.AnimationDurationMs);
         Assert.True(sm.Settings.OverlayMaxHeight > 480);
     }
@@ -432,7 +434,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(14, sm.Settings.FontSize);
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
-        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, sm.Settings.MaxVisibleNotifications);
     }
 
     [Fact]

@@ -1064,7 +1064,7 @@
                             <ToggleButton DockPanel.Dock="Right" HorizontalAlignment="Right"
                                           Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding OverlayScrollbarVisible}"
-                                          ToolTip="Show or hide the styled overlay scrollbar. When enabled, it stays visible while notification cards are present so it can be grabbed quickly, and it stays hidden while the waiting placeholder is showing."/>
+                                          ToolTip="Show or hide the styled overlay scrollbar. When enabled, it appears only when the retained cards overflow the overlay height, and it stays hidden while the waiting placeholder is showing."/>
                         </DockPanel>
 
                         <TextBlock Text="Scrollbar Width" Style="{StaticResource SettingLabel}" ToolTip="Controls how wide the scrollbar appears in the overlay"/>
@@ -1376,15 +1376,15 @@
                             </DockPanel>
                         </StackPanel>
 
-                        <TextBlock Text="Visible Notifications" Style="{StaticResource SettingLabel}" ToolTip="Default is 40. Lower counts keep the overlay shorter; higher counts preserve more live context and reduce skipped notifications."/>
+                        <TextBlock Text="Retained Notifications" Style="{StaticResource SettingLabel}" ToolTip="Default is 40. Notifications Pro keeps between 1 and 1000 cards in RAM for the live overlay. Cards beyond this limit are discarded immediately and counted as +N not shown."/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
                                 <Run Text="{Binding MaxVisibleNotifications, StringFormat='{}{0:0}'}"/>
                             </TextBlock>
                             <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="1" Maximum="40" Value="{Binding MaxVisibleNotifications}"
+                                    Minimum="1" Maximum="1000" Value="{Binding MaxVisibleNotifications}"
                                     TickFrequency="1" IsSnapToTickEnabled="True"
-                                    ToolTip="Maximum number of notification cards shown at once"/>
+                                    ToolTip="Maximum number of notification cards retained in the live overlay at once. Beyond this limit, notifications are counted as +N not shown instead of being retained, and the scrollbar only applies to the retained cards."/>
                         </DockPanel>
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="ANIMATIONS" Style="{StaticResource SectionHeader}"/>

@@ -124,7 +124,7 @@ public class QueueManager : BaseViewModel
         _recentNotificationTimes.RemoveAll(t => t < burstCutoff);
         _recentNotificationTimes.Add(DateTime.Now);
 
-        int maxVisible = Math.Max(1, settings.MaxVisibleNotifications);
+        int maxVisible = Math.Clamp(settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
 
         // Replace mode: clear all current notifications so the new one
         // takes their place instead of stacking or going to overflow.
@@ -447,7 +447,7 @@ public class QueueManager : BaseViewModel
     {
         ReorderByConfiguredDirection();
 
-        var maxVisible = Math.Max(1, _settingsManager.Settings.MaxVisibleNotifications);
+        var maxVisible = Math.Clamp(_settingsManager.Settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         while (_visibleNotifications.Count > maxVisible)
         {
             var oldestIndex = _settingsManager.Settings.NewestOnTop

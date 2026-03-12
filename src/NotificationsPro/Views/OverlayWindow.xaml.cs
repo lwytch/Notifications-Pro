@@ -188,7 +188,7 @@ public partial class OverlayWindow : Window
             return;
 
         var currentLimit = Math.Max(1, _settingsManager.Settings.MaxVisibleNotifications);
-        var suggestedLimit = Math.Min(40, currentLimit + vm.Queue.OverflowCount);
+        var suggestedLimit = Math.Min(AppSettings.MaxVisibleNotificationsUpperBound, currentLimit + vm.Queue.OverflowCount);
 
         if (suggestedLimit > currentLimit)
         {
@@ -210,7 +210,7 @@ public partial class OverlayWindow : Window
         }
 
         System.Windows.MessageBox.Show(
-            $"{vm.Queue.OverflowCount} notification(s) were not shown while the overlay was already at its maximum visible limit of 40.\n\n" +
+            $"{vm.Queue.OverflowCount} notification(s) were not shown while the overlay was already at its maximum retained limit of {AppSettings.MaxVisibleNotificationsUpperBound}.\n\n" +
             "The scrollbar only helps when the currently visible cards exceed the overlay height. Notifications beyond the visible limit are discarded immediately for privacy, so they cannot be expanded later.",
             "Overflow Summary",
             MessageBoxButton.OK,

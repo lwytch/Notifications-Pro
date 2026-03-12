@@ -8,7 +8,7 @@ public static class StartupSettingsMigrationHelper
     private const int LegacyMaxVisibleNotifications = 3;
     private const double LegacyAnimationDurationMs = 300;
     private const double LegacyOverlayMaxHeight = 480;
-    private const int CurrentMaxVisibleNotifications = 40;
+    private const int CurrentMaxVisibleNotifications = AppSettings.DefaultMaxVisibleNotifications;
     private const double CurrentAnimationDurationMs = 1200;
     private const double OverlayMaxHeightMin = 200;
     private const double OverlayMaxHeightMax = 4320;

@@ -70,7 +70,7 @@ Import/export:
 
 ## Queue Logic
 
-- Configurable max visible notifications (default 40, range 1–40) with an overflow `+N not shown` summary
+- Configurable retained notifications (default 40, range 1–1000) with an overflow `+N not shown` summary
 - Overflow never stores content (count only)
 - Deduplication window is configurable; duplicate notifications within the window are suppressed
 - Filtering occurs before enqueue:
