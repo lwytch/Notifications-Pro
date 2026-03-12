@@ -12,6 +12,7 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Apps tab combo-box and command bindings now resolve through the settings window directly, preventing the tab from throwing repeated WPF binding errors when opened
 - Restored the stable single-panel UX by removing the experimental routing/lane model from the shipped codepath and reintroducing the newer useful features directly on top of the original overlay flow
 - Filtering now supports field-scoped and app-filtered highlight/mute/narration rules without changing the core built-in narrator behavior that was already working
 - Appearance now supports local image-backed notification cards again, and the settings preview reflects the same image-backed card mode

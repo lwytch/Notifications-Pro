@@ -82,6 +82,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
 - **Apps tab overrides** — assign per-app sound, icon, and card-background overrides once Notifications Pro has seen that app.
+- **Apps tab stability** — per-app override controls now bind directly to the settings window, avoiding the repeated WPF popup-binding errors that could appear when opening the `Apps` tab.
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
 
@@ -379,6 +380,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.2
+- **Apps Tab Stability Fix**: Replaced the popup-sensitive combo-box ancestor bindings in `Settings > Apps` with direct settings-window bindings so the tab no longer throws a wall of WPF binding errors when opened.
+- **Binding Cleanup**: The same root-window binding approach now covers the related per-app background commands and presentation-app removal actions to reduce the chance of similar popup-template regressions elsewhere in Settings.
 
 ### Release v1.1.10.1
 - **Apps Tab & Settings Ownership Cleanup**: Added a dedicated `Apps` tab for per-app sound, icon, and card-background overrides, while moving `Quiet Hours` and `Burst Protection` into `Behavior` so the tab layout matches what each control actually does.
