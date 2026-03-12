@@ -29,13 +29,6 @@ A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows 
 
 ---
 
-## 📸 Screenshots
-*(Add screenshots of the overlay and settings window here)*
-![Overlay Preview](docs/img/placeholder_overlay.png)
-![Settings Window](docs/img/placeholder_settings.png)
-
----
-
 ## Feature Overview
 
 ### Notification Capture
@@ -81,7 +74,7 @@ A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows 
 - **Optional border** — thin border around each card, configurable colour and thickness.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
-- **Apps tab overrides** — assign per-app sound, icon, narration, and card-background overrides once Notifications Pro has seen that app, with app search, `Only modified`, and one-click reset.
+- **Apps tab overrides** — assign per-app `Read aloud`, sound, icon, and card-background overrides once Notifications Pro has seen that app, with app search, `Only modified`, and one-click reset.
 - **Apps tab stability** — per-app override controls now bind directly to the settings window, avoiding the repeated WPF popup-binding errors that could appear when opening the `Apps` tab.
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
@@ -199,13 +192,15 @@ Avoid distraction without missing urgent messages:
 - Use `Settings > Filtering` for targeting logic, `Settings > Apps` for per-app presentation overrides, `Settings > Accessibility` for voice/rate/output choices, and `Settings > Appearance` for how stacked cards look.
 - If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Then use either `Settings > Accessibility > Narration Trigger` or `Settings > Filtering > Only speak matching rules` when speech should happen only for rule matches instead of for every allowed app.
 - Background images are local-only assets copied into Notifications Pro's backgrounds folder. Stacked cards can use fit and coverage controls, single-line banner mode stays solid-colour for readability, and app-specific overrides live in `Settings > Apps`.
+- If browser-hosted services all look like one browser app, install those sites as browser apps/PWAs first so Windows can surface a cleaner app identity when the browser supports it.
 
 ### Getting the Most Out of X
 - Browser-hosted X notifications usually surface as plain Windows notification text: `AppName`, `Title`, and `Body`. Notifications Pro does not receive structured account IDs or post metadata from X itself.
+- If X is arriving as a generic browser host, install it as a browser app/PWA first. Chrome’s desktop app flow is here: [Install or manage apps in Chrome](https://support.google.com/chrome/answer/9658361?co=GENIE.Platform%3DDesktop&hl=en). Edge also supports installable apps here: [Install as app from Microsoft Edge](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps-chromium/how-to/install). In practice, if X notifications are inconsistent in Edge on your machine, Chrome remains the safer workflow.
 - Use `Settings > Filtering > Keyword Highlighting` with `Match Scope` set to `Title Only` or `Body Only` depending on where the account name or watchword usually appears in your Windows notifications.
 - Use literal keywords like `@openai`, `@nvidia`, or a campaign hashtag when the text is stable. Turn on `.*` only when you really need regex patterns.
 - Add `App Filter = X` if you want X-specific rules without affecting Outlook, Reddit, Slack, or other notification sources using similar words.
-- Use `Settings > Filtering > Narration Rules` if only certain handles, phrases, or alerts should be spoken aloud while the rest of X stays visual-only.
+- Use `Settings > Filtering > Narration Rules` if only certain handles, phrases, or alerts should be spoken aloud while the rest of X stays visual-only. If speech should happen only for those matches, turn on `Only speak matching rules`.
 
 ### Other Social Platforms
 - The same rule system works for Reddit, Instagram, Discord communities, and browser-hosted social tools, but the exact usable keywords depend on what Windows puts into the `Title` and `Body`.
@@ -313,6 +308,19 @@ Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-t
 ### Settings
 Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview your styling without waiting for a real notification.
 
+### Windows notification setup
+Notifications Pro mirrors the notifications Windows is already surfacing. If Windows notifications are off for an app, there is nothing for the overlay to capture.
+
+- Microsoft setup guide: [Change notification settings in Windows](https://support.microsoft.com/windows/change-notification-settings-in-windows-8942c744-6198-fe56-4639-34320cf9444e)
+- In Notifications Pro, use `Settings > System > Notification Access` for `Open Windows Notification Access`, `Retry Access Check`, `Run Capture Diagnostic`, and `Capture Mode`.
+
+### Browser-hosted apps and PWAs
+If several services all show up as `Google Chrome`, `Microsoft Edge`, or another browser host, install the site as an app/PWA when the browser supports it. That gives Windows a better chance to surface a distinct app name instead of the shared browser host name.
+
+- Chrome desktop app/PWA install: [Install or manage apps in Chrome](https://support.google.com/chrome/answer/9658361?co=GENIE.Platform%3DDesktop&hl=en)
+- Microsoft Edge app/PWA install: [Install as app from Microsoft Edge](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps-chromium/how-to/install)
+- Notifications Pro only sees the Windows app name, title, and body it receives. It does not get direct platform account IDs or browser-internal metadata.
+
 ### Spoken Notifications
 In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notifications Aloud** to make Notifications Pro narrate captured notifications itself.
 
@@ -342,6 +350,9 @@ On first run, Windows will prompt for notification access. If you denied it or i
 2. Find the notification listener / notification access section.
 3. Enable access for **Notifications Pro**.
 
+Official Windows help:
+- [Change notification settings in Windows](https://support.microsoft.com/windows/change-notification-settings-in-windows-8942c744-6198-fe56-4639-34320cf9444e)
+
 The tray menu also has **Open Privacy > Notifications...** and **Retry Access Check** for troubleshooting.
 
 The same recovery controls now appear in **Settings > System > Notification Access**, alongside the current capture-mode status and a manual `Auto` / `Prefer WinRT` / `Force Accessibility` selector.
@@ -355,12 +366,13 @@ If live notifications stop appearing while preview/test notifications still work
 | Symptom | Fix |
 |---------|-----|
 | No notifications captured | Verify permission, then use tray "Retry Access Check". If test notifications work but live ones do not, open **Settings > System > Notification Access**, run **Capture Diagnostic**, and switch **Capture Mode** to `Force Accessibility`. |
-| Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > System. |
+| Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > Layout. |
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
 | Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, confirm the app is still checked in **Settings > Apps > Read aloud**, and verify that **Settings > Filtering > Only speak matching rules** or `Narration Trigger = Only Matching Narration Rules` is not enabled unless you actually have a matching `Read Aloud` rule. |
 | A highlight, mute, or narration rule is affecting the wrong app | Open **Settings > Filtering** and add or tighten the optional **App Filter** so the rule only matches the intended source such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`. |
+| Everything shows up as `Google Chrome` or `Microsoft Edge` | Install the site as a browser app/PWA so Windows can surface a more specific app identity when the browser supports it, then wait for the next live notification. |
 | Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
 
 ---
@@ -382,6 +394,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.8
+- **Startup Defaults Migration**: Legacy installs now upgrade their untouched `3` visible notifications, short animation timing, and old overlay-height defaults once at startup instead of resurfacing those older values on later packaged launches.
+- **Apps Tab Layout Cleanup**: `Settings > Apps` now uses a cleaner aligned per-app override card with a compact header, proper field rhythm, and a shorter card-background status display instead of dumping long file paths into the form itself.
+- **Setup & Workflow Documentation Refresh**: Removed the placeholder screenshots section, added official Windows notification-setup guidance, documented browser-app/PWA workflows for clearer app naming, and made the rule-only narration path more explicit in the README.
 
 ### Release v1.1.10.7
 - **Rule-Gated Speech Shortcut**: `Settings > Filtering > Narration Rules` now includes an explicit `Only speak matching rules` toggle, so users can keep read-aloud tied to narration-rule hits without hunting through Accessibility first.

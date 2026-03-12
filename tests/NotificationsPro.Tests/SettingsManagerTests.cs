@@ -28,6 +28,7 @@ public class SettingsManagerTests : IDisposable
         var sm = CreateManager();
         sm.Load();
 
+        Assert.False(sm.HadExistingSettingsFile);
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(14, sm.Settings.FontSize);
         Assert.Equal("Left", sm.Settings.TextAlignment);
@@ -109,6 +110,8 @@ public class SettingsManagerTests : IDisposable
         var sm2 = CreateManager();
         sm2.Load();
 
+        Assert.True(sm2.HadExistingSettingsFile);
+        Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, sm2.Settings.SettingsSchemaVersion);
         Assert.Equal(22, sm2.Settings.FontSize);
         Assert.Equal("Consolas", sm2.Settings.FontFamily);
         Assert.Equal("Right", sm2.Settings.TextAlignment);

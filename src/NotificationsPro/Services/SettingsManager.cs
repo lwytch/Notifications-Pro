@@ -8,6 +8,8 @@ namespace NotificationsPro.Services;
 
 public class SettingsManager
 {
+    public const int CurrentSettingsSchemaVersion = 1;
+
     private static readonly string DefaultSettingsDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "NotificationsPro");
@@ -22,6 +24,7 @@ public class SettingsManager
     };
 
     public AppSettings Settings { get; private set; } = new();
+    public bool HadExistingSettingsFile { get; private set; }
 
     public event Action? SettingsChanged;
 
@@ -38,9 +41,11 @@ public class SettingsManager
 
     public void Load()
     {
+        HadExistingSettingsFile = File.Exists(_settingsPath);
+
         try
         {
-            if (File.Exists(_settingsPath))
+            if (HadExistingSettingsFile)
             {
                 var json = File.ReadAllText(_settingsPath);
                 var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
@@ -65,6 +70,8 @@ public class SettingsManager
         try
         {
             Directory.CreateDirectory(_settingsDir);
+            if (!Settings.SettingsSchemaVersion.HasValue || Settings.SettingsSchemaVersion.Value < CurrentSettingsSchemaVersion)
+                Settings.SettingsSchemaVersion = CurrentSettingsSchemaVersion;
             var json = JsonSerializer.Serialize(Settings, JsonOptions);
             File.WriteAllText(_settingsPath, json);
         }

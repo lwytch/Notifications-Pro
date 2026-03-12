@@ -4,6 +4,8 @@ namespace NotificationsPro.Models;
 
 public class AppSettings
 {
+    public int? SettingsSchemaVersion { get; set; }
+
     // Appearance — Typography
     public string FontFamily { get; set; } = "Segoe UI";
     public double FontSize { get; set; } = 14;

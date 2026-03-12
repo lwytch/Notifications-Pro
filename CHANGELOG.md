@@ -14,6 +14,10 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Startup settings persistence now uses a one-time schema migration for legacy installs, so older `3`-visible / `300ms` / `480px` defaults upgrade once instead of resurfacing on later packaged launches
+- Apps tab per-app override cards were rebuilt into a cleaner aligned form layout, and app-specific background overrides now show a short status label with the full path moved into the tooltip
+- Accessibility voice-picker guidance no longer sits inline in the control flow; the Windows voice-exposure explanation now lives in the relevant tooltip instead
+- README setup guidance now documents Windows notification setup, browser-app/PWA workflows, and the current rule-only narration path, and the placeholder screenshots section was removed for this release
 - Filtering > Narration Rules now includes an explicit `Only speak matching rules` toggle that mirrors the Accessibility narration-trigger mode, so rule-gated speech is discoverable where narration rules are actually configured
 - Accessibility disclosure cleanup — built-in narration and Voice Access transparency/privacy copy now lives in the relevant tooltips instead of occupying the main control flow on the Accessibility tab
 - Replaced the broken HTML placeholder at `Fonts/OpenDyslexic-Regular.otf` with the real font binary so the OpenDyslexic preset is shippable again

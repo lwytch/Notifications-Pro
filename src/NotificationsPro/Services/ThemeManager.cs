@@ -79,6 +79,9 @@ public class ThemeManager
 
     public static void ExportSettings(AppSettings settings, string filePath)
     {
+        if (!settings.SettingsSchemaVersion.HasValue || settings.SettingsSchemaVersion.Value < SettingsManager.CurrentSettingsSchemaVersion)
+            settings.SettingsSchemaVersion = SettingsManager.CurrentSettingsSchemaVersion;
+
         var json = JsonSerializer.Serialize(settings, JsonOptions);
         File.WriteAllText(filePath, json);
     }

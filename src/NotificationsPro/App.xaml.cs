@@ -126,6 +126,14 @@ public partial class App : Application
         _themeManager = new ThemeManager();
         _profileManager = new ProfileManager();
 
+        var primaryScreen = WinForms.Screen.PrimaryScreen;
+        var startupSettingsChanged = StartupSettingsMigrationHelper.Apply(
+            _settingsManager.Settings,
+            primaryScreen?.WorkingArea.Height,
+            _settingsManager.HadExistingSettingsFile);
+        if (startupSettingsChanged)
+            _settingsManager.Save();
+
         // Sync startup registry with saved setting
         SyncStartupRegistryState();
 
@@ -183,17 +191,9 @@ public partial class App : Application
         _themeScheduleTimer.Start();
         OnThemeScheduleTimerTick(null, EventArgs.Empty);
 
-        // Show first-run balloon tip & set defaults
-        if (!_settingsManager.Settings.HasShownWelcome)
+        // Show first-run balloon tip only when there was no existing settings file.
+        if (!_settingsManager.HadExistingSettingsFile)
         {
-            // Set default overlay height to monitor height
-            var primaryScreen = WinForms.Screen.PrimaryScreen;
-            if (primaryScreen != null)
-            {
-                _settingsManager.Settings.OverlayMaxHeight = primaryScreen.WorkingArea.Height;
-                _settingsManager.Save();
-            }
-
             if (_trayIcon != null)
             {
                 _trayIcon.ShowBalloonTip(

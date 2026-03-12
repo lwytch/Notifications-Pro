@@ -1646,6 +1646,8 @@
                             <TextBlock Text="Only Speak Matching Rules" Style="{StaticResource SettingLabel}"
                                        ToolTip="Use this when read aloud should happen only for narration-rule hits instead of every allowed notification. Matching rules can still force Read Aloud or Skip Read Aloud per app, title, or body text."/>
                         </DockPanel>
+                        <TextBlock Text="When this is off, narration rules only override matching notifications and other allowed apps still speak normally."
+                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,8"/>
 
                         <Grid Margin="0,4,0,8">
                             <Grid.ColumnDefinitions>
@@ -1727,7 +1729,7 @@
                     <StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="APP CUSTOMIZATION" Style="{StaticResource SectionHeader}"
+                            <TextBlock Text="PER-APP OVERRIDES" Style="{StaticResource SectionHeader}"
                                        ToolTip="Assign app-specific sound, icon, narration, and card background overrides. Global styling still lives in Appearance."/>
                         </Border>
 
@@ -1759,72 +1761,101 @@
                         <ItemsControl ItemsSource="{Binding PerAppConfigEntriesView}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Padding="12,10" Margin="0,0,0,8"
+                                    <Border Padding="14,12" Margin="0,0,0,10"
                                             CornerRadius="6" Background="{DynamicResource SurfaceLightBrush}">
                                         <StackPanel>
-                                            <DockPanel Margin="0,0,0,8">
+                                            <DockPanel Margin="0,0,0,12">
                                                 <Button DockPanel.Dock="Right"
                                                         Content="Clear Overrides"
                                                         Style="{StaticResource InlineSecondaryButton}"
+                                                        Margin="12,0,0,0"
                                                         Command="{Binding ElementName=SettingsRoot, Path=DataContext.ClearPerAppOverridesCommand}"
                                                         CommandParameter="{Binding}"
                                                         ToolTip="Return this app to the global sound, icon, narration, and card background settings."/>
-                                                <StackPanel>
+                                                <StackPanel Margin="0,0,12,0">
                                                     <TextBlock Text="{Binding AppName}" Style="{StaticResource SettingLabel}"
-                                                               FontWeight="SemiBold" Margin="0,0,0,2"/>
+                                                               FontWeight="SemiBold" Margin="0"/>
                                                 </StackPanel>
                                             </DockPanel>
 
-                                            <DockPanel Margin="0,0,0,8">
-                                                <CheckBox DockPanel.Dock="Right"
-                                                          IsChecked="{Binding IsReadAloudEnabled}"
-                                                          Content="Read aloud"
-                                                          FontFamily="{StaticResource UIFont}"
-                                                          FontSize="12"
-                                                          Foreground="{DynamicResource TextPrimaryBrush}"
-                                                          ToolTip="When checked, built-in spoken notifications can read this app aloud. Uncheck to keep this app visual-only."/>
-                                                <TextBlock Text="Narration" Style="{StaticResource SettingLabel}"
-                                                           Margin="0"
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="150"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                                           Text="Read aloud"
+                                                           Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,12,8"
                                                            ToolTip="App-specific narration override. This only affects built-in read-aloud, not Microsoft Voice Access labels."/>
-                                            </DockPanel>
+                                                <ToggleButton Grid.Row="0" Grid.Column="1"
+                                                              Style="{StaticResource ToggleSwitch}"
+                                                              HorizontalAlignment="Right"
+                                                              Margin="0,0,0,8"
+                                                              IsChecked="{Binding IsReadAloudEnabled}"
+                                                              ToolTip="When enabled, built-in spoken notifications can read this app aloud. Turn it off to keep this app visual-only."/>
 
-                                            <TextBlock Text="Sound" Style="{StaticResource SettingLabel}" Margin="0,0,0,4"/>
-                                            <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                      ItemsSource="{Binding ElementName=SettingsRoot, Path=DataContext.PerAppSoundOptions}"
-                                                      SelectedValuePath="WavPath"
-                                                      SelectedValue="{Binding Sound}">
-                                                <ComboBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding Name}" FontFamily="{StaticResource UIFont}" FontSize="13"
-                                                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                    </DataTemplate>
-                                                </ComboBox.ItemTemplate>
-                                            </ComboBox>
+                                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                                           Text="Sound"
+                                                           Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,12,8"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="1"
+                                                          Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          Margin="0,0,0,12"
+                                                          ItemsSource="{Binding ElementName=SettingsRoot, Path=DataContext.PerAppSoundOptions}"
+                                                          SelectedValuePath="WavPath"
+                                                          SelectedValue="{Binding Sound}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Name}" FontFamily="{StaticResource UIFont}" FontSize="13"
+                                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
 
-                                            <TextBlock Text="Icon" Style="{StaticResource SettingLabel}" Margin="0,10,0,4"/>
-                                            <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                      ItemsSource="{Binding ElementName=SettingsRoot, Path=DataContext.PerAppIconOptions}"
-                                                      SelectedItem="{Binding Icon}"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0"
+                                                           Text="Icon"
+                                                           Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,12,8"/>
+                                                <ComboBox Grid.Row="2" Grid.Column="1"
+                                                          Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          Margin="0,0,0,12"
+                                                          ItemsSource="{Binding ElementName=SettingsRoot, Path=DataContext.PerAppIconOptions}"
+                                                          SelectedItem="{Binding Icon}"/>
 
-                                            <TextBlock Text="Card Background Override" Style="{StaticResource SettingLabel}" Margin="0,10,0,4"/>
-                                            <DockPanel>
-                                                <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource InlineSecondaryButton}"
-                                                        Margin="8,0,0,0"
-                                                        Command="{Binding ElementName=SettingsRoot, Path=DataContext.ClearPerAppBackgroundImageCommand}"
-                                                        CommandParameter="{Binding}"
-                                                        ToolTip="Remove the app-specific background image and return this app to the global card background."/>
-                                                <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource InlineSecondaryButton}"
-                                                        Margin="8,0,0,0"
-                                                        Command="{Binding ElementName=SettingsRoot, Path=DataContext.BrowsePerAppBackgroundImageCommand}"
-                                                        CommandParameter="{Binding}"
-                                                        ToolTip="Choose a local image to use only for this app's notification cards."/>
-                                                <TextBox Style="{StaticResource SettingsTextBox}"
-                                                         Text="{Binding BackgroundImageDisplay, Mode=OneWay}"
-                                                         IsReadOnly="True"
-                                                         ToolTip="If no override is set, this app uses the global card background image settings from Appearance."/>
-                                            </DockPanel>
+                                                <TextBlock Grid.Row="3" Grid.Column="0"
+                                                           Text="Card background"
+                                                           Style="{StaticResource SettingLabel}"
+                                                           Margin="0,0,12,0"
+                                                           VerticalAlignment="Top"
+                                                           ToolTip="Optional app-specific card background image. When blank, this app uses the global card background from Appearance."/>
+                                                <StackPanel Grid.Row="3" Grid.Column="1">
+                                                    <TextBox Style="{StaticResource SettingsTextBox}"
+                                                             Text="{Binding BackgroundImageDisplay, Mode=OneWay}"
+                                                             IsReadOnly="True"
+                                                             ToolTip="{Binding BackgroundImageToolTip}"/>
+                                                    <WrapPanel Margin="0,8,0,0" HorizontalAlignment="Right">
+                                                        <Button Content="Browse..." Style="{StaticResource InlineSecondaryButton}"
+                                                                Margin="0,0,8,0"
+                                                                Command="{Binding ElementName=SettingsRoot, Path=DataContext.BrowsePerAppBackgroundImageCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                ToolTip="Choose a local image to use only for this app's notification cards."/>
+                                                        <Button Content="Clear" Style="{StaticResource InlineSecondaryButton}"
+                                                                Command="{Binding ElementName=SettingsRoot, Path=DataContext.ClearPerAppBackgroundImageCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                ToolTip="Remove the app-specific background image and return this app to the global card background."/>
+                                                    </WrapPanel>
+                                                </StackPanel>
+                                            </Grid>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -2449,12 +2480,7 @@
                                       SelectedValuePath="Id"
                                       SelectedValue="{Binding ReadNotificationsAloudVoiceId}"
                                       Margin="0,4,0,0"
-                                      ToolTip="Lists every voice Windows currently exposes to Notifications Pro across the app speech API and the desktop speech API. Choose System Default to follow the current Windows app voice."/>
-                            <TextBlock TextWrapping="Wrap"
-                                       Margin="0,6,0,0"
-                                       Style="{StaticResource SettingDesc}"
-                                       Foreground="{DynamicResource TextMutedBrush}"
-                                       Text="Notifications Pro shows every voice Windows exposes to this app through its built-in speech APIs. If a Narrator voice is still missing after a refresh, Windows is not exposing that voice to app text-to-speech on this machine."/>
+                                      ToolTip="Lists every voice Windows currently exposes to Notifications Pro across the app speech API and the desktop speech API. Choose System Default to follow the current Windows app voice. If a Narrator voice is still missing after Refresh Voices, Windows is not exposing that voice to third-party app text-to-speech on this machine."/>
 
                             <TextBlock Text="Speech Rate" Style="{StaticResource SettingLabel}"
                                        ToolTip="Controls how quickly the spoken notification is read."/>

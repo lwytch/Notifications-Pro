@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -2744,6 +2745,7 @@ public class PerAppConfigEntry : BaseViewModel
                 return;
 
             OnPropertyChanged(nameof(BackgroundImageDisplay));
+            OnPropertyChanged(nameof(BackgroundImageToolTip));
             OnPropertyChanged(nameof(HasOverrides));
             _onChanged?.Invoke(this);
         }
@@ -2765,6 +2767,10 @@ public class PerAppConfigEntry : BaseViewModel
 
     public string BackgroundImageDisplay => string.IsNullOrWhiteSpace(BackgroundImagePath)
         ? "Uses global card background"
+        : Path.GetFileName(BackgroundImagePath);
+
+    public string BackgroundImageToolTip => string.IsNullOrWhiteSpace(BackgroundImagePath)
+        ? "This app uses the global card background from Appearance."
         : BackgroundImagePath;
 
     public bool HasOverrides =>
@@ -2784,6 +2790,7 @@ public class PerAppConfigEntry : BaseViewModel
         OnPropertyChanged(nameof(Icon));
         OnPropertyChanged(nameof(BackgroundImagePath));
         OnPropertyChanged(nameof(BackgroundImageDisplay));
+        OnPropertyChanged(nameof(BackgroundImageToolTip));
         OnPropertyChanged(nameof(IsReadAloudEnabled));
         OnPropertyChanged(nameof(HasOverrides));
     }

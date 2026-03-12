@@ -27,7 +27,9 @@
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Apps tab now loads its per-app sound/icon/background controls through stable root-window bindings instead of popup-sensitive combo-box ancestor lookups
 - Apps tab background override display now reads from a one-way binding, so opening the tab and sending test notifications no longer tries to write back into the read-only display property
+- Apps tab per-app override cards now use a cleaner aligned form layout, with a compact header, a consistent label/control rhythm, and a shortened background-image status display instead of dumping full file paths into the main form flow
 - Packaged MSIX startup now preserves package identity instead of forcing the unpackaged fallback AUMID, reducing the risk of live notification capture failing after updates
+- Startup settings now use a one-time schema migration instead of the welcome-tip flag to detect legacy defaults, so old `3`-visible / `300ms` / `480px` installs upgrade once without resetting current user choices on every launch
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display behavior, timing, deduplication, quiet hours, and burst protection
@@ -54,6 +56,7 @@
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
 - Accessibility tab privacy/transparency copy is now pushed into tooltips for spoken notifications and Voice Access, keeping the main control layout cleaner without removing the disclosures from Help/README
+- Accessibility spoken-voice availability now stays in tooltips rather than as a long inline paragraph in the middle of the control flow
 - System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, a clipboard-friendly `Run Capture Diagnostic` action, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
 - Appearance now supports explicit `Solid` vs `Image` card background mode, plus saturation, contrast, black-and-white, and portrait-safe vertical-focus controls
 - Fullscreen backdrops now support the same image-treatment controls as card backgrounds: hue, brightness, saturation, contrast, black-and-white, fit, and vertical focus
@@ -250,7 +253,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 182 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, and rule/background-image persistence), spoken-notification trigger logic, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 185 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
