@@ -94,9 +94,7 @@ public class SettingsManagerTests : IDisposable
             OverlayLane = OverlayLaneHelper.Secondary,
             IsReadAloudEnabled = false,
             Sound = "Default",
-            Icon = "Mail",
-            AccentColor = "#00AAFF",
-            BackgroundImagePath = @"C:\NotificationsPro\backgrounds\codex.png"
+            Icon = "Mail"
         });
         sm.Settings.OverlayLanes.Add(new OverlayLaneDefinition
         {

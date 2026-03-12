@@ -529,11 +529,17 @@ public class QueueManagerTests
     public void AddNotification_AppProfileRoutesNotificationToSecondaryOverlay()
     {
         var settings = CreateSettings();
+        settings.Settings.OverlayLanes.Add(new OverlayLaneDefinition
+        {
+            Id = OverlayLaneHelper.Secondary,
+            Name = OverlayLaneHelper.SecondaryDisplayName,
+            IsEnabled = true,
+            AccentColor = "#00AAFF"
+        });
         settings.Settings.AppProfiles.Add(new AppProfile
         {
             AppName = "Codex",
-            OverlayLane = OverlayLaneHelper.Secondary,
-            AccentColor = "#00AAFF"
+            OverlayLane = OverlayLaneHelper.Secondary
         });
         var queue = new QueueManager(settings);
 

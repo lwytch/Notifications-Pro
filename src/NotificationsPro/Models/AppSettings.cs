@@ -22,6 +22,10 @@ public class AppSettings
     public string BackgroundColor { get; set; } = "#202020";
     public double BackgroundOpacity { get; set; } = 0.94;
     public string AccentColor { get; set; } = "#0078D4";
+    public string OverlayBackgroundImagePath { get; set; } = string.Empty;
+    public double OverlayBackgroundImageOpacity { get; set; } = 0.45;
+    public double OverlayBackgroundImageHueDegrees { get; set; }
+    public double OverlayBackgroundImageBrightness { get; set; } = 1.0;
 
     // Appearance — Card Shape
     public double CornerRadius { get; set; } = 20;

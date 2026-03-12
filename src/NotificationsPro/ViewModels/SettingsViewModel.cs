@@ -66,83 +66,83 @@ public partial class SettingsViewModel : BaseViewModel
 
     // Typography — shared
     private string _fontFamily = "Segoe UI";
-    public string FontFamily { get => _fontFamily; set { if (SetProperty(ref _fontFamily, value)) QueueSave(); } }
+    public string FontFamily { get => _fontFamily; set { if (SetProperty(ref _fontFamily, value)) QueueLaneScopedSave(); } }
 
     private double _lineSpacing = 1.5;
-    public double LineSpacing { get => _lineSpacing; set { if (SetProperty(ref _lineSpacing, value)) QueueSave(); } }
+    public double LineSpacing { get => _lineSpacing; set { if (SetProperty(ref _lineSpacing, value)) QueueLaneScopedSave(); } }
 
     // Typography — body
     private double _fontSize = 14;
-    public double FontSize { get => _fontSize; set { if (SetProperty(ref _fontSize, value)) QueueSave(); } }
+    public double FontSize { get => _fontSize; set { if (SetProperty(ref _fontSize, value)) QueueLaneScopedSave(); } }
 
     private string _fontWeight = "Normal";
-    public string FontWeight { get => _fontWeight; set { if (SetProperty(ref _fontWeight, value)) QueueSave(); } }
+    public string FontWeight { get => _fontWeight; set { if (SetProperty(ref _fontWeight, value)) QueueLaneScopedSave(); } }
 
     // Typography — app name
     private double _appNameFontSize = 14;
-    public double AppNameFontSize { get => _appNameFontSize; set { if (SetProperty(ref _appNameFontSize, value)) QueueSave(); } }
+    public double AppNameFontSize { get => _appNameFontSize; set { if (SetProperty(ref _appNameFontSize, value)) QueueLaneScopedSave(); } }
 
     private string _appNameFontWeight = "SemiBold";
-    public string AppNameFontWeight { get => _appNameFontWeight; set { if (SetProperty(ref _appNameFontWeight, value)) QueueSave(); } }
+    public string AppNameFontWeight { get => _appNameFontWeight; set { if (SetProperty(ref _appNameFontWeight, value)) QueueLaneScopedSave(); } }
 
     // Typography — title
     private double _titleFontSize = 16;
-    public double TitleFontSize { get => _titleFontSize; set { if (SetProperty(ref _titleFontSize, value)) QueueSave(); } }
+    public double TitleFontSize { get => _titleFontSize; set { if (SetProperty(ref _titleFontSize, value)) QueueLaneScopedSave(); } }
 
     private string _titleFontWeight = "SemiBold";
-    public string TitleFontWeight { get => _titleFontWeight; set { if (SetProperty(ref _titleFontWeight, value)) QueueSave(); } }
+    public string TitleFontWeight { get => _titleFontWeight; set { if (SetProperty(ref _titleFontWeight, value)) QueueLaneScopedSave(); } }
 
     // Colors
     private string _textColor = "#E6E6E6";
     public IEnumerable<string> AvailableTextAlignments => new[] { "Left", "Center", "Right" };
 
     private string _textAlignment = "Left";
-    public string TextAlignment { get => _textAlignment; set { if (SetProperty(ref _textAlignment, value)) QueueSave(); } }
+    public string TextAlignment { get => _textAlignment; set { if (SetProperty(ref _textAlignment, value)) QueueLaneScopedSave(); } }
 
-    public string TextColor { get => _textColor; set { if (SetProperty(ref _textColor, value)) QueueSave(); } }
+    public string TextColor { get => _textColor; set { if (SetProperty(ref _textColor, value)) QueueLaneScopedSave(); } }
 
     private string _titleColor = "#FFFFFF";
-    public string TitleColor { get => _titleColor; set { if (SetProperty(ref _titleColor, value)) QueueSave(); } }
+    public string TitleColor { get => _titleColor; set { if (SetProperty(ref _titleColor, value)) QueueLaneScopedSave(); } }
 
     private string _appNameColor = "#C8C8C8";
-    public string AppNameColor { get => _appNameColor; set { if (SetProperty(ref _appNameColor, value)) QueueSave(); } }
+    public string AppNameColor { get => _appNameColor; set { if (SetProperty(ref _appNameColor, value)) QueueLaneScopedSave(); } }
 
     private string _backgroundColor = "#202020";
-    public string BackgroundColor { get => _backgroundColor; set { if (SetProperty(ref _backgroundColor, value)) QueueSave(); } }
+    public string BackgroundColor { get => _backgroundColor; set { if (SetProperty(ref _backgroundColor, value)) QueueLaneScopedSave(); } }
 
     private double _backgroundOpacity = 0.94;
-    public double BackgroundOpacity { get => _backgroundOpacity; set { if (SetProperty(ref _backgroundOpacity, value)) QueueSave(); } }
+    public double BackgroundOpacity { get => _backgroundOpacity; set { if (SetProperty(ref _backgroundOpacity, value)) QueueLaneScopedSave(); } }
 
     private string _accentColor = "#0078D4";
-    public string AccentColor { get => _accentColor; set { if (SetProperty(ref _accentColor, value)) QueueSave(); } }
+    public string AccentColor { get => _accentColor; set { if (SetProperty(ref _accentColor, value)) QueueLaneScopedSave(); } }
 
     // Card shape
     private double _cornerRadius = 12;
-    public double CornerRadius { get => _cornerRadius; set { if (SetProperty(ref _cornerRadius, value)) QueueSave(); } }
+    public double CornerRadius { get => _cornerRadius; set { if (SetProperty(ref _cornerRadius, value)) QueueLaneScopedSave(); } }
 
     private double _padding = 16;
-    public double Padding { get => _padding; set { if (SetProperty(ref _padding, value)) QueueSave(); } }
+    public double Padding { get => _padding; set { if (SetProperty(ref _padding, value)) QueueLaneScopedSave(); } }
 
     private double _cardGap = 8;
-    public double CardGap { get => _cardGap; set { if (SetProperty(ref _cardGap, value)) QueueSave(); } }
+    public double CardGap { get => _cardGap; set { if (SetProperty(ref _cardGap, value)) QueueLaneScopedSave(); } }
 
     private double _outerMargin = 4;
-    public double OuterMargin { get => _outerMargin; set { if (SetProperty(ref _outerMargin, value)) QueueSave(); } }
+    public double OuterMargin { get => _outerMargin; set { if (SetProperty(ref _outerMargin, value)) QueueLaneScopedSave(); } }
 
     private bool _showAccent = true;
-    public bool ShowAccent { get => _showAccent; set { if (SetProperty(ref _showAccent, value)) QueueSave(); } }
+    public bool ShowAccent { get => _showAccent; set { if (SetProperty(ref _showAccent, value)) QueueLaneScopedSave(); } }
 
     private double _accentThickness = 3;
-    public double AccentThickness { get => _accentThickness; set { if (SetProperty(ref _accentThickness, value)) QueueSave(); } }
+    public double AccentThickness { get => _accentThickness; set { if (SetProperty(ref _accentThickness, value)) QueueLaneScopedSave(); } }
 
     private bool _showBorder;
-    public bool ShowBorder { get => _showBorder; set { if (SetProperty(ref _showBorder, value)) QueueSave(); } }
+    public bool ShowBorder { get => _showBorder; set { if (SetProperty(ref _showBorder, value)) QueueLaneScopedSave(); } }
 
     private string _borderColor = "#3A3A3A";
-    public string BorderColor { get => _borderColor; set { if (SetProperty(ref _borderColor, value)) QueueSave(); } }
+    public string BorderColor { get => _borderColor; set { if (SetProperty(ref _borderColor, value)) QueueLaneScopedSave(); } }
 
     private double _borderThickness = 1;
-    public double BorderThickness { get => _borderThickness; set { if (SetProperty(ref _borderThickness, value)) QueueSave(); } }
+    public double BorderThickness { get => _borderThickness; set { if (SetProperty(ref _borderThickness, value)) QueueLaneScopedSave(); } }
 
     // Behavior
     private bool _replaceMode;
@@ -155,25 +155,25 @@ public partial class SettingsViewModel : BaseViewModel
     public int MaxVisibleNotifications { get => _maxVisibleNotifications; set { if (SetProperty(ref _maxVisibleNotifications, Math.Max(1, value))) QueueSave(); } }
 
     private bool _showAppName = true;
-    public bool ShowAppName { get => _showAppName; set { if (SetProperty(ref _showAppName, value)) QueueSave(); } }
+    public bool ShowAppName { get => _showAppName; set { if (SetProperty(ref _showAppName, value)) QueueLaneScopedSave(); } }
 
     private bool _showNotificationTitle = true;
-    public bool ShowNotificationTitle { get => _showNotificationTitle; set { if (SetProperty(ref _showNotificationTitle, value)) QueueSave(); } }
+    public bool ShowNotificationTitle { get => _showNotificationTitle; set { if (SetProperty(ref _showNotificationTitle, value)) QueueLaneScopedSave(); } }
 
     private bool _showNotificationBody = true;
-    public bool ShowNotificationBody { get => _showNotificationBody; set { if (SetProperty(ref _showNotificationBody, value)) QueueSave(); } }
+    public bool ShowNotificationBody { get => _showNotificationBody; set { if (SetProperty(ref _showNotificationBody, value)) QueueLaneScopedSave(); } }
 
     private bool _limitTextLines;
-    public bool LimitTextLines { get => _limitTextLines; set { if (SetProperty(ref _limitTextLines, value)) QueueSave(); } }
+    public bool LimitTextLines { get => _limitTextLines; set { if (SetProperty(ref _limitTextLines, value)) QueueLaneScopedSave(); } }
 
     private int _maxAppNameLines = 2;
-    public int MaxAppNameLines { get => _maxAppNameLines; set { if (SetProperty(ref _maxAppNameLines, Math.Max(1, value))) QueueSave(); } }
+    public int MaxAppNameLines { get => _maxAppNameLines; set { if (SetProperty(ref _maxAppNameLines, Math.Max(1, value))) QueueLaneScopedSave(); } }
 
     private int _maxTitleLines = 2;
-    public int MaxTitleLines { get => _maxTitleLines; set { if (SetProperty(ref _maxTitleLines, Math.Max(1, value))) QueueSave(); } }
+    public int MaxTitleLines { get => _maxTitleLines; set { if (SetProperty(ref _maxTitleLines, Math.Max(1, value))) QueueLaneScopedSave(); } }
 
     private int _maxBodyLines = 4;
-    public int MaxBodyLines { get => _maxBodyLines; set { if (SetProperty(ref _maxBodyLines, Math.Max(1, value))) QueueSave(); } }
+    public int MaxBodyLines { get => _maxBodyLines; set { if (SetProperty(ref _maxBodyLines, Math.Max(1, value))) QueueLaneScopedSave(); } }
 
     private bool _singleLineMode;
     public bool SingleLineMode
@@ -183,33 +183,33 @@ public partial class SettingsViewModel : BaseViewModel
         {
             if (!SetProperty(ref _singleLineMode, value)) return;
             OnPropertyChanged(nameof(IsStackedLayout));
-            QueueSave();
+            QueueLaneScopedSave();
         }
     }
 
     private bool _singleLineWrapText;
-    public bool SingleLineWrapText { get => _singleLineWrapText; set { if (SetProperty(ref _singleLineWrapText, value)) QueueSave(); } }
+    public bool SingleLineWrapText { get => _singleLineWrapText; set { if (SetProperty(ref _singleLineWrapText, value)) QueueLaneScopedSave(); } }
 
     private int _singleLineMaxLines = 3;
-    public int SingleLineMaxLines { get => _singleLineMaxLines; set { if (SetProperty(ref _singleLineMaxLines, Math.Max(1, value))) QueueSave(); } }
+    public int SingleLineMaxLines { get => _singleLineMaxLines; set { if (SetProperty(ref _singleLineMaxLines, Math.Max(1, value))) QueueLaneScopedSave(); } }
 
     private bool _singleLineAutoFullWidth;
-    public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set { if (SetProperty(ref _singleLineAutoFullWidth, value)) QueueSave(); } }
+    public bool SingleLineAutoFullWidth { get => _singleLineAutoFullWidth; set { if (SetProperty(ref _singleLineAutoFullWidth, value)) QueueLaneScopedSave(); } }
 
     private bool _showTimestamp;
-    public bool ShowTimestamp { get => _showTimestamp; set { if (SetProperty(ref _showTimestamp, value)) QueueSave(); } }
+    public bool ShowTimestamp { get => _showTimestamp; set { if (SetProperty(ref _showTimestamp, value)) QueueLaneScopedSave(); } }
 
     private double _timestampFontSize = 11;
-    public double TimestampFontSize { get => _timestampFontSize; set { if (SetProperty(ref _timestampFontSize, Math.Clamp(value, 8, 32))) QueueSave(); } }
+    public double TimestampFontSize { get => _timestampFontSize; set { if (SetProperty(ref _timestampFontSize, Math.Clamp(value, 8, 32))) QueueLaneScopedSave(); } }
 
     private string _timestampDisplayMode = "Relative";
-    public string TimestampDisplayMode { get => _timestampDisplayMode; set { if (SetProperty(ref _timestampDisplayMode, NormalizeTimestampDisplayMode(value))) QueueSave(); } }
+    public string TimestampDisplayMode { get => _timestampDisplayMode; set { if (SetProperty(ref _timestampDisplayMode, NormalizeTimestampDisplayMode(value))) QueueLaneScopedSave(); } }
 
     private string _timestampFontWeight = "Normal";
-    public string TimestampFontWeight { get => _timestampFontWeight; set { if (SetProperty(ref _timestampFontWeight, value)) QueueSave(); } }
+    public string TimestampFontWeight { get => _timestampFontWeight; set { if (SetProperty(ref _timestampFontWeight, value)) QueueLaneScopedSave(); } }
 
     private string _timestampColor = "#C8C8C8";
-    public string TimestampColor { get => _timestampColor; set { if (SetProperty(ref _timestampColor, value)) QueueSave(); } }
+    public string TimestampColor { get => _timestampColor; set { if (SetProperty(ref _timestampColor, value)) QueueLaneScopedSave(); } }
 
     private bool _newestOnTop = true;
     public bool NewestOnTop { get => _newestOnTop; set { if (SetProperty(ref _newestOnTop, value)) QueueSave(); } }
@@ -515,7 +515,7 @@ public partial class SettingsViewModel : BaseViewModel
 
     // Appearance — Density
     private string _densityPreset = "Comfortable";
-    public string DensityPreset { get => _densityPreset; set { if (SetProperty(ref _densityPreset, value)) QueueSave(); } }
+    public string DensityPreset { get => _densityPreset; set { if (SetProperty(ref _densityPreset, value)) QueueLaneScopedSave(); } }
 
     private string _notificationAccessStatusSummary = "Checking Windows notification access...";
     public string NotificationAccessStatusSummary
@@ -905,7 +905,7 @@ public partial class SettingsViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _selectedMonitorIndex, value))
-                QueueSave();
+                QueueLaneScopedSave();
         }
     }
 
@@ -930,7 +930,7 @@ public partial class SettingsViewModel : BaseViewModel
             var clamped = Math.Clamp(value, OverlayWidthMin, OverlayWidthMax);
             if (!SetProperty(ref _overlayWidth, clamped)) return;
             _overlayWidthDirty = true;
-            QueueSave();
+            QueueLaneScopedSave();
         }
     }
 
@@ -942,7 +942,7 @@ public partial class SettingsViewModel : BaseViewModel
         {
             var clamped = Math.Clamp(value, OverlayMaxHeightMin, OverlayMaxHeightMax);
             if (SetProperty(ref _overlayMaxHeight, clamped))
-                QueueSave();
+                QueueLaneScopedSave();
         }
     }
 
@@ -1424,9 +1424,6 @@ public partial class SettingsViewModel : BaseViewModel
         RefreshSpokenAppEntries();
         RefreshAppProfileEntries();
         RefreshNarrationVoices();
-
-        _overlayWidth = Math.Clamp(s.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
-        _overlayMaxHeight = Math.Clamp(s.OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax);
         _allowManualResize = s.AllowManualResize;
         _snapToEdges = s.SnapToEdges;
         _snapDistance = s.SnapDistance;
@@ -1441,6 +1438,12 @@ public partial class SettingsViewModel : BaseViewModel
     {
         _saveDebounce.Stop();
         _saveDebounce.Start();
+    }
+
+    private void QueueLaneScopedSave()
+    {
+        SyncSelectedOverlayLaneFromEditor();
+        QueueSave();
     }
 
     private void Undo()
@@ -1808,22 +1811,24 @@ public partial class SettingsViewModel : BaseViewModel
         if (parameter is not string preset || string.IsNullOrWhiteSpace(preset))
             return;
 
-        _saveDebounce.Stop();
-        SaveSettings();
+        SyncSelectedOverlayLaneFromEditor();
 
-        var updated = _settingsManager.Settings.Clone();
-        // Use the selected monitor from M9 monitor picker
-        updated.MonitorIndex = SelectedMonitorIndex;
-        updated.SelectedMonitorIndex = SelectedMonitorIndex;
+        var lane = SelectedOverlayLaneEntry ?? _mainOverlayLaneEntry;
+        lane.MonitorIndex = SelectedMonitorIndex;
+        lane.PositionPreset = SecondaryOverlayPositionHelper.Normalize(preset);
         var workArea = GetWorkAreaForMonitor(SelectedMonitorIndex);
 
         // Calculate boundary edges safely using exact internal padding metrics.
         // OuterContentMargin=8px on all sides, Bottom Item Margin=16px.
-        var targetWidth = Math.Clamp(updated.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
-        if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
+        var targetWidth = Math.Clamp(OverlayWidth, OverlayWidthMin, OverlayWidthMax);
+        if (SingleLineMode && SingleLineAutoFullWidth)
             targetWidth = Math.Clamp(workArea.Width + 16, OverlayWidthMin, OverlayWidthMax);
 
-        var overlayWindow = System.Windows.Application.Current.Windows.OfType<NotificationsPro.Views.OverlayWindow>().FirstOrDefault();
+        var overlayWindow = System.Windows.Application.Current.Windows
+            .OfType<NotificationsPro.Views.OverlayWindow>()
+            .FirstOrDefault(window =>
+                window.DataContext is OverlayViewModel vm &&
+                string.Equals(vm.OverlayLane, OverlayLaneHelper.Normalize(SelectedOverlayLaneId), StringComparison.OrdinalIgnoreCase));
         var actualHeight = overlayWindow?.ActualHeight > 0 ? overlayWindow.ActualHeight : Math.Min(360, workArea.Height - 16);
 
         var targetTop = workArea.Top - 8;
@@ -1884,20 +1889,13 @@ public partial class SettingsViewModel : BaseViewModel
         targetLeft = Math.Max(minLeft, Math.Min(targetLeft, maxLeft));
         targetTop = Math.Max(minTop, Math.Min(targetTop, maxTop));
 
-        updated.OverlayWidth = targetWidth;
-        if (!(updated.SingleLineMode && updated.SingleLineAutoFullWidth))
-            updated.LastManualOverlayWidth = targetWidth;
-        updated.OverlayLeft = targetLeft;
-        updated.OverlayTop = targetTop;
-        _settingsManager.Apply(updated);
+        lane.Width = targetWidth;
+        lane.Left = targetLeft;
+        lane.Top = targetTop;
+        LoadSelectedLaneEditor();
 
-        if (Math.Abs(_overlayWidth - targetWidth) > 0.5)
-        {
-            _overlayWidth = targetWidth;
-            OnPropertyChanged(nameof(OverlayWidth));
-        }
-
-        _overlayWidthDirty = false;
+        _saveDebounce.Stop();
+        SaveSettings();
     }
 
     private static Rect GetWorkAreaForMonitor(int monitorIndex)
@@ -2145,6 +2143,26 @@ public partial class SettingsViewModel : BaseViewModel
     {
         if (parameter is not ThemePreset theme) return;
 
+        if (!IsMainOverlayLaneSelected)
+        {
+            TextColor = theme.TextColor;
+            TitleColor = theme.TitleColor;
+            AppNameColor = theme.AppNameColor;
+            BackgroundColor = theme.BackgroundColor;
+            BackgroundOpacity = theme.BackgroundOpacity;
+            AccentColor = theme.AccentColor;
+            BorderColor = theme.BorderColor;
+            CornerRadius = theme.CornerRadius;
+            Padding = theme.Padding;
+            CardGap = theme.CardGap;
+            OuterMargin = theme.OuterMargin;
+            ShowAccent = theme.ShowAccent;
+            AccentThickness = theme.AccentThickness;
+            ShowBorder = theme.ShowBorder;
+            BorderThickness = theme.BorderThickness;
+            return;
+        }
+
         _saveDebounce.Stop();
         SaveSettings();
 
@@ -2175,9 +2193,26 @@ public partial class SettingsViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(name)) return;
 
         _saveDebounce.Stop();
-        SaveSettings();
+        SyncSelectedOverlayLaneFromEditor();
 
-        var theme = ThemePreset.FromSettings(_settingsManager.Settings, name);
+        var snapshot = _settingsManager.Settings.Clone();
+        snapshot.TextColor = TextColor;
+        snapshot.TitleColor = TitleColor;
+        snapshot.AppNameColor = AppNameColor;
+        snapshot.BackgroundColor = BackgroundColor;
+        snapshot.BackgroundOpacity = BackgroundOpacity;
+        snapshot.AccentColor = AccentColor;
+        snapshot.BorderColor = BorderColor;
+        snapshot.CornerRadius = CornerRadius;
+        snapshot.Padding = Padding;
+        snapshot.CardGap = CardGap;
+        snapshot.OuterMargin = OuterMargin;
+        snapshot.ShowAccent = ShowAccent;
+        snapshot.AccentThickness = AccentThickness;
+        snapshot.ShowBorder = ShowBorder;
+        snapshot.BorderThickness = BorderThickness;
+
+        var theme = ThemePreset.FromSettings(snapshot, name);
         _themeManager.SaveCustomTheme(theme);
         NewThemeName = string.Empty;
         RefreshCustomThemes();
@@ -2581,36 +2616,26 @@ public partial class SettingsViewModel : BaseViewModel
 
     private void MoveToSelectedMonitor()
     {
-        _saveDebounce.Stop();
-        SaveSettings();
+        SyncSelectedOverlayLaneFromEditor();
 
-        var updated = _settingsManager.Settings.Clone();
-        updated.MonitorIndex = SelectedMonitorIndex;
-        updated.SelectedMonitorIndex = SelectedMonitorIndex;
+        var lane = SelectedOverlayLaneEntry ?? _mainOverlayLaneEntry;
+        lane.MonitorIndex = SelectedMonitorIndex;
 
         var workArea = GetWorkAreaForMonitor(SelectedMonitorIndex);
         const double margin = 16;
 
-        var targetWidth = Math.Clamp(updated.OverlayWidth, OverlayWidthMin, OverlayWidthMax);
-        if (updated.SingleLineMode && updated.SingleLineAutoFullWidth)
+        var targetWidth = Math.Clamp(OverlayWidth, OverlayWidthMin, OverlayWidthMax);
+        if (SingleLineMode && SingleLineAutoFullWidth)
             targetWidth = Math.Clamp(workArea.Width - (margin * 2), OverlayWidthMin, OverlayWidthMax);
 
         // Position at top-right of selected monitor
-        updated.OverlayLeft = workArea.Right - targetWidth - margin;
-        updated.OverlayTop = workArea.Top + margin;
-        updated.OverlayWidth = targetWidth;
-        if (!(updated.SingleLineMode && updated.SingleLineAutoFullWidth))
-            updated.LastManualOverlayWidth = targetWidth;
+        lane.Left = workArea.Right - targetWidth - margin;
+        lane.Top = workArea.Top + margin;
+        lane.Width = targetWidth;
+        LoadSelectedLaneEditor();
 
-        _settingsManager.Apply(updated);
-
-        if (Math.Abs(_overlayWidth - targetWidth) > 0.5)
-        {
-            _overlayWidth = targetWidth;
-            OnPropertyChanged(nameof(OverlayWidth));
-        }
-
-        _overlayWidthDirty = false;
+        _saveDebounce.Stop();
+        SaveSettings();
     }
 
     public ThemeManager GetThemeManager() => _themeManager;

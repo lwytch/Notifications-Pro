@@ -372,10 +372,10 @@ public class QueueManager : BaseViewModel
         item.TitleColorOverride = string.Empty;
         item.TextColorOverride = string.Empty;
         item.AppNameColorOverride = string.Empty;
-        item.BackgroundImagePath = string.Empty;
-        item.BackgroundImageOpacity = 0.45;
-        item.BackgroundImageHueDegrees = 0;
-        item.BackgroundImageBrightness = 1.0;
+        item.BackgroundImagePath = settings.OverlayBackgroundImagePath;
+        item.BackgroundImageOpacity = Math.Clamp(settings.OverlayBackgroundImageOpacity, 0.0, 1.0);
+        item.BackgroundImageHueDegrees = settings.OverlayBackgroundImageHueDegrees;
+        item.BackgroundImageBrightness = Math.Clamp(settings.OverlayBackgroundImageBrightness, 0.2, 2.0);
 
         if (profile == null)
             return;
@@ -408,24 +408,6 @@ public class QueueManager : BaseViewModel
             item.BackgroundImageOpacity = Math.Clamp(lane.BackgroundImageOpacity, 0.0, 1.0);
             item.BackgroundImageHueDegrees = lane.BackgroundImageHueDegrees;
             item.BackgroundImageBrightness = Math.Clamp(lane.BackgroundImageBrightness, 0.2, 2.0);
-        }
-
-        if (!string.IsNullOrWhiteSpace(profile.AccentColor))
-            item.AccentColorOverride = profile.AccentColor;
-        if (!string.IsNullOrWhiteSpace(profile.BackgroundColor))
-            item.BackgroundColorOverride = profile.BackgroundColor;
-        if (!string.IsNullOrWhiteSpace(profile.TitleColor))
-            item.TitleColorOverride = profile.TitleColor;
-        if (!string.IsNullOrWhiteSpace(profile.TextColor))
-            item.TextColorOverride = profile.TextColor;
-        if (!string.IsNullOrWhiteSpace(profile.AppNameColor))
-            item.AppNameColorOverride = profile.AppNameColor;
-        if (!string.IsNullOrWhiteSpace(profile.BackgroundImagePath))
-        {
-            item.BackgroundImagePath = profile.BackgroundImagePath;
-            item.BackgroundImageOpacity = Math.Clamp(profile.BackgroundImageOpacity, 0.0, 1.0);
-            item.BackgroundImageHueDegrees = profile.BackgroundImageHueDegrees;
-            item.BackgroundImageBrightness = Math.Clamp(profile.BackgroundImageBrightness, 0.2, 2.0);
         }
     }
 
