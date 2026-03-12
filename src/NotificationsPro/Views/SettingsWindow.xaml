@@ -1636,7 +1636,7 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="NARRATION RULES" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Override normal read-aloud behavior when a keyword matches the title, body, or both. These rules sit on top of the global read-aloud toggle and per-app checkboxes."/>
+                                       ToolTip="Override normal read-aloud behavior when a keyword matches the title, body, or both. These rules can sit on top of the normal narration settings, or become the only narration trigger when Accessibility uses Only Matching Narration Rules."/>
                         </Border>
 
                         <Grid Margin="0,4,0,8">
@@ -2414,6 +2414,15 @@
                         </DockPanel>
 
                         <StackPanel Visibility="{Binding ReadNotificationsAloudEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Narration Trigger" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Choose whether built-in narration should speak every allowed notification or only items that match a Narration Rule in Filtering."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableReadNotificationsAloudTriggerModes}"
+                                      SelectedItem="{Binding ReadNotificationsAloudTriggerMode}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="All Allowed Notifications follows your global narration toggle plus the per-app Read aloud checkboxes. Only Matching Narration Rules speaks only notifications that hit a Narration Rule with the Read Aloud action."/>
+
                             <TextBlock Text="Spoken Content" Style="{StaticResource SettingLabel}"
                                        ToolTip="Choose which notification fields narration should read, including concise title/body modes and timestamp-aware combinations."/>
                             <ComboBox Style="{StaticResource SettingsComboBox}"
@@ -2432,12 +2441,12 @@
                                       SelectedValuePath="Id"
                                       SelectedValue="{Binding ReadNotificationsAloudVoiceId}"
                                       Margin="0,4,0,0"
-                                      ToolTip="Uses Windows-installed Microsoft-signed voices. Choose System Default to follow your current Windows voice."/>
+                                      ToolTip="Lists every voice Windows currently exposes to Notifications Pro across the app speech API and the desktop speech API. Choose System Default to follow the current Windows app voice."/>
                             <TextBlock TextWrapping="Wrap"
                                        Margin="0,6,0,0"
                                        Style="{StaticResource SettingDesc}"
                                        Foreground="{DynamicResource TextMutedBrush}"
-                                       Text="Only Windows-installed Microsoft-signed voices appear here. If your preferred voice is missing, install it in Windows first, then reopen Notifications Pro if needed."/>
+                                       Text="Notifications Pro shows every voice Windows exposes to this app through its built-in speech APIs. If a Narrator voice is still missing after a refresh, Windows is not exposing that voice to app text-to-speech on this machine."/>
 
                             <TextBlock Text="Speech Rate" Style="{StaticResource SettingLabel}"
                                        ToolTip="Controls how quickly the spoken notification is read."/>
@@ -2470,6 +2479,9 @@
                                         Command="{Binding TestNarrationCommand}"
                                         Margin="0,0,8,0"
                                         ToolTip="Speak a sample notification using the current voice, speed, volume, and spoken-content mode."/>
+                                <Button Content="Refresh Voices" Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding RefreshNarrationVoicesCommand}"
+                                        ToolTip="Re-scan the Windows voice lists without reopening Notifications Pro."/>
                             </WrapPanel>
 
                             <TextBlock Text="Per-app narration overrides now live in Apps so all app-specific controls stay in one place."
@@ -3095,7 +3107,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="2. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Pick any installed Windows voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification. Use the Read Aloud checkbox list if you only want certain apps narrated."/>
+                                       Text="Pick any available voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification. Use the Narration Trigger selector if you want speech only when a Narration Rule matches, or the Read Aloud checkbox list if you only want certain apps narrated."/>
                         </Grid>
                         <Grid Margin="12,0,0,4">
                             <Grid.ColumnDefinitions>
@@ -3104,7 +3116,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="3. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Only Windows-installed Microsoft-signed voices appear in Notifications Pro. If the voice you want is missing, add it in Windows first, then reopen the app if it still does not appear. Finished cards are only read once, so new arrivals do not replay older cards that already spoke."/>
+                                       Text="Notifications Pro lists every voice Windows exposes to it through the app and desktop speech APIs. Some Narrator Natural voices may still be Narrator-only on your machine, in which case Windows will not expose them here even after installation. Finished cards are only read once, so new arrivals do not replay older cards that already spoke."/>
                         </Grid>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
@@ -3128,7 +3140,7 @@
                                    Text="Settings → Filtering now lets you target rules against Title Only, Body Only, or Title + Body, and optionally limit them to a specific app name such as X, Reddit, Outlook, Slack, Codex, or Antigravity."/>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="Use Keyword Highlighting and Keyword Muting for visual rules, then use Narration Rules only when a matching phrase should force Read Aloud or Skip Read Aloud without changing your normal global narration settings."/>
+                                   Text="Use Keyword Highlighting and Keyword Muting for visual rules, then use Narration Rules when a matching phrase should force Read Aloud or Skip Read Aloud. If you want narration to happen only for rule matches, set Accessibility → Narration Trigger to Only Matching Narration Rules."/>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
                                    Text="Notifications Pro still works from the Windows notification text only. It does not receive structured X account IDs, post metadata, or platform APIs, so the safest setup is to target the text patterns that actually appear in your live notifications."/>
@@ -3328,7 +3340,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in Per-App Speech."/>
+                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in Settings → Apps → Read aloud."/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"

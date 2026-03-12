@@ -12,6 +12,8 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Spoken notifications now support an explicit `Only Matching Narration Rules` trigger mode, so narration rules can gate speech cleanly without forcing you to disable the normal global narration path by hand
+- Spoken voice enumeration now merges the Windows app speech voice list with the desktop speech voice list, so Notifications Pro shows more of the voices actually usable on the machine instead of only the WinRT subset
 - Packaged MSIX builds no longer force the fallback unpackaged AUMID at startup, avoiding split Windows notification identities that could stop live notification capture after updates
 - Apps tab per-app background path display now uses an explicit one-way binding, preventing the `BackgroundImageDisplay` read-only property from crashing the settings window when the tab refreshes or a test notification is sent
 - Apps tab combo-box and command bindings now resolve through the settings window directly, preventing the tab from throwing repeated WPF binding errors when opened
@@ -44,6 +46,7 @@
 - Legacy settings/import files that predate `CardBackgroundMode` now upgrade correctly to image-backed cards when they already contain a card background image path, instead of silently normalizing back to `Solid`
 
 ### Added
+- `Refresh Voices` action in Accessibility so the narration voice picker can be rescanned without reopening the app after Windows voice changes
 - Settings IA polish pass — `Persistent Notifications` and `Auto-Duration` now live in `Behavior`, app-specific narration moved into `Apps`, overlay window interaction moved into `Layout`, quick tips moved into `Settings Window`, and `System` now includes a `Run Capture Diagnostic` action
 - Apps tab management tools — per-app override search, `Only modified` filtering, `Read aloud` checkboxes, and one-click `Clear Overrides`
 - Advanced image treatment controls — card backgrounds and fullscreen backdrops now expose `Saturation`, `Contrast`, `Black & White`, and portrait-safe `Vertical Focus`, and card backgrounds now use an explicit `Solid / Image` mode

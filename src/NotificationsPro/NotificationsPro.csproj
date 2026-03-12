@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <Version>1.1.10.5</Version>
+    <Version>1.1.10.6</Version>
     <AssemblyTitle>Notifications Pro</AssemblyTitle>
     <Product>Notifications Pro</Product>
     <Description>Windows tray app that mirrors toast notifications into a customizable always-on-top overlay</Description>

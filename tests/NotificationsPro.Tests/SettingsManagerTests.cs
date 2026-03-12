@@ -57,6 +57,7 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.TextAlignment = "Right";
         sm.Settings.BackgroundOpacity = 0.5;
         sm.Settings.ReadNotificationsAloudEnabled = true;
+        sm.Settings.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.OnlyMatchingNarrationRules;
         sm.Settings.ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleBodyTimestamp;
         sm.Settings.SpokenMutedApps.Add("Teams");
         sm.Settings.VoiceAccessReadMode = VoiceAccessTextFormatter.ModeBodyOnly;
@@ -113,6 +114,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Right", sm2.Settings.TextAlignment);
         Assert.Equal(0.5, sm2.Settings.BackgroundOpacity);
         Assert.True(sm2.Settings.ReadNotificationsAloudEnabled);
+        Assert.Equal(NarrationTriggerModeHelper.OnlyMatchingNarrationRules, sm2.Settings.ReadNotificationsAloudTriggerMode);
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleBodyTimestamp, sm2.Settings.ReadNotificationsAloudMode);
         Assert.Equal(new[] { "Teams" }, sm2.Settings.SpokenMutedApps);
         Assert.Equal(VoiceAccessTextFormatter.ModeBodyOnly, sm2.Settings.VoiceAccessReadMode);
@@ -237,6 +239,7 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
         Assert.False(settings.ReadNotificationsAloudEnabled);
+        Assert.Equal(NarrationTriggerModeHelper.AllAllowedNotifications, settings.ReadNotificationsAloudTriggerMode);
         Assert.Equal(SpokenNotificationTextFormatter.ModeBodyOnly, settings.ReadNotificationsAloudMode);
         Assert.Equal(string.Empty, settings.ReadNotificationsAloudVoiceId);
         Assert.Equal(1.0, settings.ReadNotificationsAloudRate);

@@ -444,6 +444,17 @@ public partial class SettingsViewModel : BaseViewModel
     private bool _readNotificationsAloudEnabled;
     public bool ReadNotificationsAloudEnabled { get => _readNotificationsAloudEnabled; set { if (SetProperty(ref _readNotificationsAloudEnabled, value)) QueueSave(); } }
 
+    private string _readNotificationsAloudTriggerMode = NarrationTriggerModeHelper.AllAllowedNotifications;
+    public string ReadNotificationsAloudTriggerMode
+    {
+        get => _readNotificationsAloudTriggerMode;
+        set
+        {
+            if (SetProperty(ref _readNotificationsAloudTriggerMode, NormalizeReadNotificationsAloudTriggerMode(value)))
+                QueueSave();
+        }
+    }
+
     private string _readNotificationsAloudMode = SpokenNotificationTextFormatter.ModeBodyOnly;
     public string ReadNotificationsAloudMode
     {
@@ -849,6 +860,11 @@ public partial class SettingsViewModel : BaseViewModel
         return SpokenNotificationTextFormatter.NormalizeMode(mode);
     }
 
+    private static string NormalizeReadNotificationsAloudTriggerMode(string? mode)
+    {
+        return NarrationTriggerModeHelper.Normalize(mode);
+    }
+
     private static string NormalizeReadNotificationsAloudVoiceId(string? voiceId)
     {
         return string.IsNullOrWhiteSpace(voiceId) ? string.Empty : voiceId.Trim();
@@ -1006,6 +1022,8 @@ public partial class SettingsViewModel : BaseViewModel
         SpokenNotificationTextFormatter.ModeTitleBodyTimestamp
     };
 
+    public List<string> AvailableReadNotificationsAloudTriggerModes { get; } = NarrationTriggerModeHelper.KnownModes.ToList();
+
     public ObservableCollection<NarrationVoiceOption> AvailableNarrationVoices { get; } = new();
 
     public List<string> AvailableNotificationCaptureModes { get; } = new()
@@ -1038,6 +1056,7 @@ public partial class SettingsViewModel : BaseViewModel
     public ICommand RemovePresentationAppCommand { get; }
     public ICommand TestSoundCommand { get; }
     public ICommand TestNarrationCommand { get; }
+    public ICommand RefreshNarrationVoicesCommand { get; }
     public ICommand BrowseCustomSoundCommand { get; }
     public ICommand BrowseCustomIconCommand { get; }
     public ICommand BrowsePerAppBackgroundImageCommand { get; }
@@ -1156,6 +1175,7 @@ public partial class SettingsViewModel : BaseViewModel
         RemovePresentationAppCommand = new RelayCommand(RemovePresentationApp);
         TestSoundCommand = new RelayCommand(_ => TestSound());
         TestNarrationCommand = new RelayCommand(_ => TestNarration(), _ => !IsNarrationPreviewInProgress);
+        RefreshNarrationVoicesCommand = new RelayCommand(_ => RefreshNarrationVoices());
         BrowseCustomSoundCommand = new RelayCommand(_ => BrowseCustomSound());
         BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
         BrowsePerAppBackgroundImageCommand = new RelayCommand(BrowsePerAppBackgroundImage);
@@ -1337,6 +1357,7 @@ public partial class SettingsViewModel : BaseViewModel
         _hotkeyDismissAll = s.HotkeyDismissAll;
         _hotkeyToggleDnd = s.HotkeyToggleDnd;
         _readNotificationsAloudEnabled = s.ReadNotificationsAloudEnabled;
+        _readNotificationsAloudTriggerMode = NormalizeReadNotificationsAloudTriggerMode(s.ReadNotificationsAloudTriggerMode);
         _readNotificationsAloudMode = NormalizeReadNotificationsAloudMode(s.ReadNotificationsAloudMode);
         _readNotificationsAloudVoiceId = NormalizeReadNotificationsAloudVoiceId(s.ReadNotificationsAloudVoiceId);
         _readNotificationsAloudRate = Math.Clamp(s.ReadNotificationsAloudRate, 0.5, 6.0);
@@ -1669,6 +1690,7 @@ public partial class SettingsViewModel : BaseViewModel
             HotkeyDismissAll = HotkeyDismissAll,
             HotkeyToggleDnd = HotkeyToggleDnd,
             ReadNotificationsAloudEnabled = ReadNotificationsAloudEnabled,
+            ReadNotificationsAloudTriggerMode = NormalizeReadNotificationsAloudTriggerMode(ReadNotificationsAloudTriggerMode),
             ReadNotificationsAloudMode = NormalizeReadNotificationsAloudMode(ReadNotificationsAloudMode),
             ReadNotificationsAloudVoiceId = NormalizeReadNotificationsAloudVoiceId(ReadNotificationsAloudVoiceId),
             ReadNotificationsAloudRate = ReadNotificationsAloudRate,

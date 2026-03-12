@@ -1,6 +1,8 @@
 using System.Collections.Specialized;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using Windows.Media.Core;
 using Windows.Media.Playback;
@@ -14,6 +16,9 @@ namespace NotificationsPro.Services;
 /// </summary>
 public sealed class SpokenNotificationService : IDisposable
 {
+    private const string SystemSpeechVoicePrefix = "sapi:";
+    private const int SystemSpeechPurgeBeforeSpeakFlag = 2;
+
     private readonly QueueManager _queueManager;
     private readonly SettingsManager _settingsManager;
     private readonly Dispatcher _dispatcher;
@@ -24,6 +29,7 @@ public sealed class SpokenNotificationService : IDisposable
     private int _playbackGeneration;
     private bool _isSynthesizing;
     private NotificationItem? _currentItem;
+    private object? _currentSystemSpeechVoice;
     private SpeechSynthesisStream? _currentStream;
     private MediaSource? _currentSource;
     private bool _wasSpeechEnabled;
@@ -50,28 +56,41 @@ public sealed class SpokenNotificationService : IDisposable
     public static IReadOnlyList<NarrationVoiceOption> GetInstalledVoices()
     {
         var voices = new List<NarrationVoiceOption>();
+        var seenIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
             var defaultVoice = SpeechSynthesizer.DefaultVoice;
-            var defaultLabel = string.IsNullOrWhiteSpace(defaultVoice?.DisplayName)
+            var defaultDisplayName = BuildWinRtVoiceDisplayLabel(defaultVoice);
+            var defaultLabel = string.IsNullOrWhiteSpace(defaultDisplayName)
                 ? "System Default"
-                : $"System Default ({defaultVoice.DisplayName})";
+                : $"System Default ({defaultDisplayName})";
 
             voices.Add(new NarrationVoiceOption(string.Empty, defaultLabel, defaultVoice?.Language ?? string.Empty, isSystemDefault: true));
+            seenIds.Add(string.Empty);
 
             foreach (var voice in SpeechSynthesizer.AllVoices
-                         .OrderBy(v => v.DisplayName, StringComparer.OrdinalIgnoreCase))
+                         .OrderBy(BuildWinRtVoiceDisplayLabel, StringComparer.OrdinalIgnoreCase))
             {
-                var label = string.IsNullOrWhiteSpace(voice.Language)
-                    ? voice.DisplayName
-                    : $"{voice.DisplayName} ({voice.Language})";
-                voices.Add(new NarrationVoiceOption(voice.Id, label, voice.Language));
+                var voiceId = voice.Id?.Trim() ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(voiceId) || !seenIds.Add(voiceId))
+                    continue;
+
+                voices.Add(new NarrationVoiceOption(voiceId, BuildWinRtVoiceDisplayLabel(voice), voice.Language));
             }
         }
         catch
         {
             voices.Add(new NarrationVoiceOption(string.Empty, "System Default", string.Empty, isSystemDefault: true));
+            seenIds.Add(string.Empty);
+        }
+
+        foreach (var desktopVoice in GetInstalledSystemSpeechVoices())
+        {
+            if (!seenIds.Add(desktopVoice.Id))
+                continue;
+
+            voices.Add(desktopVoice);
         }
 
         return voices;
@@ -79,9 +98,6 @@ public sealed class SpokenNotificationService : IDisposable
 
     public static async Task PlayPreviewAsync(AppSettings settings)
     {
-        using var synthesizer = new SpeechSynthesizer();
-        ConfigureSynthesizer(synthesizer, settings);
-
         var previewText = SpokenNotificationTextFormatter.BuildText(
             "Notifications Pro",
             "Sample notification body. Build succeeded and the release package is ready.",
@@ -89,6 +105,17 @@ public sealed class SpokenNotificationService : IDisposable
             settings.ReadNotificationsAloudMode,
             settings.TimestampDisplayMode);
 
+        if (string.IsNullOrWhiteSpace(previewText))
+            return;
+
+        if (IsSystemSpeechVoiceId(settings.ReadNotificationsAloudVoiceId))
+        {
+            await PlaySystemSpeechPreviewAsync(settings, previewText);
+            return;
+        }
+
+        using var synthesizer = new SpeechSynthesizer();
+        ConfigureSynthesizer(synthesizer, settings);
         using var stream = await synthesizer.SynthesizeTextToStreamAsync(previewText);
         using var player = new MediaPlayer();
         player.CommandManager.IsEnabled = false;
@@ -213,7 +240,18 @@ public sealed class SpokenNotificationService : IDisposable
     }
 
     private bool ShouldSpeakItem(NotificationItem item)
+        => ShouldSpeakItem(item, _settingsManager.Settings);
+
+    internal static bool ShouldSpeakItem(NotificationItem item, AppSettings settings)
     {
+        if (string.Equals(
+                NarrationTriggerModeHelper.Normalize(settings.ReadNotificationsAloudTriggerMode),
+                NarrationTriggerModeHelper.OnlyMatchingNarrationRules,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return item.ReadAloudEnabledOverride == true;
+        }
+
         if (item.ReadAloudEnabledOverride.HasValue)
             return item.ReadAloudEnabledOverride.Value;
 
@@ -221,7 +259,7 @@ public sealed class SpokenNotificationService : IDisposable
         if (string.IsNullOrWhiteSpace(appName))
             return true;
 
-        return !_settingsManager.Settings.SpokenMutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase);
+        return !settings.SpokenMutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase);
     }
 
     private void TryStartNext()
@@ -267,6 +305,11 @@ public sealed class SpokenNotificationService : IDisposable
 
         var generation = ++_playbackGeneration;
         _currentItem = item;
+        _isSynthesizing = false;
+
+        if (TryStartSystemSpeechPlayback(item, spokenText, settings, generation))
+            return;
+
         _isSynthesizing = true;
 
         SpeechSynthesisStream? stream = null;
@@ -318,7 +361,7 @@ public sealed class SpokenNotificationService : IDisposable
     private static void ConfigureSynthesizer(SpeechSynthesizer synthesizer, AppSettings settings)
     {
         var voiceId = settings.ReadNotificationsAloudVoiceId?.Trim() ?? string.Empty;
-        if (!string.IsNullOrWhiteSpace(voiceId))
+        if (!string.IsNullOrWhiteSpace(voiceId) && !IsSystemSpeechVoiceId(voiceId))
         {
             var voice = SpeechSynthesizer.AllVoices.FirstOrDefault(v => string.Equals(v.Id, voiceId, StringComparison.Ordinal));
             if (voice != null)
@@ -363,6 +406,12 @@ public sealed class SpokenNotificationService : IDisposable
     {
         _playbackGeneration++;
 
+        if (_currentSystemSpeechVoice != null)
+        {
+            try { ((dynamic)_currentSystemSpeechVoice).Speak(string.Empty, SystemSpeechPurgeBeforeSpeakFlag); } catch { }
+            _currentSystemSpeechVoice = null;
+        }
+
         try { _mediaPlayer.Pause(); } catch { }
         try { _mediaPlayer.Source = null; } catch { }
 
@@ -380,6 +429,243 @@ public sealed class SpokenNotificationService : IDisposable
             foreach (var item in _pendingItems)
                 _playbackTracker.MarkDequeued(item);
             _pendingItems.Clear();
+        }
+    }
+
+    private static IReadOnlyList<NarrationVoiceOption> GetInstalledSystemSpeechVoices()
+    {
+        var voices = new List<NarrationVoiceOption>();
+        var voiceObject = CreateSystemSpeechVoice();
+        if (voiceObject == null)
+            return voices;
+
+        try
+        {
+            dynamic voice = voiceObject;
+            dynamic tokens = voice.GetVoices();
+            var count = (int)tokens.Count;
+            for (var index = 0; index < count; index++)
+            {
+                dynamic token = tokens.Item(index);
+                var tokenId = SafeString(token.Id);
+                if (string.IsNullOrWhiteSpace(tokenId))
+                    continue;
+
+                var displayLabel = SafeString(token.GetDescription());
+                if (string.IsNullOrWhiteSpace(displayLabel))
+                    displayLabel = tokenId;
+
+                voices.Add(new NarrationVoiceOption(
+                    BuildSystemSpeechVoiceId(tokenId),
+                    displayLabel,
+                    string.Empty));
+            }
+        }
+        catch
+        {
+            return voices;
+        }
+        finally
+        {
+            ReleaseSystemSpeechVoice(voiceObject);
+        }
+
+        return voices;
+    }
+
+    private static string BuildWinRtVoiceDisplayLabel(VoiceInformation? voice)
+    {
+        if (voice == null)
+            return string.Empty;
+
+        var registryLabel = TryReadRegistryVoiceDisplayName(voice.Id);
+        if (!string.IsNullOrWhiteSpace(registryLabel))
+            return registryLabel;
+
+        return string.IsNullOrWhiteSpace(voice.Language)
+            ? voice.DisplayName
+            : $"{voice.DisplayName} ({voice.Language})";
+    }
+
+    private static string? TryReadRegistryVoiceDisplayName(string? voiceId)
+    {
+        if (string.IsNullOrWhiteSpace(voiceId))
+            return null;
+
+        const string hklmPrefix = @"HKEY_LOCAL_MACHINE\";
+        if (!voiceId.StartsWith(hklmPrefix, StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        try
+        {
+            using var key = Registry.LocalMachine.OpenSubKey(voiceId[hklmPrefix.Length..]);
+            return key?.GetValue(null) as string;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private bool TryStartSystemSpeechPlayback(NotificationItem item, string spokenText, AppSettings settings, int generation)
+    {
+        if (!IsSystemSpeechVoiceId(settings.ReadNotificationsAloudVoiceId))
+            return false;
+
+        var voiceObject = CreateSystemSpeechVoice();
+        if (voiceObject == null)
+            return false;
+
+        if (!TryConfigureSystemSpeechVoice(voiceObject, settings))
+        {
+            ReleaseSystemSpeechVoice(voiceObject);
+            return false;
+        }
+
+        _currentSystemSpeechVoice = voiceObject;
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                ((dynamic)voiceObject).Speak(spokenText, 0);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }).ContinueWith(task =>
+        {
+            _dispatcher.InvokeAsync(() =>
+            {
+                HandleSystemSpeechCompletion(item, generation, voiceObject, task.Status == TaskStatus.RanToCompletion && task.Result);
+            });
+        }, TaskScheduler.Default);
+
+        return true;
+    }
+
+    private void HandleSystemSpeechCompletion(NotificationItem item, int generation, object voiceObject, bool completedSuccessfully)
+    {
+        if (ReferenceEquals(_currentSystemSpeechVoice, voiceObject))
+            _currentSystemSpeechVoice = null;
+
+        ReleaseSystemSpeechVoice(voiceObject);
+
+        if (_disposed || generation != _playbackGeneration)
+        {
+            if (ReferenceEquals(_currentItem, item))
+                _currentItem = null;
+
+            _isSynthesizing = false;
+            TryStartNext();
+            return;
+        }
+
+        if (completedSuccessfully && ReferenceEquals(_currentItem, item))
+            _playbackTracker.MarkSpoken(item);
+
+        StopCurrentPlayback(clearPending: false);
+        TryStartNext();
+    }
+
+    private static async Task PlaySystemSpeechPreviewAsync(AppSettings settings, string previewText)
+    {
+        var voiceObject = CreateSystemSpeechVoice();
+        if (voiceObject == null)
+            throw new InvalidOperationException("Desktop speech voices are not available on this machine.");
+
+        if (!TryConfigureSystemSpeechVoice(voiceObject, settings))
+        {
+            ReleaseSystemSpeechVoice(voiceObject);
+            throw new InvalidOperationException("The selected desktop voice is no longer available.");
+        }
+
+        try
+        {
+            await Task.Run(() => ((dynamic)voiceObject).Speak(previewText, 0));
+        }
+        finally
+        {
+            ReleaseSystemSpeechVoice(voiceObject);
+        }
+    }
+
+    private static object? CreateSystemSpeechVoice()
+    {
+        try
+        {
+            var voiceType = Type.GetTypeFromProgID("SAPI.SpVoice", throwOnError: false);
+            return voiceType == null ? null : Activator.CreateInstance(voiceType);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool TryConfigureSystemSpeechVoice(object voiceObject, AppSettings settings)
+    {
+        try
+        {
+            dynamic voice = voiceObject;
+            var storedVoiceId = settings.ReadNotificationsAloudVoiceId?.Trim() ?? string.Empty;
+            var tokenId = storedVoiceId[SystemSpeechVoicePrefix.Length..];
+            dynamic tokens = voice.GetVoices();
+            var count = (int)tokens.Count;
+            for (var index = 0; index < count; index++)
+            {
+                dynamic token = tokens.Item(index);
+                if (!string.Equals(SafeString(token.Id), tokenId, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                voice.Voice = token;
+                voice.Rate = MapSystemSpeechRate(settings.ReadNotificationsAloudRate);
+                voice.Volume = (int)Math.Round(Math.Clamp(settings.ReadNotificationsAloudVolume, 0.0, 1.0) * 100.0);
+                return true;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    private static int MapSystemSpeechRate(double configuredRate)
+    {
+        var clampedRate = Math.Clamp(configuredRate, 0.5, 6.0);
+        if (clampedRate >= 1.0)
+            return (int)Math.Round(((clampedRate - 1.0) / 5.0) * 10.0);
+
+        return (int)Math.Round(((clampedRate - 1.0) / 0.5) * 10.0);
+    }
+
+    private static string BuildSystemSpeechVoiceId(string tokenId)
+        => $"{SystemSpeechVoicePrefix}{tokenId}";
+
+    private static bool IsSystemSpeechVoiceId(string? voiceId)
+        => !string.IsNullOrWhiteSpace(voiceId)
+           && voiceId.StartsWith(SystemSpeechVoicePrefix, StringComparison.OrdinalIgnoreCase);
+
+    private static string SafeString(object? value)
+        => value?.ToString()?.Trim() ?? string.Empty;
+
+    private static void ReleaseSystemSpeechVoice(object? voiceObject)
+    {
+        if (voiceObject == null)
+            return;
+
+        try
+        {
+            if (Marshal.IsComObject(voiceObject))
+                Marshal.FinalReleaseComObject(voiceObject);
+        }
+        catch
+        {
+            // Best-effort cleanup only.
         }
     }
 

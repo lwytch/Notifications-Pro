@@ -195,6 +195,7 @@ Keyboard & motor accessibility:
 - [x] Per-app spoken notification controls and voice setup help: choose which seen apps are narrated, surface Windows voice-install guidance, and disclose the built-in voice requirements clearly
 - [x] Spoken notification replay guard: visible cards are spoken once, new arrivals no longer replay cards that already finished speaking, and unfinished visible cards can still resume after pause/unmute
 - [x] Spoken app selector clarity: switched from Speak/Skip buttons to explicit Read Aloud checkboxes
+- [x] Spoken voice availability and trigger clarity: enumerate every voice Windows exposes to Notifications Pro across app and desktop speech APIs, add an explicit narration trigger mode for `All allowed notifications` vs `Only matching narration rules`, and update help/readme wording so Narrator-only voices are disclosed honestly.
 - [ ] Full keyboard navigation audit (deferred)
 
 Cognitive accessibility:

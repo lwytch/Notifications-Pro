@@ -115,6 +115,7 @@ public class ThemeManager
         s.FontSize = double.IsNaN(s.FontSize) ? 14 : Math.Clamp(s.FontSize, 6, 72);
         s.TitleFontSize = double.IsNaN(s.TitleFontSize) ? 16 : Math.Clamp(s.TitleFontSize, 6, 72);
         s.AppNameFontSize = double.IsNaN(s.AppNameFontSize) ? 14 : Math.Clamp(s.AppNameFontSize, 6, 72);
+        s.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(s.ReadNotificationsAloudTriggerMode);
         s.CardBackgroundMode = CardBackgroundModeHelper.Normalize(
             !hasCardBackgroundMode && !string.IsNullOrWhiteSpace(s.CardBackgroundImagePath)
                 ? CardBackgroundModeHelper.Image

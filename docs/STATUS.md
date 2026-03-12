@@ -48,10 +48,10 @@
 - Notification cards now expose meaningful UI Automation names instead of the raw `NotificationsPro.Models.NotificationItem` class name
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
-- Accessibility tab now includes built-in spoken notifications with on/off toggle, multiple title/body/timestamp combinations, installed voice selection, speed/volume controls, and a Preview Voice button
+- Accessibility tab now includes built-in spoken notifications with on/off toggle, explicit narration trigger mode (`All Allowed Notifications` vs `Only Matching Narration Rules`), multiple title/body/timestamp combinations, voice selection across the Windows app and desktop speech APIs, speed/volume controls, plus Preview Voice and Refresh Voices actions
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
-- Accessibility Help now links to official Microsoft voice-setup pages and explains that only Windows-installed Microsoft-signed voices appear in the picker
+- Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
 - System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, a clipboard-friendly `Run Capture Diagnostic` action, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
 - Appearance now supports explicit `Solid` vs `Image` card background mode, plus saturation, contrast, black-and-white, and portrait-safe vertical-focus controls
 - Fullscreen backdrops now support the same image-treatment controls as card backgrounds: hue, brightness, saturation, contrast, black-and-white, fit, and vertical focus
@@ -247,7 +247,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 176 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, and rule/background-image persistence), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 182 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, and rule/background-image persistence), spoken-notification trigger logic, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -255,6 +255,7 @@
 
 ## Known Issues / Troubleshooting
 - **UserNotificationListener** may report "Allowed" but not deliver notifications reliably on some systems. Workaround: open Windows Settings > Privacy > Notifications, ensure the app has access, then use "Retry Access Check". If test notifications work but live ones do not, switch Settings > System > Notification Access > Capture Mode to `Force Accessibility`.
+- Some voices shown in Windows Narrator are not exposed to third-party app speech APIs. Notifications Pro now merges both the Windows app speech list and the desktop speech list, but a Narrator voice can still be missing if Windows keeps it Narrator-only on that machine.
 - If overlay cannot be dragged, check click-through state first. Click-through intentionally blocks mouse interaction; use tray menu item "Disable Click-Through (Allow Dragging)".
 - The tray status line shows diagnostic info (WinRT poll metrics or accessibility captured/candidate/event counters) to help debug listener visibility.
 

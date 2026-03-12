@@ -102,6 +102,7 @@
   "HotkeyDismissAll": "Ctrl+Alt+D",
   "HotkeyToggleDnd": "Ctrl+Alt+P",
   "ReadNotificationsAloudEnabled": false,
+  "ReadNotificationsAloudTriggerMode": "All Allowed Notifications",
   "ReadNotificationsAloudMode": "Body Only",
   "ReadNotificationsAloudVoiceId": "",
   "ReadNotificationsAloudRate": 1.0,

@@ -136,6 +136,7 @@ public class AppSettings
 
     // Accessibility — Spoken notifications
     public bool ReadNotificationsAloudEnabled { get; set; } = false;
+    public string ReadNotificationsAloudTriggerMode { get; set; } = NarrationTriggerModeHelper.AllAllowedNotifications;
     public string ReadNotificationsAloudMode { get; set; } = "Body Only";
     public string ReadNotificationsAloudVoiceId { get; set; } = string.Empty;
     public double ReadNotificationsAloudRate { get; set; } = 1.0;

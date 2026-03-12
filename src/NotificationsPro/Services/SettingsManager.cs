@@ -105,6 +105,7 @@ public class SettingsManager
         settings.PerAppSounds ??= new Dictionary<string, string>();
         settings.PerAppBackgroundImages ??= new Dictionary<string, string>();
         settings.PresentationApps ??= new List<string>();
+        settings.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(settings.ReadNotificationsAloudTriggerMode);
         settings.CardBackgroundMode = CardBackgroundModeHelper.Normalize(
             !hasCardBackgroundMode && !string.IsNullOrWhiteSpace(settings.CardBackgroundImagePath)
                 ? CardBackgroundModeHelper.Image
