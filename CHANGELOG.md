@@ -30,7 +30,6 @@
 - Hotkey registration failures are now surfaced in Settings > Accessibility when a combo is invalid or already taken
 - Help tab references now match the current tab layout and control locations
 - Spoken-notification selectors no longer render with the extra left indentation that made the section look misaligned
-- Multi-lane overlays now use independent lane-filtered views, fixing the bug where routed notifications could appear duplicated in the same visible lane
 - Notification cards now expose meaningful Windows UI Automation names instead of the raw model class name
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
 - Memory leak: OverlayWindow now unsubscribes from SettingsChanged event on close (prevents GC retention)
@@ -41,10 +40,9 @@
 ### Added
 - Field-scoped highlight, mute, and narration rules with optional app filters and title/body/title+body targeting
 - Dedicated `Apps` tab for per-app read aloud, overlay lane, sounds, icons, colours, and local background-image styling
-- Reusable overlay lanes with independent monitor, preset, width, max-height, colours, and background images
-- Dedicated `Lanes` tab so routed overlay styling/layout is edited once and apps only assign into those lanes
+- Secondary overlay routing with independent monitor, preset, width, and max-height controls
+- Local background-image styling for app profiles with opacity, hue, and brightness controls
 - Explicit `Show Quick Tips` onboarding toggle in Settings > System
-- Dedicated `Lanes` tab so routed overlay styling/layout is edited once and apps only assign into those lanes
 - README workflow guides for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, including browser-hosted notification guidance for services such as X, Reddit, Codex, and Antigravity
 - App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls
 - Overflow badge recovery affordance — clicking the `+N not shown` summary now offers to raise the visible-notification limit for future cards, while clearly disclosing that skipped content was not retained

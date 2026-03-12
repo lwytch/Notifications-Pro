@@ -356,77 +356,23 @@ public class QueueManager : BaseViewModel
             string.Equals(profile.AppName, appName, StringComparison.OrdinalIgnoreCase));
     }
 
-    private static OverlayLaneDefinition? FindOverlayLane(AppSettings settings, string? laneId)
-    {
-        if (settings.OverlayLanes.Count == 0)
-            return null;
-
-        return OverlayLaneHelper.FindLane(settings.OverlayLanes, laneId);
-    }
-
     private static void ApplyProfileOverrides(NotificationItem item, AppSettings settings, AppProfile? profile)
     {
         item.OverlayLane = OverlayLaneHelper.Main;
-        item.AccentColorOverride = string.Empty;
-        item.BackgroundColorOverride = string.Empty;
-        item.TitleColorOverride = string.Empty;
-        item.TextColorOverride = string.Empty;
-        item.AppNameColorOverride = string.Empty;
-        item.BackgroundImagePath = string.Empty;
-        item.BackgroundImageOpacity = 0.45;
-        item.BackgroundImageHueDegrees = 0;
-        item.BackgroundImageBrightness = 1.0;
 
         if (profile == null)
             return;
 
-        var requestedLaneId = OverlayLaneHelper.Normalize(profile.OverlayLane);
-        var laneId = OverlayLaneHelper.NormalizeOrMain(requestedLaneId, settings.OverlayLanes);
-        var lane = FindOverlayLane(settings, laneId);
-        if (!string.Equals(requestedLaneId, OverlayLaneHelper.Main, StringComparison.OrdinalIgnoreCase)
-            && string.Equals(laneId, OverlayLaneHelper.Main, StringComparison.OrdinalIgnoreCase)
-            && string.Equals(requestedLaneId, OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase))
-        {
-            laneId = OverlayLaneHelper.Secondary;
-        }
-
-        if (lane != null && !lane.IsEnabled)
-        {
-            laneId = OverlayLaneHelper.Main;
-            lane = null;
-        }
-
-        item.OverlayLane = laneId;
-        if (lane != null)
-        {
-            item.AccentColorOverride = lane.AccentColor;
-            item.BackgroundColorOverride = lane.BackgroundColor;
-            item.TitleColorOverride = lane.TitleColor;
-            item.TextColorOverride = lane.TextColor;
-            item.AppNameColorOverride = lane.AppNameColor;
-            item.BackgroundImagePath = lane.BackgroundImagePath;
-            item.BackgroundImageOpacity = Math.Clamp(lane.BackgroundImageOpacity, 0.0, 1.0);
-            item.BackgroundImageHueDegrees = lane.BackgroundImageHueDegrees;
-            item.BackgroundImageBrightness = Math.Clamp(lane.BackgroundImageBrightness, 0.2, 2.0);
-        }
-
-        if (!string.IsNullOrWhiteSpace(profile.AccentColor))
-            item.AccentColorOverride = profile.AccentColor;
-        if (!string.IsNullOrWhiteSpace(profile.BackgroundColor))
-            item.BackgroundColorOverride = profile.BackgroundColor;
-        if (!string.IsNullOrWhiteSpace(profile.TitleColor))
-            item.TitleColorOverride = profile.TitleColor;
-        if (!string.IsNullOrWhiteSpace(profile.TextColor))
-            item.TextColorOverride = profile.TextColor;
-        if (!string.IsNullOrWhiteSpace(profile.AppNameColor))
-            item.AppNameColorOverride = profile.AppNameColor;
-        if (!string.IsNullOrWhiteSpace(profile.BackgroundImagePath))
-        {
-            item.BackgroundImagePath = profile.BackgroundImagePath;
-            item.BackgroundImageOpacity = Math.Clamp(profile.BackgroundImageOpacity, 0.0, 1.0);
-            item.BackgroundImageHueDegrees = profile.BackgroundImageHueDegrees;
-            item.BackgroundImageBrightness = Math.Clamp(profile.BackgroundImageBrightness, 0.2, 2.0);
-        }
+        item.OverlayLane = OverlayLaneHelper.Normalize(profile.OverlayLane);
+        item.AccentColorOverride = profile.AccentColor;
+        item.BackgroundColorOverride = profile.BackgroundColor;
+        item.TitleColorOverride = profile.TitleColor;
+        item.TextColorOverride = profile.TextColor;
+        item.AppNameColorOverride = profile.AppNameColor;
+        item.BackgroundImagePath = profile.BackgroundImagePath;
+        item.BackgroundImageOpacity = Math.Clamp(profile.BackgroundImageOpacity, 0.0, 1.0);
+        item.BackgroundImageHueDegrees = profile.BackgroundImageHueDegrees;
+        item.BackgroundImageBrightness = Math.Clamp(profile.BackgroundImageBrightness, 0.2, 2.0);
     }
 
     private static void ApplyNarrationRule(NotificationItem item, AppSettings settings)

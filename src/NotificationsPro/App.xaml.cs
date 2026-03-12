@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -19,11 +18,13 @@ namespace NotificationsPro;
 public partial class App : Application
 {
     private WinForms.NotifyIcon? _trayIcon;
-    private readonly Dictionary<string, OverlayWindow> _overlayWindows = new(StringComparer.OrdinalIgnoreCase);
+    private OverlayWindow? _overlayWindow;
+    private OverlayWindow? _secondaryOverlayWindow;
     private SettingsWindow? _settingsWindow;
     private QueueManager? _queueManager;
     private SettingsManager? _settingsManager;
-    private readonly Dictionary<string, OverlayViewModel> _overlayViewModels = new(StringComparer.OrdinalIgnoreCase);
+    private OverlayViewModel? _overlayViewModel;
+    private OverlayViewModel? _secondaryOverlayViewModel;
     private SettingsViewModel? _settingsViewModel;
 
     private NotificationListener? _notificationListener;
@@ -49,9 +50,6 @@ public partial class App : Application
     private DispatcherTimer? _themeScheduleTimer;
     private string? _lastScheduledTheme;
     private System.ComponentModel.PropertyChangedEventHandler? _highContrastHandler;
-
-    private OverlayWindow? PrimaryOverlayWindow =>
-        _overlayWindows.TryGetValue(OverlayLaneHelper.Main, out var window) ? window : null;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
     // identify them in Privacy > Notifications and grant listener access.
@@ -137,7 +135,8 @@ public partial class App : Application
         _notificationListener = new NotificationListener(_queueManager, Dispatcher, _settingsManager);
         _notificationListener.StatusChanged += UpdateStatusItem;
 
-        EnsureOverlayViewModel(OverlayLaneHelper.Main);
+        _overlayViewModel = new OverlayViewModel(_queueManager, _settingsManager, OverlayLaneHelper.Main);
+        _secondaryOverlayViewModel = new OverlayViewModel(_queueManager, _settingsManager, OverlayLaneHelper.Secondary);
         _settingsViewModel = new SettingsViewModel(_settingsManager, _queueManager);
         _settingsViewModel.ConfigureRetryNotificationAccess(() =>
             _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
@@ -157,7 +156,7 @@ public partial class App : Application
         Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
         _settingsManager.SettingsChanged += () =>
             Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
-        _settingsManager.SettingsChanged += UpdateOverlayWindows;
+        _settingsManager.SettingsChanged += UpdateSecondaryOverlayWindow;
 
         // Apply High Contrast theme if active and respected
         ApplyHighContrastIfNeeded();
@@ -321,8 +320,8 @@ public partial class App : Application
         }
 
         // Need an HWND from the overlay window
-        var hwnd = PrimaryOverlayWindow != null && PrimaryOverlayWindow.IsLoaded
-            ? new System.Windows.Interop.WindowInteropHelper(PrimaryOverlayWindow).Handle
+        var hwnd = _overlayWindow != null && _overlayWindow.IsLoaded
+            ? new System.Windows.Interop.WindowInteropHelper(_overlayWindow).Handle
             : IntPtr.Zero;
 
         if (hwnd == IntPtr.Zero)
@@ -422,9 +421,12 @@ public partial class App : Application
 
     private void ShowOverlay()
     {
-        EnsureOverlayWindows();
-        foreach (var laneId in GetActiveOverlayLaneIds(_settingsManager!.Settings))
-            EnsureOverlayWindow(laneId).Show();
+        if (_overlayWindow == null || !_overlayWindow.IsLoaded)
+        {
+            _overlayWindow = new OverlayWindow(_overlayViewModel!, _settingsManager!, OverlayLaneHelper.Main);
+        }
+        _overlayWindow.Show();
+        UpdateSecondaryOverlayWindow();
         _settingsManager!.Settings.OverlayVisible = true;
         UpdateMenuLabels();
 
@@ -435,100 +437,40 @@ public partial class App : Application
 
     private void HideOverlay()
     {
-        foreach (var window in _overlayWindows.Values)
-            window.Hide();
+        _overlayWindow?.Hide();
+        _secondaryOverlayWindow?.Hide();
         _settingsManager!.Settings.OverlayVisible = false;
         UpdateMenuLabels();
     }
 
     private void ToggleOverlay()
     {
-        if (PrimaryOverlayWindow?.IsVisible == true)
+        if (_overlayWindow?.IsVisible == true)
             HideOverlay();
         else
             ShowOverlay();
     }
 
-    private OverlayViewModel EnsureOverlayViewModel(string laneId)
-    {
-        laneId = OverlayLaneHelper.Normalize(laneId);
-        if (_overlayViewModels.TryGetValue(laneId, out var existing))
-            return existing;
-
-        var created = new OverlayViewModel(_queueManager!, _settingsManager!, laneId);
-        _overlayViewModels[laneId] = created;
-        return created;
-    }
-
-    private OverlayWindow EnsureOverlayWindow(string laneId)
-    {
-        laneId = OverlayLaneHelper.Normalize(laneId);
-        if (_overlayWindows.TryGetValue(laneId, out var existing) && existing.IsLoaded)
-            return existing;
-
-        var window = new OverlayWindow(EnsureOverlayViewModel(laneId), _settingsManager!, laneId);
-        _overlayWindows[laneId] = window;
-        return window;
-    }
-
-    private IEnumerable<string> GetActiveOverlayLaneIds(AppSettings settings)
-    {
-        yield return OverlayLaneHelper.Main;
-
-        foreach (var lane in settings.OverlayLanes
-                     .Where(lane => lane.IsEnabled)
-                     .OrderBy(lane => lane.Name, StringComparer.OrdinalIgnoreCase))
-        {
-            yield return lane.Id;
-        }
-    }
-
-    private void EnsureOverlayWindows()
-    {
-        foreach (var laneId in GetActiveOverlayLaneIds(_settingsManager!.Settings))
-            EnsureOverlayWindow(laneId);
-    }
-
-    private void UpdateOverlayWindows()
+    private void UpdateSecondaryOverlayWindow()
     {
         if (_settingsManager == null)
             return;
 
-        var settings = _settingsManager.Settings;
-        var activeLaneIds = GetActiveOverlayLaneIds(settings)
-            .Select(OverlayLaneHelper.Normalize)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var laneId in activeLaneIds)
-            EnsureOverlayViewModel(laneId).ApplySettings(settings);
-
-        foreach (var laneId in activeLaneIds)
+        if (!_settingsManager.Settings.OverlayVisible || !_settingsManager.Settings.SecondaryOverlayEnabled)
         {
-            var window = EnsureOverlayWindow(laneId);
-            if (settings.OverlayVisible)
-                window.Show();
-            else
-                window.Hide();
+            _secondaryOverlayWindow?.Hide();
+            return;
         }
 
-        var staleLaneIds = _overlayWindows.Keys
-            .Where(laneId => !activeLaneIds.Contains(laneId))
-            .ToList();
-
-        foreach (var laneId in staleLaneIds)
+        if (_secondaryOverlayWindow == null || !_secondaryOverlayWindow.IsLoaded)
         {
-            if (_overlayWindows.TryGetValue(laneId, out var window))
-            {
-                _overlayWindows.Remove(laneId);
-                window.Close();
-            }
-
-            if (_overlayViewModels.TryGetValue(laneId, out var viewModel))
-            {
-                _overlayViewModels.Remove(laneId);
-                viewModel.Cleanup();
-            }
+            _secondaryOverlayWindow = new OverlayWindow(
+                _secondaryOverlayViewModel!,
+                _settingsManager,
+                OverlayLaneHelper.Secondary);
         }
+
+        _secondaryOverlayWindow.Show();
     }
 
     private void TogglePause()
@@ -568,7 +510,7 @@ public partial class App : Application
 
         if (_showHideItem != null)
         {
-            var label = PrimaryOverlayWindow?.IsVisible == true ? "Hide Overlay" : "Show Overlay";
+            var label = _overlayWindow?.IsVisible == true ? "Hide Overlay" : "Show Overlay";
             if (hotkeysOn && s != null && !string.IsNullOrWhiteSpace(s.HotkeyToggleOverlay))
                 label += $"    {s.HotkeyToggleOverlay}";
             _showHideItem.Text = label;
@@ -1064,10 +1006,8 @@ public partial class App : Application
         _notificationListener?.Stop();
         _settingsManager?.Save();
         _trayIcon?.Dispose();
-        foreach (var window in _overlayWindows.Values.ToList())
-            window.Close();
-        _overlayWindows.Clear();
-        _overlayViewModels.Clear();
+        _overlayWindow?.Close();
+        _secondaryOverlayWindow?.Close();
         _settingsWindow?.Close();
         Shutdown();
     }

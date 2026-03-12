@@ -23,14 +23,13 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: thirteen sections (Appearance, Behavior, Filtering, Apps, Lanes, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
+- Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display and layout-mode behavior
   - Filtering now owns quiet hours, burst limiting, and targeted highlight/mute/narration rules
-  - Apps now owns per-app narration, routing, sounds, and icons
-  - Lanes now owns routed-overlay placement, colours, and background images
+  - Apps now owns per-app narration, routing, sounds, icons, colours, and background images
   - Layout now owns fullscreen overlay mode alongside monitor/size controls
   - Streaming now owns presentation mode and per-app tinting
   - Accessibility now owns the real global hotkey editor
@@ -52,8 +51,8 @@
 - Tray About dialog now shows the full installed package version, package identity, listener status, runtime version, and install path
 - Settings persistence audit fixed a save/load gap where text alignment was not round-tripping through the viewmodel layer
 - First-run display-aware sizing now applies before the first overlay window is created, so true first launch honors the primary monitor work area again
-- Apps tab now focuses on per-app read aloud, lane assignment, sound, and icon controls instead of squeezing full styling into every app row
-- Dedicated `Lanes` tab now manages reusable routed overlay lanes with independent monitor, preset, width, max-height, colours, and optional background images
+- Apps tab now includes per-app profiles for read aloud, overlay lane, sound, icon, colours, and optional background images with opacity/hue/brightness controls
+- Secondary overlay routing now supports its own monitor, preset, width, and max-height settings, and preset values now save/load correctly for spaced names like `Bottom Right`
 - Filtering tab now includes title/body/title+body-scoped highlight, mute, and narration rules with optional app filters
 - Quick Tips can now be disabled explicitly from Settings > System > Onboarding
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
@@ -74,7 +73,7 @@
 - Layout tab includes quick preset buttons for top/side placement
 - Layout tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
 - Layout tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
-- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen overlay controls for the main overlay
+- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, fullscreen overlay controls, and Secondary Overlay routing controls
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
 - Visible-notification default increased to `40` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
@@ -182,7 +181,7 @@
   - Move overlay to selected monitor with one click
   - Refresh button to re-detect monitors without restarting
   - Position presets (top-left, center, etc.) target the selected monitor
-  - Named routed overlay lanes can target their own monitor and preset independently of the main overlay
+  - Secondary overlay lane can target its own monitor and preset independently of the main overlay
   - Per-monitor DPI awareness handled by .NET 8 WPF per-monitor V2 defaults
 - **Streaming & Presentation (Milestone 10)**:
   - Chroma key background — solid green/blue/magenta background for OBS chroma key capture with preset color buttons
@@ -206,8 +205,8 @@
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
-  - Per-app sound and icon assignment now lives in the Apps tab alongside narration and lane routing, while lane styling/backgrounds live in the Lanes tab
-  - Local background-image styling for routed overlay lanes — images copied into AppData backgrounds with opacity, hue, and brightness controls
+  - Per-app sound and icon assignment now lives in the Apps tab alongside narration, routing, colours, and background images
+  - Local background-image styling for app profiles — images copied into AppData backgrounds with opacity, hue, and brightness controls
   - Fullscreen overlay background color picker (in addition to opacity)
   - Fullscreen overlay section now lives in Layout for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)

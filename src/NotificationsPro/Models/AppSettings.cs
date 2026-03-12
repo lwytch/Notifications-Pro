@@ -78,7 +78,6 @@ public class AppSettings
     public List<MuteRuleDefinition> MuteRules { get; set; } = new();
     public List<NarrationRuleDefinition> NarrationRules { get; set; } = new();
     public List<AppProfile> AppProfiles { get; set; } = new();
-    public List<OverlayLaneDefinition> OverlayLanes { get; set; } = new();
 
     // Notification icons (M9.5)
     public bool ShowNotificationIcons { get; set; } = false;
@@ -245,7 +244,6 @@ public class AppSettings
         clone.MuteRules = MuteRules.Select(rule => rule.Clone()).ToList();
         clone.NarrationRules = NarrationRules.Select(rule => rule.Clone()).ToList();
         clone.AppProfiles = AppProfiles.Select(profile => profile.Clone()).ToList();
-        clone.OverlayLanes = OverlayLanes.Select(lane => lane.Clone()).ToList();
         clone.PresentationApps = new List<string>(PresentationApps);
         clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);
         clone.PerAppIcons = new Dictionary<string, string>(PerAppIcons);
