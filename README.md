@@ -409,6 +409,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.16
+- **Truthful Scrollbar Behavior**: the overlay scrollbar now appears only when the currently visible cards actually exceed the overlay height, so enabling the feature no longer implies that discarded `+N not shown` overflow items can be scrolled back into view.
+- **Overflow Guidance**: the overflow wording now lines up with the real model more clearly during live use: if you want more cards available to scroll, raise `Max Visible`; hidden overflow is still counted only and not retained for privacy.
+
 ### Release v1.1.10.15
 - **Scrollbar Polish**: `Settings > Appearance` now includes a card-to-scrollbar gap control, the themed scrollbar stays hidden while the idle `Waiting for notifications...` placeholder is showing, and the overlay keeps a cleaner separation between the cards and the scrollbar column when it is enabled.
 - **Overflow Clarity**: the overflow badge and its click action now explain the real privacy model more clearly: scrollbars only apply to currently visible cards, while notifications beyond `Max Visible` are discarded immediately and counted as `+N not shown`.

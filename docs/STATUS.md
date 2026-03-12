@@ -33,7 +33,7 @@
 - Startup defaults repair now follows schema version 4 and only fires for the real legacy-default signature, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on the next launch without overriding intentional later choices
 - Overlay scrollbars now receive real client hit-testing over the scrollbar/search areas, so dragging still works across the cards while the scrollbar itself remains clickable and draggable
 - Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, card-to-scrollbar gap, and corner radius, and overlay themes carry those scrollbar settings with the rest of the visual palette
-- Overlay scrollbars now start disabled by default for a cleaner first-run overlay, turn on reliably in the live overlay, and stay hidden while the idle `Waiting for notifications...` placeholder is showing
+- Overlay scrollbars now start disabled by default for a cleaner first-run overlay, turn on reliably in the live overlay, stay hidden while the idle `Waiting for notifications...` placeholder is showing, and only appear when the currently visible cards really overflow the overlay height
 - Overflow wording now makes the privacy boundary explicit: scrollbars only apply to currently visible cards, while notifications beyond `Max Visible` are discarded immediately and represented only as `+N not shown`
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only

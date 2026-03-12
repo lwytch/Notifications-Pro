@@ -37,8 +37,9 @@ public class OverlayViewModelTests : IDisposable
 
             viewModel.OverlayScrollbarVisible = true;
             viewModel.OverlayScrollbarContentGap = 14;
+            viewModel.SetScrollableOverflow(true);
 
-            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
+            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Visible, viewModel.ScrollbarVisibility);
             Assert.Contains(nameof(OverlayViewModel.OverlayScrollbarVisible), changedProperties);
             Assert.Contains(nameof(OverlayViewModel.ScrollbarVisibility), changedProperties);
             Assert.Contains(nameof(OverlayViewModel.OverlayScrollbarContentGap), changedProperties);
@@ -66,12 +67,12 @@ public class OverlayViewModelTests : IDisposable
             Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
             Assert.Equal(0, viewModel.OverlayContentMargin.Right);
 
-            queueManager.AddNotification("X", "Title", "Body");
+            viewModel.SetScrollableOverflow(true);
 
             Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Visible, viewModel.ScrollbarVisibility);
             Assert.Equal(12, viewModel.OverlayContentMargin.Right);
 
-            queueManager.ClearAll();
+            viewModel.SetScrollableOverflow(false);
 
             Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
             Assert.Equal(0, viewModel.OverlayContentMargin.Right);

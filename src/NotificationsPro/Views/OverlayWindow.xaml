@@ -491,6 +491,7 @@
                       HorizontalScrollBarVisibility="Disabled"
                       CanContentScroll="False"
                       PanningMode="None"
+                      ScrollChanged="OnNotificationScrollChanged"
                       MaxHeight="{Binding OverlayMaxHeight}">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar">

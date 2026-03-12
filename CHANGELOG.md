@@ -18,6 +18,7 @@
 - Overlay hit-testing now treats the real scrollbar and search controls as client input regions, so the scrollbar can be clicked and dragged normally without sacrificing drag-anywhere behavior on the rest of the overlay
 - Overlay scrollbar toggling now updates the live overlay correctly, and the enabled state keeps the themed scrollbar visible instead of relying on WPF `Auto` visibility
 - Overlay scrollbar polish — the idle `Waiting for notifications...` placeholder no longer shows the themed scrollbar, the overflow affordance now explains that scrollbars only apply to currently visible cards, and `Preview Voice` now uses app-focused sample wording instead of build/release phrasing
+- Overlay scrollbar visibility now follows real visible-card overflow instead of merely the toggle state, so enabling the feature no longer suggests that discarded `+N not shown` items are scrollable later
 - Startup settings persistence now uses a one-time schema migration for legacy installs, so older `3`-visible / `300ms` / `480px` defaults upgrade once instead of resurfacing on later packaged launches
 - Apps tab per-app override cards were rebuilt into a cleaner aligned form layout, and app-specific background overrides now show a short status label with the full path moved into the tooltip
 - App-specific card background status text now sits vertically centered in its field instead of hugging the top edge

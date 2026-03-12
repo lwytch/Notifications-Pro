@@ -14,6 +14,7 @@ public class OverlayViewModel : BaseViewModel
 {
     private readonly QueueManager _queueManager;
     private readonly SettingsManager _settingsManager;
+    private bool _hasScrollableOverflow;
 
     public ReadOnlyObservableCollection<NotificationItem> Notifications => _queueManager.VisibleNotifications;
     public QueueManager Queue => _queueManager;
@@ -319,7 +320,7 @@ public class OverlayViewModel : BaseViewModel
     }
 
     public System.Windows.Controls.ScrollBarVisibility ScrollbarVisibility =>
-        OverlayScrollbarVisible && _queueManager.VisibleNotifications.Count > 0
+        OverlayScrollbarVisible && _hasScrollableOverflow
             ? System.Windows.Controls.ScrollBarVisibility.Visible
             : System.Windows.Controls.ScrollBarVisibility.Hidden;
     public Thickness OverlayScrollbarPaddingThickness => new(OverlayScrollbarPadding);
@@ -628,6 +629,16 @@ public class OverlayViewModel : BaseViewModel
         _timestampTimer.Stop();
     }
 
+    public void SetScrollableOverflow(bool hasScrollableOverflow)
+    {
+        if (_hasScrollableOverflow == hasScrollableOverflow)
+            return;
+
+        _hasScrollableOverflow = hasScrollableOverflow;
+        OnPropertyChanged(nameof(ScrollbarVisibility));
+        OnPropertyChanged(nameof(OverlayContentMargin));
+    }
+
     public void ApplySettings(AppSettings s)
     {
         FontFamily = s.FontFamily;
@@ -774,11 +785,10 @@ public class OverlayViewModel : BaseViewModel
 
     private void UpdateEmptyState()
     {
-        EmptyStateVisibility = _queueManager.VisibleNotifications.Count == 0
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        OnPropertyChanged(nameof(ScrollbarVisibility));
-        OnPropertyChanged(nameof(OverlayContentMargin));
+        var isEmpty = _queueManager.VisibleNotifications.Count == 0;
+        EmptyStateVisibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
+        if (isEmpty)
+            SetScrollableOverflow(false);
     }
 
     private static Duration DurationFor(double ms)

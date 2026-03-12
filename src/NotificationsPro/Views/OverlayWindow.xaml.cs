@@ -259,6 +259,7 @@ public partial class OverlayWindow : Window
         InvalidateMeasure();
         InvalidateArrange();
         UpdateLayout();
+        UpdateScrollbarOverflowState();
 
         _settingsManager.SettingsChanged += OnSettingsChanged;
     }
@@ -306,7 +307,22 @@ public partial class OverlayWindow : Window
             InvalidateMeasure();
             InvalidateArrange();
             UpdateLayout();
+            UpdateScrollbarOverflowState();
         });
+    }
+
+    private void OnNotificationScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        UpdateScrollbarOverflowState();
+    }
+
+    private void UpdateScrollbarOverflowState()
+    {
+        if (DataContext is not OverlayViewModel vm)
+            return;
+
+        var hasScrollableOverflow = NotificationScrollViewer.ScrollableHeight > 0.5;
+        vm.SetScrollableOverflow(hasScrollableOverflow);
     }
 
     private void ApplyObsFixedWindowMode(AppSettings settings)
