@@ -864,7 +864,7 @@ public partial class App : Application
         ShowSettings();
         if (_settingsWindow != null)
         {
-            _settingsWindow.NavigateToTab("Filtering");
+            _settingsWindow.NavigateToTab("Apps");
         }
     }
 

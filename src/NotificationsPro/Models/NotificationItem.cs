@@ -41,6 +41,8 @@ public class NotificationItem : INotifyPropertyChanged
     public double BackgroundImageOpacity { get; set; } = 0.45;
     public double BackgroundImageHueDegrees { get; set; }
     public double BackgroundImageBrightness { get; set; } = 1.0;
+    public string BackgroundImageFitMode { get; set; } = "Fill Card";
+    public string BackgroundImagePlacement { get; set; } = "Inside Padding";
     public bool? ReadAloudEnabledOverride { get; set; }
     public string ReadAloudModeOverride { get; set; } = string.Empty;
 

@@ -1040,6 +1040,8 @@ public partial class SettingsViewModel : BaseViewModel
     public ICommand TestNarrationCommand { get; }
     public ICommand BrowseCustomSoundCommand { get; }
     public ICommand BrowseCustomIconCommand { get; }
+    public ICommand BrowsePerAppBackgroundImageCommand { get; }
+    public ICommand ClearPerAppBackgroundImageCommand { get; }
     public ICommand ApplyStreamingPresetCommand { get; }
     public ICommand ViewSessionArchiveCommand { get; }
     public ICommand OpenNotificationAccessSettingsCommand { get; }
@@ -1154,6 +1156,8 @@ public partial class SettingsViewModel : BaseViewModel
         TestNarrationCommand = new RelayCommand(_ => TestNarration(), _ => !IsNarrationPreviewInProgress);
         BrowseCustomSoundCommand = new RelayCommand(_ => BrowseCustomSound());
         BrowseCustomIconCommand = new RelayCommand(_ => BrowseCustomIcon());
+        BrowsePerAppBackgroundImageCommand = new RelayCommand(BrowsePerAppBackgroundImage);
+        ClearPerAppBackgroundImageCommand = new RelayCommand(ClearPerAppBackgroundImage);
         ApplyStreamingPresetCommand = new RelayCommand(_ => ApplyStreamingPreset());
         ViewSessionArchiveCommand = new RelayCommand(_ => ViewSessionArchive());
         OpenNotificationAccessSettingsCommand = new RelayCommand(OpenNotificationAccessSettings);
@@ -1560,6 +1564,8 @@ public partial class SettingsViewModel : BaseViewModel
             CardBackgroundImageOpacity = CardBackgroundImageOpacity,
             CardBackgroundImageHueDegrees = CardBackgroundImageHueDegrees,
             CardBackgroundImageBrightness = CardBackgroundImageBrightness,
+            CardBackgroundImageFitMode = CardBackgroundImageFitMode,
+            CardBackgroundImagePlacement = CardBackgroundImagePlacement,
             CornerRadius = CornerRadius,
             Padding = Padding,
             CardGap = CardGap,
@@ -1622,6 +1628,7 @@ public partial class SettingsViewModel : BaseViewModel
             SoundEnabled = SoundEnabled,
             DefaultSound = DefaultSound,
             PerAppSounds = new Dictionary<string, string>(_settingsManager.Settings.PerAppSounds),
+            PerAppBackgroundImages = new Dictionary<string, string>(_settingsManager.Settings.PerAppBackgroundImages),
             SuppressToastPopups = SuppressToastPopups,
             SessionArchiveEnabled = SessionArchiveEnabled,
             SessionArchiveMaxItems = SessionArchiveMaxItems,
@@ -1686,6 +1693,8 @@ public partial class SettingsViewModel : BaseViewModel
             FullscreenOverlayMode = FullscreenOverlayMode,
             FullscreenOverlayOpacity = FullscreenOverlayOpacity,
             FullscreenOverlayColor = FullscreenOverlayColor,
+            FullscreenOverlayImagePath = FullscreenOverlayImagePath,
+            FullscreenOverlayImageFitMode = FullscreenOverlayImageFitMode,
             SettingsDisplayMode = SettingsDisplayMode,
             PopupAutoClose = PopupAutoClose,
             SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
@@ -2056,10 +2065,16 @@ public partial class SettingsViewModel : BaseViewModel
         {
             s.PerAppSounds.TryGetValue(app, out var sound);
             s.PerAppIcons.TryGetValue(app, out var icon);
+            s.PerAppBackgroundImages.TryGetValue(app, out var backgroundImagePath);
             // Migrate old system sound names (pre-registry) to "Default"
             if (sound is "Asterisk" or "Beep" or "Exclamation" or "Hand" or "Question")
                 sound = null;
-            PerAppConfigEntries.Add(new PerAppConfigEntry(app, sound ?? "Default", icon ?? "Default", OnPerAppConfigChanged));
+            PerAppConfigEntries.Add(new PerAppConfigEntry(
+                app,
+                sound ?? "Default",
+                icon ?? "Default",
+                backgroundImagePath ?? string.Empty,
+                OnPerAppConfigChanged));
         }
     }
 
@@ -2079,7 +2094,33 @@ public partial class SettingsViewModel : BaseViewModel
         else
             updated.PerAppIcons[entry.AppName] = entry.Icon;
 
+        if (string.IsNullOrWhiteSpace(entry.BackgroundImagePath))
+            updated.PerAppBackgroundImages.Remove(entry.AppName);
+        else
+            updated.PerAppBackgroundImages[entry.AppName] = entry.BackgroundImagePath;
+
         _settingsManager.Apply(updated);
+    }
+
+    private void BrowsePerAppBackgroundImage(object? parameter)
+    {
+        if (parameter is not PerAppConfigEntry entry)
+            return;
+
+        var importedPath = ImportBackgroundImage($"Choose a background image for {entry.AppName}");
+        if (!string.IsNullOrWhiteSpace(importedPath))
+            entry.BackgroundImagePath = importedPath;
+    }
+
+    private void ClearPerAppBackgroundImage(object? parameter)
+    {
+        if (parameter is not PerAppConfigEntry entry)
+            return;
+
+        if (string.IsNullOrWhiteSpace(entry.BackgroundImagePath))
+            return;
+
+        entry.BackgroundImagePath = string.Empty;
     }
 
 
@@ -2604,11 +2645,31 @@ public class PerAppConfigEntry : BaseViewModel
         }
     }
 
-    public PerAppConfigEntry(string appName, string sound, string icon, Action<PerAppConfigEntry>? onChanged = null)
+    private string _backgroundImagePath;
+    public string BackgroundImagePath
+    {
+        get => _backgroundImagePath;
+        set
+        {
+            var normalized = value?.Trim() ?? string.Empty;
+            if (!SetProperty(ref _backgroundImagePath, normalized))
+                return;
+
+            OnPropertyChanged(nameof(BackgroundImageDisplay));
+            _onChanged?.Invoke(this);
+        }
+    }
+
+    public string BackgroundImageDisplay => string.IsNullOrWhiteSpace(BackgroundImagePath)
+        ? "Uses global card background"
+        : BackgroundImagePath;
+
+    public PerAppConfigEntry(string appName, string sound, string icon, string backgroundImagePath, Action<PerAppConfigEntry>? onChanged = null)
     {
         AppName = appName;
         _sound = sound;
         _icon = icon;
+        _backgroundImagePath = backgroundImagePath;
         _onChanged = onChanged;
     }
 }

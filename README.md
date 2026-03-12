@@ -54,7 +54,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Multi-monitor support** — place the overlay on any connected display; it remembers which monitor.
 - **Edge snapping** — configurable snap distance; overlay aligns to screen edges when dragged nearby.
 - **Manual resize** — drag the left or right edge of the overlay to change its width. Resize anchors to the edge it is near so right-aligned overlays do not jump.
-- **Fullscreen overlay mode** — expands the overlay to cover an entire monitor with a configurable semi-transparent backdrop (colour + opacity). Useful as a dedicated notification monitor or for focus sessions.
+- **Fullscreen overlay mode** — expands the overlay to cover an entire monitor with a configurable semi-transparent backdrop (solid colour or local image, with opacity and fit controls). Useful as a dedicated notification monitor or for focus sessions.
 - **OBS fixed-window mode** — locks the overlay to a precise width/height for predictable window-capture in OBS/streaming tools.
 
 ### Layout Modes
@@ -74,13 +74,14 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
 - **Background opacity** — from fully opaque to near-transparent.
-- **Card background images** — optional local image per notification card with opacity, hue, and brightness controls. If set, the image is rendered inside each card while the normal background colour remains the fallback base.
+- **Card background images** — optional local image per stacked notification card with opacity, hue, brightness, fit, and coverage controls. You can keep the image inside the padded content area or let it span the full card, while the normal background colour remains the fallback base.
 - **Card shape** — corner radius, internal padding, card gap, outer margin.
 - **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
 - **Optional border** — thin border around each card, configurable colour and thickness.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
+- **Apps tab overrides** — assign per-app sound, icon, and card-background overrides once Notifications Pro has seen that app.
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
 
@@ -91,6 +92,8 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Auto-duration** — extends display time based on notification length (configurable base seconds + seconds-per-line).
 - **Animations** — slide-in from Left / Right / Top / Bottom or fade-only, with configurable duration up to `1200ms` and that full range used as the default so the animation is actually visible out of the box.
 - **Deduplication** — suppress identical notifications within a configurable time window.
+- **Quiet hours** — block all notifications between configurable start/end times (supports overnight ranges).
+- **Burst protection** — cap the number of notifications accepted in a sliding time window to avoid floods.
 - **Always-on-top** — toggle without restarting; also available from the tray menu.
 
 ### Filtering & Smart Control
@@ -98,8 +101,6 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Field-scoped keyword rules** — highlight or mute rules can target `Title Only`, `Body Only`, or `Title + Body`, with optional regex matching.
 - **App-filtered rules** — highlight, mute, and narration rules can be limited to a specific app name such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`.
 - **Narration rules** — optional read-aloud overrides can force `Read Aloud` or `Skip Read Aloud` for matching notifications, with an optional spoken-content override.
-- **Quiet hours** — block all notifications between configurable start/end times (supports overnight ranges).
-- **Burst limiting** — cap the number of notifications accepted in a sliding time window.
 - **Focus mode** — a timed DND period (configurable minutes) accessible from the tray menu.
 - **Presentation mode** — auto-DND when a configured app (PowerPoint, Zoom, Teams, etc.) goes fullscreen.
 
@@ -194,9 +195,9 @@ Avoid distraction without missing urgent messages:
 
 ### Getting the Most Out of Notifications Pro
 - Start with `Settings > System > Notification Access` and keep `Capture Mode` on `Auto` unless live notifications stop appearing. If preview notifications work but real ones do not, switch to `Force Accessibility`.
-- Use `Settings > Filtering` for targeting logic, `Settings > Accessibility` for narration, and `Settings > Appearance` for how every live card looks.
+- Use `Settings > Filtering` for targeting logic, `Settings > Apps` for per-app presentation overrides, `Settings > Accessibility` for narration, and `Settings > Appearance` for how stacked cards look.
 - If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Use `Narration Rules` only when you need more precise exceptions than the normal global toggle and per-app checkboxes.
-- Background images are local-only assets copied into Notifications Pro's backgrounds folder. They change only card appearance and never store notification text.
+- Background images are local-only assets copied into Notifications Pro's backgrounds folder. Stacked cards can use fit and coverage controls, single-line banner mode stays solid-colour for readability, and app-specific overrides live in `Settings > Apps`.
 
 ### Getting the Most Out of X
 - Browser-hosted X notifications usually surface as plain Windows notification text: `AppName`, `Title`, and `Body`. Notifications Pro does not receive structured account IDs or post metadata from X itself.
@@ -249,6 +250,7 @@ Under `%AppData%\NotificationsPro\`:
 |------|----------|
 | `settings.json` | All app preferences (no notification content) |
 | `themes\*.json` | Named custom overlay themes |
+| `backgrounds\` | Optional user-provided background image files for cards and fullscreen backdrops |
 | `icons\` | Optional user-provided icon image files |
 | `sounds\` | Optional custom WAV files |
 
@@ -377,6 +379,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.1
+- **Apps Tab & Settings Ownership Cleanup**: Added a dedicated `Apps` tab for per-app sound, icon, and card-background overrides, while moving `Quiet Hours` and `Burst Protection` into `Behavior` so the tab layout matches what each control actually does.
+- **Background Image UX Pass**: Reworked the card-background editor back into the app’s normal single-column settings rhythm, moved explanatory copy into tooltips, added `Image Fit` plus `Image Coverage`, and kept single-line banner mode intentionally solid-color for readability.
+- **Backdrop Image Support**: `Layout > Fullscreen Backdrop` can now use a local image as well as a solid tint, and app-specific card background overrides now route through the same local-only asset model and export/import correctly.
 
 ### Release v1.1.10.0
 - **Stable Single-Panel Restore**: Removed the experimental routing/lane model and returned to the clean single-overlay UX while keeping the app ready for a better-planned multi-panel design later.

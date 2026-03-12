@@ -23,13 +23,14 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: eleven sections (Appearance, Behavior, Filtering, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
+- Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
-  - Behavior now holds content/display and layout-mode behavior
-  - Filtering now owns quiet hours and burst limiting
-  - Layout now owns fullscreen overlay mode alongside monitor/size controls
+  - Behavior now holds content/display behavior, timing, deduplication, quiet hours, and burst protection
+  - Filtering now owns mute/highlight/narration targeting only
+  - Apps now owns per-app sound, icon, and card-background overrides
+  - Layout now owns fullscreen backdrop controls alongside monitor/size controls
   - Streaming now owns presentation mode and per-app tinting
   - Accessibility now owns the real global hotkey editor
   - System now owns notification access recovery, toast suppression, session archive, overlay window toggles, and startup
@@ -67,7 +68,7 @@
 - Layout tab includes quick preset buttons for top/side placement
 - Layout tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
 - Layout tab quick-position grid now includes top/middle/bottom left/center/right presets for better alignment workflows
-- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen overlay controls
+- Layout tab now includes overlay width and max-height controls, presets (1080p/2K/4K/8K), manual-resize toggle, and fullscreen backdrop controls (solid color or local image)
 - Settings display mode now defaults to `Popup` for new installs/reset defaults
 - Visible-notification default increased to `40` (configurable 1-40)
 - Fullscreen overlay mode now uses true monitor bounds (no taskbar/work-area clipping)
@@ -77,7 +78,7 @@
 - Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
 - Appearance tab now includes grouping appearance controls (Framed Group / Header Chip / Minimal Label, plus optional group counts)
 - Appearance tab includes color picker buttons and separate app-name color customization
-- Appearance tab now includes optional local card background images with opacity, hue, and brightness controls, and the live preview reflects that image-backed card mode
+- Appearance tab now includes optional local card background images with opacity, hue, brightness, fit, and coverage controls, and the live preview reflects that image-backed card mode in stacked layouts
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
 - Overflow badge now inherits card theme (background color, text color, font, corner radius), reports `+N not shown`, and clicking it offers a privacy-safe way to raise the visible-limit setting for future cards
@@ -123,7 +124,8 @@
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
-  - Filtering tab now includes per-app toggles, scoped keyword management, narration-rule overrides, quiet hours, burst limit, and per-app sound/icon overrides
+  - Filtering tab now includes per-app muting, scoped keyword management, and narration-rule overrides
+  - Apps tab now includes per-app sound, icon, and card-background overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
@@ -199,9 +201,9 @@
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
-  - Per-app sound and icon assignment UI in Filtering tab (stacked row layout to prevent label/combobox clipping)
-  - Fullscreen overlay background color picker (in addition to opacity)
-  - Fullscreen overlay section now lives in Layout for logical grouping
+  - Apps tab now hosts per-app sound, icon, and card-background assignment UI with a cleaner stacked layout
+  - Fullscreen backdrop supports solid color or local image styling in Layout
+  - Fullscreen backdrop section now lives in Layout for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
   - All StaticResource brush references converted to DynamicResource for live theme switching
   - Primary button text foreground now auto-selects black/white for contrast against the active accent color (improves high-contrast readability)
@@ -238,7 +240,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 174 unit tests covering QueueManager (including scoped highlight/mute/narration rules, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and rule/background-image persistence), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 175 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and rule/background-image persistence), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -340,7 +342,8 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Timestamp style selector in Appearance > Timestamp Appearance switches between Relative, Time, and DateTime formats
 - [ ] Timestamp size slider in Appearance > Timestamp Appearance updates timestamp readability without affecting title/body sizes
 - [ ] Timestamp font-weight selector and color picker in Appearance > Timestamp Appearance update timestamp styling immediately
-- [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit, and per-app sound/icon sections
+- [ ] Filtering tab appears in Settings with per-app mute, keyword, and narration-rule sections
+- [ ] Apps tab appears in Settings with per-app sound, icon, and card-background overrides
 - [ ] Filtering > Keyword Highlighting rules can target Title Only / Body Only / Title + Body and optionally filter to a specific app
 - [ ] Filtering > Keyword Muting rules can target Title Only / Body Only / Title + Body and optionally filter to a specific app
 - [ ] Filtering > Narration Rules can force Read Aloud or Skip Read Aloud for matching notifications, with optional spoken-content override
@@ -349,7 +352,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color
 - [ ] Adding a mute keyword suppresses notifications containing that word
 - [ ] Quiet hours toggle suppresses all notifications between configured times
-- [ ] Burst limit toggle suppresses when too many notifications arrive quickly
+- [ ] Behavior tab burst-protection toggle suppresses when too many notifications arrive quickly
 - [ ] Focus mode (tray menu) pauses notifications for selected duration with countdown
 - [ ] Quick Mute App submenu in tray menu shows seen apps with mute/unmute toggles
 - [ ] Appearance tab exposes built-in and custom overlay theme controls
@@ -395,7 +398,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Selecting a different monitor and clicking "Move" repositions the overlay on that monitor
 - [ ] "Refresh" button updates the monitor list after connecting/disconnecting a display
 - [ ] Position presets (top/middle/bottom left/center/right) target the selected monitor
-- [ ] Layout tab exposes overlay width/max-height sliders, numeric width entry, fullscreen controls, and 1080p/2K/4K/8K preset buttons
+- [ ] Layout tab exposes overlay width/max-height sliders, numeric width entry, fullscreen backdrop controls, and 1080p/2K/4K/8K preset buttons
 - [ ] Start with Windows toggle adds a registry Run key for automatic startup
 - [ ] Disabling Start with Windows removes the registry Run key
 - [ ] App launches at Windows startup when the toggle is on

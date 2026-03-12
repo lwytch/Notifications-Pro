@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 
 namespace NotificationsPro.Services;
@@ -101,6 +102,7 @@ public class SettingsManager
         settings.SpokenMutedApps ??= new List<string>();
         settings.PerAppIcons ??= new Dictionary<string, string>();
         settings.PerAppSounds ??= new Dictionary<string, string>();
+        settings.PerAppBackgroundImages ??= new Dictionary<string, string>();
         settings.PresentationApps ??= new List<string>();
         settings.CardBackgroundImageOpacity = double.IsNaN(settings.CardBackgroundImageOpacity)
             ? 0.45
@@ -111,5 +113,8 @@ public class SettingsManager
         settings.CardBackgroundImageBrightness = double.IsNaN(settings.CardBackgroundImageBrightness)
             ? 1.0
             : Math.Clamp(settings.CardBackgroundImageBrightness, 0.2, 2.0);
+        settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.CardBackgroundImageFitMode);
+        settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.Normalize(settings.CardBackgroundImagePlacement);
+        settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.FullscreenOverlayImageFitMode);
     }
 }

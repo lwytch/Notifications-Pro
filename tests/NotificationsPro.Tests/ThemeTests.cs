@@ -309,8 +309,13 @@ public class ThemeTests : IDisposable
             CardBackgroundImageOpacity = 0.55,
             CardBackgroundImageHueDegrees = 12,
             CardBackgroundImageBrightness = 0.9,
+            CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard,
+            CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard,
+            FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png",
+            FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize,
             ShowQuickTips = false,
         };
+        original.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
         original.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "headline", Scope = NotificationMatchScopeHelper.TitleOnly, AppFilter = "X" });
         original.MuteRules.Add(new MuteRuleDefinition { Keyword = "spoiler", Scope = NotificationMatchScopeHelper.BodyOnly });
         original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@openai", Scope = NotificationMatchScopeHelper.BodyOnly, ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly });
@@ -334,6 +339,11 @@ public class ThemeTests : IDisposable
         Assert.Equal(0.55, imported.CardBackgroundImageOpacity);
         Assert.Equal(12, imported.CardBackgroundImageHueDegrees);
         Assert.Equal(0.9, imported.CardBackgroundImageBrightness);
+        Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, imported.CardBackgroundImageFitMode);
+        Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, imported.CardBackgroundImagePlacement);
+        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", imported.FullscreenOverlayImagePath);
+        Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, imported.FullscreenOverlayImageFitMode);
+        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", imported.PerAppBackgroundImages["X"]);
         Assert.False(imported.ShowQuickTips);
         Assert.Single(imported.HighlightRules);
         Assert.Single(imported.MuteRules);

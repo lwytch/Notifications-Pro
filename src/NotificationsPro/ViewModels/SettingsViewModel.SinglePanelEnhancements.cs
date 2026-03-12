@@ -75,6 +75,56 @@ public partial class SettingsViewModel
         }
     }
 
+    private string _cardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FillCard;
+    public string CardBackgroundImageFitMode
+    {
+        get => _cardBackgroundImageFitMode;
+        set
+        {
+            var normalized = CardBackgroundImageFitModeHelper.Normalize(value);
+            if (SetProperty(ref _cardBackgroundImageFitMode, normalized))
+                QueueSave();
+        }
+    }
+
+    private string _cardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.InsidePadding;
+    public string CardBackgroundImagePlacement
+    {
+        get => _cardBackgroundImagePlacement;
+        set
+        {
+            var normalized = CardBackgroundImagePlacementHelper.Normalize(value);
+            if (SetProperty(ref _cardBackgroundImagePlacement, normalized))
+                QueueSave();
+        }
+    }
+
+    private string _fullscreenOverlayImagePath = string.Empty;
+    public string FullscreenOverlayImagePath
+    {
+        get => _fullscreenOverlayImagePath;
+        set
+        {
+            var normalized = value?.Trim() ?? string.Empty;
+            if (!SetProperty(ref _fullscreenOverlayImagePath, normalized))
+                return;
+
+            QueueSave();
+        }
+    }
+
+    private string _fullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.FillCard;
+    public string FullscreenOverlayImageFitMode
+    {
+        get => _fullscreenOverlayImageFitMode;
+        set
+        {
+            var normalized = CardBackgroundImageFitModeHelper.Normalize(value);
+            if (SetProperty(ref _fullscreenOverlayImageFitMode, normalized))
+                QueueSave();
+        }
+    }
+
     private string _newNarrationKeyword = string.Empty;
     public string NewNarrationKeyword { get => _newNarrationKeyword; set => SetProperty(ref _newNarrationKeyword, value); }
 
@@ -92,11 +142,15 @@ public partial class SettingsViewModel
         SpokenNotificationTextFormatter.ModeTitleTimestamp,
         SpokenNotificationTextFormatter.ModeTitleBodyTimestamp
     };
+    public List<string> AvailableCardBackgroundImageFitModes { get; } = CardBackgroundImageFitModeHelper.KnownModes.ToList();
+    public List<string> AvailableCardBackgroundImagePlacements { get; } = CardBackgroundImagePlacementHelper.KnownPlacements.ToList();
 
     public ICommand AddNarrationRuleCommand { get; private set; } = null!;
     public ICommand RemoveNarrationRuleCommand { get; private set; } = null!;
     public ICommand BrowseCardBackgroundImageCommand { get; private set; } = null!;
     public ICommand ClearCardBackgroundImageCommand { get; private set; } = null!;
+    public ICommand BrowseFullscreenOverlayImageCommand { get; private set; } = null!;
+    public ICommand ClearFullscreenOverlayImageCommand { get; private set; } = null!;
 
     private void InitializeSinglePanelEnhancementCommands()
     {
@@ -104,6 +158,8 @@ public partial class SettingsViewModel
         RemoveNarrationRuleCommand = new RelayCommand(RemoveNarrationRule);
         BrowseCardBackgroundImageCommand = new RelayCommand(_ => BrowseCardBackgroundImage());
         ClearCardBackgroundImageCommand = new RelayCommand(_ => ClearCardBackgroundImage());
+        BrowseFullscreenOverlayImageCommand = new RelayCommand(_ => BrowseFullscreenOverlayImage());
+        ClearFullscreenOverlayImageCommand = new RelayCommand(_ => ClearFullscreenOverlayImage());
     }
 
     private void LoadSinglePanelEnhancements(AppSettings settings)
@@ -113,6 +169,10 @@ public partial class SettingsViewModel
         _cardBackgroundImageOpacity = Math.Clamp(settings.CardBackgroundImageOpacity, 0.0, 1.0);
         _cardBackgroundImageHueDegrees = Math.Clamp(settings.CardBackgroundImageHueDegrees, -180, 180);
         _cardBackgroundImageBrightness = Math.Clamp(settings.CardBackgroundImageBrightness, 0.2, 2.0);
+        _cardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.CardBackgroundImageFitMode);
+        _cardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.Normalize(settings.CardBackgroundImagePlacement);
+        _fullscreenOverlayImagePath = settings.FullscreenOverlayImagePath?.Trim() ?? string.Empty;
+        _fullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.FullscreenOverlayImageFitMode);
         _newNarrationKeyword = string.Empty;
 
         LoadHighlightEntries(settings);
@@ -125,6 +185,10 @@ public partial class SettingsViewModel
         OnPropertyChanged(nameof(CardBackgroundImageOpacity));
         OnPropertyChanged(nameof(CardBackgroundImageHueDegrees));
         OnPropertyChanged(nameof(CardBackgroundImageBrightness));
+        OnPropertyChanged(nameof(CardBackgroundImageFitMode));
+        OnPropertyChanged(nameof(CardBackgroundImagePlacement));
+        OnPropertyChanged(nameof(FullscreenOverlayImagePath));
+        OnPropertyChanged(nameof(FullscreenOverlayImageFitMode));
         OnPropertyChanged(nameof(NewNarrationKeyword));
     }
 
@@ -284,14 +348,44 @@ public partial class SettingsViewModel
 
     private void BrowseCardBackgroundImage()
     {
+        var importedPath = ImportBackgroundImage("Choose a notification card background image");
+        if (!string.IsNullOrWhiteSpace(importedPath))
+            CardBackgroundImagePath = importedPath;
+    }
+
+    private void ClearCardBackgroundImage()
+    {
+        if (string.IsNullOrWhiteSpace(CardBackgroundImagePath))
+            return;
+
+        CardBackgroundImagePath = string.Empty;
+    }
+
+    private void BrowseFullscreenOverlayImage()
+    {
+        var importedPath = ImportBackgroundImage("Choose a fullscreen backdrop image");
+        if (!string.IsNullOrWhiteSpace(importedPath))
+            FullscreenOverlayImagePath = importedPath;
+    }
+
+    private void ClearFullscreenOverlayImage()
+    {
+        if (string.IsNullOrWhiteSpace(FullscreenOverlayImagePath))
+            return;
+
+        FullscreenOverlayImagePath = string.Empty;
+    }
+
+    private static string? ImportBackgroundImage(string dialogTitle)
+    {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Filter = "Image files (*.png;*.jpg;*.jpeg;*.bmp;*.webp)|*.png;*.jpg;*.jpeg;*.bmp;*.webp",
-            Title = "Choose a notification card background image"
+            Title = dialogTitle
         };
 
         if (dialog.ShowDialog() != true)
-            return;
+            return null;
 
         BackgroundImageService.EnsureBackgroundsDirExists();
         var destinationDirectory = BackgroundImageService.GetCustomBackgroundsDir();
@@ -301,6 +395,7 @@ public partial class SettingsViewModel
         try
         {
             File.Copy(dialog.FileName, destinationPath, overwrite: true);
+            return destinationPath;
         }
         catch (Exception ex)
         {
@@ -309,17 +404,7 @@ public partial class SettingsViewModel
                 "Background Image",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error);
-            return;
+            return null;
         }
-
-        CardBackgroundImagePath = destinationPath;
-    }
-
-    private void ClearCardBackgroundImage()
-    {
-        if (string.IsNullOrWhiteSpace(CardBackgroundImagePath))
-            return;
-
-        CardBackgroundImagePath = string.Empty;
     }
 }

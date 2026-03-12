@@ -64,6 +64,9 @@ Animation refinement:
 Settings UI reorganization (Behavior tab has 6 concerns in one panel):
 - [ ] Split Behavior tab — move content/display controls to a separate tab from timing/window/animation (deferred)
 - [ ] Ensure logical grouping: Typography, Colors, Card Shape, Content/Display, Behavior, Position (deferred)
+- [x] Background-image and spacing polish: Restore the single-column settings rhythm on Appearance and other affected tabs, move explanatory copy into tooltips where possible, add explicit image fit behavior options, and verify the rollback README/help text still matches the shipped single-panel UI.
+- [x] App-specific background assets: Allow specific apps to override the default card background image treatment without reintroducing multi-panel complexity, and add fullscreen-backdrop image support with fit/opacity controls that stay privacy-safe and export/import correctly.
+- [x] Settings ownership cleanup: Add an Apps tab for per-app presentation overrides, and move Quiet Hours plus Burst Limiting out of Filtering into a behavior/scheduling home that matches what they actually do.
 
 Previously completed (Milestone 3):
 - [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)

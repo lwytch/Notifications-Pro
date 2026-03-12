@@ -5,7 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.IO;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
@@ -347,17 +349,25 @@ public partial class OverlayWindow : Window
             Height = workArea.Height;
             _wasFullscreen = true;
 
-            // Apply fullscreen background color with opacity
-            try
+            var fullscreenImageBrush = TryCreateFullscreenBackgroundBrush(settings);
+            if (fullscreenImageBrush != null)
             {
-                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.FullscreenOverlayColor);
-                color.A = (byte)(settings.FullscreenOverlayOpacity * 255);
-                Background = new SolidColorBrush(color);
+                Background = fullscreenImageBrush;
             }
-            catch
+            else
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(
-                    (byte)(settings.FullscreenOverlayOpacity * 255), 0, 0, 0));
+                // Apply fullscreen background color with opacity
+                try
+                {
+                    var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.FullscreenOverlayColor);
+                    color.A = (byte)(settings.FullscreenOverlayOpacity * 255);
+                    Background = new SolidColorBrush(color);
+                }
+                catch
+                {
+                    Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(
+                        (byte)(settings.FullscreenOverlayOpacity * 255), 0, 0, 0));
+                }
             }
         }
         else if (_wasFullscreen)
@@ -375,6 +385,44 @@ public partial class OverlayWindow : Window
                 SizeToContent = SizeToContent.Height;
                 ClearValue(HeightProperty);
             }
+        }
+    }
+
+    private static System.Windows.Media.Brush? TryCreateFullscreenBackgroundBrush(AppSettings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.FullscreenOverlayImagePath))
+            return null;
+
+        try
+        {
+            var fullPath = Path.GetFullPath(settings.FullscreenOverlayImagePath);
+            var backgroundsDir = Path.GetFullPath(BackgroundImageService.GetCustomBackgroundsDir());
+            if (!fullPath.StartsWith(backgroundsDir, StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            if (!File.Exists(fullPath))
+                return null;
+
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(fullPath, UriKind.Absolute);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            var brush = new ImageBrush(bitmap)
+            {
+                Stretch = CardBackgroundImageFitModeHelper.ToStretch(settings.FullscreenOverlayImageFitMode),
+                AlignmentX = AlignmentX.Center,
+                AlignmentY = AlignmentY.Center,
+                Opacity = Math.Clamp(settings.FullscreenOverlayOpacity, 0.1, 1.0)
+            };
+            brush.Freeze();
+            return brush;
+        }
+        catch
+        {
+            return null;
         }
     }
 

@@ -67,6 +67,11 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.CardBackgroundImageOpacity = 0.6;
         sm.Settings.CardBackgroundImageHueDegrees = 30;
         sm.Settings.CardBackgroundImageBrightness = 0.8;
+        sm.Settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard;
+        sm.Settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard;
+        sm.Settings.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
+        sm.Settings.FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png";
+        sm.Settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize;
         sm.Settings.ShowQuickTips = false;
         sm.Settings.HighlightRules.Add(new HighlightRuleDefinition
         {
@@ -107,6 +112,11 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(0.6, sm2.Settings.CardBackgroundImageOpacity);
         Assert.Equal(30, sm2.Settings.CardBackgroundImageHueDegrees);
         Assert.Equal(0.8, sm2.Settings.CardBackgroundImageBrightness);
+        Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, sm2.Settings.CardBackgroundImageFitMode);
+        Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, sm2.Settings.CardBackgroundImagePlacement);
+        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", sm2.Settings.PerAppBackgroundImages["X"]);
+        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", sm2.Settings.FullscreenOverlayImagePath);
+        Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, sm2.Settings.FullscreenOverlayImageFitMode);
         Assert.False(sm2.Settings.ShowQuickTips);
         Assert.Single(sm2.Settings.HighlightRules);
         Assert.Equal(NotificationMatchScopeHelper.TitleOnly, sm2.Settings.HighlightRules[0].Scope);
@@ -136,6 +146,8 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(0.45, settings.CardBackgroundImageOpacity);
         Assert.Equal(0, settings.CardBackgroundImageHueDegrees);
         Assert.Equal(1.0, settings.CardBackgroundImageBrightness);
+        Assert.Equal(CardBackgroundImageFitModeHelper.FillCard, settings.CardBackgroundImageFitMode);
+        Assert.Equal(CardBackgroundImagePlacementHelper.InsidePadding, settings.CardBackgroundImagePlacement);
         Assert.Equal(14, settings.AppNameFontSize);
         Assert.Equal("SemiBold", settings.AppNameFontWeight);
         Assert.Equal(16, settings.TitleFontSize);
@@ -208,6 +220,9 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(NotificationCaptureModeHelper.ModeAuto, settings.NotificationCaptureMode);
         Assert.Equal("Framed Group", settings.AppGroupingStyle);
         Assert.True(settings.ShowAppGroupCounts);
+        Assert.Empty(settings.PerAppBackgroundImages);
+        Assert.Equal(string.Empty, settings.FullscreenOverlayImagePath);
+        Assert.Equal(CardBackgroundImageFitModeHelper.FillCard, settings.FullscreenOverlayImageFitMode);
         Assert.True(settings.ShowQuickTips);
     }
 
@@ -235,6 +250,7 @@ public class SettingsManagerTests : IDisposable
         original.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "headline" });
         original.MuteRules.Add(new MuteRuleDefinition { Keyword = "muted" });
         original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@team" });
+        original.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
 
         var clone = original.Clone();
         clone.MutedApps.Add("Slack");
@@ -244,6 +260,7 @@ public class SettingsManagerTests : IDisposable
         clone.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "body" });
         clone.MuteRules.Add(new MuteRuleDefinition { Keyword = "regex" });
         clone.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "voice" });
+        clone.PerAppBackgroundImages["Slack"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\slack.png";
 
         Assert.Single(original.MutedApps);
         Assert.Single(original.SpokenMutedApps);
@@ -259,6 +276,8 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2, clone.HighlightRules.Count);
         Assert.Equal(2, clone.MuteRules.Count);
         Assert.Equal(2, clone.NarrationRules.Count);
+        Assert.Single(original.PerAppBackgroundImages);
+        Assert.Equal(2, clone.PerAppBackgroundImages.Count);
     }
 
     [Fact]

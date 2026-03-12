@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 
 namespace NotificationsPro.Services;
@@ -116,9 +117,13 @@ public class ThemeManager
         s.CardBackgroundImageOpacity = double.IsNaN(s.CardBackgroundImageOpacity) ? 0.45 : Math.Clamp(s.CardBackgroundImageOpacity, 0.0, 1.0);
         s.CardBackgroundImageHueDegrees = double.IsNaN(s.CardBackgroundImageHueDegrees) ? 0.0 : Math.Clamp(s.CardBackgroundImageHueDegrees, -180, 180);
         s.CardBackgroundImageBrightness = double.IsNaN(s.CardBackgroundImageBrightness) ? 1.0 : Math.Clamp(s.CardBackgroundImageBrightness, 0.2, 2.0);
+        s.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.Normalize(s.CardBackgroundImageFitMode);
+        s.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.Normalize(s.CardBackgroundImagePlacement);
+        s.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(s.FullscreenOverlayImageFitMode);
         s.HighlightRules ??= new List<HighlightRuleDefinition>();
         s.MuteRules ??= new List<MuteRuleDefinition>();
         s.NarrationRules ??= new List<NarrationRuleDefinition>();
+        s.PerAppBackgroundImages ??= new Dictionary<string, string>();
     }
 
     private static string SanitizeFileName(string name)

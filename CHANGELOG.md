@@ -15,6 +15,7 @@
 - Restored the stable single-panel UX by removing the experimental routing/lane model from the shipped codepath and reintroducing the newer useful features directly on top of the original overlay flow
 - Filtering now supports field-scoped and app-filtered highlight/mute/narration rules without changing the core built-in narrator behavior that was already working
 - Appearance now supports local image-backed notification cards again, and the settings preview reflects the same image-backed card mode
+- Background-image editing now follows the original single-column settings rhythm, with portrait-safe fit modes, content-vs-full-card coverage, and single-line banner mode intentionally kept solid-color for readability
 - Default-value drift resolved across `AppSettings`, the settings viewmodel, tests, docs, and `settings.example.json`, so first-run/reset defaults now consistently use 40 visible notifications and 1200ms animation speed
 - Overflow summary semantics corrected so skipped notifications are reported honestly as `not shown` instead of behaving like a hidden expandable queue
 - Settings-window programmatic tab navigation now resolves the real tab labels again after the left-nav header rework
@@ -28,6 +29,8 @@
 - Global hotkey editor now exposes the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of broken non-existent bindings
 - Hotkey registration failures are now surfaced in Settings > Accessibility when a combo is invalid or already taken
 - Help tab references now match the current tab layout and control locations
+- Quiet Hours and Burst Limiting moved into Behavior so suppression scheduling and flood protection sit with other runtime behavior controls instead of the Filtering tab
+- Per-app presentation overrides moved into a dedicated Apps tab, and the "Settings for this app" shortcut now lands there instead of Filtering
 - Spoken-notification selectors no longer render with the extra left indentation that made the section look misaligned
 - Notification cards now expose meaningful Windows UI Automation names instead of the raw model class name
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
@@ -41,6 +44,8 @@
 - System > Settings Experience > Show Quick Tips toggle for the first-run settings guidance banner
 - App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls
 - Overflow badge recovery affordance — clicking the `+N not shown` summary now offers to raise the visible-notification limit for future cards, while clearly disclosing that skipped content was not retained
+- App-specific card background overrides in the new Apps tab, so selected apps can use their own local card artwork without introducing multi-panel routing
+- Fullscreen backdrop images with local asset browsing and fit controls, so fullscreen monitoring mode can use either a solid tint or a chosen image
 - Expanded spoken notification combinations — Added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp to the Accessibility narration selector
 - Per-app spoken notification controls — Accessibility now lets you keep per-app `Read aloud` checkboxes on/off so narration can stay on globally without reading every source aloud
 - Built-in spoken notifications — Accessibility tab now includes an on/off narration toggle with Body Only vs Title + Body + Timestamp modes, installed voice selection, rate/volume controls, and an in-app Preview Voice button

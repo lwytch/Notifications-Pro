@@ -51,7 +51,7 @@
 
                 <Border x:Name="AccentBorder"
                         CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
-                        Padding="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ClipToBounds="True"
                         BorderBrush="{Binding DataContext.AccentColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource ColorToBrush}}"
                         BorderThickness="{Binding DataContext.AccentBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}">
                     <Border.Background>
@@ -65,15 +65,31 @@
                     </Border.Background>
 
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Image Stretch="UniformToFill"
-                           Opacity="{Binding BackgroundImageOpacity}"
+                    <Image Opacity="{Binding BackgroundImageOpacity}"
                            IsHitTestVisible="False"
-                           Grid.ColumnSpan="2">
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Stretch" Value="UniformToFill"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding BackgroundImagePlacement}" Value="Full Card"/>
+                                            <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Fit Inside Card">
+                                        <Setter Property="Stretch" Value="Uniform"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Original Size">
+                                        <Setter Property="Stretch" Value="None"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
                         <Image.Source>
                             <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
                                 <Binding Path="BackgroundImagePath"/>
@@ -83,24 +99,65 @@
                         </Image.Source>
                     </Image>
 
-                    <!-- Icon column -->
-                    <Image Grid.Column="0" VerticalAlignment="Top"
-                           Width="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                           Height="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
-                           Margin="0,0,8,0"
-                           Stretch="Uniform"
-                           Visibility="{Binding DataContext.ShowNotificationIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}">
-                        <Image.Source>
-                            <MultiBinding Converter="{StaticResource AppIconConverter}">
-                                <Binding Path="AppName"/>
-                                <Binding Path="DataContext.IconService" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                <Binding Path="DataContext.CurrentSettings" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                            </MultiBinding>
-                        </Image.Source>
-                    </Image>
+                    <Grid Margin="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}" ClipToBounds="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Content column -->
-                    <Grid Grid.Column="1">
+                        <Image Opacity="{Binding BackgroundImageOpacity}"
+                               IsHitTestVisible="False"
+                               Grid.ColumnSpan="2"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Setter Property="Stretch" Value="UniformToFill"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding BackgroundImagePlacement}" Value="Inside Padding"/>
+                                                <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </MultiDataTrigger>
+                                        <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Fit Inside Card">
+                                            <Setter Property="Stretch" Value="Uniform"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Original Size">
+                                            <Setter Property="Stretch" Value="None"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
+                                    <Binding Path="BackgroundImagePath"/>
+                                    <Binding Path="BackgroundImageHueDegrees"/>
+                                    <Binding Path="BackgroundImageBrightness"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+
+                        <!-- Icon column -->
+                        <Image Grid.Column="0" VerticalAlignment="Top"
+                               Width="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                               Height="{Binding DataContext.IconSize, RelativeSource={RelativeSource AncestorType=Window}}"
+                               Margin="0,0,8,0"
+                               Stretch="Uniform"
+                               Visibility="{Binding DataContext.ShowNotificationIcons, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource AppIconConverter}">
+                                    <Binding Path="AppName"/>
+                                    <Binding Path="DataContext.IconService" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                    <Binding Path="DataContext.CurrentSettings" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+
+                        <!-- Content column -->
+                        <Grid Grid.Column="1">
                     <StackPanel x:Name="StackedContent"
                                 Visibility="{Binding DataContext.StackedContentVisibility, RelativeSource={RelativeSource AncestorType=Window}}">
                         <!-- App name -->
@@ -352,6 +409,7 @@
                                 </TextBlock>
                             </InlineUIContainer>
                         </TextBlock>
+                    </Grid>
                     </Grid>
                     </Grid>
                 </Grid>

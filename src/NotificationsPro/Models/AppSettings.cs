@@ -25,6 +25,8 @@ public class AppSettings
     public double CardBackgroundImageOpacity { get; set; } = 0.45;
     public double CardBackgroundImageHueDegrees { get; set; }
     public double CardBackgroundImageBrightness { get; set; } = 1.0;
+    public string CardBackgroundImageFitMode { get; set; } = "Fill Card";
+    public string CardBackgroundImagePlacement { get; set; } = "Inside Padding";
     public string AccentColor { get; set; } = "#0078D4";
 
     // Appearance — Card Shape
@@ -92,6 +94,7 @@ public class AppSettings
     public bool SoundEnabled { get; set; } = false;
     public string DefaultSound { get; set; } = "None";
     public Dictionary<string, string> PerAppSounds { get; set; } = new();
+    public Dictionary<string, string> PerAppBackgroundImages { get; set; } = new();
 
     // Toast suppression (M9.5)
     public bool SuppressToastPopups { get; set; } = false;
@@ -165,6 +168,8 @@ public class AppSettings
     public bool FullscreenOverlayMode { get; set; } = false;
     public double FullscreenOverlayOpacity { get; set; } = 0.5;
     public string FullscreenOverlayColor { get; set; } = "#000000";
+    public string FullscreenOverlayImagePath { get; set; } = string.Empty;
+    public string FullscreenOverlayImageFitMode { get; set; } = "Fill Card";
 
     // Streaming & Presentation (M10)
     public bool ChromaKeyEnabled { get; set; } = false;
@@ -242,6 +247,7 @@ public class AppSettings
         clone.PresentationApps = new List<string>(PresentationApps);
         clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);
         clone.PerAppIcons = new Dictionary<string, string>(PerAppIcons);
+        clone.PerAppBackgroundImages = new Dictionary<string, string>(PerAppBackgroundImages);
         return clone;
     }
 }

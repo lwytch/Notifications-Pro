@@ -91,6 +91,12 @@ public class OverlayViewModel : BaseViewModel
     private double _cardBackgroundImageBrightness = 1.0;
     public double CardBackgroundImageBrightness { get => _cardBackgroundImageBrightness; set => SetProperty(ref _cardBackgroundImageBrightness, value); }
 
+    private string _cardBackgroundImageFitMode = "Fill Card";
+    public string CardBackgroundImageFitMode { get => _cardBackgroundImageFitMode; set => SetProperty(ref _cardBackgroundImageFitMode, value); }
+
+    private string _cardBackgroundImagePlacement = "Inside Padding";
+    public string CardBackgroundImagePlacement { get => _cardBackgroundImagePlacement; set => SetProperty(ref _cardBackgroundImagePlacement, value); }
+
     private string _accentColor = "#0078D4";
     public string AccentColor { get => _accentColor; set => SetProperty(ref _accentColor, value); }
 
@@ -590,6 +596,8 @@ public class OverlayViewModel : BaseViewModel
         CardBackgroundImageOpacity = s.CardBackgroundImageOpacity;
         CardBackgroundImageHueDegrees = s.CardBackgroundImageHueDegrees;
         CardBackgroundImageBrightness = s.CardBackgroundImageBrightness;
+        CardBackgroundImageFitMode = s.CardBackgroundImageFitMode;
+        CardBackgroundImagePlacement = s.CardBackgroundImagePlacement;
         AccentColor = s.AccentColor;
         HighlightColor = s.HighlightColor;
         CornerRadius = s.CornerRadius;
