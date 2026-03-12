@@ -41,7 +41,6 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NotificationsPro_TemporaryKey.pfx" />
     <Content Include="Images\*.png" />
   </ItemGroup>
   <ItemGroup>

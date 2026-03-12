@@ -49,9 +49,11 @@
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
 - Accessibility tab now includes built-in spoken notifications with on/off toggle, explicit narration trigger mode (`All Allowed Notifications` vs `Only Matching Narration Rules`), multiple title/body/timestamp combinations, voice selection across the Windows app and desktop speech APIs, speed/volume controls, plus Preview Voice and Refresh Voices actions
+- Filtering > Narration Rules now exposes an `Only speak matching rules` toggle that mirrors the Accessibility narration trigger, so rule-gated speech can be enabled where narration rules are configured
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
+- Accessibility tab privacy/transparency copy is now pushed into tooltips for spoken notifications and Voice Access, keeping the main control layout cleaner without removing the disclosures from Help/README
 - System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, a clipboard-friendly `Run Capture Diagnostic` action, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
 - Appearance now supports explicit `Solid` vs `Image` card background mode, plus saturation, contrast, black-and-white, and portrait-safe vertical-focus controls
 - Fullscreen backdrops now support the same image-treatment controls as card backgrounds: hue, brightness, saturation, contrast, black-and-white, fit, and vertical focus
@@ -86,6 +88,7 @@
 - Appearance tab now includes grouping appearance controls (Framed Group / Header Chip / Minimal Label, plus optional group counts)
 - Appearance tab includes color picker buttons and separate app-name color customization
 - Appearance tab now includes optional local card background images with opacity, hue, brightness, fit, and coverage controls, and the live preview reflects that image-backed card mode in stacked layouts
+- OpenDyslexic preset now ships with a valid bundled font file instead of a broken placeholder asset
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
 - Overflow badge now inherits card theme (background color, text color, font, corner radius), reports `+N not shown`, and clicking it offers a privacy-safe way to raise the visible-limit setting for future cards
@@ -247,7 +250,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 182 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, and rule/background-image persistence), spoken-notification trigger logic, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 182 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, and rule/background-image persistence), spoken-notification trigger logic, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)

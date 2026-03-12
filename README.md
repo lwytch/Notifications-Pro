@@ -3,7 +3,7 @@
   
   # Notifications Pro
 
-  **The ultimate open-source, highly-customisable Windows notification overlay.**
+  **A privacy-first, highly-customisable Windows notification overlay.**
   
   [![Platform](https://img.shields.io/badge/Platform-Windows_10%20%7C%2011-blue.svg)]()
   [![Framework](https://img.shields.io/badge/Framework-.NET_8%20%7C%20WPF-purple.svg)]()
@@ -13,7 +13,7 @@
 
 ---
 
-A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay widget. Stop missing important messages when the 5-second default popup vanishes—read every notification in full, without ever clicking or switching apps.
+A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay. Filter noise, style cards per app, narrate only the alerts that matter, and keep notification text RAM-only while it is visible on screen.
 
 > Still in active development. I use it every day. More updates coming.
 
@@ -101,7 +101,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Per-app mute** — silence notifications from specific apps. Muted apps are remembered per session; the settings UI shows every app seen this session.
 - **Field-scoped keyword rules** — highlight or mute rules can target `Title Only`, `Body Only`, or `Title + Body`, with optional regex matching.
 - **App-filtered rules** — highlight, mute, and narration rules can be limited to a specific app name such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`.
-- **Narration rules** — optional read-aloud overrides can force `Read Aloud` or `Skip Read Aloud` for matching notifications, with an optional spoken-content override.
+- **Narration rules** — optional read-aloud overrides can force `Read Aloud` or `Skip Read Aloud` for matching notifications, with an optional spoken-content override and a mirrored `Only speak matching rules` toggle in `Settings > Filtering`.
 - **Focus mode** — a timed DND period (configurable minutes) accessible from the tray menu.
 - **Presentation mode** — auto-DND when a configured app (PowerPoint, Zoom, Teams, etc.) goes fullscreen.
 
@@ -130,7 +130,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
-- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using every voice Windows currently exposes to Notifications Pro through its app and desktop speech APIs, with adjustable speed, volume, preview, explicit trigger mode, and per-app `Read aloud` checkboxes in `Settings > Apps`. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
+- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using every voice Windows currently exposes to Notifications Pro through its app and desktop speech APIs, with adjustable speed, volume, preview, explicit trigger mode, a mirrored `Only speak matching rules` toggle in `Filtering`, and per-app `Read aloud` checkboxes in `Settings > Apps`. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
@@ -196,8 +196,8 @@ Avoid distraction without missing urgent messages:
 
 ### Getting the Most Out of Notifications Pro
 - Start with `Settings > System > Notification Access` and keep `Capture Mode` on `Auto` unless live notifications stop appearing. If preview notifications work but real ones do not, switch to `Force Accessibility`.
-- Use `Settings > Filtering` for targeting logic, `Settings > Apps` for per-app presentation overrides, `Settings > Accessibility` for narration, and `Settings > Appearance` for how stacked cards look.
-- If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Use `Narration Trigger = Only Matching Narration Rules` when speech should happen only for rule matches instead of for every allowed app.
+- Use `Settings > Filtering` for targeting logic, `Settings > Apps` for per-app presentation overrides, `Settings > Accessibility` for voice/rate/output choices, and `Settings > Appearance` for how stacked cards look.
+- If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Then use either `Settings > Accessibility > Narration Trigger` or `Settings > Filtering > Only speak matching rules` when speech should happen only for rule matches instead of for every allowed app.
 - Background images are local-only assets copied into Notifications Pro's backgrounds folder. Stacked cards can use fit and coverage controls, single-line banner mode stays solid-colour for readability, and app-specific overrides live in `Settings > Apps`.
 
 ### Getting the Most Out of X
@@ -210,7 +210,7 @@ Avoid distraction without missing urgent messages:
 ### Other Social Platforms
 - The same rule system works for Reddit, Instagram, Discord communities, and browser-hosted social tools, but the exact usable keywords depend on what Windows puts into the `Title` and `Body`.
 - For moderation or community work, use `Body Only` rules for phrases like `reported`, `reply`, `mention`, or a subreddit/community name, then add an app filter if the same phrase appears in unrelated apps.
-- Use per-app `Read aloud` checkboxes in `Settings > Accessibility` when an entire platform should stay silent, then add narration rules only for truly high-signal posts or messages.
+- Use per-app `Read aloud` checkboxes in `Settings > Apps` when an entire platform should stay silent, then add narration rules only for truly high-signal posts or messages.
 - When several services all arrive through the same browser host, rely on text patterns and app filters rather than assuming Notifications Pro can distinguish accounts structurally.
 
 ### Common Notification-Heavy Tools
@@ -318,7 +318,7 @@ In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notificat
 
 Choose from `Body Only`, `Title Only`, `Title + Body`, `Body + Timestamp`, `Title + Timestamp`, or `Title + Body + Timestamp`. You can also choose whether narration should speak `All Allowed Notifications` or `Only Matching Narration Rules`, pick an available Windows voice, adjust rate and volume, and use **Preview Voice** or **Refresh Voices** immediately.
 
-Per-app narration now lives in `Settings > Apps`, where each seen app has a `Read aloud` checkbox alongside its other app-specific overrides. Unchecked apps still stay visible on screen but are ignored by narration. If you need finer control, `Settings > Filtering > Narration Rules` can force `Read Aloud` or `Skip Read Aloud` for matching title/body text, optionally limited to a specific app. If you switch `Narration Trigger` to `Only Matching Narration Rules`, only notifications that hit a `Read Aloud` rule will speak. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking.
+Per-app narration now lives in `Settings > Apps`, where each seen app has a `Read aloud` checkbox alongside its other app-specific overrides. Unchecked apps still stay visible on screen but are ignored by narration. If you need finer control, `Settings > Filtering > Narration Rules` can force `Read Aloud` or `Skip Read Aloud` for matching title/body text, optionally limited to a specific app. If you want speech only for rule hits, turn on `Only speak matching rules` in `Settings > Filtering` or switch `Narration Trigger` to `Only Matching Narration Rules` in Accessibility. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking.
 
 Notifications Pro now lists every voice Windows exposes to it through the local app speech API and the desktop speech API. Some Narrator Natural voices may still be missing even after installation because Windows does not expose every Narrator voice to third-party app text-to-speech. Use **Refresh Voices** after installing new voices, or reopen the app if Windows still has not published the new voice list.
 
@@ -354,12 +354,12 @@ If live notifications stop appearing while preview/test notifications still work
 
 | Symptom | Fix |
 |---------|-----|
-| No notifications captured | Verify permission, then use tray "Retry Access Check". If test notifications work but live ones do not, open **Settings > System > Notification Access** and switch **Capture Mode** to `Force Accessibility`. |
+| No notifications captured | Verify permission, then use tray "Retry Access Check". If test notifications work but live ones do not, open **Settings > System > Notification Access**, run **Capture Diagnostic**, and switch **Capture Mode** to `Force Accessibility`. |
 | Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > System. |
 | Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
-| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, confirm the app is still checked in **Settings > Apps > Read aloud**, and verify that `Narration Trigger` is not set to `Only Matching Narration Rules` unless you actually have a matching `Read Aloud` rule. |
+| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, confirm the app is still checked in **Settings > Apps > Read aloud**, and verify that **Settings > Filtering > Only speak matching rules** or `Narration Trigger = Only Matching Narration Rules` is not enabled unless you actually have a matching `Read Aloud` rule. |
 | A highlight, mute, or narration rule is affecting the wrong app | Open **Settings > Filtering** and add or tighten the optional **App Filter** so the rule only matches the intended source such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`. |
 | Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
 
@@ -382,6 +382,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.7
+- **Rule-Gated Speech Shortcut**: `Settings > Filtering > Narration Rules` now includes an explicit `Only speak matching rules` toggle, so users can keep read-aloud tied to narration-rule hits without hunting through Accessibility first.
+- **Accessibility Copy Cleanup**: The long built-in narration and Voice Access transparency/privacy paragraphs were moved out of the main Accessibility layout and folded into the relevant tooltips so the tab stays focused on controls.
+- **Release-Readiness Cleanup**: README/app descriptions were tightened, the signing script now uses local env/prompt-based secrets instead of a hardcoded password, and the repo audit now flags tracked release junk before publishing.
 
 ### Release v1.1.10.6
 - **Narration Trigger Mode**: `Settings > Accessibility > Spoken Notifications` now lets you choose `All Allowed Notifications` or `Only Matching Narration Rules`, so narration rules can cleanly gate speech without disabling the normal per-app/global narration path manually.

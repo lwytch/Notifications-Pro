@@ -47,6 +47,9 @@ logs/
 dumps/
 *.log
 *.dmp
+build_log.txt
+build_output.txt
+errors.txt
 
 # Publish profiles
 Properties/PublishProfiles/

@@ -451,8 +451,22 @@ public partial class SettingsViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _readNotificationsAloudTriggerMode, NormalizeReadNotificationsAloudTriggerMode(value)))
+            {
+                OnPropertyChanged(nameof(NarrationRulesOnlyEnabled));
                 QueueSave();
+            }
         }
+    }
+
+    public bool NarrationRulesOnlyEnabled
+    {
+        get => string.Equals(
+            _readNotificationsAloudTriggerMode,
+            NarrationTriggerModeHelper.OnlyMatchingNarrationRules,
+            StringComparison.OrdinalIgnoreCase);
+        set => ReadNotificationsAloudTriggerMode = value
+            ? NarrationTriggerModeHelper.OnlyMatchingNarrationRules
+            : NarrationTriggerModeHelper.AllAllowedNotifications;
     }
 
     private string _readNotificationsAloudMode = SpokenNotificationTextFormatter.ModeBodyOnly;

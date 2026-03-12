@@ -1639,6 +1639,14 @@
                                        ToolTip="Override normal read-aloud behavior when a keyword matches the title, body, or both. These rules can sit on top of the normal narration settings, or become the only narration trigger when Accessibility uses Only Matching Narration Rules."/>
                         </Border>
 
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding NarrationRulesOnlyEnabled}"
+                                          ToolTip="When enabled, built-in narration stays silent unless a Narration Rule matches with the Read Aloud action. This mirrors Accessibility > Narration Trigger."/>
+                            <TextBlock Text="Only Speak Matching Rules" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Use this when read aloud should happen only for narration-rule hits instead of every allowed notification. Matching rules can still force Read Aloud or Skip Read Aloud per app, title, or body text."/>
+                        </DockPanel>
+
                         <Grid Margin="0,4,0,8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -2402,7 +2410,7 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SPOKEN NOTIFICATIONS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Built-in narration reads visible notifications aloud using a Windows-installed voice."/>
+                                       ToolTip="Built-in narration reads visible notifications aloud using a Windows-installed voice. Audio plays through your normal Windows output, so nearby people may hear it. Notifications Pro only speaks from the live in-memory queue, never writes spoken text to disk, and never retains overflow content for later playback."/>
                         </Border>
 
                         <DockPanel Margin="0,0,0,8">
@@ -2488,21 +2496,9 @@
                                        Style="{StaticResource SettingDesc}" Margin="0,10,0,0"/>
                         </StackPanel>
 
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,8,0,0"
-                                   Style="{StaticResource SettingDesc}"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   Text="Transparency: this is built-in narration inside Notifications Pro, not Microsoft Voice Access. Audio can be heard by anyone nearby, so treat it as an accessibility/convenience feature rather than a private listening channel."/>
-
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,6,0,8"
-                                   Style="{StaticResource SettingDesc}"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   Text="Privacy: spoken notifications come only from Notifications Pro's live in-memory queue. The app never writes spoken text to disk, never keeps overflow content for later playback, and only retains the current live cards in RAM."/>
-
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="MICROSOFT VOICE ACCESS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Control the card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications."/>
+                                       ToolTip="Control the card-level Windows UI Automation label that Microsoft Voice Access can use for visible notifications. This affects only the on-screen accessibility label while the notification is visible, stays RAM-only, and is never written to disk, logged, or sent over the network. It does not make Notifications Pro speak on its own."/>
                         </Border>
 
                         <TextBlock Text="Voice Access Card Labels" Style="{StaticResource SettingLabel}"
@@ -2513,18 +2509,6 @@
                                   SelectedItem="{Binding VoiceAccessReadMode}"
                                   Margin="0,4,0,0"
                                   ToolTip="Choose whether Microsoft Voice Access should target a generic label, the body only, or the title, body, and timestamp."/>
-
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,8,0,0"
-                                   Style="{StaticResource SettingDesc}"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   Text="Transparency: this changes the card's Windows UI Automation label for Microsoft Voice Access and similar assistive tools. The selected text is exposed only while the notification is visible, stays in RAM only, and is never written to disk, logged, or sent over the network."/>
-
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,6,0,8"
-                                   Style="{StaticResource SettingDesc}"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   Text="This is an accessibility integration, not a separate text-to-speech engine inside Notifications Pro. Off removes the rich card label, but visible text remains available to Windows accessibility tools while it is on screen."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"
@@ -3107,7 +3091,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="2. " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,2,8,0" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Pick any available voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification. Use the Narration Trigger selector if you want speech only when a Narration Rule matches, or the Read Aloud checkbox list if you only want certain apps narrated."/>
+                                       Text="Pick any available voice, adjust speech rate and volume, then use Preview Voice to confirm the sound before waiting for a real notification. Use the Narration Trigger selector in Accessibility or the Only speak matching rules toggle in Filtering if you want speech only when a Narration Rule matches, or the Read Aloud checkbox list if you only want certain apps narrated."/>
                         </Grid>
                         <Grid Margin="12,0,0,4">
                             <Grid.ColumnDefinitions>
@@ -3140,7 +3124,7 @@
                                    Text="Settings → Filtering now lets you target rules against Title Only, Body Only, or Title + Body, and optionally limit them to a specific app name such as X, Reddit, Outlook, Slack, Codex, or Antigravity."/>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
                                    Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                   Text="Use Keyword Highlighting and Keyword Muting for visual rules, then use Narration Rules when a matching phrase should force Read Aloud or Skip Read Aloud. If you want narration to happen only for rule matches, set Accessibility → Narration Trigger to Only Matching Narration Rules."/>
+                                   Text="Use Keyword Highlighting and Keyword Muting for visual rules, then use Narration Rules when a matching phrase should force Read Aloud or Skip Read Aloud. If you want narration to happen only for rule matches, turn on Filtering → Only speak matching rules or set Accessibility → Narration Trigger to Only Matching Narration Rules."/>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
                                    Text="Notifications Pro still works from the Windows notification text only. It does not receive structured X account IDs, post metadata, or platform APIs, so the safest setup is to target the text patterns that actually appear in your live notifications."/>
@@ -3340,7 +3324,7 @@
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in Settings → Apps → Read aloud."/>
+                                       Text="Turn on Settings → Accessibility → Read Notifications Aloud, then use Preview Voice. If you still hear nothing, check your Windows output device, ensure notifications are not paused, confirm the app is still checked in Settings → Apps → Read aloud, and verify that Filtering → Only speak matching rules is off unless you already have a matching Read Aloud rule."/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="Voice Access says 'Notification'" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,8"

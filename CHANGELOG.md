@@ -10,8 +10,13 @@
 - Safe hex parsing in ContrastHelper using TryParse instead of Convert.ToByte (prevents crash on malformed input)
 - SetLastError=true added to HotkeyManager P/Invoke declarations for better error diagnostics
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
+- Release packaging script now takes the MSIX signing password from `NOTIFICATIONSPRO_PFX_PASSWORD` or a secure prompt instead of shipping a hardcoded secret in the tracked script
+- Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Filtering > Narration Rules now includes an explicit `Only speak matching rules` toggle that mirrors the Accessibility narration-trigger mode, so rule-gated speech is discoverable where narration rules are actually configured
+- Accessibility disclosure cleanup — built-in narration and Voice Access transparency/privacy copy now lives in the relevant tooltips instead of occupying the main control flow on the Accessibility tab
+- Replaced the broken HTML placeholder at `Fonts/OpenDyslexic-Regular.otf` with the real font binary so the OpenDyslexic preset is shippable again
 - Spoken notifications now support an explicit `Only Matching Narration Rules` trigger mode, so narration rules can gate speech cleanly without forcing you to disable the normal global narration path by hand
 - Spoken voice enumeration now merges the Windows app speech voice list with the desktop speech voice list, so Notifications Pro shows more of the voices actually usable on the machine instead of only the WinRT subset
 - Packaged MSIX builds no longer force the fallback unpackaged AUMID at startup, avoiding split Windows notification identities that could stop live notification capture after updates

@@ -461,7 +461,8 @@ Settings UX and persistence:
 Docs and release readiness:
 - [x] README workflow guides: add dedicated sections for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, covering setup, browser-hosted app limitations, per-app narration, privacy limits, and troubleshooting for services such as X, Reddit, Instagram, Codex, and Antigravity in the single-panel app.
 - [x] README/Help gap analysis: update README, in-app Help, example settings, and status text for advanced narration rules, card background images, voice setup, privacy disclosures, defaults, and troubleshooting without reintroducing multi-panel language.
-- [ ] Public repo sanitisation audit: review the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity that should be removed or deliberately disclosed before the repository is made public.
+- [x] Public repo sanitisation audit: reviewed the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity, and recorded the findings in `analysis/public-release-audit-2026-03-12.md`.
+- [ ] Public release follow-through: rotate the exposed signing credential, decide whether to rewrite history to remove the old secret-bearing signing-script revision and local-path-heavy commit messages, and confirm whether the package publisher identity should stay public as-is.
 
 ### Milestone 19: Settings IA Cleanup & Advanced Image Controls
 **Status: In progress**
@@ -473,6 +474,7 @@ Information architecture cleanup from the 2026-03-12 settings audit:
 - [x] Apps-tab cleanup: Make `Apps` the canonical per-app overrides surface by renaming the section to `Per-App Overrides`, moving per-app narration into it, adding app search plus `Only modified` filtering, and adding per-app clear/reset actions so large app lists stay manageable.
 - [ ] Scope signposting and discoverability: Add lightweight “configured in …” cross-links or helper rows between split concepts such as timestamp visibility vs timestamp styling, app grouping behavior vs grouping appearance, and default icon vs per-app icon overrides without duplicating the controls themselves.
 - [ ] Tooltip and inline-copy audit: Reduce non-critical inline guidance in dense tabs, keep privacy/access/live-status text inline where required, and move general usage hints into tooltips so sections stay readable.
+- [x] Accessibility disclosure cleanup: moved the built-in narration and Voice Access transparency/privacy copy out of the main Accessibility layout and into the relevant tooltips, while keeping the fuller disclosures in Help/README.
 
 Control-system and visual-rhythm cleanup from the 2026-03-12 layout audit:
 - [ ] Shared form-control normalization: Split the current monospaced text-box style into semantic input styles (`general text` vs `structured value`), standardize control heights, and make sure normal text entry fields such as theme names, profile names, app filters, and general keyword inputs no longer inherit a technical monospace look.
