@@ -76,6 +76,19 @@ public partial class App : Application
         Right
     }
 
+    private static bool HasPackageIdentity()
+    {
+        try
+        {
+            _ = Package.Current.Id.FullName;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -102,9 +115,11 @@ public partial class App : Application
             args.SetObserved();
         };
 
-        // Set AUMID before any notification API calls — this makes the app
-        // appear in Windows Settings > Privacy > Notifications
-        SetCurrentProcessExplicitAppUserModelID("NotificationsPro.App");
+        // Only unpackaged desktop runs need an explicit AUMID. In the MSIX build
+        // Windows already provides package identity, and overriding it creates a
+        // second notification identity that can break listener permissions.
+        if (!HasPackageIdentity())
+            SetCurrentProcessExplicitAppUserModelID("NotificationsPro.App");
 
         _settingsManager = new SettingsManager();
         _settingsManager.Load();

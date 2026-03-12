@@ -381,6 +381,9 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.4
+- **Live Capture Identity Fix**: Packaged installs now keep the Windows package identity that MSIX already provides instead of forcing the fallback unpackaged AUMID, which could leave the app with split notification identities and stop live notification capture after updates.
+
 ### Release v1.1.10.3
 - **Apps Tab Read-Only Binding Fix**: The per-app background path display in `Settings > Apps` now uses a one-way binding, fixing the `BackgroundImageDisplay` exception that could appear when the tab refreshed or when you sent a test notification from that screen.
 
