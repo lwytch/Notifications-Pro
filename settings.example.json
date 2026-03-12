@@ -64,6 +64,7 @@
   "MuteRules": [],
   "NarrationRules": [],
   "AppProfiles": [],
+  "OverlayLanes": [],
   "ShowNotificationIcons": false,
   "IconSize": 24,
   "DefaultIconPreset": "None",

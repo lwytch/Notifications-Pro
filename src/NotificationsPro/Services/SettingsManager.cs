@@ -151,6 +151,8 @@ public class SettingsManager
             profile.BackgroundImageBrightness = Math.Clamp(profile.BackgroundImageBrightness, 0.2, 2.0);
         }
 
+        MigrateOverlayLanes(settings);
+
         foreach (var rule in settings.HighlightRules)
         {
             rule.Scope = NotificationMatchScopeHelper.Normalize(rule.Scope);
@@ -174,5 +176,55 @@ public class SettingsManager
         settings.SecondaryOverlayPositionPreset = SecondaryOverlayPositionHelper.Normalize(settings.SecondaryOverlayPositionPreset);
         settings.SecondaryOverlayWidth = settings.SecondaryOverlayWidth <= 0 ? 340 : settings.SecondaryOverlayWidth;
         settings.SecondaryOverlayMaxHeight = settings.SecondaryOverlayMaxHeight <= 0 ? 480 : settings.SecondaryOverlayMaxHeight;
+    }
+
+    private static void MigrateOverlayLanes(AppSettings settings)
+    {
+        var needsSecondaryLane = settings.SecondaryOverlayEnabled
+            || settings.AppProfiles.Any(profile => string.Equals(
+                OverlayLaneHelper.Normalize(profile.OverlayLane),
+                OverlayLaneHelper.Secondary,
+                StringComparison.OrdinalIgnoreCase));
+
+        if (needsSecondaryLane && !settings.OverlayLanes.Any(lane =>
+                string.Equals(OverlayLaneHelper.Normalize(lane.Id), OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase)))
+        {
+            settings.OverlayLanes.Add(new OverlayLaneDefinition
+            {
+                Id = OverlayLaneHelper.Secondary,
+                Name = OverlayLaneHelper.SecondaryDisplayName,
+                IsEnabled = settings.SecondaryOverlayEnabled,
+                MonitorIndex = Math.Max(0, settings.SecondaryOverlayMonitorIndex),
+                PositionPreset = SecondaryOverlayPositionHelper.Normalize(settings.SecondaryOverlayPositionPreset),
+                Left = settings.SecondaryOverlayLeft,
+                Top = settings.SecondaryOverlayTop,
+                Width = settings.SecondaryOverlayWidth <= 0 ? 340 : settings.SecondaryOverlayWidth,
+                MaxHeight = settings.SecondaryOverlayMaxHeight <= 0 ? 480 : settings.SecondaryOverlayMaxHeight
+            });
+        }
+
+        foreach (var lane in settings.OverlayLanes)
+        {
+            lane.Id = OverlayLaneHelper.Normalize(lane.Id);
+            lane.Name = string.IsNullOrWhiteSpace(lane.Name)
+                ? OverlayLaneHelper.GetDisplayName(settings.OverlayLanes, lane.Id)
+                : lane.Name.Trim();
+            lane.MonitorIndex = Math.Max(0, lane.MonitorIndex);
+            lane.PositionPreset = SecondaryOverlayPositionHelper.Normalize(lane.PositionPreset);
+            lane.Width = lane.Width <= 0 ? 340 : lane.Width;
+            lane.MaxHeight = lane.MaxHeight <= 0 ? 480 : lane.MaxHeight;
+            lane.BackgroundImageOpacity = Math.Clamp(lane.BackgroundImageOpacity, 0.0, 1.0);
+            lane.BackgroundImageBrightness = Math.Clamp(lane.BackgroundImageBrightness, 0.2, 2.0);
+        }
+
+        settings.OverlayLanes = settings.OverlayLanes
+            .Where(lane => !string.Equals(lane.Id, OverlayLaneHelper.Main, StringComparison.OrdinalIgnoreCase))
+            .GroupBy(lane => lane.Id, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .OrderBy(lane => lane.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        foreach (var profile in settings.AppProfiles)
+            profile.OverlayLane = OverlayLaneHelper.NormalizeOrMain(profile.OverlayLane, settings.OverlayLanes);
     }
 }

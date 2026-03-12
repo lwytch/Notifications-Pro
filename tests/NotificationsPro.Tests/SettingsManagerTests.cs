@@ -98,6 +98,18 @@ public class SettingsManagerTests : IDisposable
             AccentColor = "#00AAFF",
             BackgroundImagePath = @"C:\NotificationsPro\backgrounds\codex.png"
         });
+        sm.Settings.OverlayLanes.Add(new OverlayLaneDefinition
+        {
+            Id = "social",
+            Name = "Social Feed",
+            IsEnabled = true,
+            MonitorIndex = 1,
+            PositionPreset = "Bottom Right",
+            Width = 480,
+            MaxHeight = 860,
+            AccentColor = "#FF8800",
+            BackgroundColor = "#141414"
+        });
         sm.Save();
 
         var sm2 = CreateManager();
@@ -129,6 +141,14 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleOnly, sm2.Settings.NarrationRules[0].ReadMode);
         Assert.Single(sm2.Settings.AppProfiles);
         Assert.Equal(OverlayLaneHelper.Secondary, sm2.Settings.AppProfiles[0].OverlayLane);
+        Assert.Equal(2, sm2.Settings.OverlayLanes.Count);
+        Assert.Contains(sm2.Settings.OverlayLanes, lane => lane.Id == "social"
+            && lane.Name == "Social Feed"
+            && lane.Width == 480
+            && lane.BackgroundColor == "#141414");
+        Assert.Contains(sm2.Settings.OverlayLanes, lane => lane.Id == OverlayLaneHelper.Secondary
+            && lane.Width == 512
+            && lane.MaxHeight == 720);
     }
 
     [Fact]
@@ -223,6 +243,34 @@ public class SettingsManagerTests : IDisposable
     }
 
     [Fact]
+    public void Load_MigratesLegacySecondaryOverlayIntoOverlayLanes()
+    {
+        var sm = CreateManager();
+        sm.Settings.SecondaryOverlayEnabled = true;
+        sm.Settings.SecondaryOverlayMonitorIndex = 2;
+        sm.Settings.SecondaryOverlayPositionPreset = "Middle Left";
+        sm.Settings.SecondaryOverlayWidth = 420;
+        sm.Settings.SecondaryOverlayMaxHeight = 900;
+        sm.Settings.AppProfiles.Add(new AppProfile
+        {
+            AppName = "Codex",
+            OverlayLane = "Secondary"
+        });
+        sm.Save();
+
+        var sm2 = CreateManager();
+        sm2.Load();
+
+        Assert.Single(sm2.Settings.OverlayLanes);
+        Assert.Equal(OverlayLaneHelper.Secondary, sm2.Settings.OverlayLanes[0].Id);
+        Assert.Equal(2, sm2.Settings.OverlayLanes[0].MonitorIndex);
+        Assert.Equal("Middle Left", sm2.Settings.OverlayLanes[0].PositionPreset);
+        Assert.Equal(420, sm2.Settings.OverlayLanes[0].Width);
+        Assert.Equal(900, sm2.Settings.OverlayLanes[0].MaxHeight);
+        Assert.Equal(OverlayLaneHelper.Secondary, sm2.Settings.AppProfiles[0].OverlayLane);
+    }
+
+    [Fact]
     public void Clone_ReturnsIndependentCopy()
     {
         var original = new AppSettings { FontSize = 20, FontFamily = "Arial" };
@@ -247,6 +295,7 @@ public class SettingsManagerTests : IDisposable
         original.MuteRules.Add(new MuteRuleDefinition { Keyword = "muted" });
         original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@team" });
         original.AppProfiles.Add(new AppProfile { AppName = "Codex" });
+        original.OverlayLanes.Add(new OverlayLaneDefinition { Id = "social", Name = "Social" });
 
         var clone = original.Clone();
         clone.MutedApps.Add("Slack");
@@ -257,6 +306,7 @@ public class SettingsManagerTests : IDisposable
         clone.MuteRules.Add(new MuteRuleDefinition { Keyword = "regex" });
         clone.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "voice" });
         clone.AppProfiles.Add(new AppProfile { AppName = "Antigravity" });
+        clone.OverlayLanes.Add(new OverlayLaneDefinition { Id = "dev", Name = "Dev" });
 
         Assert.Single(original.MutedApps);
         Assert.Single(original.SpokenMutedApps);
@@ -266,6 +316,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Single(original.MuteRules);
         Assert.Single(original.NarrationRules);
         Assert.Single(original.AppProfiles);
+        Assert.Single(original.OverlayLanes);
         Assert.Equal(2, clone.MutedApps.Count);
         Assert.Equal(2, clone.SpokenMutedApps.Count);
         Assert.Equal(2, clone.HighlightKeywords.Count);
@@ -274,6 +325,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2, clone.MuteRules.Count);
         Assert.Equal(2, clone.NarrationRules.Count);
         Assert.Equal(2, clone.AppProfiles.Count);
+        Assert.Equal(2, clone.OverlayLanes.Count);
     }
 
     [Fact]

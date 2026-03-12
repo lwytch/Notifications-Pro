@@ -451,8 +451,8 @@ Filtering and narration rules:
 - [x] Social/account targeting model: X/social workflows now support text-pattern targeting for handles, hashtags, account names, and watchwords using literal or regex rules with optional app filters; Windows still exposes text only, not structured account IDs.
 
 Per-app styling and routing:
-- [x] App presentation profiles: the Apps tab now centralizes per-app read aloud, overlay lane, sound, icon, colours, and background-image styling so customisation stops being scattered across unrelated tabs.
-- [x] Initial multi-overlay routing: selected apps can route to a dedicated Secondary Overlay with its own monitor, preset, width, and max-height controls while keeping the same privacy model.
+- [x] App routing architecture refresh: the Apps tab now focuses on per-app read aloud, lane assignment, sound, and icon choices while lane styling/layout moved into a dedicated reusable `Lanes` editor so high-app-count setups stop feeling cramped.
+- [x] Reusable multi-overlay routing: selected apps can now route into dedicated named overlay lanes with their own monitor, preset, width, max-height, colours, and background images while keeping the same privacy model.
 - [x] Group header styling review: grouped rendering now supports themeable `Framed Group`, `Header Chip`, and `Minimal Label` treatments with optional counts.
 
 Visual customisation:

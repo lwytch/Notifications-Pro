@@ -480,7 +480,11 @@ public class OverlayViewModel : BaseViewModel
         {
             if (_notificationsView == null)
             {
-                _notificationsView = CollectionViewSource.GetDefaultView(Notifications);
+                var source = new CollectionViewSource
+                {
+                    Source = Notifications
+                };
+                _notificationsView = source.View;
                 _notificationsView.Filter = FilterNotification;
             }
             return _notificationsView;
@@ -552,6 +556,7 @@ public class OverlayViewModel : BaseViewModel
 
     public void ApplySettings(AppSettings s)
     {
+        var lane = OverlayLaneHelper.FindLane(s.OverlayLanes, _overlayLane);
         FontFamily = s.FontFamily;
         FontSize = s.FontSize;
         FontWeight = s.FontWeight;
@@ -582,12 +587,12 @@ public class OverlayViewModel : BaseViewModel
             catch { /* Registry unavailable — use base sizes */ }
         }
 
-        TextColor = s.TextColor;
-        TitleColor = s.TitleColor;
-        AppNameColor = s.AppNameColor;
-        BackgroundColor = s.BackgroundColor;
+        TextColor = string.IsNullOrWhiteSpace(lane?.TextColor) ? s.TextColor : lane.TextColor;
+        TitleColor = string.IsNullOrWhiteSpace(lane?.TitleColor) ? s.TitleColor : lane.TitleColor;
+        AppNameColor = string.IsNullOrWhiteSpace(lane?.AppNameColor) ? s.AppNameColor : lane.AppNameColor;
+        BackgroundColor = string.IsNullOrWhiteSpace(lane?.BackgroundColor) ? s.BackgroundColor : lane.BackgroundColor;
         BackgroundOpacity = s.BackgroundOpacity;
-        AccentColor = s.AccentColor;
+        AccentColor = string.IsNullOrWhiteSpace(lane?.AccentColor) ? s.AccentColor : lane.AccentColor;
         HighlightColor = s.HighlightColor;
         CornerRadius = s.CornerRadius;
         Padding = s.Padding;
@@ -608,12 +613,8 @@ public class OverlayViewModel : BaseViewModel
 
         SlideInDirection = s.SlideInDirection;
         AnimationDurationMs = s.AnimationDurationMs;
-        OverlayWidth = string.Equals(_overlayLane, OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase)
-            ? s.SecondaryOverlayWidth
-            : s.OverlayWidth;
-        OverlayMaxHeight = string.Equals(_overlayLane, OverlayLaneHelper.Secondary, StringComparison.OrdinalIgnoreCase)
-            ? s.SecondaryOverlayMaxHeight
-            : s.OverlayMaxHeight;
+        OverlayWidth = lane?.Width ?? s.OverlayWidth;
+        OverlayMaxHeight = lane?.MaxHeight ?? s.OverlayMaxHeight;
         OverlayScrollbarVisible = s.OverlayScrollbarVisible;
         OverlayScrollbarWidth = s.OverlayScrollbarWidth;
         OverlayScrollbarOpacity = s.OverlayScrollbarOpacity;

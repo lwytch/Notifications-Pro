@@ -545,6 +545,58 @@ public class QueueManagerTests
     }
 
     [Fact]
+    public void AddNotification_CustomLaneAppliesLaneStyling()
+    {
+        var settings = CreateSettings();
+        settings.Settings.OverlayLanes.Add(new OverlayLaneDefinition
+        {
+            Id = "social",
+            Name = "Social",
+            IsEnabled = true,
+            AccentColor = "#FF5500",
+            BackgroundColor = "#111111"
+        });
+        settings.Settings.AppProfiles.Add(new AppProfile
+        {
+            AppName = "X",
+            OverlayLane = "social"
+        });
+
+        var queue = new QueueManager(settings);
+        queue.AddNotification("X", "Account update", "New post");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal("social", queue.VisibleNotifications[0].OverlayLane);
+        Assert.Equal("#FF5500", queue.VisibleNotifications[0].AccentColorOverride);
+        Assert.Equal("#111111", queue.VisibleNotifications[0].BackgroundColorOverride);
+    }
+
+    [Fact]
+    public void AddNotification_DisabledCustomLaneFallsBackToMain()
+    {
+        var settings = CreateSettings();
+        settings.Settings.OverlayLanes.Add(new OverlayLaneDefinition
+        {
+            Id = "social",
+            Name = "Social",
+            IsEnabled = false,
+            AccentColor = "#FF5500"
+        });
+        settings.Settings.AppProfiles.Add(new AppProfile
+        {
+            AppName = "X",
+            OverlayLane = "social"
+        });
+
+        var queue = new QueueManager(settings);
+        queue.AddNotification("X", "Account update", "New post");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal(OverlayLaneHelper.Main, queue.VisibleNotifications[0].OverlayLane);
+        Assert.Equal(string.Empty, queue.VisibleNotifications[0].AccentColorOverride);
+    }
+
+    [Fact]
     public void AddNotification_NarrationRuleSetsOverrides()
     {
         var settings = CreateSettings();

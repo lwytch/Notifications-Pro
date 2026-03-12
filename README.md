@@ -56,7 +56,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Manual resize** — drag the left or right edge of the overlay to change its width. Resize anchors to the edge it is near so right-aligned overlays do not jump.
 - **Fullscreen overlay mode** — expands the overlay to cover an entire monitor with a configurable semi-transparent backdrop (colour + opacity). Useful as a dedicated notification monitor or for focus sessions.
 - **OBS fixed-window mode** — locks the overlay to a precise width/height for predictable window-capture in OBS/streaming tools.
-- **Secondary overlay lane** — route selected apps to a second overlay with its own monitor, position preset, width, and max-height controls.
+- **Custom overlay lanes** — create reusable routed overlays with their own monitor, position preset, width, max-height, colours, and background images.
 
 ### Layout Modes
 - **Stacked cards** — each notification is a separate card, scrollable when many accumulate.
@@ -85,10 +85,10 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
 
 ### App Profiles & Routing
-- **Apps tab** — manage per-app read aloud, overlay lane, sound, icon, accent/background/title/body/app-name colours, and optional background images from one place.
-- **Per-app profiles** — style X, Codex, Antigravity, Chrome, Edge, or any other source independently without storing notification content.
-- **Secondary overlay routing** — send selected apps to a dedicated visual lane while the main overlay continues handling everything else.
-- **Background images** — optional local-only per-app images with opacity, hue, and brightness controls. Imported files are copied into `%AppData%\NotificationsPro\backgrounds\`.
+- **Apps tab** — manage per-app read aloud, overlay lane assignment, sound, and icon from one place.
+- **Lanes tab** — manage the reusable routed overlays themselves: monitor, position preset, width, max-height, colours, and background images.
+- **Per-app profiles** — route X, Codex, Antigravity, Chrome, Edge, or any other source into the right lane without storing notification content.
+- **Background images** — optional local-only lane images with opacity, hue, and brightness controls. Imported files are copied into `%AppData%\NotificationsPro\backgrounds\`.
 
 ### Behaviour & Control
 - **Notification duration** — configurable display time in seconds; each card has its own timer.
@@ -200,19 +200,19 @@ Avoid distraction without missing urgent messages:
 ### Getting the Most Out of Notifications Pro
 - Start with **Settings > System > Notification Access** and confirm the app is capturing reliably before tuning the visual side. If live notifications ever stall, switch **Capture Mode** to `Force Accessibility` first.
 - Keep the queue readable for your workload. `40` visible cards is the current default, but long-running monitoring setups usually work best when paired with **Auto-duration** or **Persistent Notifications** rather than a lower visible-card limit alone.
-- Use the app controls in layers: start with **Settings > Apps** for per-app lane/style/icon/sound/read-aloud decisions, then use **Settings > Filtering** for title/body-scoped highlight, mute, and narration rules inside noisy shared apps.
+- Use the app controls in layers: start with **Settings > Apps** for per-app lane/icon/sound/read-aloud decisions, use **Settings > Lanes** for routed overlay styling and placement, then use **Settings > Filtering** for title/body-scoped highlight, mute, and narration rules inside noisy shared apps.
 - Build one layout for passive monitoring and one for active work. For example: a wide **Single-Line Banner Mode** profile for streaming or browser-heavy days, and a denser stacked-card profile for operations or moderation work.
-- Route the noisiest source family to the **Secondary Overlay** when one queue is not enough. This works well for keeping ops/agent traffic separate from chat or social notifications.
+- Route the noisiest source family to a dedicated **Lane** when one queue is not enough. This works well for keeping ops/agent traffic separate from chat or social notifications.
 - Use tray actions and exports as part of the workflow, not just setup. **Pause**, **Focus Mode**, **Theme/Profile switching**, and **Export Settings** make it easier to move between work, streaming, and monitoring contexts without rebuilding the app each time.
 
 ### Getting the Most Out of X
 - Pick the most consistent notification source you can. If X notifications arrive through a dedicated app or wrapper, per-app settings target X directly. If they arrive through **Chrome** or **Edge**, per-app settings apply to the browser host and **keyword rules** become the main way to separate X from the rest of your browser traffic.
 - Use **Settings > Filtering > Keyword Highlighting**, **Keyword Muting**, and **Narration Rules** for account names, handles, campaign names, hashtags, watchwords, or brand terms. Rules can target `Title`, `Body`, or `Title + Body`, can be limited to the X source app/browser host, and can use either literal matches such as `@openai` or full regex patterns.
 - Use **Keyword Muting** for repetitive low-signal phrases that tend to create noise, such as routine engagement wording or campaign traffic that does not need immediate attention.
-- Use **Settings > Apps** to give the X source its own icon, sound, colours, optional background image, and overlay lane so it is visually distinct from other browser-hosted traffic.
+- Use **Settings > Apps** to assign the X source to its own lane, sound, and icon, then use **Settings > Lanes** to give that routed overlay its own colours and optional background image so it is visually distinct from other browser-hosted traffic.
 - Turn on **Read Notifications Aloud** globally in `Settings > Accessibility`, then use **Settings > Apps** to enable narration for the X source app and **Filtering > Narration Rules** for targeted spoken callouts.
 - Use **Deduplication** and **Burst Limiting** when you expect spikes around large posts or breaking events. They help keep the overlay readable without implying that discarded overflow content is stored anywhere.
-- Route X to the **Secondary Overlay** if you want social monitoring to stay visible without mixing it into work/tooling traffic on the main lane.
+- Route X to its own **Lane** if you want social monitoring to stay visible without mixing it into work/tooling traffic on the main overlay.
 - If X notifications stop appearing while previews still work, go back to **Settings > System > Notification Access** and try `Force Accessibility`, especially for browser-hosted toasts.
 
 ### Other Social Platforms
@@ -237,7 +237,7 @@ Avoid distraction without missing urgent messages:
 #### Codex / Antigravity / Browser-Based Agent Tooling
 - If these tools notify through a browser, treat **Chrome** or **Edge** as the source app for per-app styling, narration, routing, and sounds, then use **keyword rules** for project names, environments, repo names, agent names, or failure wording.
 - Use a clear **per-app icon**, **colour set**, and optional **background image** so agent/tool notifications are immediately distinct from social traffic arriving from the same host app.
-- Route noisy agent/tool traffic to the **Secondary Overlay** when you want it visible but separated from chat, email, or social notifications.
+- Route noisy agent/tool traffic to its own **Lane** when you want it visible but separated from chat, email, or social notifications.
 - Pair **Read Notifications Aloud** with aggressive keyword filtering if you want spoken updates for builds, completions, or interventions without hearing every low-value event.
 - Use **Persistent Notifications** or longer durations for actions that require a response instead of a glance.
 
@@ -285,7 +285,7 @@ Under `%AppData%\NotificationsPro\`:
 | `themes\*.json` | Named custom overlay themes |
 | `icons\` | Optional user-provided icon image files |
 | `sounds\` | Optional custom WAV files |
-| `backgrounds\` | Optional user-provided background images for per-app card styling |
+| `backgrounds\` | Optional user-provided background images for routed overlay lane styling |
 
 ---
 
@@ -415,9 +415,14 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.8.0
+- **Lane Architecture Refresh**: Fixed the multi-lane rendering bug by giving each overlay its own lane-filtered view, and replaced the cramped per-app styling expander with a dedicated `Lanes` tab where routed overlays are edited once and reused across apps.
+- **Apps Tab Simplification**: `Settings > Apps` now focuses on per-app lane assignment, narration, sounds, and icons, while routed overlay placement, colours, and background images live in `Settings > Lanes`.
+- **Routing & Persistence Hardening**: Added reusable overlay-lane persistence/migration, updated settings export examples/docs, and kept legacy `Secondary` assignments compatible while the new lane model rolls forward.
+
 ### Release v1.1.7.0
-- **Targeted Rules & App Profiles**: Added title/body/title+body-scoped highlight, mute, and narration rules with optional app filters, plus a dedicated `Apps` tab for per-app read aloud, overlay lane, sounds, icons, colours, and background images.
-- **Secondary Overlay Routing**: Selected apps can now render in a separate overlay lane with its own monitor, position preset, width, and max-height controls, making it practical to split social, tooling, or ops traffic.
+- **Targeted Rules & Lane Routing**: Added title/body/title+body-scoped highlight, mute, and narration rules with optional app filters, plus a dedicated `Apps` tab for per-app read aloud, lane assignment, sounds, and icons.
+- **Reusable Overlay Lanes**: Routed overlays now live in a dedicated `Lanes` tab with their own monitor, position preset, width, max-height, colours, and background images, making it practical to split social, tooling, or ops traffic cleanly.
 - **Reliability & Docs Sync**: Restored display-aware first-run sizing before the overlay is created, fixed secondary-overlay preset normalization/placement, refreshed Help/README/status text, and expanded `settings.example.json` to match the shipped settings model.
 
 ### Release v1.1.6.4
