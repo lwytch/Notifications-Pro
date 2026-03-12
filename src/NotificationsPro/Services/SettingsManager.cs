@@ -44,7 +44,10 @@ public class SettingsManager
                 var json = File.ReadAllText(_settingsPath);
                 var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
                 if (loaded != null)
+                {
+                    NormalizeLoadedSettings(loaded);
                     Settings = loaded;
+                }
             }
         }
         catch
@@ -71,6 +74,7 @@ public class SettingsManager
 
     public void Apply(AppSettings updated)
     {
+        NormalizeLoadedSettings(updated);
         Settings = updated;
         Save();
         SettingsChanged?.Invoke();
@@ -81,5 +85,31 @@ public class SettingsManager
         Settings = new AppSettings();
         Save();
         SettingsChanged?.Invoke();
+    }
+
+    private static void NormalizeLoadedSettings(AppSettings settings)
+    {
+        settings.MutedApps ??= new List<string>();
+        settings.HighlightKeywords ??= new List<string>();
+        settings.PerKeywordColors ??= new Dictionary<string, string>();
+        settings.MuteKeywords ??= new List<string>();
+        settings.HighlightKeywordRegexFlags ??= new Dictionary<string, bool>();
+        settings.MuteKeywordRegexFlags ??= new Dictionary<string, bool>();
+        settings.HighlightRules ??= new List<HighlightRuleDefinition>();
+        settings.MuteRules ??= new List<MuteRuleDefinition>();
+        settings.NarrationRules ??= new List<NarrationRuleDefinition>();
+        settings.SpokenMutedApps ??= new List<string>();
+        settings.PerAppIcons ??= new Dictionary<string, string>();
+        settings.PerAppSounds ??= new Dictionary<string, string>();
+        settings.PresentationApps ??= new List<string>();
+        settings.CardBackgroundImageOpacity = double.IsNaN(settings.CardBackgroundImageOpacity)
+            ? 0.45
+            : Math.Clamp(settings.CardBackgroundImageOpacity, 0.0, 1.0);
+        settings.CardBackgroundImageHueDegrees = double.IsNaN(settings.CardBackgroundImageHueDegrees)
+            ? 0.0
+            : Math.Clamp(settings.CardBackgroundImageHueDegrees, -180, 180);
+        settings.CardBackgroundImageBrightness = double.IsNaN(settings.CardBackgroundImageBrightness)
+            ? 1.0
+            : Math.Clamp(settings.CardBackgroundImageBrightness, 0.2, 2.0);
     }
 }

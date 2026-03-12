@@ -113,6 +113,12 @@ public class ThemeManager
         s.FontSize = double.IsNaN(s.FontSize) ? 14 : Math.Clamp(s.FontSize, 6, 72);
         s.TitleFontSize = double.IsNaN(s.TitleFontSize) ? 16 : Math.Clamp(s.TitleFontSize, 6, 72);
         s.AppNameFontSize = double.IsNaN(s.AppNameFontSize) ? 14 : Math.Clamp(s.AppNameFontSize, 6, 72);
+        s.CardBackgroundImageOpacity = double.IsNaN(s.CardBackgroundImageOpacity) ? 0.45 : Math.Clamp(s.CardBackgroundImageOpacity, 0.0, 1.0);
+        s.CardBackgroundImageHueDegrees = double.IsNaN(s.CardBackgroundImageHueDegrees) ? 0.0 : Math.Clamp(s.CardBackgroundImageHueDegrees, -180, 180);
+        s.CardBackgroundImageBrightness = double.IsNaN(s.CardBackgroundImageBrightness) ? 1.0 : Math.Clamp(s.CardBackgroundImageBrightness, 0.2, 2.0);
+        s.HighlightRules ??= new List<HighlightRuleDefinition>();
+        s.MuteRules ??= new List<MuteRuleDefinition>();
+        s.NarrationRules ??= new List<NarrationRuleDefinition>();
     }
 
     private static string SanitizeFileName(string name)

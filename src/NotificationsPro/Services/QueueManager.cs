@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.ViewModels;
 
@@ -97,8 +98,9 @@ public class QueueManager : BaseViewModel
             settings.MutedApps.Contains(appName, StringComparer.OrdinalIgnoreCase))
             return;
 
-        // Check mute keywords
-        if (MatchesAnyKeyword(settings.MuteKeywords, settings.MuteKeywordRegexFlags, title, body))
+        // Check mute keywords/rules
+        if (NotificationRuleMatcher.MatchesAny(settings.MuteRules, appName, title, body)
+            || MatchesAnyLegacyKeyword(settings.MuteKeywords, settings.MuteKeywordRegexFlags, title, body))
             return;
 
         // Check burst rate limiting
@@ -143,9 +145,17 @@ public class QueueManager : BaseViewModel
         }
 
         var item = new NotificationItem(appName, title, body);
+        item.BackgroundImagePath = settings.CardBackgroundImagePath;
+        item.BackgroundImageOpacity = settings.CardBackgroundImageOpacity;
+        item.BackgroundImageHueDegrees = settings.CardBackgroundImageHueDegrees;
+        item.BackgroundImageBrightness = settings.CardBackgroundImageBrightness;
 
-        // Check highlight keywords — find the first match and use its per-keyword color (falls back to global)
-        var highlightColor = FindMatchingKeywordColor(settings.HighlightKeywords, settings.HighlightKeywordRegexFlags, settings.PerKeywordColors, settings.HighlightColor, title, body);
+        ApplyNarrationRule(item, settings);
+
+        // Check highlight keywords/rules — find the first match and use its configured color.
+        var highlightColor =
+            NotificationRuleMatcher.FindMatchingHighlightColor(settings.HighlightRules, appName, title, body, settings.HighlightColor)
+            ?? FindMatchingLegacyKeywordColor(settings.HighlightKeywords, settings.HighlightKeywordRegexFlags, settings.PerKeywordColors, settings.HighlightColor, title, body);
         if (highlightColor != null)
         {
             item.IsHighlighted = true;
@@ -342,9 +352,28 @@ public class QueueManager : BaseViewModel
         return _recentNotificationTimes.Count >= _settingsManager.Settings.BurstLimitCount;
     }
 
+    private static void ApplyNarrationRule(NotificationItem item, AppSettings settings)
+    {
+        var rule = NotificationRuleMatcher.FindMatchingNarrationRule(
+            settings.NarrationRules,
+            item.AppName,
+            item.Title,
+            item.Body);
+
+        if (rule == null)
+            return;
+
+        item.ReadAloudEnabledOverride = string.Equals(rule.Action, NarrationRuleActionHelper.SkipReadAloud, StringComparison.OrdinalIgnoreCase)
+            ? false
+            : true;
+
+        if (!string.Equals(rule.ReadMode, NarrationRuleReadModeHelper.UseGlobal, StringComparison.OrdinalIgnoreCase))
+            item.ReadAloudModeOverride = SpokenNotificationTextFormatter.NormalizeMode(rule.ReadMode);
+    }
+
     private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(100);
 
-    private static bool MatchesAnyKeyword(List<string> keywords, Dictionary<string, bool> regexFlags, string title, string body)
+    private static bool MatchesAnyLegacyKeyword(List<string> keywords, Dictionary<string, bool> regexFlags, string title, string body)
     {
         if (keywords.Count == 0) return false;
         var combined = $"{title} {body}";
@@ -374,7 +403,7 @@ public class QueueManager : BaseViewModel
     /// Returns the effective highlight color for the first matched keyword, or null if no keyword matches.
     /// Per-keyword color is used when set; otherwise falls back to the global highlight color.
     /// </summary>
-    private static string? FindMatchingKeywordColor(
+    private static string? FindMatchingLegacyKeywordColor(
         List<string> keywords,
         Dictionary<string, bool> regexFlags,
         Dictionary<string, string> perKeywordColors,

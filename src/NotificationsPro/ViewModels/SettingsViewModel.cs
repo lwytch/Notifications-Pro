@@ -12,7 +12,7 @@ using WinForms = System.Windows.Forms;
 
 namespace NotificationsPro.ViewModels;
 
-public class SettingsViewModel : BaseViewModel
+public partial class SettingsViewModel : BaseViewModel
 {
     public const double OverlayWidthMin = 220;
     public const double OverlayWidthMax = 7680;
@@ -1133,6 +1133,7 @@ public class SettingsViewModel : BaseViewModel
         RemoveHighlightKeywordCommand = new RelayCommand(RemoveHighlightKeyword);
         AddMuteKeywordCommand = new RelayCommand(_ => AddMuteKeyword());
         RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
+        InitializeSinglePanelEnhancementCommands();
         ToggleMuteAppCommand = new RelayCommand(ToggleMuteApp);
         ApplyThemeCommand = new RelayCommand(ApplyTheme);
         ApplySelectedBuiltInThemeCommand = new RelayCommand(_ =>
@@ -1178,7 +1179,7 @@ public class SettingsViewModel : BaseViewModel
         RefreshProfiles();
 
         // Show first-run tip if welcome hasn't been shown yet
-        if (!_settingsManager.Settings.HasShownWelcome)
+        if (!_settingsManager.Settings.HasShownWelcome && ShowQuickTips)
             ShowFirstRunTip = true;
     }
 
@@ -1374,23 +1375,7 @@ public class SettingsViewModel : BaseViewModel
             ApplySettingsThemeColors(presetColors, queueSave: false);
         }
 
-        HighlightKeywordEntries.Clear();
-        foreach (var kw in s.HighlightKeywords)
-        {
-            var color = s.PerKeywordColors.TryGetValue(kw, out var kwColor) ? kwColor : s.HighlightColor;
-            var isRegex = s.HighlightKeywordRegexFlags.TryGetValue(kw, out var rf) && rf;
-            var entry = new KeywordHighlightEntry(kw, color, isRegex);
-            entry.PropertyChanged += (_, _) => QueueSave();
-            HighlightKeywordEntries.Add(entry);
-        }
-        MuteKeywordEntries.Clear();
-        foreach (var kw in s.MuteKeywords)
-        {
-            var isRegex = s.MuteKeywordRegexFlags.TryGetValue(kw, out var rf) && rf;
-            var entry = new MuteKeywordEntry(kw, isRegex);
-            entry.PropertyChanged += (_, _) => QueueSave();
-            MuteKeywordEntries.Add(entry);
-        }
+        LoadSinglePanelEnhancements(s);
         PresentationApps.Clear();
         foreach (var app in s.PresentationApps) PresentationApps.Add(app);
         RefreshMutedAppEntries();
@@ -1571,6 +1556,10 @@ public class SettingsViewModel : BaseViewModel
             AppNameColor = AppNameColor,
             BackgroundColor = BackgroundColor,
             BackgroundOpacity = BackgroundOpacity,
+            CardBackgroundImagePath = CardBackgroundImagePath,
+            CardBackgroundImageOpacity = CardBackgroundImageOpacity,
+            CardBackgroundImageHueDegrees = CardBackgroundImageHueDegrees,
+            CardBackgroundImageBrightness = CardBackgroundImageBrightness,
             CornerRadius = CornerRadius,
             Padding = Padding,
             CardGap = CardGap,
@@ -1610,6 +1599,7 @@ public class SettingsViewModel : BaseViewModel
             DeduplicationEnabled = DeduplicationEnabled,
             DeduplicationWindowSeconds = DeduplicationWindowSeconds,
             HighlightColor = HighlightColor,
+            HighlightRules = BuildHighlightRules(),
             HighlightKeywords = HighlightKeywordEntries.Select(e => e.Keyword).ToList(),
             PerKeywordColors = HighlightKeywordEntries
                 .Where(e => !string.Equals(e.Color, HighlightColor, StringComparison.OrdinalIgnoreCase))
@@ -1617,10 +1607,12 @@ public class SettingsViewModel : BaseViewModel
             HighlightKeywordRegexFlags = HighlightKeywordEntries
                 .Where(e => e.IsRegex)
                 .ToDictionary(e => e.Keyword, _ => true),
+            MuteRules = BuildMuteRules(),
             MuteKeywords = MuteKeywordEntries.Select(e => e.Keyword).ToList(),
             MuteKeywordRegexFlags = MuteKeywordEntries
                 .Where(e => e.IsRegex)
                 .ToDictionary(e => e.Keyword, _ => true),
+            NarrationRules = BuildNarrationRules(),
             MutedApps = _settingsManager.Settings.MutedApps,
             SpokenMutedApps = new List<string>(_settingsManager.Settings.SpokenMutedApps),
             ShowNotificationIcons = ShowNotificationIcons,
@@ -1714,6 +1706,7 @@ public class SettingsViewModel : BaseViewModel
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
             HasShownWelcome = previousSettings.HasShownWelcome,
+            ShowQuickTips = ShowQuickTips,
             SettingsWindowLeft = previousSettings.SettingsWindowLeft,
             SettingsWindowTop = previousSettings.SettingsWindowTop,
         };

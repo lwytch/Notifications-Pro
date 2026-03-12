@@ -21,6 +21,10 @@ public class AppSettings
     public string AppNameColor { get; set; } = "#C8C8C8";
     public string BackgroundColor { get; set; } = "#202020";
     public double BackgroundOpacity { get; set; } = 0.94;
+    public string CardBackgroundImagePath { get; set; } = string.Empty;
+    public double CardBackgroundImageOpacity { get; set; } = 0.45;
+    public double CardBackgroundImageHueDegrees { get; set; }
+    public double CardBackgroundImageBrightness { get; set; } = 1.0;
     public string AccentColor { get; set; } = "#0078D4";
 
     // Appearance — Card Shape
@@ -72,6 +76,9 @@ public class AppSettings
     public List<string> MuteKeywords { get; set; } = new();
     public Dictionary<string, bool> HighlightKeywordRegexFlags { get; set; } = new();
     public Dictionary<string, bool> MuteKeywordRegexFlags { get; set; } = new();
+    public List<HighlightRuleDefinition> HighlightRules { get; set; } = new();
+    public List<MuteRuleDefinition> MuteRules { get; set; } = new();
+    public List<NarrationRuleDefinition> NarrationRules { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
     public List<string> SpokenMutedApps { get; set; } = new();
 
@@ -215,6 +222,7 @@ public class AppSettings
 
     // UX Polish (M8)
     public bool HasShownWelcome { get; set; } = false;
+    public bool ShowQuickTips { get; set; } = true;
     public double? SettingsWindowLeft { get; set; }
     public double? SettingsWindowTop { get; set; }
 
@@ -228,6 +236,9 @@ public class AppSettings
         clone.HighlightKeywordRegexFlags = new Dictionary<string, bool>(HighlightKeywordRegexFlags);
         clone.MuteKeywordRegexFlags = new Dictionary<string, bool>(MuteKeywordRegexFlags);
         clone.MuteKeywords = new List<string>(MuteKeywords);
+        clone.HighlightRules = HighlightRules.Select(rule => rule.Clone()).ToList();
+        clone.MuteRules = MuteRules.Select(rule => rule.Clone()).ToList();
+        clone.NarrationRules = NarrationRules.Select(rule => rule.Clone()).ToList();
         clone.PresentationApps = new List<string>(PresentationApps);
         clone.PerAppSounds = new Dictionary<string, string>(PerAppSounds);
         clone.PerAppIcons = new Dictionary<string, string>(PerAppIcons);

@@ -79,6 +79,18 @@ public class OverlayViewModel : BaseViewModel
     private double _backgroundOpacity = 0.94;
     public double BackgroundOpacity { get => _backgroundOpacity; set => SetProperty(ref _backgroundOpacity, value); }
 
+    private string _cardBackgroundImagePath = string.Empty;
+    public string CardBackgroundImagePath { get => _cardBackgroundImagePath; set => SetProperty(ref _cardBackgroundImagePath, value); }
+
+    private double _cardBackgroundImageOpacity = 0.45;
+    public double CardBackgroundImageOpacity { get => _cardBackgroundImageOpacity; set => SetProperty(ref _cardBackgroundImageOpacity, value); }
+
+    private double _cardBackgroundImageHueDegrees;
+    public double CardBackgroundImageHueDegrees { get => _cardBackgroundImageHueDegrees; set => SetProperty(ref _cardBackgroundImageHueDegrees, value); }
+
+    private double _cardBackgroundImageBrightness = 1.0;
+    public double CardBackgroundImageBrightness { get => _cardBackgroundImageBrightness; set => SetProperty(ref _cardBackgroundImageBrightness, value); }
+
     private string _accentColor = "#0078D4";
     public string AccentColor { get => _accentColor; set => SetProperty(ref _accentColor, value); }
 
@@ -574,6 +586,10 @@ public class OverlayViewModel : BaseViewModel
         AppNameColor = s.AppNameColor;
         BackgroundColor = s.BackgroundColor;
         BackgroundOpacity = s.BackgroundOpacity;
+        CardBackgroundImagePath = s.CardBackgroundImagePath;
+        CardBackgroundImageOpacity = s.CardBackgroundImageOpacity;
+        CardBackgroundImageHueDegrees = s.CardBackgroundImageHueDegrees;
+        CardBackgroundImageBrightness = s.CardBackgroundImageBrightness;
         AccentColor = s.AccentColor;
         HighlightColor = s.HighlightColor;
         CornerRadius = s.CornerRadius;

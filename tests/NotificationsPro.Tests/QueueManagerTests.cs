@@ -1,3 +1,4 @@
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 using System.IO;
@@ -361,6 +362,84 @@ public class QueueManagerTests
 
         Assert.Single(queue.VisibleNotifications);
         Assert.False(queue.VisibleNotifications[0].IsHighlighted);
+    }
+
+    [Fact]
+    public void AddNotification_HighlightRuleMatchesConfiguredScope()
+    {
+        var settings = CreateSettings();
+        settings.Settings.HighlightRules.Add(new HighlightRuleDefinition
+        {
+            Keyword = "urgent",
+            Scope = NotificationMatchScopeHelper.TitleOnly,
+            Color = "#FF6600"
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Urgent issue", "Body does not matter");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.True(queue.VisibleNotifications[0].IsHighlighted);
+        Assert.Equal("#FF6600", queue.VisibleNotifications[0].HighlightColor);
+    }
+
+    [Fact]
+    public void AddNotification_MuteRuleCanFilterByApp()
+    {
+        var settings = CreateSettings();
+        settings.Settings.MuteRules.Add(new MuteRuleDefinition
+        {
+            Keyword = "mention",
+            Scope = NotificationMatchScopeHelper.TitleAndBody,
+            AppFilter = "X"
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("Slack", "Mention", "Allowed here");
+        queue.AddNotification("X", "Mention", "Muted here");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal("Slack", queue.VisibleNotifications[0].AppName);
+    }
+
+    [Fact]
+    public void AddNotification_NarrationRuleSetsOverrides()
+    {
+        var settings = CreateSettings();
+        settings.Settings.NarrationRules.Add(new NarrationRuleDefinition
+        {
+            Keyword = "@openai",
+            Scope = NotificationMatchScopeHelper.BodyOnly,
+            Action = NarrationRuleActionHelper.ReadAloud,
+            ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("X", "Account update", "New post from @openai");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.True(queue.VisibleNotifications[0].ReadAloudEnabledOverride);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeTitleOnly, queue.VisibleNotifications[0].ReadAloudModeOverride);
+    }
+
+    [Fact]
+    public void AddNotification_CopiesConfiguredCardBackgroundImageSettings()
+    {
+        var settings = CreateSettings();
+        settings.Settings.CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
+        settings.Settings.CardBackgroundImageOpacity = 0.6;
+        settings.Settings.CardBackgroundImageHueDegrees = 24;
+        settings.Settings.CardBackgroundImageBrightness = 1.2;
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("X", "Post", "Body");
+
+        Assert.Single(queue.VisibleNotifications);
+        var item = queue.VisibleNotifications[0];
+        Assert.Equal(settings.Settings.CardBackgroundImagePath, item.BackgroundImagePath);
+        Assert.Equal(0.6, item.BackgroundImageOpacity);
+        Assert.Equal(24, item.BackgroundImageHueDegrees);
+        Assert.Equal(1.2, item.BackgroundImageBrightness);
     }
 
     [Fact]

@@ -18,6 +18,7 @@
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
         <converters:ColorToOpacityBrushConverter x:Key="ColorToOpacityBrush"/>
         <converters:AppTintBrushConverter x:Key="AppTintBrush"/>
+        <converters:NotificationBackgroundImageSourceConverter x:Key="NotificationBackgroundImageSource"/>
         <converters:NotificationTextVisibilityConverter x:Key="NotificationTextVisibility"/>
         <converters:NotificationOneLineContentConverter x:Key="NotificationOneLineContent"/>
         <converters:AppIconConverter x:Key="AppIconConverter"/>
@@ -68,6 +69,19 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+
+                    <Image Stretch="UniformToFill"
+                           Opacity="{Binding BackgroundImageOpacity}"
+                           IsHitTestVisible="False"
+                           Grid.ColumnSpan="2">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
+                                <Binding Path="BackgroundImagePath"/>
+                                <Binding Path="BackgroundImageHueDegrees"/>
+                                <Binding Path="BackgroundImageBrightness"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
 
                     <!-- Icon column -->
                     <Image Grid.Column="0" VerticalAlignment="Top"

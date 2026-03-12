@@ -74,6 +74,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
 - **Background opacity** — from fully opaque to near-transparent.
+- **Card background images** — optional local image per notification card with opacity, hue, and brightness controls. If set, the image is rendered inside each card while the normal background colour remains the fallback base.
 - **Card shape** — corner radius, internal padding, card gap, outer margin.
 - **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
@@ -94,8 +95,9 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 ### Filtering & Smart Control
 - **Per-app mute** — silence notifications from specific apps. Muted apps are remembered per session; the settings UI shows every app seen this session.
-- **Keyword mute** — suppress any notification whose title or body contains a keyword.
-- **Keyword highlight** — flag notifications containing certain keywords with a custom highlight colour.
+- **Field-scoped keyword rules** — highlight or mute rules can target `Title Only`, `Body Only`, or `Title + Body`, with optional regex matching.
+- **App-filtered rules** — highlight, mute, and narration rules can be limited to a specific app name such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`.
+- **Narration rules** — optional read-aloud overrides can force `Read Aloud` or `Skip Read Aloud` for matching notifications, with an optional spoken-content override.
 - **Quiet hours** — block all notifications between configurable start/end times (supports overnight ranges).
 - **Burst limiting** — cap the number of notifications accepted in a sliding time window.
 - **Focus mode** — a timed DND period (configurable minutes) accessible from the tray menu.
@@ -118,6 +120,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
 - **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border).
 - **Settings popup mode** — settings window can float as a popup above the taskbar with optional auto-close.
+- **Quick tips toggle** — `Settings > System > Settings Experience` can turn the first-run guidance banner on or off without affecting notification capture.
 
 ### Accessibility
 - **Accessibility mode** toggle — enables persistent notifications + system motion/contrast/text-scaling respect in one click.
@@ -184,6 +187,35 @@ Avoid distraction without missing urgent messages:
 - Use **Keyword highlight** for your brand name or specific campaign hashtags so you never miss an important engagement.
 - Use **Deduplication** and **Burst limiting** to filter out rapid-fire "liked your post" storms while keeping meaningful comments visible.
 - Keep the overlay tucked in the corner of your screen to passively monitor community health while working on other tasks.
+
+---
+
+## Workflow Guides
+
+### Getting the Most Out of Notifications Pro
+- Start with `Settings > System > Notification Access` and keep `Capture Mode` on `Auto` unless live notifications stop appearing. If preview notifications work but real ones do not, switch to `Force Accessibility`.
+- Use `Settings > Filtering` for targeting logic, `Settings > Accessibility` for narration, and `Settings > Appearance` for how every live card looks.
+- If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Use `Narration Rules` only when you need more precise exceptions than the normal global toggle and per-app checkboxes.
+- Background images are local-only assets copied into Notifications Pro's backgrounds folder. They change only card appearance and never store notification text.
+
+### Getting the Most Out of X
+- Browser-hosted X notifications usually surface as plain Windows notification text: `AppName`, `Title`, and `Body`. Notifications Pro does not receive structured account IDs or post metadata from X itself.
+- Use `Settings > Filtering > Keyword Highlighting` with `Match Scope` set to `Title Only` or `Body Only` depending on where the account name or watchword usually appears in your Windows notifications.
+- Use literal keywords like `@openai`, `@nvidia`, or a campaign hashtag when the text is stable. Turn on `.*` only when you really need regex patterns.
+- Add `App Filter = X` if you want X-specific rules without affecting Outlook, Reddit, Slack, or other notification sources using similar words.
+- Use `Settings > Filtering > Narration Rules` if only certain handles, phrases, or alerts should be spoken aloud while the rest of X stays visual-only.
+
+### Other Social Platforms
+- The same rule system works for Reddit, Instagram, Discord communities, and browser-hosted social tools, but the exact usable keywords depend on what Windows puts into the `Title` and `Body`.
+- For moderation or community work, use `Body Only` rules for phrases like `reported`, `reply`, `mention`, or a subreddit/community name, then add an app filter if the same phrase appears in unrelated apps.
+- Use per-app `Read aloud` checkboxes in `Settings > Accessibility` when an entire platform should stay silent, then add narration rules only for truly high-signal posts or messages.
+- When several services all arrive through the same browser host, rely on text patterns and app filters rather than assuming Notifications Pro can distinguish accounts structurally.
+
+### Common Notification-Heavy Tools
+- Tools like Codex, Antigravity, CI dashboards, repo alerts, and monitoring systems work best with field-scoped rules instead of broad global keywords. Match the exact repo name, environment name, or failure phrase where it usually appears.
+- Use `Title Only` rules for concise build/status subjects, `Body Only` rules for longer deployment or tool output phrases, and app filters when several tools share similar wording.
+- Pair highlight rules with the built-in narrator carefully: keep the global spoken toggle on only for the apps you routinely care about, then use narration rules to elevate truly urgent phrases.
+- If a tool is too noisy, mute it at the app level first, then reintroduce a small set of specific highlight or narration rules for the signals that matter.
 
 ---
 
@@ -283,7 +315,7 @@ In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notificat
 
 Choose from `Body Only`, `Title Only`, `Title + Body`, `Body + Timestamp`, `Title + Timestamp`, or `Title + Body + Timestamp`. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
 
-The same section also lets you control narration per app with a `Read aloud` checkbox. Unchecked apps still stay visible on screen but are ignored by narration. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
+The same section also lets you control narration per app with a `Read aloud` checkbox. Unchecked apps still stay visible on screen but are ignored by narration. If you need finer control, `Settings > Filtering > Narration Rules` can force `Read Aloud` or `Skip Read Aloud` for matching title/body text, optionally limited to a specific app. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
 
 If you want to install more voices, Microsoft’s setup guides are:
 - [Customize Narrator voices](https://support.microsoft.com/windows/chapter-7-customizing-narrator-6e30e2d0-b2f3-b907-d264-a5d30502ad73)
@@ -323,6 +355,7 @@ If live notifications stop appearing while preview/test notifications still work
 | System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
 | Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
 | Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, and confirm the app is still checked in **Per-App Speech**. |
+| A highlight, mute, or narration rule is affecting the wrong app | Open **Settings > Filtering** and add or tighten the optional **App Filter** so the rule only matches the intended source such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`. |
 | Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
 
 ---
@@ -344,6 +377,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.0
+- **Stable Single-Panel Restore**: Removed the experimental routing/lane model and returned to the clean single-overlay UX while keeping the app ready for a better-planned multi-panel design later.
+- **Scoped Rules & X Workflows**: Filtering now supports title/body/title+body rule scope, optional app filters, and narration overrides, so services like X, Reddit, Codex, and Antigravity can be targeted much more precisely without affecting every notification.
+- **Card Background Images & Quick Tips Toggle**: Appearance now supports optional local image-backed notification cards with opacity, hue, and brightness controls, and System now includes a `Show Quick Tips` toggle for the settings guidance banner.
 
 ### Release v1.1.6.4
 - **Default UX Repair**: Re-aligned the shipped defaults so new installs and reset-to-default flows now consistently start with `40` visible notifications and the full `1200ms` animation timing, instead of the mixed `3` / `15` / `20` and `300ms` drift that had built up across files.

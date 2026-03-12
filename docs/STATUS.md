@@ -77,6 +77,7 @@
 - Appearance tab includes card shape controls (card gap, outer margin, accent stripe toggle + thickness, card border toggle + color + thickness)
 - Appearance tab now includes grouping appearance controls (Framed Group / Header Chip / Minimal Label, plus optional group counts)
 - Appearance tab includes color picker buttons and separate app-name color customization
+- Appearance tab now includes optional local card background images with opacity, hue, and brightness controls, and the live preview reflects that image-backed card mode
 - Font size range increased for accessibility (up to 56px)
 - Tray menu includes quick toggles for click-through and always-on-top states
 - Overflow badge now inherits card theme (background color, text color, font, corner radius), reports `+N not shown`, and clicking it offers a privacy-safe way to raise the visible-limit setting for future cards
@@ -117,10 +118,12 @@
   - Per-app muting — mute/unmute from card context menu, tray Quick Mute submenu, or Filtering settings tab
   - Keyword highlighting — notifications matching configured keywords get a colored accent stripe
   - Keyword muting — silently suppress notifications containing configured keywords
+  - Field-scoped highlight, mute, and narration rules — rules can target `Title Only`, `Body Only`, or `Title + Body` with optional regex matching
+  - App-filtered rules — highlight, mute, and narration rules can be limited to app names such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
-  - Filtering tab now includes per-app toggles, keyword management, quiet hours, burst limit, and per-app sound/icon overrides
+  - Filtering tab now includes per-app toggles, scoped keyword management, narration-rule overrides, quiet hours, burst limit, and per-app sound/icon overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
@@ -157,6 +160,7 @@
   - Empty overlay ghost card — low-opacity "Waiting for notifications..." placeholder when no cards are visible
   - First-run tray balloon tip — tray/settings quick-start guidance with theme/focus hints
   - First-run tip bar in settings — dismissable info bar on first open with sidebar/theme/Ctrl+T guidance
+  - System tab now includes a `Show Quick Tips` toggle so the settings guidance banner can be turned off explicitly without changing notification behavior
   - HasShownWelcome tracking in AppSettings (UI state, not notification content)
   - Confirm before "Reset to Defaults" — MessageBox confirmation prevents accidental resets
   - "Saved" micro-feedback — brief "Saved" label appears next to auto-save text after each save
@@ -234,7 +238,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 170 unit tests covering QueueManager (including filtering, regex keywords, session archive + persistent/auto-duration + overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and new grouping settings), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 174 unit tests covering QueueManager (including scoped highlight/mute/narration rules, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and rule/background-image persistence), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -282,6 +286,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Font size slider changes overlay text size in real time
 - [ ] Font size can be increased to larger accessibility values (up to 56px)
 - [ ] Background opacity slider changes overlay transparency
+- [ ] Appearance > Background Image renders the selected local image inside live cards and in the settings preview
 - [ ] Overlay no longer shows a faint empty panel under cards
 - [ ] Very long stacked notifications can be scrolled when they exceed Max Overlay Height
 - [ ] At max font sizes, overlay scrollbar remains usable and no cards are clipped off-screen
@@ -336,6 +341,9 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Timestamp size slider in Appearance > Timestamp Appearance updates timestamp readability without affecting title/body sizes
 - [ ] Timestamp font-weight selector and color picker in Appearance > Timestamp Appearance update timestamp styling immediately
 - [ ] Filtering tab appears in Settings with per-app mute, keyword, quiet hours, burst limit, and per-app sound/icon sections
+- [ ] Filtering > Keyword Highlighting rules can target Title Only / Body Only / Title + Body and optionally filter to a specific app
+- [ ] Filtering > Keyword Muting rules can target Title Only / Body Only / Title + Body and optionally filter to a specific app
+- [ ] Filtering > Narration Rules can force Read Aloud or Skip Read Aloud for matching notifications, with optional spoken-content override
 - [ ] Muting an app from card context menu suppresses future notifications from that app
 - [ ] Unmuting an app from Filtering tab restores notifications
 - [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color

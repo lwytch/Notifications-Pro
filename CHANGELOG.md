@@ -12,6 +12,9 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Restored the stable single-panel UX by removing the experimental routing/lane model from the shipped codepath and reintroducing the newer useful features directly on top of the original overlay flow
+- Filtering now supports field-scoped and app-filtered highlight/mute/narration rules without changing the core built-in narrator behavior that was already working
+- Appearance now supports local image-backed notification cards again, and the settings preview reflects the same image-backed card mode
 - Default-value drift resolved across `AppSettings`, the settings viewmodel, tests, docs, and `settings.example.json`, so first-run/reset defaults now consistently use 40 visible notifications and 1200ms animation speed
 - Overflow summary semantics corrected so skipped notifications are reported honestly as `not shown` instead of behaving like a hidden expandable queue
 - Settings-window programmatic tab navigation now resolves the real tab labels again after the left-nav header rework
@@ -34,6 +37,8 @@
 - Resource leak: HwndSource properly disposed in HotkeyManager.Unregister()
 
 ### Added
+- Single-panel social/tooling workflow guides in `README.md` for Notifications Pro itself, X, other social platforms, and common notification-heavy tools such as Codex and Antigravity
+- System > Settings Experience > Show Quick Tips toggle for the first-run settings guidance banner
 - App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls
 - Overflow badge recovery affordance — clicking the `+N not shown` summary now offers to raise the visible-notification limit for future cards, while clearly disclosing that skipped content was not retained
 - Expanded spoken notification combinations — Added Title Only, Title + Body, Body + Timestamp, and Title + Timestamp to the Accessibility narration selector

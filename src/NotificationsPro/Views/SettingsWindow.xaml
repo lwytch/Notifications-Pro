@@ -26,6 +26,7 @@
     <Window.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush"/>
         <converters:ColorToOpacityBrushConverter x:Key="ColorToOpacityBrush"/>
+        <converters:NotificationBackgroundImageSourceConverter x:Key="NotificationBackgroundImageSource"/>
         <converters:BoolToMuteLabelConverter x:Key="BoolToMuteLabel"/>
         <converters:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -213,45 +214,58 @@
                             <Binding Path="BackgroundOpacity"/>
                         </MultiBinding>
                     </Border.Background>
-                    <StackPanel>
-                        <TextBlock Text="Microsoft Teams"
-                                   FontFamily="{Binding FontFamily}"
-                                   FontSize="{Binding AppNameFontSize}"
-                                   FontWeight="{Binding AppNameFontWeight}"
-                                   Foreground="{Binding AppNameColor, Converter={StaticResource ColorToBrush}}"
-                                   Visibility="{Binding ShowAppName, Converter={StaticResource BoolToVis}}"
-                                   HorizontalAlignment="Stretch"
-                                   TextAlignment="{Binding TextAlignment}"
-                                   Margin="0,0,0,4"/>
-                        <TextBlock Text="Sarah sent a message"
-                                   FontFamily="{Binding FontFamily}"
-                                   FontSize="{Binding TitleFontSize}"
-                                   FontWeight="{Binding TitleFontWeight}"
-                                   Foreground="{Binding TitleColor, Converter={StaticResource ColorToBrush}}"
-                                   Visibility="{Binding ShowNotificationTitle, Converter={StaticResource BoolToVis}}"
-                                   HorizontalAlignment="Stretch"
-                                   TextAlignment="{Binding TextAlignment}"
-                                   Margin="0,0,0,4"/>
-                        <TextBlock Text="Hey, are you available for a quick call about the project?"
-                                   FontFamily="{Binding FontFamily}"
-                                   FontSize="{Binding FontSize}"
-                                   FontWeight="{Binding FontWeight}"
-                                   Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
-                                   Visibility="{Binding ShowNotificationBody, Converter={StaticResource BoolToVis}}"
-                                   HorizontalAlignment="Stretch"
-                                   TextAlignment="{Binding TextAlignment}"
-                                   TextWrapping="Wrap"/>
-                        <TextBlock Text="2m ago"
-                                   FontFamily="{Binding FontFamily}"
-                                   FontSize="{Binding TimestampFontSize}"
-                                   FontWeight="{Binding TimestampFontWeight}"
-                                   Foreground="{Binding TimestampColor, Converter={StaticResource ColorToBrush}}"
-                                   Visibility="{Binding ShowTimestamp, Converter={StaticResource BoolToVis}}"
-                                   HorizontalAlignment="Stretch"
-                                   TextAlignment="{Binding TextAlignment}"
-                                   Opacity="0.8"
-                                   Margin="0,4,0,0"/>
-                    </StackPanel>
+                    <Grid>
+                        <Image Stretch="UniformToFill"
+                               Opacity="{Binding CardBackgroundImageOpacity}"
+                               IsHitTestVisible="False">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
+                                    <Binding Path="CardBackgroundImagePath"/>
+                                    <Binding Path="CardBackgroundImageHueDegrees"/>
+                                    <Binding Path="CardBackgroundImageBrightness"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                        <StackPanel>
+                            <TextBlock Text="Microsoft Teams"
+                                       FontFamily="{Binding FontFamily}"
+                                       FontSize="{Binding AppNameFontSize}"
+                                       FontWeight="{Binding AppNameFontWeight}"
+                                       Foreground="{Binding AppNameColor, Converter={StaticResource ColorToBrush}}"
+                                       Visibility="{Binding ShowAppName, Converter={StaticResource BoolToVis}}"
+                                       HorizontalAlignment="Stretch"
+                                       TextAlignment="{Binding TextAlignment}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Sarah sent a message"
+                                       FontFamily="{Binding FontFamily}"
+                                       FontSize="{Binding TitleFontSize}"
+                                       FontWeight="{Binding TitleFontWeight}"
+                                       Foreground="{Binding TitleColor, Converter={StaticResource ColorToBrush}}"
+                                       Visibility="{Binding ShowNotificationTitle, Converter={StaticResource BoolToVis}}"
+                                       HorizontalAlignment="Stretch"
+                                       TextAlignment="{Binding TextAlignment}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Hey, are you available for a quick call about the project?"
+                                       FontFamily="{Binding FontFamily}"
+                                       FontSize="{Binding FontSize}"
+                                       FontWeight="{Binding FontWeight}"
+                                       Foreground="{Binding TextColor, Converter={StaticResource ColorToBrush}}"
+                                       Visibility="{Binding ShowNotificationBody, Converter={StaticResource BoolToVis}}"
+                                       HorizontalAlignment="Stretch"
+                                       TextAlignment="{Binding TextAlignment}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="2m ago"
+                                       FontFamily="{Binding FontFamily}"
+                                       FontSize="{Binding TimestampFontSize}"
+                                       FontWeight="{Binding TimestampFontWeight}"
+                                       Foreground="{Binding TimestampColor, Converter={StaticResource ColorToBrush}}"
+                                       Visibility="{Binding ShowTimestamp, Converter={StaticResource BoolToVis}}"
+                                       HorizontalAlignment="Stretch"
+                                       TextAlignment="{Binding TextAlignment}"
+                                       Opacity="0.8"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </Border>
         </Border>
@@ -662,6 +676,69 @@
                                     TickFrequency="0.05" IsSnapToTickEnabled="True"
                                     ToolTip="How transparent the notification background appears"/>
                         </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="BACKGROUND IMAGE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Optional local image shown inside each notification card instead of relying only on a flat fill color."/>
+                        </Border>
+
+                        <TextBlock Text="Optional card image" Style="{StaticResource SettingLabel}"
+                                   ToolTip="When set, the image is rendered inside each notification card. The background color still acts as the fallback base behind it."/>
+                        <DockPanel Margin="0,4,0,8">
+                            <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource SecondaryButton}"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding ClearCardBackgroundImageCommand}"
+                                    ToolTip="Remove the current card background image and return to solid-color cards."/>
+                            <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource SecondaryButton}"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding BrowseCardBackgroundImageCommand}"
+                                    ToolTip="Choose a local image file to use as the notification card background."/>
+                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding CardBackgroundImagePath, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Path to the local card background image copied into Notifications Pro's backgrounds folder."/>
+                        </DockPanel>
+
+                        <UniformGrid Columns="3" Margin="0,0,0,8">
+                            <StackPanel Margin="0,0,8,0">
+                                <TextBlock Text="Image Opacity" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                        <Run Text="{Binding CardBackgroundImageOpacity, StringFormat='{}{0:P0}'}"/>
+                                    </TextBlock>
+                                    <Slider Style="{StaticResource SettingsSlider}"
+                                            Minimum="0.0" Maximum="1.0"
+                                            Value="{Binding CardBackgroundImageOpacity}"
+                                            TickFrequency="0.05" IsSnapToTickEnabled="False"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,8,0">
+                                <TextBlock Text="Hue" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                        <Run Text="{Binding CardBackgroundImageHueDegrees, StringFormat='{}{0:0}'}"/><Run Text="°"/>
+                                    </TextBlock>
+                                    <Slider Style="{StaticResource SettingsSlider}"
+                                            Minimum="-180" Maximum="180"
+                                            Value="{Binding CardBackgroundImageHueDegrees}"
+                                            TickFrequency="10" IsSnapToTickEnabled="False"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Brightness" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                        <Run Text="{Binding CardBackgroundImageBrightness, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                    </TextBlock>
+                                    <Slider Style="{StaticResource SettingsSlider}"
+                                            Minimum="0.2" Maximum="2.0"
+                                            Value="{Binding CardBackgroundImageBrightness}"
+                                            TickFrequency="0.1" IsSnapToTickEnabled="False"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </UniformGrid>
+
+                        <TextBlock Text="Images stay local to your Notifications Pro backgrounds folder and are exported/imported by path with the rest of your settings. They affect only the live card appearance and never store notification content."
+                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,8"/>
 
                         <!-- SHAPE section -->
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -1202,29 +1279,53 @@
                         <ItemsControl ItemsSource="{Binding HighlightKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <DockPanel Margin="0,0,0,6">
-                                        <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
-                                                Width="72" Padding="0"
-                                                Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="Remove this highlight keyword"/>
-                                        <Button DockPanel.Dock="Right" Content="Color" Style="{StaticResource SecondaryButton}"
-                                                Width="56" Padding="0" Margin="0,0,4,0"
-                                                Click="OnPickKeywordColorClick"
-                                                ToolTip="Pick a custom highlight color for this keyword"/>
-                                        <Border DockPanel.Dock="Right" Width="24" Height="24" CornerRadius="4"
-                                                Background="{Binding Color, Converter={StaticResource ColorToBrush}}"
-                                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                                Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                        <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
-                                                      Background="{DynamicResource SurfaceLightBrush}"
-                                                      Foreground="{DynamicResource TextPrimaryBrush}"
-                                                      BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                                      Width="36" Padding="0" Margin="0,0,4,0"
-                                                      ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
-                                        <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
-                                                   VerticalAlignment="Center"/>
-                                    </DockPanel>
+                                    <Border Padding="8,6" Margin="0,0,0,6"
+                                            CornerRadius="6" Background="{DynamicResource SurfaceLightBrush}">
+                                        <StackPanel>
+                                            <DockPanel>
+                                                <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
+                                                        Width="72" Padding="0"
+                                                        Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Remove this highlight keyword"/>
+                                                <Button DockPanel.Dock="Right" Content="Color" Style="{StaticResource SecondaryButton}"
+                                                        Width="56" Padding="0" Margin="0,0,4,0"
+                                                        Click="OnPickKeywordColorClick"
+                                                        ToolTip="Pick a custom highlight color for this keyword"/>
+                                                <Border DockPanel.Dock="Right" Width="24" Height="24" CornerRadius="4"
+                                                        Background="{Binding Color, Converter={StaticResource ColorToBrush}}"
+                                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                                        Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
+                                                              Background="{DynamicResource SurfaceLightBrush}"
+                                                              Foreground="{DynamicResource TextPrimaryBrush}"
+                                                              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                                              Width="36" Padding="0" Margin="0,0,4,0"
+                                                              ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
+                                                <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
+                                                           VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                            <Grid Margin="0,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,8,0">
+                                                    <TextBlock Text="Match Scope" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                              ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedItem="{Binding Scope}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="App Filter (Optional)" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <TextBox Style="{StaticResource SettingsTextBox}"
+                                                             Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
+                                                             ToolTip="Limit this rule to apps whose name contains this text, for example X, Outlook, Slack, or Antigravity."/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -1245,24 +1346,137 @@
                         <ItemsControl ItemsSource="{Binding MuteKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <DockPanel Margin="0,0,0,6">
-                                        <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
-                                                Width="72" Padding="0"
-                                                Command="{Binding DataContext.RemoveMuteKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="Remove this mute keyword"/>
-                                        <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
-                                                      Background="{DynamicResource SurfaceLightBrush}"
-                                                      Foreground="{DynamicResource TextPrimaryBrush}"
-                                                      BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                                      Width="36" Padding="0" Margin="0,0,4,0"
-                                                      ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
-                                        <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
-                                                   VerticalAlignment="Center"/>
-                                    </DockPanel>
+                                    <Border Padding="8,6" Margin="0,0,0,6"
+                                            CornerRadius="6" Background="{DynamicResource SurfaceLightBrush}">
+                                        <StackPanel>
+                                            <DockPanel>
+                                                <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
+                                                        Width="72" Padding="0"
+                                                        Command="{Binding DataContext.RemoveMuteKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Remove this mute keyword"/>
+                                                <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
+                                                              Background="{DynamicResource SurfaceLightBrush}"
+                                                              Foreground="{DynamicResource TextPrimaryBrush}"
+                                                              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                                              Width="36" Padding="0" Margin="0,0,4,0"
+                                                              ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
+                                                <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
+                                                           VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                            <Grid Margin="0,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,8,0">
+                                                    <TextBlock Text="Match Scope" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                              ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedItem="{Binding Scope}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="App Filter (Optional)" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <TextBox Style="{StaticResource SettingsTextBox}"
+                                                             Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
+                                                             ToolTip="Limit this mute rule to a specific app or group of app names."/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="NARRATION RULES" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Override normal read-aloud behavior when a keyword matches the title, body, or both."/>
+                        </Border>
+
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding NewNarrationKeyword, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Type a keyword or handle and press Add Rule. Use regex if you need advanced matching."
+                                     Margin="0,0,8,0"/>
+
+                            <Button Grid.Column="1" Content="Add Rule" Style="{StaticResource SecondaryButton}"
+                                    MinWidth="96" Command="{Binding AddNarrationRuleCommand}"
+                                    ToolTip="Add a narration rule that can force read-aloud or skip read-aloud for matching notifications."/>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding NarrationRuleEntries}" Margin="0,4,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="8,6" Margin="0,0,0,6"
+                                            CornerRadius="6" Background="{DynamicResource SurfaceLightBrush}">
+                                        <StackPanel>
+                                            <DockPanel>
+                                                <Button DockPanel.Dock="Right" Content="Remove" Style="{StaticResource SecondaryButton}"
+                                                        Width="72" Padding="0"
+                                                        Command="{Binding DataContext.RemoveNarrationRuleCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Remove this narration rule"/>
+                                                <ToggleButton DockPanel.Dock="Right" Content=".*" IsChecked="{Binding IsRegex}"
+                                                              Background="{DynamicResource SurfaceLightBrush}"
+                                                              Foreground="{DynamicResource TextPrimaryBrush}"
+                                                              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                                              Width="36" Padding="0" Margin="0,0,4,0"
+                                                              ToolTip="Toggle regex mode — when enabled, the keyword is treated as a regular expression pattern"/>
+                                                <TextBlock Text="{Binding Keyword}" Style="{StaticResource SettingLabel}"
+                                                           VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                            <Grid Margin="0,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <StackPanel Margin="0,0,8,8">
+                                                    <TextBlock Text="Match Scope" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                              ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedItem="{Binding Scope}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Margin="0,0,0,8">
+                                                    <TextBlock Text="App Filter (Optional)" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <TextBox Style="{StaticResource SettingsTextBox}"
+                                                             Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
+                                                             ToolTip="Limit this narration rule to apps whose name contains this text."/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="1" Margin="0,0,8,0">
+                                                    <TextBlock Text="Action" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                              ItemsSource="{Binding DataContext.AvailableNarrationRuleActions, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedItem="{Binding Action}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="1" Grid.Column="1">
+                                                    <TextBlock Text="Read Mode" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                              ItemsSource="{Binding DataContext.AvailableNarrationRuleReadModes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedItem="{Binding ReadMode}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="Narration rules are optional overrides. They sit on top of the normal Read Notifications Aloud toggle and per-app checkboxes, so you can target handles, phrases, or account names more precisely."
+                                   Style="{StaticResource SettingDesc}" Margin="0,4,0,0"/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="QUIET HOURS" Style="{StaticResource SectionHeader}"/>
@@ -2379,6 +2593,18 @@
                                 ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SETTINGS EXPERIENCE" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowQuickTips}"
+                                          ToolTip="Show or hide the first-run quick tips banner at the top of the settings window."/>
+                            <TextBlock Text="Show Quick Tips" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Controls whether the guidance banner appears for new users at the top of Settings. Turning this off hides the banner immediately."/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
                         </Border>
 
@@ -2621,6 +2847,19 @@
                                    Text="Privacy: spoken notifications are generated from the live in-memory queue only. Notifications Pro never saves notification text to disk, never builds an overflow speech backlog, and does not send the text over the network. Narration plays through your default Windows audio output, so anyone nearby may hear it."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SCOPED RULES &amp; SOCIAL WORKFLOWS" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Settings → Filtering now lets you target rules against Title Only, Body Only, or Title + Body, and optionally limit them to a specific app name such as X, Reddit, Outlook, Slack, Codex, or Antigravity."/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Use Keyword Highlighting and Keyword Muting for visual rules, then use Narration Rules only when a matching phrase should force Read Aloud or Skip Read Aloud without changing your normal global narration settings."/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
+                                   Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
+                                   Text="Notifications Pro still works from the Windows notification text only. It does not receive structured X account IDs, post metadata, or platform APIs, so the safest setup is to target the text patterns that actually appear in your live notifications."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="VOICE ACCESS" Style="{StaticResource SectionHeader}"/>
                         </Border>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
@@ -2639,6 +2878,16 @@
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
                                    Text="Transparency: this affects the on-screen card's Windows accessibility label only. The selected text is available while the notification is visible, stays in RAM only, and is never written to disk, logged, or sent over the network."/>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="CARD BACKGROUND IMAGES" Style="{StaticResource SectionHeader}"/>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   Text="Settings → Appearance → Background Image can place a local image inside each live notification card. The normal background colour stays underneath as the fallback base, while the image gets its own opacity, hue, and brightness controls."/>
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
+                                   Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
+                                   Text="Images are copied into Notifications Pro's local backgrounds folder and referenced by path in settings export/import. They affect card appearance only and never include or persist notification text."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="WHY CAN'T I CLICK NOTIFICATIONS TO OPEN APPS?" Style="{StaticResource SectionHeader}"/>

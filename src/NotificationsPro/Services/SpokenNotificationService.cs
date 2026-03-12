@@ -214,6 +214,9 @@ public sealed class SpokenNotificationService : IDisposable
 
     private bool ShouldSpeakItem(NotificationItem item)
     {
+        if (item.ReadAloudEnabledOverride.HasValue)
+            return item.ReadAloudEnabledOverride.Value;
+
         var appName = item.AppName?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(appName))
             return true;
@@ -251,7 +254,9 @@ public sealed class SpokenNotificationService : IDisposable
             item.Title,
             item.Body,
             item.ReceivedAt,
-            settings.ReadNotificationsAloudMode,
+            string.IsNullOrWhiteSpace(item.ReadAloudModeOverride)
+                ? settings.ReadNotificationsAloudMode
+                : item.ReadAloudModeOverride,
             settings.TimestampDisplayMode);
 
         if (string.IsNullOrWhiteSpace(spokenText))

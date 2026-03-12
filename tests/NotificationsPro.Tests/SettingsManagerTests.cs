@@ -63,6 +63,30 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility;
         sm.Settings.AppGroupingStyle = "Header Chip";
         sm.Settings.ShowAppGroupCounts = false;
+        sm.Settings.CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png";
+        sm.Settings.CardBackgroundImageOpacity = 0.6;
+        sm.Settings.CardBackgroundImageHueDegrees = 30;
+        sm.Settings.CardBackgroundImageBrightness = 0.8;
+        sm.Settings.ShowQuickTips = false;
+        sm.Settings.HighlightRules.Add(new HighlightRuleDefinition
+        {
+            Keyword = "urgent",
+            Color = "#FF8800",
+            Scope = NotificationMatchScopeHelper.TitleOnly,
+            AppFilter = "X"
+        });
+        sm.Settings.MuteRules.Add(new MuteRuleDefinition
+        {
+            Keyword = "spoiler",
+            Scope = NotificationMatchScopeHelper.BodyOnly
+        });
+        sm.Settings.NarrationRules.Add(new NarrationRuleDefinition
+        {
+            Keyword = "@openai",
+            Scope = NotificationMatchScopeHelper.BodyOnly,
+            Action = NarrationRuleActionHelper.ReadAloud,
+            ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly
+        });
         sm.Save();
 
         var sm2 = CreateManager();
@@ -79,6 +103,18 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, sm2.Settings.NotificationCaptureMode);
         Assert.Equal("Header Chip", sm2.Settings.AppGroupingStyle);
         Assert.False(sm2.Settings.ShowAppGroupCounts);
+        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png", sm2.Settings.CardBackgroundImagePath);
+        Assert.Equal(0.6, sm2.Settings.CardBackgroundImageOpacity);
+        Assert.Equal(30, sm2.Settings.CardBackgroundImageHueDegrees);
+        Assert.Equal(0.8, sm2.Settings.CardBackgroundImageBrightness);
+        Assert.False(sm2.Settings.ShowQuickTips);
+        Assert.Single(sm2.Settings.HighlightRules);
+        Assert.Equal(NotificationMatchScopeHelper.TitleOnly, sm2.Settings.HighlightRules[0].Scope);
+        Assert.Equal("X", sm2.Settings.HighlightRules[0].AppFilter);
+        Assert.Single(sm2.Settings.MuteRules);
+        Assert.Equal(NotificationMatchScopeHelper.BodyOnly, sm2.Settings.MuteRules[0].Scope);
+        Assert.Single(sm2.Settings.NarrationRules);
+        Assert.Equal(SpokenNotificationTextFormatter.ModeTitleOnly, sm2.Settings.NarrationRules[0].ReadMode);
     }
 
     [Fact]
@@ -96,6 +132,10 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("#C8C8C8", settings.AppNameColor);
         Assert.Equal("#202020", settings.BackgroundColor);
         Assert.Equal(0.94, settings.BackgroundOpacity);
+        Assert.Equal(string.Empty, settings.CardBackgroundImagePath);
+        Assert.Equal(0.45, settings.CardBackgroundImageOpacity);
+        Assert.Equal(0, settings.CardBackgroundImageHueDegrees);
+        Assert.Equal(1.0, settings.CardBackgroundImageBrightness);
         Assert.Equal(14, settings.AppNameFontSize);
         Assert.Equal("SemiBold", settings.AppNameFontWeight);
         Assert.Equal(16, settings.TitleFontSize);
@@ -140,6 +180,9 @@ public class SettingsManagerTests : IDisposable
         Assert.Empty(settings.MutedApps);
         Assert.Empty(settings.HighlightKeywords);
         Assert.Empty(settings.MuteKeywords);
+        Assert.Empty(settings.HighlightRules);
+        Assert.Empty(settings.MuteRules);
+        Assert.Empty(settings.NarrationRules);
         Assert.Equal("#FFD700", settings.HighlightColor);
         Assert.Empty(settings.SpokenMutedApps);
         Assert.False(settings.QuietHoursEnabled);
@@ -165,6 +208,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(NotificationCaptureModeHelper.ModeAuto, settings.NotificationCaptureMode);
         Assert.Equal("Framed Group", settings.AppGroupingStyle);
         Assert.True(settings.ShowAppGroupCounts);
+        Assert.True(settings.ShowQuickTips);
     }
 
     [Fact]
@@ -188,21 +232,33 @@ public class SettingsManagerTests : IDisposable
         original.SpokenMutedApps.Add("Outlook");
         original.HighlightKeywords.Add("urgent");
         original.MuteKeywords.Add("spam");
+        original.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "headline" });
+        original.MuteRules.Add(new MuteRuleDefinition { Keyword = "muted" });
+        original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@team" });
 
         var clone = original.Clone();
         clone.MutedApps.Add("Slack");
         clone.SpokenMutedApps.Add("Discord");
         clone.HighlightKeywords.Add("critical");
         clone.MuteKeywords.Add("ad");
+        clone.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "body" });
+        clone.MuteRules.Add(new MuteRuleDefinition { Keyword = "regex" });
+        clone.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "voice" });
 
         Assert.Single(original.MutedApps);
         Assert.Single(original.SpokenMutedApps);
         Assert.Single(original.HighlightKeywords);
         Assert.Single(original.MuteKeywords);
+        Assert.Single(original.HighlightRules);
+        Assert.Single(original.MuteRules);
+        Assert.Single(original.NarrationRules);
         Assert.Equal(2, clone.MutedApps.Count);
         Assert.Equal(2, clone.SpokenMutedApps.Count);
         Assert.Equal(2, clone.HighlightKeywords.Count);
         Assert.Equal(2, clone.MuteKeywords.Count);
+        Assert.Equal(2, clone.HighlightRules.Count);
+        Assert.Equal(2, clone.MuteRules.Count);
+        Assert.Equal(2, clone.NarrationRules.Count);
     }
 
     [Fact]

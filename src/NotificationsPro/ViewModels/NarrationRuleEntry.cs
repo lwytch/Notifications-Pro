@@ -4,16 +4,9 @@ using NotificationsPro.Helpers;
 
 namespace NotificationsPro.ViewModels;
 
-public class KeywordHighlightEntry : INotifyPropertyChanged
+public class NarrationRuleEntry : INotifyPropertyChanged
 {
     public string Keyword { get; }
-
-    private string _color;
-    public string Color
-    {
-        get => _color;
-        set { _color = value; OnPropertyChanged(); }
-    }
 
     private bool _isRegex;
     public bool IsRegex
@@ -44,21 +37,46 @@ public class KeywordHighlightEntry : INotifyPropertyChanged
         }
     }
 
-    public KeywordHighlightEntry(
+    private string _action = NarrationRuleActionHelper.ReadAloud;
+    public string Action
+    {
+        get => _action;
+        set
+        {
+            _action = NarrationRuleActionHelper.Normalize(value);
+            OnPropertyChanged();
+        }
+    }
+
+    private string _readMode = NarrationRuleReadModeHelper.UseGlobal;
+    public string ReadMode
+    {
+        get => _readMode;
+        set
+        {
+            _readMode = NarrationRuleReadModeHelper.Normalize(value);
+            OnPropertyChanged();
+        }
+    }
+
+    public NarrationRuleEntry(
         string keyword,
-        string color,
         bool isRegex = false,
         string? scope = null,
-        string? appFilter = null)
+        string? appFilter = null,
+        string? action = null,
+        string? readMode = null)
     {
         Keyword = keyword;
-        _color = color;
         _isRegex = isRegex;
         _scope = NotificationMatchScopeHelper.Normalize(scope);
         _appFilter = appFilter?.Trim() ?? string.Empty;
+        _action = NarrationRuleActionHelper.Normalize(action);
+        _readMode = NarrationRuleReadModeHelper.Normalize(readMode);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

@@ -305,7 +305,15 @@ public class ThemeTests : IDisposable
             ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleTimestamp,
             SpokenMutedApps = new() { "Teams", "Outlook" },
             NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility,
+            CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png",
+            CardBackgroundImageOpacity = 0.55,
+            CardBackgroundImageHueDegrees = 12,
+            CardBackgroundImageBrightness = 0.9,
+            ShowQuickTips = false,
         };
+        original.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "headline", Scope = NotificationMatchScopeHelper.TitleOnly, AppFilter = "X" });
+        original.MuteRules.Add(new MuteRuleDefinition { Keyword = "spoiler", Scope = NotificationMatchScopeHelper.BodyOnly });
+        original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@openai", Scope = NotificationMatchScopeHelper.BodyOnly, ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly });
 
         var filePath = Path.Combine(_tempDir, "export.json");
         ThemeManager.ExportSettings(original, filePath);
@@ -322,6 +330,14 @@ public class ThemeTests : IDisposable
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleTimestamp, imported.ReadNotificationsAloudMode);
         Assert.Equal(new[] { "Teams", "Outlook" }, imported.SpokenMutedApps);
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, imported.NotificationCaptureMode);
+        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png", imported.CardBackgroundImagePath);
+        Assert.Equal(0.55, imported.CardBackgroundImageOpacity);
+        Assert.Equal(12, imported.CardBackgroundImageHueDegrees);
+        Assert.Equal(0.9, imported.CardBackgroundImageBrightness);
+        Assert.False(imported.ShowQuickTips);
+        Assert.Single(imported.HighlightRules);
+        Assert.Single(imported.MuteRules);
+        Assert.Single(imported.NarrationRules);
     }
 
     [Fact]

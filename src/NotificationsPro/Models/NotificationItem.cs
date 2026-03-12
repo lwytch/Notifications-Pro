@@ -37,6 +37,12 @@ public class NotificationItem : INotifyPropertyChanged
 
     /// <summary>Per-notification highlight color (hex). Empty means fall back to the global HighlightColor.</summary>
     public string HighlightColor { get; set; } = string.Empty;
+    public string BackgroundImagePath { get; set; } = string.Empty;
+    public double BackgroundImageOpacity { get; set; } = 0.45;
+    public double BackgroundImageHueDegrees { get; set; }
+    public double BackgroundImageBrightness { get; set; } = 1.0;
+    public bool? ReadAloudEnabledOverride { get; set; }
+    public string ReadAloudModeOverride { get; set; } = string.Empty;
 
     public void NotifyTimestampChanged() => OnPropertyChanged(nameof(RelativeTimeText));
 

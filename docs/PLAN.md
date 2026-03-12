@@ -437,8 +437,30 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Overflow affordance hardening: make the overflow badge actionable without retaining discarded notification content, and update the wording so it no longer implies hidden cards can be expanded later.
 - [x] Grouping customization pass: move information density into Appearance, keep app-grouping behavior in its logical tab, and replace the hardcoded app banner with a properly styleable grouping presentation.
 
+### Milestone 18: Stable Single-Panel Enhancements
+**Status: Mostly complete**
+
+Targeted rules and narration:
+- [x] Field-scoped keyword rules: highlight and mute rules should target `Title`, `Body`, or `Title + Body`, preserve regex support, and work cleanly in the restored single-panel app.
+- [x] Field-scoped narration triggers: keep the existing built-in narrator, but add optional title/body/title+body matching rules that can force `Read Aloud` or `Skip Read Aloud` with spoken-content overrides.
+- [x] App-filtered rules: allow highlight, mute, and narration rules to be limited to one source app so browser-hosted services like X can be targeted precisely without affecting every notification.
+- [x] Social/account targeting model: X/social workflows should support text-pattern targeting for handles, hashtags, account names, and watchwords using literal or regex rules with optional app filters; Windows still exposes text only, not structured account IDs.
+
+Visual customisation:
+- [x] Background image card mode: add optional image-backed notification cards for the single-panel app so each visible notification can render an image instead of a flat background colour, with privacy-safe local asset storage plus opacity, hue, and brightness controls.
+
+Settings UX and persistence:
+- [x] Quick tips control: add an explicit user-facing toggle so tray/settings first-run guidance can be turned off without relying on the one-time welcome-state flag alone.
+- [x] Export/import coverage expansion: restored single-panel rule and background-image settings must round-trip through `AppSettings`, `SettingsViewModel`, export/import JSON, reset defaults, and regression tests.
+- [ ] Install/update persistence audit: trace the MSIX update path versus `%AppData%\NotificationsPro\settings.json`, confirm whether upgrades should preserve settings, and document any intentional reset behavior in Help/README so reinstalling never feels random.
+
+Docs and release readiness:
+- [x] README workflow guides: add dedicated sections for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, covering setup, browser-hosted app limitations, per-app narration, privacy limits, and troubleshooting for services such as X, Reddit, Instagram, Codex, and Antigravity in the single-panel app.
+- [x] README/Help gap analysis: update README, in-app Help, example settings, and status text for advanced narration rules, card background images, voice setup, privacy disclosures, defaults, and troubleshooting without reintroducing multi-panel language.
+- [ ] Public repo sanitisation audit: review the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity that should be removed or deliberately disclosed before the repository is made public.
+
 ## Current Focus
-Post-release validation of the refreshed defaults, overflow summary, and new grouping styles, plus follow-up UX review for any stricter privacy masking options.
+Finish the remaining post-rollback release work: audit install/update settings persistence under MSIX upgrades and complete the public-repo sanitisation pass.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.
