@@ -12,6 +12,7 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
+- Apps tab per-app background path display now uses an explicit one-way binding, preventing the `BackgroundImageDisplay` read-only property from crashing the settings window when the tab refreshes or a test notification is sent
 - Apps tab combo-box and command bindings now resolve through the settings window directly, preventing the tab from throwing repeated WPF binding errors when opened
 - Restored the stable single-panel UX by removing the experimental routing/lane model from the shipped codepath and reintroducing the newer useful features directly on top of the original overlay flow
 - Filtering now supports field-scoped and app-filtered highlight/mute/narration rules without changing the core built-in narrator behavior that was already working

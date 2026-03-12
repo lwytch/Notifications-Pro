@@ -1626,7 +1626,7 @@
                                                         CommandParameter="{Binding}"
                                                         ToolTip="Choose a local image to use only for this app's notification cards."/>
                                                 <TextBox Style="{StaticResource SettingsTextBox}"
-                                                         Text="{Binding BackgroundImageDisplay}"
+                                                         Text="{Binding BackgroundImageDisplay, Mode=OneWay}"
                                                          IsReadOnly="True"
                                                          ToolTip="If no override is set, this app uses the global card background image settings from Appearance."/>
                                             </DockPanel>

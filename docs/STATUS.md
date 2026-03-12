@@ -26,6 +26,7 @@
 - Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Apps tab now loads its per-app sound/icon/background controls through stable root-window bindings instead of popup-sensitive combo-box ancestor lookups
+- Apps tab background override display now reads from a one-way binding, so opening the tab and sending test notifications no longer tries to write back into the read-only display property
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display behavior, timing, deduplication, quiet hours, and burst protection

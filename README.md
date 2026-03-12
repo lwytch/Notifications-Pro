@@ -381,6 +381,9 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.3
+- **Apps Tab Read-Only Binding Fix**: The per-app background path display in `Settings > Apps` now uses a one-way binding, fixing the `BackgroundImageDisplay` exception that could appear when the tab refreshed or when you sent a test notification from that screen.
+
 ### Release v1.1.10.2
 - **Apps Tab Stability Fix**: Replaced the popup-sensitive combo-box ancestor bindings in `Settings > Apps` with direct settings-window bindings so the tab no longer throws a wall of WPF binding errors when opened.
 - **Binding Cleanup**: The same root-window binding approach now covers the related per-app background commands and presentation-app removal actions to reduce the chance of similar popup-template regressions elsewhere in Settings.
