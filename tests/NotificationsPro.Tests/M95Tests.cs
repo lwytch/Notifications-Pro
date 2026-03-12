@@ -35,6 +35,11 @@ public class M95Tests
         Assert.True(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);
+        Assert.Equal("#141414", s.OverlayScrollbarTrackColor);
+        Assert.Equal("#4F4F4F", s.OverlayScrollbarThumbColor);
+        Assert.Equal("#0078D4", s.OverlayScrollbarThumbHoverColor);
+        Assert.Equal(1.5, s.OverlayScrollbarPadding);
+        Assert.Equal(6, s.OverlayScrollbarCornerRadius);
         Assert.False(s.FullscreenOverlayMode);
         Assert.Equal(0.5, s.FullscreenOverlayOpacity);
         Assert.False(s.AccessibilityModeEnabled);
@@ -86,6 +91,11 @@ public class M95Tests
             OverlayScrollbarVisible = false,
             OverlayScrollbarWidth = 12,
             OverlayScrollbarOpacity = 0.5,
+            OverlayScrollbarTrackColor = "#111111",
+            OverlayScrollbarThumbColor = "#555555",
+            OverlayScrollbarThumbHoverColor = "#77AAFF",
+            OverlayScrollbarPadding = 2.5,
+            OverlayScrollbarCornerRadius = 8,
             FullscreenOverlayMode = true,
             FullscreenOverlayOpacity = 0.8,
             AccessibilityModeEnabled = true,
@@ -108,6 +118,11 @@ public class M95Tests
         Assert.False(clone.OverlayScrollbarVisible);
         Assert.Equal(12, clone.OverlayScrollbarWidth);
         Assert.Equal(0.5, clone.OverlayScrollbarOpacity);
+        Assert.Equal("#111111", clone.OverlayScrollbarTrackColor);
+        Assert.Equal("#555555", clone.OverlayScrollbarThumbColor);
+        Assert.Equal("#77AAFF", clone.OverlayScrollbarThumbHoverColor);
+        Assert.Equal(2.5, clone.OverlayScrollbarPadding);
+        Assert.Equal(8, clone.OverlayScrollbarCornerRadius);
         Assert.True(clone.FullscreenOverlayMode);
         Assert.Equal(0.8, clone.FullscreenOverlayOpacity);
         Assert.True(clone.AccessibilityModeEnabled);
@@ -133,6 +148,11 @@ public class M95Tests
             TimestampFontWeight = "Medium",
             TimestampColor = "#334455",
             OverlayScrollbarWidth = 16,
+            OverlayScrollbarTrackColor = "#121212",
+            OverlayScrollbarThumbColor = "#666666",
+            OverlayScrollbarThumbHoverColor = "#88BBFF",
+            OverlayScrollbarPadding = 2,
+            OverlayScrollbarCornerRadius = 7,
             FullscreenOverlayMode = true,
         };
         s.PerAppSounds["Teams"] = "Hand";
@@ -155,6 +175,11 @@ public class M95Tests
         Assert.Equal("Medium", deserialized.TimestampFontWeight);
         Assert.Equal("#334455", deserialized.TimestampColor);
         Assert.Equal(16, deserialized.OverlayScrollbarWidth);
+        Assert.Equal("#121212", deserialized.OverlayScrollbarTrackColor);
+        Assert.Equal("#666666", deserialized.OverlayScrollbarThumbColor);
+        Assert.Equal("#88BBFF", deserialized.OverlayScrollbarThumbHoverColor);
+        Assert.Equal(2, deserialized.OverlayScrollbarPadding);
+        Assert.Equal(7, deserialized.OverlayScrollbarCornerRadius);
         Assert.True(deserialized.FullscreenOverlayMode);
     }
 
@@ -287,11 +312,13 @@ public class M95Tests
         {
             SettingsWindowBg = "#AABBCC",
             SettingsWindowAccent = "#112233",
+            OverlayScrollbarThumbColor = "#778899",
         };
         var settings = new AppSettings();
         preset.ApplyTo(settings);
         Assert.Equal("#AABBCC", settings.SettingsWindowBg);
         Assert.Equal("#112233", settings.SettingsWindowAccent);
+        Assert.Equal("#778899", settings.OverlayScrollbarThumbColor);
     }
 
     [Fact]
@@ -301,9 +328,11 @@ public class M95Tests
         {
             SettingsWindowBg = "#001122",
             SettingsWindowBorder = "#334455",
+            OverlayScrollbarTrackColor = "#202020",
         };
         var preset = ThemePreset.FromSettings(settings, "Test");
         Assert.Equal("#001122", preset.SettingsWindowBg);
         Assert.Equal("#334455", preset.SettingsWindowBorder);
+        Assert.Equal("#202020", preset.OverlayScrollbarTrackColor);
     }
 }

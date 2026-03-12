@@ -67,6 +67,7 @@ Settings UI reorganization (Behavior tab has 6 concerns in one panel):
 - [x] Background-image and spacing polish: Restore the single-column settings rhythm on Appearance and other affected tabs, move explanatory copy into tooltips where possible, add explicit image fit behavior options, and verify the rollback README/help text still matches the shipped single-panel UI.
 - [x] App-specific background assets: Allow specific apps to override the default card background image treatment without reintroducing multi-panel complexity, and add fullscreen-backdrop image support with fit/opacity controls that stay privacy-safe and export/import correctly.
 - [x] Settings ownership cleanup: Add an Apps tab for per-app presentation overrides, and move Quiet Hours plus Burst Limiting out of Filtering into a behavior/scheduling home that matches what they actually do.
+- [x] Overlay scrollbar theming and interaction repair: fix the overlay hit-test split so the scrollbar and search box receive normal client input without losing drag-anywhere behavior elsewhere, add themed track/thumb color plus padding/radius controls in Appearance, and keep theme/export/import coverage aligned with those new style settings.
 
 Previously completed (Milestone 3):
 - [x] Click-through toggle (Win32 WS_EX_TRANSPARENT)
@@ -457,6 +458,7 @@ Settings UX and persistence:
 - [x] Quick tips control: add an explicit user-facing toggle so tray/settings first-run guidance can be turned off without relying on the one-time welcome-state flag alone.
 - [x] Export/import coverage expansion: restored single-panel rule and background-image settings must round-trip through `AppSettings`, `SettingsViewModel`, export/import JSON, reset defaults, and regression tests.
 - [x] Install/update persistence audit: traced the packaged app to the single `%AppData%\NotificationsPro\settings.json` store, then added a one-time startup settings-schema migration so legacy `3`-card / `300ms` / `480px` installs upgrade cleanly without overwriting current user choices on every launch.
+- [x] Startup-defaults repair follow-up: bump the settings schema so already-stamped broken installs still self-repair from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on their next packaged launch.
 
 Docs and release readiness:
 - [x] README workflow guides: add dedicated sections for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, covering setup, browser-hosted app limitations, per-app narration, privacy limits, and troubleshooting for services such as X, Reddit, Instagram, Codex, and Antigravity in the single-panel app.

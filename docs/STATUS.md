@@ -30,6 +30,9 @@
 - Apps tab per-app override cards now use a cleaner aligned form layout, with a compact header, a consistent label/control rhythm, and a shortened background-image status display instead of dumping full file paths into the main form flow
 - Packaged MSIX startup now preserves package identity instead of forcing the unpackaged fallback AUMID, reducing the risk of live notification capture failing after updates
 - Startup settings now use a one-time schema migration instead of the welcome-tip flag to detect legacy defaults, so old `3`-visible / `300ms` / `480px` installs upgrade once without resetting current user choices on every launch
+- Startup defaults repair now follows schema version 4 and only fires for the real legacy-default signature, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on the next launch without overriding intentional later choices
+- Overlay scrollbars now receive real client hit-testing over the scrollbar/search areas, so dragging still works across the cards while the scrollbar itself remains clickable and draggable
+- Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, and corner radius, and overlay themes carry those scrollbar settings with the rest of the visual palette
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display behavior, timing, deduplication, quiet hours, and burst protection
@@ -207,7 +210,7 @@
   - Settings window dynamic theming — Windows Dark/Light, High Contrast, System, or Custom palette
   - SettingsThemeService for runtime DynamicResource brush updates
   - Custom settings window color pickers (background, surface, surface light, surface hover, text, text secondary, text muted, accent, border)
-  - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
+- Overlay scrollbar controls (show/hide, width, opacity, track/thumb colors, padding, corner radius) now apply to a fully themed custom scrollbar instead of the stock WPF look
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
   - Settings popup display mode — Window or Popup (toast-corner anchored on the taskbar monitor, auto-close option, reduced popup height at 55% of work area)
   - Settings window rounded corners with adjustable radius slider (0–20px) in Settings Window — XAML clipping in popup mode, DWM corner preference in windowed mode
@@ -253,7 +256,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 185 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 190 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)

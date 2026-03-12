@@ -267,8 +267,41 @@ public class OverlayViewModel : BaseViewModel
     private double _overlayScrollbarOpacity = 1.0;
     public double OverlayScrollbarOpacity { get => _overlayScrollbarOpacity; set => SetProperty(ref _overlayScrollbarOpacity, value); }
 
+    private string _overlayScrollbarTrackColor = "#141414";
+    public string OverlayScrollbarTrackColor { get => _overlayScrollbarTrackColor; set => SetProperty(ref _overlayScrollbarTrackColor, value); }
+
+    private string _overlayScrollbarThumbColor = "#4F4F4F";
+    public string OverlayScrollbarThumbColor { get => _overlayScrollbarThumbColor; set => SetProperty(ref _overlayScrollbarThumbColor, value); }
+
+    private string _overlayScrollbarThumbHoverColor = "#0078D4";
+    public string OverlayScrollbarThumbHoverColor { get => _overlayScrollbarThumbHoverColor; set => SetProperty(ref _overlayScrollbarThumbHoverColor, value); }
+
+    private double _overlayScrollbarPadding = 1.5;
+    public double OverlayScrollbarPadding
+    {
+        get => _overlayScrollbarPadding;
+        set
+        {
+            if (!SetProperty(ref _overlayScrollbarPadding, value)) return;
+            OnPropertyChanged(nameof(OverlayScrollbarPaddingThickness));
+        }
+    }
+
+    private double _overlayScrollbarCornerRadius = 6;
+    public double OverlayScrollbarCornerRadius
+    {
+        get => _overlayScrollbarCornerRadius;
+        set
+        {
+            if (!SetProperty(ref _overlayScrollbarCornerRadius, value)) return;
+            OnPropertyChanged(nameof(OverlayScrollbarCornerRadiusValue));
+        }
+    }
+
     public System.Windows.Controls.ScrollBarVisibility ScrollbarVisibility =>
         OverlayScrollbarVisible ? System.Windows.Controls.ScrollBarVisibility.Auto : System.Windows.Controls.ScrollBarVisibility.Hidden;
+    public Thickness OverlayScrollbarPaddingThickness => new(OverlayScrollbarPadding);
+    public CornerRadius OverlayScrollbarCornerRadiusValue => new(OverlayScrollbarCornerRadius);
 
     // Content
     private bool _showAppName = true;
@@ -647,6 +680,11 @@ public class OverlayViewModel : BaseViewModel
         OverlayScrollbarVisible = s.OverlayScrollbarVisible;
         OverlayScrollbarWidth = s.OverlayScrollbarWidth;
         OverlayScrollbarOpacity = s.OverlayScrollbarOpacity;
+        OverlayScrollbarTrackColor = s.OverlayScrollbarTrackColor;
+        OverlayScrollbarThumbColor = s.OverlayScrollbarThumbColor;
+        OverlayScrollbarThumbHoverColor = s.OverlayScrollbarThumbHoverColor;
+        OverlayScrollbarPadding = s.OverlayScrollbarPadding;
+        OverlayScrollbarCornerRadius = s.OverlayScrollbarCornerRadius;
         OnPropertyChanged(nameof(ScrollbarVisibility));
         ShowNotificationIcons = s.ShowNotificationIcons;
         IconSize = s.IconSize;

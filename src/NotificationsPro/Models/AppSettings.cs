@@ -168,6 +168,11 @@ public class AppSettings
     public bool OverlayScrollbarVisible { get; set; } = true;
     public double OverlayScrollbarWidth { get; set; } = 8;
     public double OverlayScrollbarOpacity { get; set; } = 1.0;
+    public string OverlayScrollbarTrackColor { get; set; } = "#141414";
+    public string OverlayScrollbarThumbColor { get; set; } = "#4F4F4F";
+    public string OverlayScrollbarThumbHoverColor { get; set; } = "#0078D4";
+    public double OverlayScrollbarPadding { get; set; } = 1.5;
+    public double OverlayScrollbarCornerRadius { get; set; } = 6;
 
     // Overlay visibility
     public bool OverlayVisible { get; set; } = true;

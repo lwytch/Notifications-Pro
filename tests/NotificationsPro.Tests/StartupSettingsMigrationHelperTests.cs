@@ -46,6 +46,66 @@ public class StartupSettingsMigrationHelperTests
     }
 
     [Fact]
+    public void Apply_BuggySchemaThreeSettings_RepairsLegacyStartupDefaults()
+    {
+        var settings = new AppSettings
+        {
+            SettingsSchemaVersion = 3,
+            MaxVisibleNotifications = 3,
+            AnimationDurationMs = 0,
+            OverlayMaxHeight = 480
+        };
+
+        var changed = StartupSettingsMigrationHelper.Apply(settings, 1440, hadExistingSettingsFile: true);
+
+        Assert.True(changed);
+        Assert.Equal(40, settings.MaxVisibleNotifications);
+        Assert.Equal(1200, settings.AnimationDurationMs);
+        Assert.Equal(1440, settings.OverlayMaxHeight);
+        Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, settings.SettingsSchemaVersion);
+    }
+
+    [Fact]
+    public void Apply_CurrentSchemaWithLegacySignature_StillRepairsBrokenDefaults()
+    {
+        var settings = new AppSettings
+        {
+            SettingsSchemaVersion = SettingsManager.CurrentSettingsSchemaVersion,
+            MaxVisibleNotifications = 3,
+            AnimationDurationMs = 0,
+            OverlayMaxHeight = 480
+        };
+
+        var changed = StartupSettingsMigrationHelper.Apply(settings, 1440, hadExistingSettingsFile: true);
+
+        Assert.True(changed);
+        Assert.Equal(40, settings.MaxVisibleNotifications);
+        Assert.Equal(1200, settings.AnimationDurationMs);
+        Assert.Equal(1440, settings.OverlayMaxHeight);
+        Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, settings.SettingsSchemaVersion);
+    }
+
+    [Fact]
+    public void Apply_PartialLegacyValues_DoesNotOverrideIntentionalChoices()
+    {
+        var settings = new AppSettings
+        {
+            SettingsSchemaVersion = 3,
+            MaxVisibleNotifications = 3,
+            AnimationDurationMs = 1200,
+            OverlayMaxHeight = 900
+        };
+
+        var changed = StartupSettingsMigrationHelper.Apply(settings, 1440, hadExistingSettingsFile: true);
+
+        Assert.True(changed);
+        Assert.Equal(3, settings.MaxVisibleNotifications);
+        Assert.Equal(1200, settings.AnimationDurationMs);
+        Assert.Equal(900, settings.OverlayMaxHeight);
+        Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, settings.SettingsSchemaVersion);
+    }
+
+    [Fact]
     public void Apply_CurrentSettings_DoesNotOverrideIntentionalValues()
     {
         var settings = new AppSettings

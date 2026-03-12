@@ -996,6 +996,21 @@ public partial class SettingsViewModel : BaseViewModel
     private double _overlayScrollbarOpacity = 1.0;
     public double OverlayScrollbarOpacity { get => _overlayScrollbarOpacity; set { if (SetProperty(ref _overlayScrollbarOpacity, Math.Clamp(value, 0.1, 1.0))) QueueSave(); } }
 
+    private string _overlayScrollbarTrackColor = "#141414";
+    public string OverlayScrollbarTrackColor { get => _overlayScrollbarTrackColor; set { if (SetProperty(ref _overlayScrollbarTrackColor, value)) QueueSave(); } }
+
+    private string _overlayScrollbarThumbColor = "#4F4F4F";
+    public string OverlayScrollbarThumbColor { get => _overlayScrollbarThumbColor; set { if (SetProperty(ref _overlayScrollbarThumbColor, value)) QueueSave(); } }
+
+    private string _overlayScrollbarThumbHoverColor = "#0078D4";
+    public string OverlayScrollbarThumbHoverColor { get => _overlayScrollbarThumbHoverColor; set { if (SetProperty(ref _overlayScrollbarThumbHoverColor, value)) QueueSave(); } }
+
+    private double _overlayScrollbarPadding = 1.5;
+    public double OverlayScrollbarPadding { get => _overlayScrollbarPadding; set { if (SetProperty(ref _overlayScrollbarPadding, Math.Clamp(value, 0.0, 6.0))) QueueSave(); } }
+
+    private double _overlayScrollbarCornerRadius = 6;
+    public double OverlayScrollbarCornerRadius { get => _overlayScrollbarCornerRadius; set { if (SetProperty(ref _overlayScrollbarCornerRadius, Math.Clamp(value, 0.0, 12.0))) QueueSave(); } }
+
     // Collections
     public List<string> AvailableFonts { get; }
     public List<string> AvailableFontWeights { get; } = new()
@@ -1435,6 +1450,11 @@ public partial class SettingsViewModel : BaseViewModel
         _overlayScrollbarVisible = s.OverlayScrollbarVisible;
         _overlayScrollbarWidth = s.OverlayScrollbarWidth;
         _overlayScrollbarOpacity = s.OverlayScrollbarOpacity;
+        _overlayScrollbarTrackColor = s.OverlayScrollbarTrackColor;
+        _overlayScrollbarThumbColor = s.OverlayScrollbarThumbColor;
+        _overlayScrollbarThumbHoverColor = s.OverlayScrollbarThumbHoverColor;
+        _overlayScrollbarPadding = s.OverlayScrollbarPadding;
+        _overlayScrollbarCornerRadius = s.OverlayScrollbarCornerRadius;
         _overlayWidthDirty = false;
         OnPropertyChanged(nameof(IsStackedLayout));
     }
@@ -1722,6 +1742,11 @@ public partial class SettingsViewModel : BaseViewModel
             OverlayScrollbarVisible = OverlayScrollbarVisible,
             OverlayScrollbarWidth = OverlayScrollbarWidth,
             OverlayScrollbarOpacity = OverlayScrollbarOpacity,
+            OverlayScrollbarTrackColor = OverlayScrollbarTrackColor,
+            OverlayScrollbarThumbColor = OverlayScrollbarThumbColor,
+            OverlayScrollbarThumbHoverColor = OverlayScrollbarThumbHoverColor,
+            OverlayScrollbarPadding = OverlayScrollbarPadding,
+            OverlayScrollbarCornerRadius = OverlayScrollbarCornerRadius,
             // Preserve position from current settings
             OverlayLeft = previousSettings.OverlayLeft,
             OverlayTop = previousSettings.OverlayTop,

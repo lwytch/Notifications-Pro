@@ -118,6 +118,11 @@ public class ThemeManager
         s.FontSize = double.IsNaN(s.FontSize) ? 14 : Math.Clamp(s.FontSize, 6, 72);
         s.TitleFontSize = double.IsNaN(s.TitleFontSize) ? 16 : Math.Clamp(s.TitleFontSize, 6, 72);
         s.AppNameFontSize = double.IsNaN(s.AppNameFontSize) ? 14 : Math.Clamp(s.AppNameFontSize, 6, 72);
+        s.OverlayScrollbarTrackColor = string.IsNullOrWhiteSpace(s.OverlayScrollbarTrackColor) ? "#141414" : s.OverlayScrollbarTrackColor;
+        s.OverlayScrollbarThumbColor = string.IsNullOrWhiteSpace(s.OverlayScrollbarThumbColor) ? "#4F4F4F" : s.OverlayScrollbarThumbColor;
+        s.OverlayScrollbarThumbHoverColor = string.IsNullOrWhiteSpace(s.OverlayScrollbarThumbHoverColor) ? "#0078D4" : s.OverlayScrollbarThumbHoverColor;
+        s.OverlayScrollbarPadding = double.IsNaN(s.OverlayScrollbarPadding) ? 1.5 : Math.Clamp(s.OverlayScrollbarPadding, 0.0, 6.0);
+        s.OverlayScrollbarCornerRadius = double.IsNaN(s.OverlayScrollbarCornerRadius) ? 6.0 : Math.Clamp(s.OverlayScrollbarCornerRadius, 0.0, 12.0);
         s.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(s.ReadNotificationsAloudTriggerMode);
         s.CardBackgroundMode = CardBackgroundModeHelper.Normalize(
             !hasCardBackgroundMode && !string.IsNullOrWhiteSpace(s.CardBackgroundImagePath)

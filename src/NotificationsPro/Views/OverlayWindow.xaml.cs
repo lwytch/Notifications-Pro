@@ -39,6 +39,7 @@ public partial class OverlayWindow : Window
     private const int WM_NCLBUTTONDBLCLK = 0x00A3;
     private const int WM_NCRBUTTONUP = 0x00A5;
     private const int WM_NCMOUSEMOVE = 0x00A0;
+    private const int HTCLIENT = 1;
     private const int HTTRANSPARENT = -1;
     private const int HTCAPTION = 2;
     private const int HTLEFT = 10;
@@ -111,6 +112,12 @@ public partial class OverlayWindow : Window
                 {
                     handled = true;
                     return (IntPtr)HTTRANSPARENT;
+                }
+
+                if (IsInteractiveClientElementHit(lParam))
+                {
+                    handled = true;
+                    return (IntPtr)HTCLIENT;
                 }
 
                 if (_settingsManager.Settings.AllowManualResize
@@ -261,6 +268,7 @@ public partial class OverlayWindow : Window
         // Fallback if Win32 hook was not attached for any reason.
         if (_hookInstalled || _settingsManager.Settings.ClickThrough) return;
         if (e.LeftButton != System.Windows.Input.MouseButtonState.Pressed) return;
+        if (IsInteractiveClientElementHit(e.GetPosition(this))) return;
 
         try
         {
@@ -657,6 +665,35 @@ public partial class OverlayWindow : Window
         {
             if (current is FrameworkElement fe && (ReferenceEquals(fe, OverflowBadge) || fe.Name == "OverflowBadge"))
                 return true;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return false;
+    }
+
+    private bool IsInteractiveClientElementHit(IntPtr lParam)
+    {
+        return IsInteractiveClientElementHit(PointFromScreen(GetScreenPointFromLParam(lParam)));
+    }
+
+    private bool IsInteractiveClientElementHit(System.Windows.Point point)
+    {
+        var result = VisualTreeHelper.HitTest(this, point);
+        if (result?.VisualHit == null)
+            return false;
+
+        DependencyObject? current = result.VisualHit;
+        while (current != null)
+        {
+            if (current is System.Windows.Controls.Primitives.ScrollBar
+                || current is System.Windows.Controls.Primitives.Thumb
+                || current is System.Windows.Controls.Primitives.Track
+                || current is System.Windows.Controls.Primitives.RepeatButton
+                || current is System.Windows.Controls.Primitives.TextBoxBase)
+            {
+                return true;
+            }
 
             current = VisualTreeHelper.GetParent(current);
         }

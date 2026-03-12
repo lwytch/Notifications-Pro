@@ -1,5 +1,5 @@
 {
-  "SettingsSchemaVersion": 1,
+  "SettingsSchemaVersion": 4,
   "FontFamily": "Segoe UI",
   "FontSize": 14,
   "FontWeight": "Normal",
@@ -123,6 +123,11 @@
   "OverlayScrollbarVisible": true,
   "OverlayScrollbarWidth": 8,
   "OverlayScrollbarOpacity": 1.0,
+  "OverlayScrollbarTrackColor": "#141414",
+  "OverlayScrollbarThumbColor": "#4F4F4F",
+  "OverlayScrollbarThumbHoverColor": "#0078D4",
+  "OverlayScrollbarPadding": 1.5,
+  "OverlayScrollbarCornerRadius": 6,
   "OverlayVisible": true,
   "FullscreenOverlayMode": false,
   "FullscreenOverlayOpacity": 0.5,

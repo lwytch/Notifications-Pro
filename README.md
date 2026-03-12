@@ -125,8 +125,8 @@ A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows 
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
 - **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using every voice Windows currently exposes to Notifications Pro through its app and desktop speech APIs, with adjustable speed, volume, preview, explicit trigger mode, a mirrored `Only speak matching rules` toggle in `Filtering`, and per-app `Read aloud` checkboxes in `Settings > Apps`. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
-- **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
-- **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
+- **Scrollable overlay** — when content exceeds the max height, a clickable scrollbar appears so no text is lost without giving up drag-anywhere behavior on the rest of the overlay.
+- **Overlay scrollbar customisation** — show/hide scrollbar, configurable width, opacity, track/thumb colours, inset padding, and corner radius, all carried by overlay themes.
 
 ### Automation & Scheduling
 - **CLI arguments** — `--pause`, `--resume`, `--theme <name>`, `--send-test`, `--hide`, and `--show` can control the app from shortcuts or scripts.
@@ -394,6 +394,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.13
+- **Startup Repair Follow-Up**: installs that were already stamped during the earlier migration bug now repair their old `3` visible notifications, tiny overlay height, and broken animation timing on the next launch instead of staying stuck in that bad first-run state, even if the broken build had already bumped the stored schema once or left the old values in place under the current schema.
+- **Clickable Themed Scrollbars**: the overlay scrollbar now receives real client input so it can be clicked and dragged properly, while the rest of the overlay keeps its drag-anywhere behavior.
+- **Scrollbar Appearance Controls**: `Settings > Appearance` now includes track/thumb colour, hover colour, inset padding, and corner-radius controls for the overlay scrollbar, and those visuals follow overlay themes and export/import cleanly.
 
 ### Release v1.1.10.8
 - **Startup Defaults Migration**: Legacy installs now upgrade their untouched `3` visible notifications, short animation timing, and old overlay-height defaults once at startup instead of resurfacing those older values on later packaged launches.

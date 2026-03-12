@@ -76,6 +76,11 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard;
         sm.Settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard;
         sm.Settings.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Top;
+        sm.Settings.OverlayScrollbarTrackColor = "#101010";
+        sm.Settings.OverlayScrollbarThumbColor = "#6A6A6A";
+        sm.Settings.OverlayScrollbarThumbHoverColor = "#44AAFF";
+        sm.Settings.OverlayScrollbarPadding = 2.5;
+        sm.Settings.OverlayScrollbarCornerRadius = 7;
         sm.Settings.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
         sm.Settings.FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png";
         sm.Settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize;
@@ -135,6 +140,11 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, sm2.Settings.CardBackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, sm2.Settings.CardBackgroundImagePlacement);
         Assert.Equal(ImageVerticalFocusHelper.Top, sm2.Settings.CardBackgroundImageVerticalFocus);
+        Assert.Equal("#101010", sm2.Settings.OverlayScrollbarTrackColor);
+        Assert.Equal("#6A6A6A", sm2.Settings.OverlayScrollbarThumbColor);
+        Assert.Equal("#44AAFF", sm2.Settings.OverlayScrollbarThumbHoverColor);
+        Assert.Equal(2.5, sm2.Settings.OverlayScrollbarPadding);
+        Assert.Equal(7, sm2.Settings.OverlayScrollbarCornerRadius);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", sm2.Settings.PerAppBackgroundImages["X"]);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", sm2.Settings.FullscreenOverlayImagePath);
         Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, sm2.Settings.FullscreenOverlayImageFitMode);
@@ -241,6 +251,14 @@ public class SettingsManagerTests : IDisposable
         Assert.True(settings.AllowManualResize);
         Assert.True(settings.SnapToEdges);
         Assert.Equal(20, settings.SnapDistance);
+        Assert.True(settings.OverlayScrollbarVisible);
+        Assert.Equal(8, settings.OverlayScrollbarWidth);
+        Assert.Equal(1.0, settings.OverlayScrollbarOpacity);
+        Assert.Equal("#141414", settings.OverlayScrollbarTrackColor);
+        Assert.Equal("#4F4F4F", settings.OverlayScrollbarThumbColor);
+        Assert.Equal("#0078D4", settings.OverlayScrollbarThumbHoverColor);
+        Assert.Equal(1.5, settings.OverlayScrollbarPadding);
+        Assert.Equal(6, settings.OverlayScrollbarCornerRadius);
         Assert.False(settings.ReadNotificationsAloudEnabled);
         Assert.Equal(NarrationTriggerModeHelper.AllAllowedNotifications, settings.ReadNotificationsAloudTriggerMode);
         Assert.Equal(SpokenNotificationTextFormatter.ModeBodyOnly, settings.ReadNotificationsAloudMode);
@@ -292,6 +310,52 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageSaturation);
         Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageContrast);
         Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.FullscreenOverlayImageVerticalFocus);
+    }
+
+    [Fact]
+    public void Load_RepairsBuggySchemaThreeStartupDefaults()
+    {
+        var settingsPath = Path.Combine(_tempDir, "settings.json");
+        File.WriteAllText(settingsPath,
+            """
+            {
+              "SettingsSchemaVersion": 3,
+              "MaxVisibleNotifications": 3,
+              "AnimationDurationMs": 0,
+              "OverlayMaxHeight": 480
+            }
+            """);
+
+        var sm = CreateManager();
+        sm.Load();
+
+        Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, sm.Settings.SettingsSchemaVersion);
+        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(1200, sm.Settings.AnimationDurationMs);
+        Assert.True(sm.Settings.OverlayMaxHeight > 480);
+    }
+
+    [Fact]
+    public void Load_RepairsLegacyStartupSignatureEvenWhenSchemaAlreadyCurrent()
+    {
+        var settingsPath = Path.Combine(_tempDir, "settings.json");
+        File.WriteAllText(settingsPath,
+            $$"""
+            {
+              "SettingsSchemaVersion": {{SettingsManager.CurrentSettingsSchemaVersion}},
+              "MaxVisibleNotifications": 3,
+              "AnimationDurationMs": 0,
+              "OverlayMaxHeight": 480
+            }
+            """);
+
+        var sm = CreateManager();
+        sm.Load();
+
+        Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, sm.Settings.SettingsSchemaVersion);
+        Assert.Equal(40, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(1200, sm.Settings.AnimationDurationMs);
+        Assert.True(sm.Settings.OverlayMaxHeight > 480);
     }
 
     [Fact]

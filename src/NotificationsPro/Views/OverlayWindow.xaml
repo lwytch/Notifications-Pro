@@ -496,6 +496,44 @@
                 <Style TargetType="ScrollBar">
                     <Setter Property="Width" Value="{Binding DataContext.OverlayScrollbarWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"/>
                     <Setter Property="Opacity" Value="{Binding DataContext.OverlayScrollbarOpacity, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ScrollBar">
+                                <Grid Background="Transparent">
+                                    <Border Background="{Binding DataContext.OverlayScrollbarTrackColor, RelativeSource={RelativeSource AncestorType=ScrollBar}, Converter={StaticResource ColorToBrush}}"
+                                            CornerRadius="{Binding DataContext.OverlayScrollbarCornerRadiusValue, RelativeSource={RelativeSource AncestorType=ScrollBar}}"
+                                            Margin="{Binding DataContext.OverlayScrollbarPaddingThickness, RelativeSource={RelativeSource AncestorType=ScrollBar}}"/>
+                                    <Track x:Name="PART_Track"
+                                           Margin="{Binding DataContext.OverlayScrollbarPaddingThickness, RelativeSource={RelativeSource AncestorType=ScrollBar}}"
+                                           IsDirectionReversed="True">
+                                        <Track.Thumb>
+                                            <Thumb Background="Transparent">
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border x:Name="ThumbBorder"
+                                                                Background="{Binding DataContext.OverlayScrollbarThumbColor, RelativeSource={RelativeSource AncestorType=ScrollBar}, Converter={StaticResource ColorToBrush}}"
+                                                                CornerRadius="{Binding DataContext.OverlayScrollbarCornerRadiusValue, RelativeSource={RelativeSource AncestorType=ScrollBar}}"/>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="ThumbBorder" Property="Background"
+                                                                        Value="{Binding DataContext.OverlayScrollbarThumbHoverColor, RelativeSource={RelativeSource AncestorType=ScrollBar}, Converter={StaticResource ColorToBrush}}"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsDragging" Value="True">
+                                                                <Setter TargetName="ThumbBorder" Property="Background"
+                                                                        Value="{Binding DataContext.OverlayScrollbarThumbHoverColor, RelativeSource={RelativeSource AncestorType=ScrollBar}, Converter={StaticResource ColorToBrush}}"/>
+                                                                <Setter TargetName="ThumbBorder" Property="Opacity" Value="0.92"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </ScrollViewer.Resources>
             <StackPanel>

@@ -3,12 +3,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
+using WinForms = System.Windows.Forms;
 
 namespace NotificationsPro.Services;
 
 public class SettingsManager
 {
-    public const int CurrentSettingsSchemaVersion = 1;
+    public const int CurrentSettingsSchemaVersion = 4;
 
     private static readonly string DefaultSettingsDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -63,6 +64,10 @@ public class SettingsManager
             // Never log notification content — settings file never contains any.
             Settings = new AppSettings();
         }
+
+        var primaryScreenHeight = WinForms.Screen.PrimaryScreen?.WorkingArea.Height;
+        if (StartupSettingsMigrationHelper.Apply(Settings, primaryScreenHeight, HadExistingSettingsFile))
+            Save();
     }
 
     public void Save()
@@ -113,6 +118,21 @@ public class SettingsManager
         settings.PerAppBackgroundImages ??= new Dictionary<string, string>();
         settings.PresentationApps ??= new List<string>();
         settings.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(settings.ReadNotificationsAloudTriggerMode);
+        settings.OverlayScrollbarTrackColor = string.IsNullOrWhiteSpace(settings.OverlayScrollbarTrackColor)
+            ? "#141414"
+            : settings.OverlayScrollbarTrackColor;
+        settings.OverlayScrollbarThumbColor = string.IsNullOrWhiteSpace(settings.OverlayScrollbarThumbColor)
+            ? "#4F4F4F"
+            : settings.OverlayScrollbarThumbColor;
+        settings.OverlayScrollbarThumbHoverColor = string.IsNullOrWhiteSpace(settings.OverlayScrollbarThumbHoverColor)
+            ? "#0078D4"
+            : settings.OverlayScrollbarThumbHoverColor;
+        settings.OverlayScrollbarPadding = double.IsNaN(settings.OverlayScrollbarPadding)
+            ? 1.5
+            : Math.Clamp(settings.OverlayScrollbarPadding, 0.0, 6.0);
+        settings.OverlayScrollbarCornerRadius = double.IsNaN(settings.OverlayScrollbarCornerRadius)
+            ? 6.0
+            : Math.Clamp(settings.OverlayScrollbarCornerRadius, 0.0, 12.0);
         settings.CardBackgroundMode = CardBackgroundModeHelper.Normalize(
             !hasCardBackgroundMode && !string.IsNullOrWhiteSpace(settings.CardBackgroundImagePath)
                 ? CardBackgroundModeHelper.Image

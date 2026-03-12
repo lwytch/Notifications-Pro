@@ -1089,6 +1089,67 @@
                                     ToolTip="Opacity of the overlay scrollbar"/>
                         </DockPanel>
 
+                        <TextBlock Text="Scrollbar Padding" Style="{StaticResource SettingLabel}" ToolTip="Inset spacing between the scrollbar edge and its thumb"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OverlayScrollbarPadding, StringFormat='{}{0:0.0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0" Maximum="6" Value="{Binding OverlayScrollbarPadding}"
+                                    TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                    ToolTip="Extra inset around the scrollbar track and thumb"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Scrollbar Corner Radius" Style="{StaticResource SettingLabel}" ToolTip="Rounds the scrollbar track and thumb"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OverlayScrollbarCornerRadius, StringFormat='{}{0:0.0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0" Maximum="12" Value="{Binding OverlayScrollbarCornerRadius}"
+                                    TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                    ToolTip="Corner radius used for the overlay scrollbar"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Scrollbar Track Color" Style="{StaticResource SettingLabel}" ToolTip="Background color behind the scrollbar thumb"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="OverlayScrollbarTrackColor" Click="OnPickColorClick"
+                                    ToolTip="Pick the overlay scrollbar track color"/>
+                            <Border DockPanel.Dock="Left" Width="24" Height="24" CornerRadius="4"
+                                    Background="{Binding OverlayScrollbarTrackColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <TextBox Text="{Binding OverlayScrollbarTrackColor}" Style="{StaticResource SettingsValueTextBox}"
+                                     ToolTip="Scrollbar track color in HEX format"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Scrollbar Thumb Color" Style="{StaticResource SettingLabel}" ToolTip="Default color of the draggable scrollbar thumb"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="OverlayScrollbarThumbColor" Click="OnPickColorClick"
+                                    ToolTip="Pick the default overlay scrollbar thumb color"/>
+                            <Border DockPanel.Dock="Left" Width="24" Height="24" CornerRadius="4"
+                                    Background="{Binding OverlayScrollbarThumbColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <TextBox Text="{Binding OverlayScrollbarThumbColor}" Style="{StaticResource SettingsValueTextBox}"
+                                     ToolTip="Scrollbar thumb color in HEX format"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Scrollbar Hover Color" Style="{StaticResource SettingLabel}" ToolTip="Color used when the scrollbar thumb is hovered or dragged"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <Button DockPanel.Dock="Right" Content="Pick"
+                                    Style="{StaticResource ColorPickButton}" Margin="8,0,0,0"
+                                    Tag="OverlayScrollbarThumbHoverColor" Click="OnPickColorClick"
+                                    ToolTip="Pick the overlay scrollbar hover color"/>
+                            <Border DockPanel.Dock="Left" Width="24" Height="24" CornerRadius="4"
+                                    Background="{Binding OverlayScrollbarThumbHoverColor, Converter={StaticResource ColorToBrush}}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Margin="0,0,8,0"/>
+                            <TextBox Text="{Binding OverlayScrollbarThumbHoverColor}" Style="{StaticResource SettingsValueTextBox}"
+                                     ToolTip="Scrollbar hover color in HEX format"/>
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

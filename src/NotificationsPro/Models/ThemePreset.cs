@@ -17,6 +17,9 @@ public class ThemePreset
     public string AccentColor { get; set; } = "#0078D4";
     public string HighlightColor { get; set; } = "#FFD700";
     public string BorderColor { get; set; } = "#3A3A3A";
+    public string OverlayScrollbarTrackColor { get; set; } = "#141414";
+    public string OverlayScrollbarThumbColor { get; set; } = "#4F4F4F";
+    public string OverlayScrollbarThumbHoverColor { get; set; } = "#0078D4";
 
     // Settings window colors
     public string SettingsWindowBg { get; set; } = "#111111";
@@ -41,6 +44,8 @@ public class ThemePreset
     public double AccentThickness { get; set; } = 3;
     public bool ShowBorder { get; set; } = false;
     public double BorderThickness { get; set; } = 1;
+    public double OverlayScrollbarPadding { get; set; } = 1.5;
+    public double OverlayScrollbarCornerRadius { get; set; } = 6;
 
     /// <summary>
     /// Apply only overlay visuals (cards/overlay colors + shape) onto settings.
@@ -55,6 +60,9 @@ public class ThemePreset
         settings.AccentColor = AccentColor;
         settings.HighlightColor = HighlightColor;
         settings.BorderColor = BorderColor;
+        settings.OverlayScrollbarTrackColor = OverlayScrollbarTrackColor;
+        settings.OverlayScrollbarThumbColor = OverlayScrollbarThumbColor;
+        settings.OverlayScrollbarThumbHoverColor = OverlayScrollbarThumbHoverColor;
         settings.CornerRadius = CornerRadius;
         settings.Padding = Padding;
         settings.CardGap = CardGap;
@@ -63,6 +71,8 @@ public class ThemePreset
         settings.AccentThickness = AccentThickness;
         settings.ShowBorder = ShowBorder;
         settings.BorderThickness = BorderThickness;
+        settings.OverlayScrollbarPadding = OverlayScrollbarPadding;
+        settings.OverlayScrollbarCornerRadius = OverlayScrollbarCornerRadius;
     }
 
     /// <summary>
@@ -107,6 +117,9 @@ public class ThemePreset
             AccentColor = settings.AccentColor,
             HighlightColor = settings.HighlightColor,
             BorderColor = settings.BorderColor,
+            OverlayScrollbarTrackColor = settings.OverlayScrollbarTrackColor,
+            OverlayScrollbarThumbColor = settings.OverlayScrollbarThumbColor,
+            OverlayScrollbarThumbHoverColor = settings.OverlayScrollbarThumbHoverColor,
             CornerRadius = settings.CornerRadius,
             Padding = settings.Padding,
             CardGap = settings.CardGap,
@@ -115,6 +128,8 @@ public class ThemePreset
             AccentThickness = settings.AccentThickness,
             ShowBorder = settings.ShowBorder,
             BorderThickness = settings.BorderThickness,
+            OverlayScrollbarPadding = settings.OverlayScrollbarPadding,
+            OverlayScrollbarCornerRadius = settings.OverlayScrollbarCornerRadius,
             SettingsWindowBg = settings.SettingsWindowBg,
             SettingsWindowSurface = settings.SettingsWindowSurface,
             SettingsWindowSurfaceLight = settings.SettingsWindowSurfaceLight,
@@ -141,6 +156,7 @@ public class ThemePreset
             TextColor = "#E6E6E6", TitleColor = "#FFFFFF", AppNameColor = "#C8C8C8",
             BackgroundColor = "#202020", BackgroundOpacity = 0.94,
             AccentColor = "#0078D4", HighlightColor = "#FFD700", BorderColor = "#3A3A3A",
+            OverlayScrollbarTrackColor = "#141414", OverlayScrollbarThumbColor = "#4F4F4F", OverlayScrollbarThumbHoverColor = "#2893E8",
             SettingsWindowBg = "#111111", SettingsWindowSurface = "#1C1C1C",
             SettingsWindowSurfaceLight = "#262626", SettingsWindowSurfaceHover = "#303030",
             SettingsWindowText = "#F3F3F3", SettingsWindowTextSecondary = "#C7C7C7",
@@ -148,6 +164,7 @@ public class ThemePreset
             SettingsWindowBorder = "#353535", SettingsWindowOpacity = 0.98,
             CornerRadius = 12, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = false, BorderThickness = 1,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
         },
         new()
         {
@@ -155,6 +172,7 @@ public class ThemePreset
             TextColor = "#E4E4EF", TitleColor = "#FFFFFF", AppNameColor = "#B8B8CC",
             BackgroundColor = "#1E1E2E", BackgroundOpacity = 0.92,
             AccentColor = "#7C5CFC", HighlightColor = "#FFD700", BorderColor = "#363650",
+            OverlayScrollbarTrackColor = "#161624", OverlayScrollbarThumbColor = "#54547A", OverlayScrollbarThumbHoverColor = "#7C5CFC",
             SettingsWindowBg = "#151521", SettingsWindowSurface = "#1E1E2E",
             SettingsWindowSurfaceLight = "#282840", SettingsWindowSurfaceHover = "#343450",
             SettingsWindowText = "#E4E4EF", SettingsWindowTextSecondary = "#9898B0",
@@ -162,6 +180,7 @@ public class ThemePreset
             SettingsWindowBorder = "#363650", SettingsWindowOpacity = 0.98,
             CornerRadius = 12, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = false, BorderThickness = 1,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
         },
         new()
         {
@@ -169,8 +188,10 @@ public class ThemePreset
             TextColor = "#333333", TitleColor = "#111111", AppNameColor = "#666666",
             BackgroundColor = "#FFFFFF", BackgroundOpacity = 0.95,
             AccentColor = "#5B7FFF", HighlightColor = "#E67E00", BorderColor = "#D0D0D0",
+            OverlayScrollbarTrackColor = "#E8E8F0", OverlayScrollbarThumbColor = "#B0B0C0", OverlayScrollbarThumbHoverColor = "#5B7FFF",
             CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
             SettingsWindowBg = "#F5F5F8", SettingsWindowSurface = "#FFFFFF",
             SettingsWindowSurfaceLight = "#E8E8F0", SettingsWindowSurfaceHover = "#DEDEE8",
             SettingsWindowText = "#222222", SettingsWindowTextSecondary = "#555555",
@@ -183,6 +204,7 @@ public class ThemePreset
             TextColor = "#E0E0F0", TitleColor = "#FFFFFF", AppNameColor = "#A0A0C0",
             BackgroundColor = "#2A2A40", BackgroundOpacity = 0.72,
             AccentColor = "#60A0FF", HighlightColor = "#FFD700", BorderColor = "#4A4A6A",
+            OverlayScrollbarTrackColor = "#1C2535", OverlayScrollbarThumbColor = "#6F8AB5", OverlayScrollbarThumbHoverColor = "#60A0FF",
             SettingsWindowBg = "#121722", SettingsWindowSurface = "#1A2333",
             SettingsWindowSurfaceLight = "#243146", SettingsWindowSurfaceHover = "#2D3E59",
             SettingsWindowText = "#E7EEF8", SettingsWindowTextSecondary = "#B3C0D4",
@@ -191,6 +213,7 @@ public class ThemePreset
             SettingsSurfaceOpacity = 0.15, SettingsElementOpacity = 0.50,
             CornerRadius = 16, Padding = 18, CardGap = 10, OuterMargin = 6,
             ShowAccent = false, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
+            OverlayScrollbarPadding = 2, OverlayScrollbarCornerRadius = 8,
         },
         new()
         {
@@ -198,6 +221,7 @@ public class ThemePreset
             TextColor = "#FFFFFF", TitleColor = "#FFFF00", AppNameColor = "#00FF00",
             BackgroundColor = "#000000", BackgroundOpacity = 1.0,
             AccentColor = "#FFFF00", HighlightColor = "#FF4444", BorderColor = "#FFFFFF",
+            OverlayScrollbarTrackColor = "#000000", OverlayScrollbarThumbColor = "#FFFF00", OverlayScrollbarThumbHoverColor = "#FFFFFF",
             SettingsWindowBg = "#000000", SettingsWindowSurface = "#000000",
             SettingsWindowSurfaceLight = "#101010", SettingsWindowSurfaceHover = "#1A1A1A",
             SettingsWindowText = "#FFFFFF", SettingsWindowTextSecondary = "#FFFF00",
@@ -205,6 +229,7 @@ public class ThemePreset
             SettingsWindowBorder = "#FFFFFF", SettingsWindowOpacity = 1.0,
             CornerRadius = 0, Padding = 14, CardGap = 6, OuterMargin = 2,
             ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 2,
+            OverlayScrollbarPadding = 1, OverlayScrollbarCornerRadius = 0,
         },
         new()
         {
@@ -212,6 +237,7 @@ public class ThemePreset
             TextColor = "#C8C8D0", TitleColor = "#E0E0E8", AppNameColor = "#808090",
             BackgroundColor = "#181820", BackgroundOpacity = 0.88,
             AccentColor = "#181820", HighlightColor = "#FFD700", BorderColor = "#282838",
+            OverlayScrollbarTrackColor = "#12121A", OverlayScrollbarThumbColor = "#3A3A50", OverlayScrollbarThumbHoverColor = "#58587A",
             SettingsWindowBg = "#101018", SettingsWindowSurface = "#171724",
             SettingsWindowSurfaceLight = "#222234", SettingsWindowSurfaceHover = "#2A2A3D",
             SettingsWindowText = "#E0E0E8", SettingsWindowTextSecondary = "#B0B0C0",
@@ -219,6 +245,7 @@ public class ThemePreset
             SettingsWindowBorder = "#2B2B40", SettingsWindowOpacity = 0.98,
             CornerRadius = 6, Padding = 12, CardGap = 4, OuterMargin = 2,
             ShowAccent = false, AccentThickness = 2, ShowBorder = false, BorderThickness = 1,
+            OverlayScrollbarPadding = 1, OverlayScrollbarCornerRadius = 4,
         },
         new()
         {
@@ -226,6 +253,7 @@ public class ThemePreset
             TextColor = "#FFFFFF", TitleColor = "#FFFFFF", AppNameColor = "#CCCCCC",
             BackgroundColor = "#1A1A2E", BackgroundOpacity = 0.95,
             AccentColor = "#0072B2", HighlightColor = "#E69F00", BorderColor = "#444466",
+            OverlayScrollbarTrackColor = "#101A2A", OverlayScrollbarThumbColor = "#557C96", OverlayScrollbarThumbHoverColor = "#0072B2",
             SettingsWindowBg = "#101425", SettingsWindowSurface = "#1A2138",
             SettingsWindowSurfaceLight = "#252F4D", SettingsWindowSurfaceHover = "#2F3D63",
             SettingsWindowText = "#F5F5F5", SettingsWindowTextSecondary = "#D0D0D0",
@@ -233,6 +261,7 @@ public class ThemePreset
             SettingsWindowBorder = "#425075", SettingsWindowOpacity = 0.98,
             CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 1,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
         },
     };
 }

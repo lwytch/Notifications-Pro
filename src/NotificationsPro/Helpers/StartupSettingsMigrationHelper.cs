@@ -12,6 +12,7 @@ public static class StartupSettingsMigrationHelper
     private const double CurrentAnimationDurationMs = 1200;
     private const double OverlayMaxHeightMin = 200;
     private const double OverlayMaxHeightMax = 4320;
+    private const int StartupDefaultsRepairSchemaVersion = 4;
 
     public static bool Apply(AppSettings settings, double? primaryWorkAreaHeight, bool hadExistingSettingsFile)
     {
@@ -29,20 +30,35 @@ public static class StartupSettingsMigrationHelper
             return changed;
         }
 
-        if (settings.SettingsSchemaVersion >= SettingsManager.CurrentSettingsSchemaVersion)
+        var schemaVersion = settings.SettingsSchemaVersion ?? 0;
+
+        if (LooksLikeLegacyStartupDefaults(settings))
+            changed |= RepairStartupDefaults(settings, effectiveHeight);
+
+        if (schemaVersion < SettingsManager.CurrentSettingsSchemaVersion)
+            changed |= SetSchemaVersion(settings);
+
+        return changed;
+    }
+
+    private static bool RepairStartupDefaults(AppSettings settings, double effectiveHeight)
+    {
+        if (!LooksLikeLegacyStartupDefaults(settings))
             return false;
 
-        if (settings.MaxVisibleNotifications == LegacyMaxVisibleNotifications)
-            changed |= SetIfDifferent(settings.MaxVisibleNotifications, CurrentMaxVisibleNotifications, value => settings.MaxVisibleNotifications = value);
+        var changed = false;
+        changed |= SetIfDifferent(settings.MaxVisibleNotifications, CurrentMaxVisibleNotifications, value => settings.MaxVisibleNotifications = value);
+        changed |= SetIfDifferent(settings.AnimationDurationMs, CurrentAnimationDurationMs, value => settings.AnimationDurationMs = value);
+        changed |= SetIfDifferent(settings.OverlayMaxHeight, effectiveHeight, value => settings.OverlayMaxHeight = value);
 
-        if (settings.AnimationDurationMs > 0 && settings.AnimationDurationMs <= LegacyAnimationDurationMs)
-            changed |= SetIfDifferent(settings.AnimationDurationMs, CurrentAnimationDurationMs, value => settings.AnimationDurationMs = value);
-
-        if (settings.OverlayMaxHeight <= LegacyOverlayMaxHeight)
-            changed |= SetIfDifferent(settings.OverlayMaxHeight, effectiveHeight, value => settings.OverlayMaxHeight = value);
-
-        changed |= SetSchemaVersion(settings);
         return changed;
+    }
+
+    private static bool LooksLikeLegacyStartupDefaults(AppSettings settings)
+    {
+        return settings.MaxVisibleNotifications == LegacyMaxVisibleNotifications
+            && settings.AnimationDurationMs <= LegacyAnimationDurationMs
+            && settings.OverlayMaxHeight <= LegacyOverlayMaxHeight;
     }
 
     private static double GetEffectiveHeight(double? primaryWorkAreaHeight)

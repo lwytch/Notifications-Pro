@@ -126,14 +126,6 @@ public partial class App : Application
         _themeManager = new ThemeManager();
         _profileManager = new ProfileManager();
 
-        var primaryScreen = WinForms.Screen.PrimaryScreen;
-        var startupSettingsChanged = StartupSettingsMigrationHelper.Apply(
-            _settingsManager.Settings,
-            primaryScreen?.WorkingArea.Height,
-            _settingsManager.HadExistingSettingsFile);
-        if (startupSettingsChanged)
-            _settingsManager.Save();
-
         // Sync startup registry with saved setting
         SyncStartupRegistryState();
 
