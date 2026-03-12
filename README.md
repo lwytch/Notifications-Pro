@@ -86,9 +86,9 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 ### App Profiles & Routing
 - **Apps tab** — manage per-app read aloud, overlay lane assignment, sound, and icon from one place.
-- **Lane picker above the preview** — switch which lane the normal `Appearance`, `Behavior`, and `Layout` controls are editing, so styling lives in one place instead of being duplicated per app.
-- **Lane profiles** — each lane is a reusable overlay profile with its own monitor, position preset, width, max-height, colours, and background image settings.
-- **Background images** — optional local-only lane images with opacity, hue, and brightness controls in `Settings > Appearance`. Imported files are copied into `%AppData%\\NotificationsPro\\backgrounds\\`.
+- **Lanes tab** — manage the reusable routed overlays themselves: monitor, position preset, width, max-height, colours, and background images.
+- **Per-app profiles** — route X, Codex, Antigravity, Chrome, Edge, or any other source into the right lane without storing notification content.
+- **Background images** — optional local-only lane images with opacity, hue, and brightness controls. Imported files are copied into `%AppData%\NotificationsPro\backgrounds\`.
 
 ### Behaviour & Control
 - **Notification duration** — configurable display time in seconds; each card has its own timer.
@@ -200,7 +200,7 @@ Avoid distraction without missing urgent messages:
 ### Getting the Most Out of Notifications Pro
 - Start with **Settings > System > Notification Access** and confirm the app is capturing reliably before tuning the visual side. If live notifications ever stall, switch **Capture Mode** to `Force Accessibility` first.
 - Keep the queue readable for your workload. `40` visible cards is the current default, but long-running monitoring setups usually work best when paired with **Auto-duration** or **Persistent Notifications** rather than a lower visible-card limit alone.
-- Use the app controls in layers: start with **Settings > Apps** for per-app lane/icon/sound/read-aloud decisions, use the **lane picker above the preview** plus **Appearance / Behavior / Layout** to style and place each lane, then use **Settings > Filtering** for title/body-scoped highlight, mute, and narration rules inside noisy shared apps.
+- Use the app controls in layers: start with **Settings > Apps** for per-app lane/icon/sound/read-aloud decisions, use **Settings > Lanes** for routed overlay styling and placement, then use **Settings > Filtering** for title/body-scoped highlight, mute, and narration rules inside noisy shared apps.
 - Build one layout for passive monitoring and one for active work. For example: a wide **Single-Line Banner Mode** profile for streaming or browser-heavy days, and a denser stacked-card profile for operations or moderation work.
 - Route the noisiest source family to a dedicated **Lane** when one queue is not enough. This works well for keeping ops/agent traffic separate from chat or social notifications.
 - Use tray actions and exports as part of the workflow, not just setup. **Pause**, **Focus Mode**, **Theme/Profile switching**, and **Export Settings** make it easier to move between work, streaming, and monitoring contexts without rebuilding the app each time.
@@ -209,7 +209,7 @@ Avoid distraction without missing urgent messages:
 - Pick the most consistent notification source you can. If X notifications arrive through a dedicated app or wrapper, per-app settings target X directly. If they arrive through **Chrome** or **Edge**, per-app settings apply to the browser host and **keyword rules** become the main way to separate X from the rest of your browser traffic.
 - Use **Settings > Filtering > Keyword Highlighting**, **Keyword Muting**, and **Narration Rules** for account names, handles, campaign names, hashtags, watchwords, or brand terms. Rules can target `Title`, `Body`, or `Title + Body`, can be limited to the X source app/browser host, and can use either literal matches such as `@openai` or full regex patterns.
 - Use **Keyword Muting** for repetitive low-signal phrases that tend to create noise, such as routine engagement wording or campaign traffic that does not need immediate attention.
-- Use **Settings > Apps** to assign the X source to its own lane, sound, and icon, then switch to that lane with the **lane picker above the preview** so `Appearance`, `Behavior`, and `Layout` can make it visually distinct from other browser-hosted traffic.
+- Use **Settings > Apps** to assign the X source to its own lane, sound, and icon, then use **Settings > Lanes** to give that routed overlay its own colours and optional background image so it is visually distinct from other browser-hosted traffic.
 - Turn on **Read Notifications Aloud** globally in `Settings > Accessibility`, then use **Settings > Apps** to enable narration for the X source app and **Filtering > Narration Rules** for targeted spoken callouts.
 - Use **Deduplication** and **Burst Limiting** when you expect spikes around large posts or breaking events. They help keep the overlay readable without implying that discarded overflow content is stored anywhere.
 - Route X to its own **Lane** if you want social monitoring to stay visible without mixing it into work/tooling traffic on the main overlay.
@@ -235,8 +235,8 @@ Avoid distraction without missing urgent messages:
 ### Common Notification-Heavy Tools
 
 #### Codex / Antigravity / Browser-Based Agent Tooling
-- If these tools notify through a browser, treat **Chrome** or **Edge** as the source app for per-app narration, routing, icons, and sounds, then use **keyword rules** for project names, environments, repo names, agent names, or failure wording.
-- Give these tools their own **lane** if you want a dedicated colour set or background image, and keep a clear **per-app icon** so agent/tool notifications are immediately distinct from social traffic arriving from the same host app.
+- If these tools notify through a browser, treat **Chrome** or **Edge** as the source app for per-app styling, narration, routing, and sounds, then use **keyword rules** for project names, environments, repo names, agent names, or failure wording.
+- Use a clear **per-app icon**, **colour set**, and optional **background image** so agent/tool notifications are immediately distinct from social traffic arriving from the same host app.
 - Route noisy agent/tool traffic to its own **Lane** when you want it visible but separated from chat, email, or social notifications.
 - Pair **Read Notifications Aloud** with aggressive keyword filtering if you want spoken updates for builds, completions, or interventions without hearing every low-value event.
 - Use **Persistent Notifications** or longer durations for actions that require a response instead of a glance.
@@ -414,11 +414,6 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
-
-### Release v1.1.9.0
-- **Lane Profile Cleanup**: Replaced the cramped multi-editor lane setup with a single lane picker above the preview, so the normal `Appearance`, `Behavior`, and `Layout` tabs now edit the selected lane directly.
-- **Apps Tab Simplification**: `Settings > Apps` now owns only per-app lane assignment, narration, sounds, and icons. Hidden per-app visual overrides were retired so styling lives with the lane instead of being duplicated per app.
-- **Lane Runtime Hardening**: New lanes start from `Lane 1` defaults, `Save As Lane` branches the current setup cleanly, background images now live in `Appearance`, and routed notifications render in their correct separate lanes without the earlier same-lane duplication problem.
 
 ### Release v1.1.8.0
 - **Lane Architecture Refresh**: Fixed the multi-lane rendering bug by giving each overlay its own lane-filtered view, and replaced the cramped per-app styling expander with a dedicated `Lanes` tab where routed overlays are edited once and reused across apps.

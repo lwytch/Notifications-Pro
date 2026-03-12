@@ -6,8 +6,8 @@ public static class OverlayLaneHelper
 {
     public const string Main = "main";
     public const string Secondary = "secondary";
-    public const string MainDisplayName = "Lane 1";
-    public const string SecondaryDisplayName = "Lane 2";
+    public const string MainDisplayName = "Main Overlay";
+    public const string SecondaryDisplayName = "Secondary Overlay";
 
     public static string Normalize(string? laneId)
     {
@@ -15,15 +15,13 @@ public static class OverlayLaneHelper
             return Main;
 
         if (string.Equals(laneId, Main, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(laneId, "Main", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(laneId, MainDisplayName, StringComparison.OrdinalIgnoreCase))
+            || string.Equals(laneId, "Main", StringComparison.OrdinalIgnoreCase))
         {
             return Main;
         }
 
         if (string.Equals(laneId, Secondary, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(laneId, "Secondary", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(laneId, SecondaryDisplayName, StringComparison.OrdinalIgnoreCase))
+            || string.Equals(laneId, "Secondary", StringComparison.OrdinalIgnoreCase))
         {
             return Secondary;
         }

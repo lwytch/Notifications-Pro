@@ -147,10 +147,9 @@ public class SettingsManager
             profile.OverlayLane = OverlayLaneHelper.Normalize(profile.OverlayLane);
             profile.Sound = string.IsNullOrWhiteSpace(profile.Sound) ? "Default" : profile.Sound;
             profile.Icon = string.IsNullOrWhiteSpace(profile.Icon) ? "Default" : profile.Icon;
+            profile.BackgroundImageOpacity = Math.Clamp(profile.BackgroundImageOpacity, 0.0, 1.0);
+            profile.BackgroundImageBrightness = Math.Clamp(profile.BackgroundImageBrightness, 0.2, 2.0);
         }
-
-        settings.OverlayBackgroundImageOpacity = Math.Clamp(settings.OverlayBackgroundImageOpacity, 0.0, 1.0);
-        settings.OverlayBackgroundImageBrightness = Math.Clamp(settings.OverlayBackgroundImageBrightness, 0.2, 2.0);
 
         MigrateOverlayLanes(settings);
 
@@ -214,7 +213,6 @@ public class SettingsManager
             lane.PositionPreset = SecondaryOverlayPositionHelper.Normalize(lane.PositionPreset);
             lane.Width = lane.Width <= 0 ? 340 : lane.Width;
             lane.MaxHeight = lane.MaxHeight <= 0 ? 480 : lane.MaxHeight;
-            HydrateLaneProfileFromMain(settings, lane);
             lane.BackgroundImageOpacity = Math.Clamp(lane.BackgroundImageOpacity, 0.0, 1.0);
             lane.BackgroundImageBrightness = Math.Clamp(lane.BackgroundImageBrightness, 0.2, 2.0);
         }
@@ -228,86 +226,5 @@ public class SettingsManager
 
         foreach (var profile in settings.AppProfiles)
             profile.OverlayLane = OverlayLaneHelper.NormalizeOrMain(profile.OverlayLane, settings.OverlayLanes);
-    }
-
-    private static void HydrateLaneProfileFromMain(AppSettings settings, OverlayLaneDefinition lane)
-    {
-        var needsLegacyHydration =
-            string.IsNullOrWhiteSpace(lane.FontFamily)
-            && lane.FontSize <= 0
-            && lane.AppNameFontSize <= 0
-            && lane.TitleFontSize <= 0
-            && string.IsNullOrWhiteSpace(lane.TimestampDisplayMode)
-            && string.IsNullOrWhiteSpace(lane.DensityPreset);
-
-        if (needsLegacyHydration)
-        {
-            lane.FontFamily = settings.FontFamily;
-            lane.FontSize = settings.FontSize;
-            lane.FontWeight = settings.FontWeight;
-            lane.AppNameFontSize = settings.AppNameFontSize;
-            lane.AppNameFontWeight = settings.AppNameFontWeight;
-            lane.TitleFontSize = settings.TitleFontSize;
-            lane.TitleFontWeight = settings.TitleFontWeight;
-            lane.LineSpacing = settings.LineSpacing;
-            lane.TextAlignment = settings.TextAlignment;
-            lane.BackgroundOpacity = settings.BackgroundOpacity;
-            lane.CornerRadius = settings.CornerRadius;
-            lane.Padding = settings.Padding;
-            lane.CardGap = settings.CardGap;
-            lane.OuterMargin = settings.OuterMargin;
-            lane.ShowAccent = settings.ShowAccent;
-            lane.AccentThickness = settings.AccentThickness;
-            lane.ShowBorder = settings.ShowBorder;
-            lane.BorderColor = settings.BorderColor;
-            lane.BorderThickness = settings.BorderThickness;
-            lane.ShowAppName = settings.ShowAppName;
-            lane.ShowNotificationTitle = settings.ShowNotificationTitle;
-            lane.ShowNotificationBody = settings.ShowNotificationBody;
-            lane.LimitTextLines = settings.LimitTextLines;
-            lane.MaxAppNameLines = settings.MaxAppNameLines;
-            lane.MaxTitleLines = settings.MaxTitleLines;
-            lane.MaxBodyLines = settings.MaxBodyLines;
-            lane.SingleLineMode = settings.SingleLineMode;
-            lane.SingleLineWrapText = settings.SingleLineWrapText;
-            lane.SingleLineMaxLines = settings.SingleLineMaxLines;
-            lane.SingleLineAutoFullWidth = settings.SingleLineAutoFullWidth;
-            lane.ShowTimestamp = settings.ShowTimestamp;
-            lane.TimestampFontSize = settings.TimestampFontSize;
-            lane.TimestampDisplayMode = settings.TimestampDisplayMode;
-            lane.TimestampFontWeight = settings.TimestampFontWeight;
-            lane.TimestampColor = settings.TimestampColor;
-            lane.DensityPreset = settings.DensityPreset;
-        }
-
-        lane.FontFamily = string.IsNullOrWhiteSpace(lane.FontFamily) ? settings.FontFamily : lane.FontFamily.Trim();
-        lane.FontSize = lane.FontSize <= 0 ? settings.FontSize : lane.FontSize;
-        lane.FontWeight = string.IsNullOrWhiteSpace(lane.FontWeight) ? settings.FontWeight : lane.FontWeight.Trim();
-        lane.AppNameFontSize = lane.AppNameFontSize <= 0 ? settings.AppNameFontSize : lane.AppNameFontSize;
-        lane.AppNameFontWeight = string.IsNullOrWhiteSpace(lane.AppNameFontWeight) ? settings.AppNameFontWeight : lane.AppNameFontWeight.Trim();
-        lane.TitleFontSize = lane.TitleFontSize <= 0 ? settings.TitleFontSize : lane.TitleFontSize;
-        lane.TitleFontWeight = string.IsNullOrWhiteSpace(lane.TitleFontWeight) ? settings.TitleFontWeight : lane.TitleFontWeight.Trim();
-        lane.LineSpacing = lane.LineSpacing <= 0 ? settings.LineSpacing : lane.LineSpacing;
-        lane.TextAlignment = string.IsNullOrWhiteSpace(lane.TextAlignment) ? settings.TextAlignment : lane.TextAlignment.Trim();
-        lane.BackgroundOpacity = lane.BackgroundOpacity <= 0 ? settings.BackgroundOpacity : Math.Clamp(lane.BackgroundOpacity, 0.0, 1.0);
-        lane.CornerRadius = lane.CornerRadius < 0 ? settings.CornerRadius : lane.CornerRadius;
-        lane.Padding = lane.Padding <= 0 ? settings.Padding : lane.Padding;
-        lane.CardGap = lane.CardGap < 0 ? settings.CardGap : lane.CardGap;
-        lane.OuterMargin = lane.OuterMargin < 0 ? settings.OuterMargin : lane.OuterMargin;
-        lane.AccentThickness = lane.AccentThickness <= 0 ? settings.AccentThickness : lane.AccentThickness;
-        lane.BorderColor = string.IsNullOrWhiteSpace(lane.BorderColor) ? settings.BorderColor : lane.BorderColor.Trim();
-        lane.BorderThickness = lane.BorderThickness <= 0 ? settings.BorderThickness : lane.BorderThickness;
-        lane.MaxAppNameLines = lane.MaxAppNameLines <= 0 ? settings.MaxAppNameLines : lane.MaxAppNameLines;
-        lane.MaxTitleLines = lane.MaxTitleLines <= 0 ? settings.MaxTitleLines : lane.MaxTitleLines;
-        lane.MaxBodyLines = lane.MaxBodyLines <= 0 ? settings.MaxBodyLines : lane.MaxBodyLines;
-        lane.SingleLineMaxLines = lane.SingleLineMaxLines <= 0 ? settings.SingleLineMaxLines : lane.SingleLineMaxLines;
-        lane.TimestampFontSize = lane.TimestampFontSize <= 0 ? settings.TimestampFontSize : lane.TimestampFontSize;
-        lane.TimestampDisplayMode = string.IsNullOrWhiteSpace(lane.TimestampDisplayMode) ? settings.TimestampDisplayMode : lane.TimestampDisplayMode.Trim();
-        lane.TimestampFontWeight = string.IsNullOrWhiteSpace(lane.TimestampFontWeight) ? settings.TimestampFontWeight : lane.TimestampFontWeight.Trim();
-        lane.TimestampColor = string.IsNullOrWhiteSpace(lane.TimestampColor) ? settings.TimestampColor : lane.TimestampColor.Trim();
-        lane.DensityPreset = string.IsNullOrWhiteSpace(lane.DensityPreset) ? settings.DensityPreset : lane.DensityPreset.Trim();
-
-        if (!lane.ShowAppName && !lane.ShowNotificationTitle && !lane.ShowNotificationBody)
-            lane.ShowNotificationBody = true;
     }
 }

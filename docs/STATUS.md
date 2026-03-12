@@ -23,14 +23,15 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme plus a lane picker above the preview for selecting which overlay lane the normal tabs are editing
+- Settings window: thirteen sections (Appearance, Behavior, Filtering, Apps, Lanes, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Settings information architecture refreshed so each tab owns a single concern:
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display and layout-mode behavior
   - Filtering now owns quiet hours, burst limiting, and targeted highlight/mute/narration rules
   - Apps now owns per-app narration, routing, sounds, and icons
-  - Layout now owns fullscreen overlay mode alongside monitor/size controls for the selected lane
+  - Lanes now owns routed-overlay placement, colours, and background images
+  - Layout now owns fullscreen overlay mode alongside monitor/size controls
   - Streaming now owns presentation mode and per-app tinting
   - Accessibility now owns the real global hotkey editor
   - System now owns notification access recovery, toast suppression, session archive, overlay window toggles, and startup
@@ -52,8 +53,7 @@
 - Settings persistence audit fixed a save/load gap where text alignment was not round-tripping through the viewmodel layer
 - First-run display-aware sizing now applies before the first overlay window is created, so true first launch honors the primary monitor work area again
 - Apps tab now focuses on per-app read aloud, lane assignment, sound, and icon controls instead of squeezing full styling into every app row
-- Lane picker above the preview now switches which reusable overlay lane the normal Appearance, Behavior, and Layout controls are editing
-- Lane styling is now lane-owned rather than app-owned, so routed apps only choose lane, narration, sound, and icon while visuals and background images live with the selected lane
+- Dedicated `Lanes` tab now manages reusable routed overlay lanes with independent monitor, preset, width, max-height, colours, and optional background images
 - Filtering tab now includes title/body/title+body-scoped highlight, mute, and narration rules with optional app filters
 - Quick Tips can now be disabled explicitly from Settings > System > Onboarding
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
@@ -142,7 +142,7 @@
   - Import settings from a JSON file
   - Theme quick-switch submenu in tray menu (built-in + custom themes)
   - Profiles tab in Settings now focuses on import/export of full settings profiles
-  - App profiles in the Apps tab now centralize per-app read aloud, routing, sound, and icon choices, while lane visuals are edited through the shared lane picker flow
+  - App profiles in the Apps tab now centralize per-app read aloud, routing, sound, icon, colour, and background-image choices
 - **Accessibility & Inclusivity (Milestone 7)**:
   - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
   - Auto-duration — longer notifications get more display time based on estimated line count
@@ -206,8 +206,8 @@
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
-  - Per-app sound and icon assignment now lives in the Apps tab alongside narration and lane routing, while lane styling/backgrounds live on the lane selected above the preview
-  - Local background-image styling for routed overlay lanes — images copied into AppData backgrounds with opacity, hue, and brightness controls in Appearance for the selected lane
+  - Per-app sound and icon assignment now lives in the Apps tab alongside narration and lane routing, while lane styling/backgrounds live in the Lanes tab
+  - Local background-image styling for routed overlay lanes — images copied into AppData backgrounds with opacity, hue, and brightness controls
   - Fullscreen overlay background color picker (in addition to opacity)
   - Fullscreen overlay section now lives in Layout for logical grouping
   - IconService for icon resolution with in-memory cache (privacy safe)
@@ -246,7 +246,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 181 unit tests covering QueueManager (including field-scoped rules, app-profile routing, narration overrides, regex keywords, session archive + persistent/auto-duration + overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, secondary-overlay settings, rule/profile/background settings, and grouping settings), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 178 unit tests covering QueueManager (including field-scoped rules, app-profile routing, narration overrides, regex keywords, session archive + persistent/auto-duration + overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, secondary-overlay settings, rule/profile/background settings, and grouping settings), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)

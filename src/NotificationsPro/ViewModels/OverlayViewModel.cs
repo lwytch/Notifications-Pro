@@ -557,17 +557,15 @@ public class OverlayViewModel : BaseViewModel
     public void ApplySettings(AppSettings s)
     {
         var lane = OverlayLaneHelper.FindLane(s.OverlayLanes, _overlayLane);
-        FontFamily = lane != null ? lane.FontFamily : s.FontFamily;
-        FontSize = lane != null ? lane.FontSize : s.FontSize;
-        FontWeight = lane != null ? lane.FontWeight : s.FontWeight;
-        AppNameFontSize = lane != null ? lane.AppNameFontSize : s.AppNameFontSize;
-        AppNameFontWeight = lane != null ? lane.AppNameFontWeight : s.AppNameFontWeight;
-        TitleFontSize = lane != null ? lane.TitleFontSize : s.TitleFontSize;
-        TitleFontWeight = lane != null ? lane.TitleFontWeight : s.TitleFontWeight;
-        LineSpacing = lane != null ? lane.LineSpacing : s.LineSpacing;
-        TextAlignment = lane != null
-            ? (string.IsNullOrWhiteSpace(lane.TextAlignment) ? "Left" : lane.TextAlignment)
-            : (string.IsNullOrWhiteSpace(s.TextAlignment) ? "Left" : s.TextAlignment);
+        FontFamily = s.FontFamily;
+        FontSize = s.FontSize;
+        FontWeight = s.FontWeight;
+        AppNameFontSize = s.AppNameFontSize;
+        AppNameFontWeight = s.AppNameFontWeight;
+        TitleFontSize = s.TitleFontSize;
+        TitleFontWeight = s.TitleFontWeight;
+        LineSpacing = s.LineSpacing;
+        TextAlignment = string.IsNullOrWhiteSpace(s.TextAlignment) ? "Left" : s.TextAlignment;
 
         // Apply text scaling from system if enabled
         if (s.RespectTextScaling)
@@ -581,30 +579,30 @@ public class OverlayViewModel : BaseViewModel
                 if (key?.GetValue("TextScaleFactor") is int scaleFactor && scaleFactor > 100)
                 {
                     var factor = scaleFactor / 100.0;
-                    FontSize *= factor;
-                    AppNameFontSize *= factor;
-                    TitleFontSize *= factor;
+                    FontSize = s.FontSize * factor;
+                    AppNameFontSize = s.AppNameFontSize * factor;
+                    TitleFontSize = s.TitleFontSize * factor;
                 }
             }
             catch { /* Registry unavailable — use base sizes */ }
         }
 
-        TextColor = lane != null ? lane.TextColor : s.TextColor;
-        TitleColor = lane != null ? lane.TitleColor : s.TitleColor;
-        AppNameColor = lane != null ? lane.AppNameColor : s.AppNameColor;
-        BackgroundColor = lane != null ? lane.BackgroundColor : s.BackgroundColor;
-        BackgroundOpacity = lane != null ? lane.BackgroundOpacity : s.BackgroundOpacity;
-        AccentColor = lane != null ? lane.AccentColor : s.AccentColor;
+        TextColor = string.IsNullOrWhiteSpace(lane?.TextColor) ? s.TextColor : lane.TextColor;
+        TitleColor = string.IsNullOrWhiteSpace(lane?.TitleColor) ? s.TitleColor : lane.TitleColor;
+        AppNameColor = string.IsNullOrWhiteSpace(lane?.AppNameColor) ? s.AppNameColor : lane.AppNameColor;
+        BackgroundColor = string.IsNullOrWhiteSpace(lane?.BackgroundColor) ? s.BackgroundColor : lane.BackgroundColor;
+        BackgroundOpacity = s.BackgroundOpacity;
+        AccentColor = string.IsNullOrWhiteSpace(lane?.AccentColor) ? s.AccentColor : lane.AccentColor;
         HighlightColor = s.HighlightColor;
-        CornerRadius = lane != null ? lane.CornerRadius : s.CornerRadius;
-        Padding = lane != null ? lane.Padding : s.Padding;
-        CardGap = lane != null ? lane.CardGap : s.CardGap;
-        OuterMargin = lane != null ? lane.OuterMargin : s.OuterMargin;
-        ShowAccent = lane != null ? lane.ShowAccent : s.ShowAccent;
-        AccentThickness = lane != null ? lane.AccentThickness : s.AccentThickness;
-        ShowBorder = lane != null ? lane.ShowBorder : s.ShowBorder;
-        BorderColor = lane != null ? lane.BorderColor : s.BorderColor;
-        BorderThickness = lane != null ? lane.BorderThickness : s.BorderThickness;
+        CornerRadius = s.CornerRadius;
+        Padding = s.Padding;
+        CardGap = s.CardGap;
+        OuterMargin = s.OuterMargin;
+        ShowAccent = s.ShowAccent;
+        AccentThickness = s.AccentThickness;
+        ShowBorder = s.ShowBorder;
+        BorderColor = s.BorderColor;
+        BorderThickness = s.BorderThickness;
         AlwaysOnTop = s.AlwaysOnTop;
 
         // Respect Reduce Motion by removing directional movement, but keep fades
@@ -624,28 +622,22 @@ public class OverlayViewModel : BaseViewModel
         ShowNotificationIcons = s.ShowNotificationIcons;
         IconSize = s.IconSize;
         CurrentSettings = s;
-        ShowAppName = lane != null ? lane.ShowAppName : s.ShowAppName;
-        ShowNotificationTitle = lane != null ? lane.ShowNotificationTitle : s.ShowNotificationTitle;
-        ShowNotificationBody = lane != null ? lane.ShowNotificationBody : s.ShowNotificationBody;
-        LimitTextLines = lane != null ? lane.LimitTextLines : s.LimitTextLines;
-        MaxAppNameLines = lane != null ? lane.MaxAppNameLines : s.MaxAppNameLines;
-        MaxTitleLines = lane != null ? lane.MaxTitleLines : s.MaxTitleLines;
-        MaxBodyLines = lane != null ? lane.MaxBodyLines : s.MaxBodyLines;
-        SingleLineMode = lane != null ? lane.SingleLineMode : s.SingleLineMode;
-        SingleLineWrapText = lane != null ? lane.SingleLineWrapText : s.SingleLineWrapText;
-        SingleLineMaxLines = Math.Max(1, lane != null ? lane.SingleLineMaxLines : s.SingleLineMaxLines);
-        SingleLineAutoFullWidth = lane != null ? lane.SingleLineAutoFullWidth : s.SingleLineAutoFullWidth;
-        ShowTimestamp = lane != null ? lane.ShowTimestamp : s.ShowTimestamp;
-        TimestampFontSize = lane != null ? lane.TimestampFontSize : s.TimestampFontSize;
-        TimestampDisplayMode = lane != null
-            ? (string.IsNullOrWhiteSpace(lane.TimestampDisplayMode) ? "Relative" : lane.TimestampDisplayMode)
-            : (string.IsNullOrWhiteSpace(s.TimestampDisplayMode) ? "Relative" : s.TimestampDisplayMode);
-        TimestampFontWeight = lane != null
-            ? (string.IsNullOrWhiteSpace(lane.TimestampFontWeight) ? "Normal" : lane.TimestampFontWeight)
-            : (string.IsNullOrWhiteSpace(s.TimestampFontWeight) ? "Normal" : s.TimestampFontWeight);
-        TimestampColor = lane != null
-            ? (string.IsNullOrWhiteSpace(lane.TimestampColor) ? "#C8C8C8" : lane.TimestampColor)
-            : (string.IsNullOrWhiteSpace(s.TimestampColor) ? "#C8C8C8" : s.TimestampColor);
+        ShowAppName = s.ShowAppName;
+        ShowNotificationTitle = s.ShowNotificationTitle;
+        ShowNotificationBody = s.ShowNotificationBody;
+        LimitTextLines = s.LimitTextLines;
+        MaxAppNameLines = s.MaxAppNameLines;
+        MaxTitleLines = s.MaxTitleLines;
+        MaxBodyLines = s.MaxBodyLines;
+        SingleLineMode = s.SingleLineMode;
+        SingleLineWrapText = s.SingleLineWrapText;
+        SingleLineMaxLines = Math.Max(1, s.SingleLineMaxLines);
+        SingleLineAutoFullWidth = s.SingleLineAutoFullWidth;
+        ShowTimestamp = s.ShowTimestamp;
+        TimestampFontSize = s.TimestampFontSize;
+        TimestampDisplayMode = string.IsNullOrWhiteSpace(s.TimestampDisplayMode) ? "Relative" : s.TimestampDisplayMode;
+        TimestampFontWeight = string.IsNullOrWhiteSpace(s.TimestampFontWeight) ? "Normal" : s.TimestampFontWeight;
+        TimestampColor = string.IsNullOrWhiteSpace(s.TimestampColor) ? "#C8C8C8" : s.TimestampColor;
         VoiceAccessReadMode = VoiceAccessTextFormatter.NormalizeMode(s.VoiceAccessReadMode);
         ChromaKeyEnabled = s.ChromaKeyEnabled;
         ChromaKeyColor = s.ChromaKeyColor;

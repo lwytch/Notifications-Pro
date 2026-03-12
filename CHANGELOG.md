@@ -12,9 +12,6 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 
 ### Fixed
-- Lane configuration no longer duplicates styling controls across multiple tabs or hidden per-app overrides; lane visuals are now edited once through the normal Appearance / Behavior / Layout flow
-- Hidden per-app visual overrides were retired so app routing now only owns lane, narration, sound, and icon choices
-- New lanes now start from Lane 1 defaults, while `Save As Lane` branches the current setup into another lane without stacking a second copy on top of it
 - First-run display-aware sizing now applies before the first overlay window is created again, so true first launch honors the primary monitor work area instead of starting clipped
 - Secondary-overlay preset save/load and placement now accept spaced values such as `Bottom Right` instead of collapsing back to `Top Left`
 - Literal rule matching now handles symbolic handles and hashtags such as `@openai` without relying on word-boundary regex behavior
@@ -43,10 +40,11 @@
 
 ### Added
 - Field-scoped highlight, mute, and narration rules with optional app filters and title/body/title+body targeting
-- Dedicated `Apps` tab for per-app read aloud, overlay lane, sounds, and icons
+- Dedicated `Apps` tab for per-app read aloud, overlay lane, sounds, icons, colours, and local background-image styling
 - Reusable overlay lanes with independent monitor, preset, width, max-height, colours, and background images
+- Dedicated `Lanes` tab so routed overlay styling/layout is edited once and apps only assign into those lanes
 - Explicit `Show Quick Tips` onboarding toggle in Settings > System
-- Lane picker above the preview so the normal Appearance / Behavior / Layout flow can edit any lane without duplicating controls
+- Dedicated `Lanes` tab so routed overlay styling/layout is edited once and apps only assign into those lanes
 - README workflow guides for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, including browser-hosted notification guidance for services such as X, Reddit, Codex, and Antigravity
 - App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls
 - Overflow badge recovery affordance — clicking the `+N not shown` summary now offers to raise the visible-notification limit for future cards, while clearly disclosing that skipped content was not retained

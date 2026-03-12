@@ -453,9 +453,6 @@ Filtering and narration rules:
 Per-app styling and routing:
 - [x] App routing architecture refresh: the Apps tab now focuses on per-app read aloud, lane assignment, sound, and icon choices while lane styling/layout moved into a dedicated reusable `Lanes` editor so high-app-count setups stop feeling cramped.
 - [x] Reusable multi-overlay routing: selected apps can now route into dedicated named overlay lanes with their own monitor, preset, width, max-height, colours, and background images while keeping the same privacy model.
-- [x] Lane selector consolidation: removed the duplicated lane-specific controls from the separate editor flow and restored the cleaner pre-lane UI by editing lane-scoped settings through the existing Appearance / Behavior / Layout flow with a single active-lane selector above the preview.
-- [x] Lane-scoped settings audit: classified lane-specific versus app-wide controls, moved background-image controls into `Appearance`, kept app-wide controls single-source, and simplified app routing so per-app entries now only own lane, narration, sound, and icon.
-- [x] Lane runtime hardening: lane creation is no longer capped by the UI model, routed notifications render in separate windows without same-lane duplication, and new/save-as lane flows now default to clearer names and non-overlapping placement behavior.
 - [x] Group header styling review: grouped rendering now supports themeable `Framed Group`, `Header Chip`, and `Minimal Label` treatments with optional counts.
 
 Visual customisation:
