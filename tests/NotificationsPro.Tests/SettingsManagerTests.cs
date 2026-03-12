@@ -63,15 +63,26 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility;
         sm.Settings.AppGroupingStyle = "Header Chip";
         sm.Settings.ShowAppGroupCounts = false;
+        sm.Settings.CardBackgroundMode = CardBackgroundModeHelper.Image;
         sm.Settings.CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png";
         sm.Settings.CardBackgroundImageOpacity = 0.6;
         sm.Settings.CardBackgroundImageHueDegrees = 30;
         sm.Settings.CardBackgroundImageBrightness = 0.8;
+        sm.Settings.CardBackgroundImageSaturation = 0.55;
+        sm.Settings.CardBackgroundImageContrast = 1.35;
+        sm.Settings.CardBackgroundImageBlackAndWhite = true;
         sm.Settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard;
         sm.Settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard;
+        sm.Settings.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Top;
         sm.Settings.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
         sm.Settings.FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png";
         sm.Settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize;
+        sm.Settings.FullscreenOverlayImageHueDegrees = -45;
+        sm.Settings.FullscreenOverlayImageBrightness = 0.9;
+        sm.Settings.FullscreenOverlayImageSaturation = 0.25;
+        sm.Settings.FullscreenOverlayImageContrast = 1.4;
+        sm.Settings.FullscreenOverlayImageBlackAndWhite = true;
+        sm.Settings.FullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Bottom;
         sm.Settings.ShowQuickTips = false;
         sm.Settings.HighlightRules.Add(new HighlightRuleDefinition
         {
@@ -108,15 +119,26 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, sm2.Settings.NotificationCaptureMode);
         Assert.Equal("Header Chip", sm2.Settings.AppGroupingStyle);
         Assert.False(sm2.Settings.ShowAppGroupCounts);
+        Assert.Equal(CardBackgroundModeHelper.Image, sm2.Settings.CardBackgroundMode);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png", sm2.Settings.CardBackgroundImagePath);
         Assert.Equal(0.6, sm2.Settings.CardBackgroundImageOpacity);
         Assert.Equal(30, sm2.Settings.CardBackgroundImageHueDegrees);
         Assert.Equal(0.8, sm2.Settings.CardBackgroundImageBrightness);
+        Assert.Equal(0.55, sm2.Settings.CardBackgroundImageSaturation);
+        Assert.Equal(1.35, sm2.Settings.CardBackgroundImageContrast);
+        Assert.True(sm2.Settings.CardBackgroundImageBlackAndWhite);
         Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, sm2.Settings.CardBackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, sm2.Settings.CardBackgroundImagePlacement);
+        Assert.Equal(ImageVerticalFocusHelper.Top, sm2.Settings.CardBackgroundImageVerticalFocus);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", sm2.Settings.PerAppBackgroundImages["X"]);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", sm2.Settings.FullscreenOverlayImagePath);
         Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, sm2.Settings.FullscreenOverlayImageFitMode);
+        Assert.Equal(-45, sm2.Settings.FullscreenOverlayImageHueDegrees);
+        Assert.Equal(0.9, sm2.Settings.FullscreenOverlayImageBrightness);
+        Assert.Equal(0.25, sm2.Settings.FullscreenOverlayImageSaturation);
+        Assert.Equal(1.4, sm2.Settings.FullscreenOverlayImageContrast);
+        Assert.True(sm2.Settings.FullscreenOverlayImageBlackAndWhite);
+        Assert.Equal(ImageVerticalFocusHelper.Bottom, sm2.Settings.FullscreenOverlayImageVerticalFocus);
         Assert.False(sm2.Settings.ShowQuickTips);
         Assert.Single(sm2.Settings.HighlightRules);
         Assert.Equal(NotificationMatchScopeHelper.TitleOnly, sm2.Settings.HighlightRules[0].Scope);
@@ -142,12 +164,17 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("#C8C8C8", settings.AppNameColor);
         Assert.Equal("#202020", settings.BackgroundColor);
         Assert.Equal(0.94, settings.BackgroundOpacity);
+        Assert.Equal(CardBackgroundModeHelper.Solid, settings.CardBackgroundMode);
         Assert.Equal(string.Empty, settings.CardBackgroundImagePath);
         Assert.Equal(0.45, settings.CardBackgroundImageOpacity);
         Assert.Equal(0, settings.CardBackgroundImageHueDegrees);
         Assert.Equal(1.0, settings.CardBackgroundImageBrightness);
+        Assert.Equal(1.0, settings.CardBackgroundImageSaturation);
+        Assert.Equal(1.0, settings.CardBackgroundImageContrast);
+        Assert.False(settings.CardBackgroundImageBlackAndWhite);
         Assert.Equal(CardBackgroundImageFitModeHelper.FillCard, settings.CardBackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.InsidePadding, settings.CardBackgroundImagePlacement);
+        Assert.Equal(ImageVerticalFocusHelper.Center, settings.CardBackgroundImageVerticalFocus);
         Assert.Equal(14, settings.AppNameFontSize);
         Assert.Equal("SemiBold", settings.AppNameFontWeight);
         Assert.Equal(16, settings.TitleFontSize);
@@ -223,7 +250,42 @@ public class SettingsManagerTests : IDisposable
         Assert.Empty(settings.PerAppBackgroundImages);
         Assert.Equal(string.Empty, settings.FullscreenOverlayImagePath);
         Assert.Equal(CardBackgroundImageFitModeHelper.FillCard, settings.FullscreenOverlayImageFitMode);
+        Assert.Equal(0, settings.FullscreenOverlayImageHueDegrees);
+        Assert.Equal(1.0, settings.FullscreenOverlayImageBrightness);
+        Assert.Equal(1.0, settings.FullscreenOverlayImageSaturation);
+        Assert.Equal(1.0, settings.FullscreenOverlayImageContrast);
+        Assert.False(settings.FullscreenOverlayImageBlackAndWhite);
+        Assert.Equal(ImageVerticalFocusHelper.Center, settings.FullscreenOverlayImageVerticalFocus);
         Assert.True(settings.ShowQuickTips);
+    }
+
+    [Fact]
+    public void Load_NormalizesLegacyAndOutOfRangeBackgroundSettings()
+    {
+        var settingsPath = Path.Combine(_tempDir, "settings.json");
+        File.WriteAllText(settingsPath,
+            """
+            {
+              "CardBackgroundImagePath": "C:\\Users\\demo\\AppData\\Roaming\\NotificationsPro\\backgrounds\\legacy.png",
+              "CardBackgroundImageSaturation": 5.0,
+              "CardBackgroundImageContrast": -2.0,
+              "CardBackgroundImageVerticalFocus": "Somewhere",
+              "FullscreenOverlayImageSaturation": 3.0,
+              "FullscreenOverlayImageContrast": 9.0,
+              "FullscreenOverlayImageVerticalFocus": "Elsewhere"
+            }
+            """);
+
+        var sm = CreateManager();
+        sm.Load();
+
+        Assert.Equal(CardBackgroundModeHelper.Image, sm.Settings.CardBackgroundMode);
+        Assert.Equal(2.0, sm.Settings.CardBackgroundImageSaturation);
+        Assert.Equal(0.2, sm.Settings.CardBackgroundImageContrast);
+        Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.CardBackgroundImageVerticalFocus);
+        Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageSaturation);
+        Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageContrast);
+        Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.FullscreenOverlayImageVerticalFocus);
     }
 
     [Fact]

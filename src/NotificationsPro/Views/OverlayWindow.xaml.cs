@@ -395,26 +395,28 @@ public partial class OverlayWindow : Window
 
         try
         {
-            var fullPath = Path.GetFullPath(settings.FullscreenOverlayImagePath);
-            var backgroundsDir = Path.GetFullPath(BackgroundImageService.GetCustomBackgroundsDir());
-            if (!fullPath.StartsWith(backgroundsDir, StringComparison.OrdinalIgnoreCase))
-                return null;
+            var backgroundImageService = new BackgroundImageService();
+            var bitmap = backgroundImageService.ResolveBackgroundImage(
+                settings.FullscreenOverlayImagePath,
+                settings.FullscreenOverlayImageHueDegrees,
+                settings.FullscreenOverlayImageBrightness,
+                settings.FullscreenOverlayImageSaturation,
+                settings.FullscreenOverlayImageContrast,
+                settings.FullscreenOverlayImageBlackAndWhite);
 
-            if (!File.Exists(fullPath))
+            if (bitmap == null)
                 return null;
-
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(fullPath, UriKind.Absolute);
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            bitmap.Freeze();
 
             var brush = new ImageBrush(bitmap)
             {
                 Stretch = CardBackgroundImageFitModeHelper.ToStretch(settings.FullscreenOverlayImageFitMode),
                 AlignmentX = AlignmentX.Center,
-                AlignmentY = AlignmentY.Center,
+                AlignmentY = ImageVerticalFocusHelper.ToVerticalAlignment(settings.FullscreenOverlayImageVerticalFocus) switch
+                {
+                    VerticalAlignment.Top => AlignmentY.Top,
+                    VerticalAlignment.Bottom => AlignmentY.Bottom,
+                    _ => AlignmentY.Center
+                },
                 Opacity = Math.Clamp(settings.FullscreenOverlayOpacity, 0.1, 1.0)
             };
             brush.Freeze();

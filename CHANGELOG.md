@@ -41,8 +41,12 @@
 - Crash guard: 0-monitor fallback in popup positioning handles empty Screen.AllScreens safely
 - Event leak: SystemParameters.StaticPropertyChanged handler properly unsubscribed on app exit
 - Resource leak: HwndSource properly disposed in HotkeyManager.Unregister()
+- Legacy settings/import files that predate `CardBackgroundMode` now upgrade correctly to image-backed cards when they already contain a card background image path, instead of silently normalizing back to `Solid`
 
 ### Added
+- Settings IA polish pass — `Persistent Notifications` and `Auto-Duration` now live in `Behavior`, app-specific narration moved into `Apps`, overlay window interaction moved into `Layout`, quick tips moved into `Settings Window`, and `System` now includes a `Run Capture Diagnostic` action
+- Apps tab management tools — per-app override search, `Only modified` filtering, `Read aloud` checkboxes, and one-click `Clear Overrides`
+- Advanced image treatment controls — card backgrounds and fullscreen backdrops now expose `Saturation`, `Contrast`, `Black & White`, and portrait-safe `Vertical Focus`, and card backgrounds now use an explicit `Solid / Image` mode
 - Single-panel social/tooling workflow guides in `README.md` for Notifications Pro itself, X, other social platforms, and common notification-heavy tools such as Codex and Antigravity
 - System > Settings Experience > Show Quick Tips toggle for the first-run settings guidance banner
 - App grouping customization — grouped notifications can now render as `Framed Group`, `Header Chip`, or `Minimal Label`, with optional visible-count labels and styling that follows the existing appearance theme controls

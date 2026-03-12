@@ -171,7 +171,7 @@
                 <Button DockPanel.Dock="Right" Content="Got it" Margin="12,0,0,0"
                         Style="{StaticResource SecondaryButton}"
                         Command="{Binding DismissFirstRunTipCommand}"/>
-                <TextBlock Text="Quick tips: Use the left sidebar to switch sections. Overlay themes are under Appearance. Settings-window theme lives in UI Styling. Use Ctrl+T for a test notification."
+                <TextBlock Text="Quick tips: Use the left sidebar to switch sections. Overlay themes are under Appearance. Settings-window theme lives in Settings Window. Use Ctrl+T for a test notification."
                            FontFamily="{StaticResource UIFont}" FontSize="12"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            VerticalAlignment="Center" TextWrapping="Wrap"/>
@@ -227,6 +227,7 @@
                                     <Style.Triggers>
                                         <MultiDataTrigger>
                                             <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding CardBackgroundMode}" Value="Image"/>
                                                 <Condition Binding="{Binding CardBackgroundImagePlacement}" Value="Full Card"/>
                                                 <Condition Binding="{Binding SingleLineMode}" Value="False"/>
                                             </MultiDataTrigger.Conditions>
@@ -238,6 +239,12 @@
                                         <DataTrigger Binding="{Binding CardBackgroundImageFitMode}" Value="Original Size">
                                             <Setter Property="Stretch" Value="None"/>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding CardBackgroundImageVerticalFocus}" Value="Top">
+                                            <Setter Property="VerticalAlignment" Value="Top"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CardBackgroundImageVerticalFocus}" Value="Bottom">
+                                            <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Image.Style>
@@ -246,6 +253,9 @@
                                     <Binding Path="CardBackgroundImagePath"/>
                                     <Binding Path="CardBackgroundImageHueDegrees"/>
                                     <Binding Path="CardBackgroundImageBrightness"/>
+                                    <Binding Path="CardBackgroundImageSaturation"/>
+                                    <Binding Path="CardBackgroundImageContrast"/>
+                                    <Binding Path="CardBackgroundImageBlackAndWhite"/>
                                 </MultiBinding>
                             </Image.Source>
                         </Image>
@@ -261,6 +271,7 @@
                                         <Style.Triggers>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding CardBackgroundMode}" Value="Image"/>
                                                     <Condition Binding="{Binding CardBackgroundImagePlacement}" Value="Inside Padding"/>
                                                     <Condition Binding="{Binding SingleLineMode}" Value="False"/>
                                                 </MultiDataTrigger.Conditions>
@@ -272,6 +283,12 @@
                                             <DataTrigger Binding="{Binding CardBackgroundImageFitMode}" Value="Original Size">
                                                 <Setter Property="Stretch" Value="None"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding CardBackgroundImageVerticalFocus}" Value="Top">
+                                                <Setter Property="VerticalAlignment" Value="Top"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding CardBackgroundImageVerticalFocus}" Value="Bottom">
+                                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Image.Style>
@@ -280,6 +297,9 @@
                                         <Binding Path="CardBackgroundImagePath"/>
                                         <Binding Path="CardBackgroundImageHueDegrees"/>
                                         <Binding Path="CardBackgroundImageBrightness"/>
+                                        <Binding Path="CardBackgroundImageSaturation"/>
+                                        <Binding Path="CardBackgroundImageContrast"/>
+                                        <Binding Path="CardBackgroundImageBlackAndWhite"/>
                                     </MultiBinding>
                                 </Image.Source>
                             </Image>
@@ -357,7 +377,7 @@
                         <!-- OVERLAY THEMES section -->
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="OVERLAY THEMES" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Quickly style notification cards. These theme presets affect the overlay. UI Styling controls settings-window colors."/>
+                                       ToolTip="Quickly style notification cards. These theme presets affect the overlay. Settings Window controls the settings panel colors and chrome."/>
                         </Border>
 
                         <DockPanel Margin="0,4,0,0">
@@ -740,78 +760,133 @@
                                        ToolTip="Optional local image shown inside each stacked notification card. Use Image Coverage to keep it inside the padded content area or let it span the full card, and use Image Fit to handle portrait artwork cleanly. Single-line banner mode stays solid-color for readability."/>
                         </Border>
 
-                        <TextBlock Text="Optional card image" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Choose a local image to render behind notification text. The background color remains underneath as the fallback base."/>
-                        <DockPanel Margin="0,4,0,8">
-                            <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource SecondaryButton}"
-                                    Margin="8,0,0,0"
-                                    Command="{Binding ClearCardBackgroundImageCommand}"
-                                    ToolTip="Remove the current card background image and return to solid-color cards."/>
-                            <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource SecondaryButton}"
-                                    Margin="8,0,0,0"
-                                    Command="{Binding BrowseCardBackgroundImageCommand}"
-                                    ToolTip="Choose a local image file to use as the notification card background."/>
-                            <TextBox Style="{StaticResource SettingsTextBox}"
-                                     Text="{Binding CardBackgroundImagePath, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Path to the local card background image copied into Notifications Pro's backgrounds folder."/>
-                        </DockPanel>
-
-                        <TextBlock Text="Image Coverage" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Inside Padding keeps the padded border area solid. Full Card lets the image span the whole notification card behind the text and padding."/>
+                        <TextBlock Text="Background Mode" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Solid uses the plain card background colour. Image replaces the flat fill with a treated local image on each stacked notification card."/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
                                   ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                  ItemsSource="{Binding AvailableCardBackgroundImagePlacements}"
-                                  SelectedItem="{Binding CardBackgroundImagePlacement}"
+                                  ItemsSource="{Binding AvailableCardBackgroundModes}"
+                                  SelectedItem="{Binding CardBackgroundMode}"
                                   Margin="0,4,0,0"
-                                  ToolTip="Inside Padding keeps the image within the content area. Full Card lets the image reach the card edges."/>
+                                  ToolTip="Switch between solid colour cards and image-backed cards. Single-line banner mode stays solid-colour for readability."/>
 
-                        <TextBlock Text="Image Fit" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Fill Card covers the area, Fit Inside Card keeps the whole image visible, and Original Size keeps the asset's natural size. Use Fit Inside Card for portrait artwork you do not want cropped."/>
-                        <ComboBox Style="{StaticResource SettingsComboBox}"
-                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                  ItemsSource="{Binding AvailableCardBackgroundImageFitModes}"
-                                  SelectedItem="{Binding CardBackgroundImageFitMode}"
-                                  Margin="0,4,0,0"
-                                  ToolTip="Choose how the image should scale inside the selected coverage area."/>
+                        <StackPanel Margin="0,4,0,0"
+                                    Visibility="{Binding IsCardBackgroundImageMode, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Card Background Image" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Choose a local image to render behind notification text. The background colour remains underneath as the fallback base and tint layer."/>
+                            <DockPanel Margin="0,4,0,8">
+                                <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource InlineSecondaryButton}"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding ClearCardBackgroundImageCommand}"
+                                        ToolTip="Remove the current card background image and return to solid-colour cards."/>
+                                <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource InlineSecondaryButton}"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding BrowseCardBackgroundImageCommand}"
+                                        ToolTip="Choose a local image file to use as the notification card background."/>
+                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                         Text="{Binding CardBackgroundImagePath, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Path to the local card background image copied into Notifications Pro's backgrounds folder."/>
+                            </DockPanel>
 
-                        <TextBlock Text="Image Opacity" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Lower values let more of the solid background colour show through behind the image."/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding CardBackgroundImageOpacity, StringFormat='{}{0:P0}'}"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="0.0" Maximum="1.0"
-                                    Value="{Binding CardBackgroundImageOpacity}"
-                                    TickFrequency="0.05" IsSnapToTickEnabled="False"
-                                    ToolTip="Adjust how strongly the image shows through the card background."/>
-                        </DockPanel>
+                            <TextBlock Text="Image Coverage" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Inside Padding keeps the border padding solid. Full Card lets the image span the entire card behind the padding and text."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableCardBackgroundImagePlacements}"
+                                      SelectedItem="{Binding CardBackgroundImagePlacement}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="Choose whether the image stays inside the padded content area or fills the full card shape."/>
 
-                        <TextBlock Text="Hue" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Shift the image colours without editing the source file. Leave at 0° for the original colours."/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding CardBackgroundImageHueDegrees, StringFormat='{}{0:0}'}"/><Run Text="°"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="-180" Maximum="180"
-                                    Value="{Binding CardBackgroundImageHueDegrees}"
-                                    TickFrequency="10" IsSnapToTickEnabled="False"
-                                    ToolTip="Rotate the image hue for alternate colour treatments without replacing the file."/>
-                        </DockPanel>
+                            <TextBlock Text="Image Fit" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Fill Card crops to cover the area, Fit Inside Card keeps the whole image visible, and Original Size keeps the asset's natural size."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableCardBackgroundImageFitModes}"
+                                      SelectedItem="{Binding CardBackgroundImageFitMode}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="Use Fit Inside Card for portrait artwork you do not want cropped. Use Fill Card when you want a full-bleed look."/>
 
-                        <TextBlock Text="Brightness" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Lower brightness helps busy images stay behind the text. Higher brightness makes the artwork more prominent."/>
-                        <DockPanel Margin="0,4,0,0">
-                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                <Run Text="{Binding CardBackgroundImageBrightness, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
-                            </TextBlock>
-                            <Slider Style="{StaticResource SettingsSlider}"
-                                    Minimum="0.2" Maximum="2.0"
-                                    Value="{Binding CardBackgroundImageBrightness}"
-                                    TickFrequency="0.1" IsSnapToTickEnabled="False"
-                                    ToolTip="Adjust the image brightness without editing the source file."/>
-                        </DockPanel>
+                            <TextBlock Text="Vertical Focus" Style="{StaticResource SettingLabel}"
+                                       ToolTip="When the image is cropped or aligned inside a shorter card, choose whether the visible area should favor the top, center, or bottom of the image."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableImageVerticalFocusModes}"
+                                      SelectedItem="{Binding CardBackgroundImageVerticalFocus}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="Top works well for portrait images with a subject near the top. Bottom is useful for lower-third style art."/>
+
+                            <TextBlock Text="Image Opacity" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Lower values let more of the solid background colour show through behind the image."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding CardBackgroundImageOpacity, StringFormat='{}{0:P0}'}"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.0" Maximum="1.0"
+                                        Value="{Binding CardBackgroundImageOpacity}"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="False"
+                                        ToolTip="Adjust how strongly the image shows through the card background."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Hue" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Shift the image colours without editing the source file. Leave at 0° for the original colours."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding CardBackgroundImageHueDegrees, StringFormat='{}{0:0}'}"/><Run Text="°"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="-180" Maximum="180"
+                                        Value="{Binding CardBackgroundImageHueDegrees}"
+                                        TickFrequency="10" IsSnapToTickEnabled="False"
+                                        ToolTip="Rotate the image hue for alternate colour treatments without replacing the file."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Brightness" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Lower brightness helps busy images stay behind the text. Higher brightness makes the artwork more prominent."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding CardBackgroundImageBrightness, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.2" Maximum="2.0"
+                                        Value="{Binding CardBackgroundImageBrightness}"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="False"
+                                        ToolTip="Adjust the image brightness without editing the source file."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Saturation" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Reduce saturation to mute intense artwork or increase it to make colours more vivid."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding CardBackgroundImageSaturation, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.0" Maximum="2.0"
+                                        Value="{Binding CardBackgroundImageSaturation}"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="False"
+                                        ToolTip="0.0 makes the image grayscale by saturation alone. 1.0 is the original saturation."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Contrast" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Lower contrast flattens busy artwork. Higher contrast makes light/dark separation stronger."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding CardBackgroundImageContrast, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.2" Maximum="2.0"
+                                        Value="{Binding CardBackgroundImageContrast}"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="False"
+                                        ToolTip="1.0 keeps the original contrast. Lower values soften the image; higher values increase contrast."/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding CardBackgroundImageBlackAndWhite}"
+                                              ToolTip="Render the selected card background image in grayscale."/>
+                                <TextBlock Text="Black &amp; White" Style="{StaticResource SettingLabel}"
+                                           ToolTip="Useful when you want texture and depth without introducing extra colour into the card."/>
+                            </DockPanel>
+                        </StackPanel>
 
                         <!-- SHAPE section -->
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -1187,6 +1262,48 @@
                                     ToolTip="How long each notification stays visible before fading out"/>
                         </DockPanel>
 
+                        <DockPanel Margin="0,12,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding PersistentNotifications}"
+                                          ToolTip="Notifications stay on screen until manually dismissed."/>
+                            <TextBlock Text="Persistent Notifications" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Keep notifications visible until you dismiss them manually. This overrides timed expiry."/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AutoDurationEnabled}"
+                                          ToolTip="Automatically extend display time for longer notifications."/>
+                            <TextBlock Text="Auto-Duration" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Automatically adds extra on-screen time for longer notifications so they remain readable."/>
+                        </DockPanel>
+
+                        <StackPanel Margin="12,0,0,0" Visibility="{Binding AutoDurationEnabled, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Base Duration" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Starting duration before time is added for longer content."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding AutoDurationBaseSeconds, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="2" Maximum="30" Value="{Binding AutoDurationBaseSeconds}"
+                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                        ToolTip="Minimum display time before per-line additions."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Seconds Per Line" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Additional time added for each estimated line of body text."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding AutoDurationSecondsPerLine, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.5" Maximum="5" Value="{Binding AutoDurationSecondsPerLine}"
+                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                        ToolTip="Extra display time added per estimated line of text."/>
+                            </DockPanel>
+                        </StackPanel>
+
                         <TextBlock Text="Visible Notifications" Style="{StaticResource SettingLabel}" ToolTip="Default is 40. Lower counts keep the overlay shorter; higher counts preserve more live context and reduce skipped notifications."/>
                         <DockPanel Margin="0,4,0,0">
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
@@ -1340,12 +1457,34 @@
                                        ToolTip="Apps seen this session appear below. Toggle to mute/unmute."/>
                         </Border>
 
-                        <ItemsControl ItemsSource="{Binding MutedAppEntries}">
+                        <Grid Margin="0,4,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0"
+                                     Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding MutedAppsFilterText, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Filter muted app entries by app name."/>
+
+                            <CheckBox Grid.Column="1"
+                                      Margin="12,0,0,0"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding ShowOnlyMutedApps}"
+                                      Content="Only muted"
+                                      FontFamily="{StaticResource UIFont}"
+                                      FontSize="12"
+                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                      ToolTip="Hide apps that are currently allowed through."/>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding MutedAppEntriesView}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel Margin="0,0,0,6">
                                         <Button DockPanel.Dock="Right" Content="{Binding IsMuted, Converter={StaticResource BoolToMuteLabel}}"
-                                                Style="{StaticResource SecondaryButton}" Width="72" Padding="0"
+                                                Style="{StaticResource InlineSecondaryButton}" Width="84" Padding="0"
                                                 Command="{Binding DataContext.ToggleMuteAppCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                 CommandParameter="{Binding AppName}"/>
                                         <TextBlock Text="{Binding AppName}" Style="{StaticResource SettingLabel}"
@@ -1581,19 +1720,67 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="APP CUSTOMIZATION" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Assign per-app presentation overrides. Filtering stays in Filtering; this tab is only for app-specific sound, icon, and background appearance."/>
+                                       ToolTip="Assign app-specific sound, icon, narration, and card background overrides. Global styling still lives in Appearance."/>
                         </Border>
 
-                        <ItemsControl ItemsSource="{Binding PerAppConfigEntries}">
+                        <TextBlock Text="Per-app overrides are optional. Leave controls at Default to keep using the global overlay settings from Appearance, Sounds, and Accessibility."
+                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,10"/>
+
+                        <Grid Margin="0,4,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0"
+                                     Style="{StaticResource SettingsTextBox}"
+                                     Text="{Binding AppOverridesFilterText, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Filter app overrides by app name."/>
+
+                            <CheckBox Grid.Column="1"
+                                      Margin="12,0,0,0"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding ShowOnlyModifiedAppOverrides}"
+                                      Content="Only modified"
+                                      FontFamily="{StaticResource UIFont}"
+                                      FontSize="12"
+                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                      ToolTip="Hide apps that still use all global defaults."/>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding PerAppConfigEntriesView}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Padding="12,10" Margin="0,0,0,8"
                                             CornerRadius="6" Background="{DynamicResource SurfaceLightBrush}">
                                         <StackPanel>
-                                            <TextBlock Text="{Binding AppName}" Style="{StaticResource SettingLabel}"
-                                                       FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                            <DockPanel Margin="0,0,0,8">
+                                                <Button DockPanel.Dock="Right"
+                                                        Content="Clear Overrides"
+                                                        Style="{StaticResource InlineSecondaryButton}"
+                                                        Command="{Binding ElementName=SettingsRoot, Path=DataContext.ClearPerAppOverridesCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Return this app to the global sound, icon, narration, and card background settings."/>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding AppName}" Style="{StaticResource SettingLabel}"
+                                                               FontWeight="SemiBold" Margin="0,0,0,2"/>
+                                                </StackPanel>
+                                            </DockPanel>
 
-                                            <TextBlock Text="Sound" Style="{StaticResource SettingDesc}" Margin="0,0,0,4"/>
+                                            <DockPanel Margin="0,0,0,8">
+                                                <CheckBox DockPanel.Dock="Right"
+                                                          IsChecked="{Binding IsReadAloudEnabled}"
+                                                          Content="Read aloud"
+                                                          FontFamily="{StaticResource UIFont}"
+                                                          FontSize="12"
+                                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                                          ToolTip="When checked, built-in spoken notifications can read this app aloud. Uncheck to keep this app visual-only."/>
+                                                <TextBlock Text="Narration" Style="{StaticResource SettingLabel}"
+                                                           Margin="0"
+                                                           ToolTip="App-specific narration override. This only affects built-in read-aloud, not Microsoft Voice Access labels."/>
+                                            </DockPanel>
+
+                                            <TextBlock Text="Sound" Style="{StaticResource SettingLabel}" Margin="0,0,0,4"/>
                                             <ComboBox Style="{StaticResource SettingsComboBox}"
                                                       ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                                       ItemsSource="{Binding ElementName=SettingsRoot, Path=DataContext.PerAppSoundOptions}"
@@ -1607,20 +1794,20 @@
                                                 </ComboBox.ItemTemplate>
                                             </ComboBox>
 
-                                            <TextBlock Text="Icon" Style="{StaticResource SettingDesc}" Margin="0,10,0,4"/>
+                                            <TextBlock Text="Icon" Style="{StaticResource SettingLabel}" Margin="0,10,0,4"/>
                                             <ComboBox Style="{StaticResource SettingsComboBox}"
                                                       ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                                       ItemsSource="{Binding ElementName=SettingsRoot, Path=DataContext.PerAppIconOptions}"
                                                       SelectedItem="{Binding Icon}"/>
 
-                                            <TextBlock Text="Card Background Override" Style="{StaticResource SettingDesc}" Margin="0,10,0,4"/>
+                                            <TextBlock Text="Card Background Override" Style="{StaticResource SettingLabel}" Margin="0,10,0,4"/>
                                             <DockPanel>
-                                                <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource SecondaryButton}"
+                                                <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource InlineSecondaryButton}"
                                                         Margin="8,0,0,0"
                                                         Command="{Binding ElementName=SettingsRoot, Path=DataContext.ClearPerAppBackgroundImageCommand}"
                                                         CommandParameter="{Binding}"
                                                         ToolTip="Remove the app-specific background image and return this app to the global card background."/>
-                                                <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource SecondaryButton}"
+                                                <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource InlineSecondaryButton}"
                                                         Margin="8,0,0,0"
                                                         Command="{Binding ElementName=SettingsRoot, Path=DataContext.BrowsePerAppBackgroundImageCommand}"
                                                         CommandParameter="{Binding}"
@@ -1806,11 +1993,11 @@
                             <TextBlock Text="Backdrop Image" Style="{StaticResource SettingLabel}"
                                        ToolTip="Optional local image used instead of the solid fullscreen backdrop colour. This uses the same local-only background asset folder as card backgrounds."/>
                             <DockPanel Margin="0,4,0,0">
-                                <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource SecondaryButton}"
+                                <Button DockPanel.Dock="Right" Content="Clear" Style="{StaticResource InlineSecondaryButton}"
                                         Margin="8,0,0,0"
                                         Command="{Binding ClearFullscreenOverlayImageCommand}"
                                         ToolTip="Remove the fullscreen backdrop image and return to solid colour."/>
-                                <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource SecondaryButton}"
+                                <Button DockPanel.Dock="Right" Content="Browse..." Style="{StaticResource InlineSecondaryButton}"
                                         Margin="8,0,0,0"
                                         Command="{Binding BrowseFullscreenOverlayImageCommand}"
                                         ToolTip="Choose a local image for the fullscreen backdrop."/>
@@ -1827,6 +2014,75 @@
                                       SelectedItem="{Binding FullscreenOverlayImageFitMode}"
                                       Margin="0,4,0,0"
                                       ToolTip="Choose how the fullscreen backdrop image scales to the screen."/>
+
+                            <TextBlock Text="Vertical Focus" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Choose which part of the backdrop should stay most visible when the image is cropped vertically."/>
+                            <ComboBox Style="{StaticResource SettingsComboBox}"
+                                      ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                      ItemsSource="{Binding AvailableImageVerticalFocusModes}"
+                                      SelectedItem="{Binding FullscreenOverlayImageVerticalFocus}"
+                                      Margin="0,4,0,0"
+                                      ToolTip="Top is helpful for portrait artwork or wallpapers with important content near the top edge."/>
+
+                            <TextBlock Text="Hue" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Shift the backdrop colours without editing the source file."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding FullscreenOverlayImageHueDegrees, StringFormat='{}{0:0}'}"/><Run Text="°"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="-180" Maximum="180"
+                                        Value="{Binding FullscreenOverlayImageHueDegrees}"
+                                        TickFrequency="10" IsSnapToTickEnabled="False"
+                                        ToolTip="Rotate the fullscreen backdrop hue for alternate colour treatments."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Brightness" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Lower brightness keeps the backdrop unobtrusive; higher brightness makes it more prominent."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding FullscreenOverlayImageBrightness, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.2" Maximum="2.0"
+                                        Value="{Binding FullscreenOverlayImageBrightness}"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="False"
+                                        ToolTip="Adjust the fullscreen backdrop brightness without editing the source file."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Saturation" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Reduce saturation to calm the backdrop or increase it to make the image more vivid."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding FullscreenOverlayImageSaturation, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.0" Maximum="2.0"
+                                        Value="{Binding FullscreenOverlayImageSaturation}"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="False"
+                                        ToolTip="0.0 removes colour. 1.0 keeps the original saturation."/>
+                            </DockPanel>
+
+                            <TextBlock Text="Contrast" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Control how strong light/dark separation appears in the backdrop image."/>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                    <Run Text="{Binding FullscreenOverlayImageContrast, StringFormat='{}{0:0.00}'}"/><Run Text="x"/>
+                                </TextBlock>
+                                <Slider Style="{StaticResource SettingsSlider}"
+                                        Minimum="0.2" Maximum="2.0"
+                                        Value="{Binding FullscreenOverlayImageContrast}"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="False"
+                                        ToolTip="Lower values soften the backdrop. Higher values increase contrast."/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding FullscreenOverlayImageBlackAndWhite}"
+                                              ToolTip="Render the fullscreen backdrop image in grayscale."/>
+                                <TextBlock Text="Black &amp; White" Style="{StaticResource SettingLabel}"
+                                           ToolTip="Useful when you want a textured fullscreen backdrop without adding extra colour to the workspace."/>
+                            </DockPanel>
                         </StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -1849,6 +2105,27 @@
                                     Minimum="5" Maximum="50" Value="{Binding SnapDistance}"
                                     TickFrequency="5" IsSnapToTickEnabled="True"
                                     ToolTip="How close to a screen edge before the overlay snaps"/>
+                        </DockPanel>
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="WINDOW INTERACTION" Style="{StaticResource SectionHeader}"
+                                       ToolTip="These controls affect how the overlay window behaves on your desktop."/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding AlwaysOnTop}"
+                                          ToolTip="Keep the overlay above other windows, including fullscreen apps."/>
+                            <TextBlock Text="Always on Top" Style="{StaticResource SettingLabel}"
+                                       ToolTip="When enabled, the overlay stays above normal windows and fullscreen apps."/>
+                        </DockPanel>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ClickThrough}"
+                                          ToolTip="Allow mouse clicks to pass through the overlay."/>
+                            <TextBlock Text="Click-Through Mode" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Mouse clicks pass through the overlay so you can interact with windows behind it. Disable it when you need to drag or resize the overlay."/>
                         </DockPanel>
 
                     </StackPanel>
@@ -2094,48 +2371,8 @@
                                        ToolTip="Enables persistent notifications, respect for system motion/contrast/text settings, and spacious layout in one click. Individual settings below still work independently."/>
                         </DockPanel>
 
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="NOTIFICATION TIMING" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Control how long notifications stay visible on screen."/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding PersistentNotifications}"
-                                          ToolTip="Notifications stay on screen until manually dismissed"/>
-                            <TextBlock Text="Persistent Notifications" Style="{StaticResource SettingLabel}" ToolTip="Notifications remain visible until you click to dismiss them (no auto-expiry)"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding AutoDurationEnabled}"
-                                          ToolTip="Automatically extend display time for longer notifications"/>
-                            <TextBlock Text="Auto-Duration (Longer Text = More Time)" Style="{StaticResource SettingLabel}" ToolTip="Calculates display time based on notification length so you have time to read"/>
-                        </DockPanel>
-
-                        <StackPanel Margin="12,0,0,0" Visibility="{Binding AutoDurationEnabled, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Base Duration" Style="{StaticResource SettingLabel}" ToolTip="Starting duration before adding time per line of text"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding AutoDurationBaseSeconds, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="2" Maximum="30" Value="{Binding AutoDurationBaseSeconds}"
-                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
-                                        ToolTip="Minimum display time before per-line additions"/>
-                            </DockPanel>
-
-                            <TextBlock Text="Seconds Per Line" Style="{StaticResource SettingLabel}" ToolTip="Additional seconds added for each line of notification body text"/>
-                            <DockPanel Margin="0,4,0,0">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                    <Run Text="{Binding AutoDurationSecondsPerLine, StringFormat='{}{0:0.0}'}"/><Run Text="s"/>
-                                </TextBlock>
-                                <Slider Style="{StaticResource SettingsSlider}"
-                                        Minimum="0.5" Maximum="5" Value="{Binding AutoDurationSecondsPerLine}"
-                                        TickFrequency="0.5" IsSnapToTickEnabled="True"
-                                        ToolTip="Extra display time added per estimated line of text"/>
-                            </DockPanel>
-                        </StackPanel>
+                        <TextBlock Text="Timing and expiry settings now live in Behavior so all on-screen display rules stay together."
+                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,12"/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SYSTEM INTEGRATION" Style="{StaticResource SectionHeader}"
@@ -2235,35 +2472,8 @@
                                         ToolTip="Speak a sample notification using the current voice, speed, volume, and spoken-content mode."/>
                             </WrapPanel>
 
-                            <Border Style="{StaticResource SectionHeaderPanel}">
-                                <TextBlock Text="PER-APP SPEECH" Style="{StaticResource SectionHeader}"
-                                           ToolTip="Choose which seen apps should be spoken aloud and which should stay visual-only."/>
-                            </Border>
-
-                            <ItemsControl ItemsSource="{Binding SpokenAppEntries}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <DockPanel Margin="0,0,0,6">
-                                            <TextBlock Text="{Binding AppName}"
-                                                       Style="{StaticResource SettingLabel}"
-                                                       VerticalAlignment="Center"/>
-                                            <CheckBox DockPanel.Dock="Right"
-                                                      IsChecked="{Binding IsReadAloudEnabled}"
-                                                      Content="Read aloud"
-                                                      Margin="12,0,0,0"
-                                                      VerticalAlignment="Center"
-                                                      FontFamily="{StaticResource UIFont}"
-                                                      FontSize="12"
-                                                      Foreground="{DynamicResource TextPrimaryBrush}"
-                                                      ToolTip="When checked, Notifications Pro will narrate notifications from this app."/>
-                                        </DockPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                            <TextBlock Text="Apps appear here after Notifications Pro sees them. Unchecked apps still show on screen but are ignored by narration. Each visible card is only read once, so new arrivals do not replay cards that already finished speaking."
-                                       Style="{StaticResource SettingDesc}"
-                                       Margin="0,4,0,0"
-                                       Visibility="{Binding SpokenAppEntries.Count, Converter={StaticResource ZeroToVisible}}"/>
+                            <TextBlock Text="Per-app narration overrides now live in Apps so all app-specific controls stay in one place."
+                                       Style="{StaticResource SettingDesc}" Margin="0,10,0,0"/>
                         </StackPanel>
 
                         <TextBlock TextWrapping="Wrap"
@@ -2351,14 +2561,14 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <!-- ═══ UI STYLING TAB ═══ -->
-            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="UI Styling settings tab">
+            <!-- ═══ SETTINGS WINDOW TAB ═══ -->
+            <TabItem Style="{StaticResource SettingsTabItem}" AutomationProperties.Name="Settings window tab">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" Margin="4,0">
                         <!-- brush -->
                         <Path Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5" Fill="Transparent" 
                               Data="m11 10 3 3 M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031" />
-                        <TextBlock Text="UI Styling"/>
+                        <TextBlock Text="Settings Window"/>
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
@@ -2378,6 +2588,19 @@
                                   Margin="0,4,0,0"
                                   ToolTip="Window mode opens a normal resizable window. Popup mode anchors to the same corner where Windows toasts appear."
                                   />
+
+                        <Border Style="{StaticResource SectionHeaderPanel}">
+                            <TextBlock Text="SETTINGS EXPERIENCE" Style="{StaticResource SectionHeader}"
+                                       ToolTip="Controls for how the settings window itself behaves and guides the user."/>
+                        </Border>
+
+                        <DockPanel Margin="0,0,0,8">
+                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                          IsChecked="{Binding ShowQuickTips}"
+                                          ToolTip="Show or hide the quick tips banner at the top of the settings window."/>
+                            <TextBlock Text="Show Quick Tips" Style="{StaticResource SettingLabel}"
+                                       ToolTip="Controls the guidance banner shown at the top of Settings."/>
+                        </DockPanel>
 
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
@@ -2611,6 +2834,10 @@
                                     Margin="0,0,8,8"
                                     Command="{Binding RetryNotificationAccessCommand}"
                                     ToolTip="Retry the direct WinRT access check without leaving the settings window."/>
+                            <Button Content="Run Capture Diagnostic" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,8"
+                                    Command="{Binding RunCaptureDiagnosticCommand}"
+                                    ToolTip="Copy a concise live capture snapshot to the clipboard and show it on screen."/>
                         </WrapPanel>
 
                         <TextBlock Text="Capture Mode" Style="{StaticResource SettingLabel}"
@@ -2655,44 +2882,19 @@
 
                         <TextBlock Text="Max archive items" Style="{StaticResource SettingLabel}"
                                    ToolTip="Maximum number of notifications to keep in the session archive (10-1000). Oldest entries are removed when the limit is reached."/>
-                        <Slider Minimum="10" Maximum="1000" TickFrequency="10"
-                                Value="{Binding SessionArchiveMaxItems}"
-                                Style="{StaticResource SettingsSlider}" Margin="0,4,0,0"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding SessionArchiveMaxItems, StringFormat='{}{0:0}'}"/>
+                            </TextBlock>
+                            <Slider Minimum="10" Maximum="1000" TickFrequency="10"
+                                    Value="{Binding SessionArchiveMaxItems}"
+                                    Style="{StaticResource SettingsSlider}"/>
+                        </DockPanel>
 
                         <Button Content="View Archive (Copy to Clipboard)" Style="{StaticResource SecondaryButton}"
                                 Command="{Binding ViewSessionArchiveCommand}"
                                 Margin="0,8,0,0" HorizontalAlignment="Left"
                                 ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="SETTINGS EXPERIENCE" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ShowQuickTips}"
-                                          ToolTip="Show or hide the first-run quick tips banner at the top of the settings window."/>
-                            <TextBlock Text="Show Quick Tips" Style="{StaticResource SettingLabel}"
-                                       ToolTip="Controls whether the guidance banner appears for new users at the top of Settings. Turning this off hides the banner immediately."/>
-                        </DockPanel>
-
-                        <Border Style="{StaticResource SectionHeaderPanel}">
-                            <TextBlock Text="WINDOW" Style="{StaticResource SectionHeader}"/>
-                        </Border>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding AlwaysOnTop}"
-                                          ToolTip="Keep the overlay above all other windows"/>
-                            <TextBlock Text="Always on Top" Style="{StaticResource SettingLabel}" ToolTip="When enabled, the overlay floats above all other windows including full-screen apps"/>
-                        </DockPanel>
-
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding ClickThrough}"
-                                          ToolTip="Allow mouse clicks to pass through the overlay"/>
-                            <TextBlock Text="Click-Through Mode" Style="{StaticResource SettingLabel}" ToolTip="Mouse clicks pass through the overlay so you can interact with windows behind it. Disable to drag/resize the overlay."/>
-                        </DockPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
@@ -3238,15 +3440,15 @@
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="7" Grid.Column="0" Text="Accessibility" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="7" Grid.Column="1" Text="Accessibility mode, persistent notifications, spoken notifications, Windows accessibility integration, Microsoft Voice Access card labels, and global hotkeys"
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="Accessibility mode, spoken notifications, Windows accessibility integration, Microsoft Voice Access card labels, and global hotkeys"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="8" Grid.Column="0" Text="UI Styling" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Settings Window" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="8" Grid.Column="1" Text="Settings window display mode, compact mode, corner radius, theme, and custom color palette"
+                            <TextBlock Grid.Row="8" Grid.Column="1" Text="Settings window display mode, quick tips, compact mode, corner radius, theme, and custom color palette"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="9" Grid.Column="0" Text="System" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>
-                            <TextBlock Grid.Row="9" Grid.Column="1" Text="Toast suppression, session archive, always-on-top, click-through, and Windows startup integration"
+                            <TextBlock Grid.Row="9" Grid.Column="1" Text="Notification access, live capture diagnostics, toast suppression, session archive, and Windows startup integration"
                                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,8" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="10" Grid.Column="0" Text="Profiles" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" Margin="0,0,8,8"/>

@@ -1090,6 +1090,8 @@ public partial class SettingsViewModel : BaseViewModel
         _settingsManager = settingsManager;
         _queueManager = queueManager;
 
+        InitializeSettingsAuditPolishCommands();
+
         if (_queueManager != null)
         {
             // Initial population from memory
@@ -1177,6 +1179,7 @@ public partial class SettingsViewModel : BaseViewModel
         RefreshCustomThemes();
 
         LoadFromSettings();
+        InitializeSettingsAuditPolishViews();
         RefreshWindowsSounds(); // After LoadFromSettings so custom WAV paths are already known
         RefreshMonitors();
         RefreshPerAppConfig();
@@ -1200,6 +1203,8 @@ public partial class SettingsViewModel : BaseViewModel
         var detail = string.IsNullOrWhiteSpace(statusMessage)
             ? "No additional status reported yet."
             : statusMessage.Trim();
+
+        UpdateCaptureDiagnosticSnapshot(normalizedMode, detail);
 
         if (string.Equals(normalizedMode, "Accessibility", StringComparison.OrdinalIgnoreCase))
         {
@@ -1560,12 +1565,17 @@ public partial class SettingsViewModel : BaseViewModel
             AppNameColor = AppNameColor,
             BackgroundColor = BackgroundColor,
             BackgroundOpacity = BackgroundOpacity,
+            CardBackgroundMode = CardBackgroundMode,
             CardBackgroundImagePath = CardBackgroundImagePath,
             CardBackgroundImageOpacity = CardBackgroundImageOpacity,
             CardBackgroundImageHueDegrees = CardBackgroundImageHueDegrees,
             CardBackgroundImageBrightness = CardBackgroundImageBrightness,
+            CardBackgroundImageSaturation = CardBackgroundImageSaturation,
+            CardBackgroundImageContrast = CardBackgroundImageContrast,
+            CardBackgroundImageBlackAndWhite = CardBackgroundImageBlackAndWhite,
             CardBackgroundImageFitMode = CardBackgroundImageFitMode,
             CardBackgroundImagePlacement = CardBackgroundImagePlacement,
+            CardBackgroundImageVerticalFocus = CardBackgroundImageVerticalFocus,
             CornerRadius = CornerRadius,
             Padding = Padding,
             CardGap = CardGap,
@@ -1695,6 +1705,12 @@ public partial class SettingsViewModel : BaseViewModel
             FullscreenOverlayColor = FullscreenOverlayColor,
             FullscreenOverlayImagePath = FullscreenOverlayImagePath,
             FullscreenOverlayImageFitMode = FullscreenOverlayImageFitMode,
+            FullscreenOverlayImageHueDegrees = FullscreenOverlayImageHueDegrees,
+            FullscreenOverlayImageBrightness = FullscreenOverlayImageBrightness,
+            FullscreenOverlayImageSaturation = FullscreenOverlayImageSaturation,
+            FullscreenOverlayImageContrast = FullscreenOverlayImageContrast,
+            FullscreenOverlayImageBlackAndWhite = FullscreenOverlayImageBlackAndWhite,
+            FullscreenOverlayImageVerticalFocus = FullscreenOverlayImageVerticalFocus,
             SettingsDisplayMode = SettingsDisplayMode,
             PopupAutoClose = PopupAutoClose,
             SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
@@ -2011,8 +2027,17 @@ public partial class SettingsViewModel : BaseViewModel
     public void RefreshMutedAppEntries()
     {
         MutedAppEntries.Clear();
-        foreach (var app in _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase))
+
+        var appNames = _queueManager.SeenAppNames
+            .Concat(_settingsManager.Settings.MutedApps)
+            .Where(app => !string.IsNullOrWhiteSpace(app))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(app => app, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var app in appNames)
             MutedAppEntries.Add(new MutedAppEntry(app, _queueManager.IsAppMuted(app)));
+
+        RefreshMutedAppFilters();
     }
 
     private void OnSpokenAppChanged(SpokenAppEntry entry)
@@ -2061,7 +2086,16 @@ public partial class SettingsViewModel : BaseViewModel
     {
         PerAppConfigEntries.Clear();
         var s = _settingsManager.Settings;
-        foreach (var app in _queueManager.SeenAppNames.OrderBy(a => a, StringComparer.OrdinalIgnoreCase))
+        var appNames = _queueManager.SeenAppNames
+            .Concat(s.PerAppSounds.Keys)
+            .Concat(s.PerAppIcons.Keys)
+            .Concat(s.PerAppBackgroundImages.Keys)
+            .Concat(s.SpokenMutedApps)
+            .Where(app => !string.IsNullOrWhiteSpace(app))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(app => app, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var app in appNames)
         {
             s.PerAppSounds.TryGetValue(app, out var sound);
             s.PerAppIcons.TryGetValue(app, out var icon);
@@ -2074,8 +2108,11 @@ public partial class SettingsViewModel : BaseViewModel
                 sound ?? "Default",
                 icon ?? "Default",
                 backgroundImagePath ?? string.Empty,
+                !IsSpokenAppMuted(app),
                 OnPerAppConfigChanged));
         }
+
+        RefreshPerAppConfigFilters();
     }
 
     private void OnPerAppConfigChanged(PerAppConfigEntry entry)
@@ -2099,7 +2136,18 @@ public partial class SettingsViewModel : BaseViewModel
         else
             updated.PerAppBackgroundImages[entry.AppName] = entry.BackgroundImagePath;
 
+        updated.SpokenMutedApps.RemoveAll(existing => string.Equals(existing, entry.AppName, StringComparison.OrdinalIgnoreCase));
+        if (!entry.IsReadAloudEnabled)
+            updated.SpokenMutedApps.Add(entry.AppName);
+
+        updated.SpokenMutedApps = updated.SpokenMutedApps
+            .Where(app => !string.IsNullOrWhiteSpace(app))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(app => app, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
         _settingsManager.Apply(updated);
+        RefreshPerAppConfigFilters();
     }
 
     private void BrowsePerAppBackgroundImage(object? parameter)
@@ -2620,6 +2668,8 @@ public class MutedAppEntry
 
 public class PerAppConfigEntry : BaseViewModel
 {
+    private const string DefaultOption = "Default";
+
     public string AppName { get; }
     private readonly Action<PerAppConfigEntry>? _onChanged;
 
@@ -2630,6 +2680,7 @@ public class PerAppConfigEntry : BaseViewModel
         set
         {
             if (!SetProperty(ref _sound, value)) return;
+            OnPropertyChanged(nameof(HasOverrides));
             _onChanged?.Invoke(this);
         }
     }
@@ -2641,6 +2692,7 @@ public class PerAppConfigEntry : BaseViewModel
         set
         {
             if (!SetProperty(ref _icon, value)) return;
+            OnPropertyChanged(nameof(HasOverrides));
             _onChanged?.Invoke(this);
         }
     }
@@ -2656,6 +2708,21 @@ public class PerAppConfigEntry : BaseViewModel
                 return;
 
             OnPropertyChanged(nameof(BackgroundImageDisplay));
+            OnPropertyChanged(nameof(HasOverrides));
+            _onChanged?.Invoke(this);
+        }
+    }
+
+    private bool _isReadAloudEnabled;
+    public bool IsReadAloudEnabled
+    {
+        get => _isReadAloudEnabled;
+        set
+        {
+            if (!SetProperty(ref _isReadAloudEnabled, value))
+                return;
+
+            OnPropertyChanged(nameof(HasOverrides));
             _onChanged?.Invoke(this);
         }
     }
@@ -2664,12 +2731,40 @@ public class PerAppConfigEntry : BaseViewModel
         ? "Uses global card background"
         : BackgroundImagePath;
 
-    public PerAppConfigEntry(string appName, string sound, string icon, string backgroundImagePath, Action<PerAppConfigEntry>? onChanged = null)
+    public bool HasOverrides =>
+        !string.Equals(Sound, DefaultOption, StringComparison.OrdinalIgnoreCase)
+        || !string.Equals(Icon, DefaultOption, StringComparison.OrdinalIgnoreCase)
+        || !string.IsNullOrWhiteSpace(BackgroundImagePath)
+        || !IsReadAloudEnabled;
+
+    public void ApplyDefaults()
+    {
+        _sound = DefaultOption;
+        _icon = DefaultOption;
+        _backgroundImagePath = string.Empty;
+        _isReadAloudEnabled = true;
+
+        OnPropertyChanged(nameof(Sound));
+        OnPropertyChanged(nameof(Icon));
+        OnPropertyChanged(nameof(BackgroundImagePath));
+        OnPropertyChanged(nameof(BackgroundImageDisplay));
+        OnPropertyChanged(nameof(IsReadAloudEnabled));
+        OnPropertyChanged(nameof(HasOverrides));
+    }
+
+    public PerAppConfigEntry(
+        string appName,
+        string sound,
+        string icon,
+        string backgroundImagePath,
+        bool isReadAloudEnabled,
+        Action<PerAppConfigEntry>? onChanged = null)
     {
         AppName = appName;
         _sound = sound;
         _icon = icon;
         _backgroundImagePath = backgroundImagePath;
+        _isReadAloudEnabled = isReadAloudEnabled;
         _onChanged = onChanged;
     }
 }

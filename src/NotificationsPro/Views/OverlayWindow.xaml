@@ -76,6 +76,7 @@
                                 <Style.Triggers>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding BackgroundImageMode}" Value="Image"/>
                                             <Condition Binding="{Binding BackgroundImagePlacement}" Value="Full Card"/>
                                             <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
                                         </MultiDataTrigger.Conditions>
@@ -87,6 +88,12 @@
                                     <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Original Size">
                                         <Setter Property="Stretch" Value="None"/>
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Top">
+                                        <Setter Property="VerticalAlignment" Value="Top"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Bottom">
+                                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Image.Style>
@@ -95,6 +102,9 @@
                                 <Binding Path="BackgroundImagePath"/>
                                 <Binding Path="BackgroundImageHueDegrees"/>
                                 <Binding Path="BackgroundImageBrightness"/>
+                                <Binding Path="BackgroundImageSaturation"/>
+                                <Binding Path="BackgroundImageContrast"/>
+                                <Binding Path="BackgroundImageBlackAndWhite"/>
                             </MultiBinding>
                         </Image.Source>
                     </Image>
@@ -110,23 +120,30 @@
                                Grid.ColumnSpan="2"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center">
-                            <Image.Style>
-                                <Style TargetType="Image">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Setter Property="Stretch" Value="UniformToFill"/>
-                                    <Style.Triggers>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding BackgroundImagePlacement}" Value="Inside Padding"/>
-                                                <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </MultiDataTrigger>
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Setter Property="Stretch" Value="UniformToFill"/>
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding BackgroundImageMode}" Value="Image"/>
+                                                    <Condition Binding="{Binding BackgroundImagePlacement}" Value="Inside Padding"/>
+                                                    <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger>
                                         <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Fit Inside Card">
                                             <Setter Property="Stretch" Value="Uniform"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Original Size">
                                             <Setter Property="Stretch" Value="None"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Top">
+                                            <Setter Property="VerticalAlignment" Value="Top"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Bottom">
+                                            <Setter Property="VerticalAlignment" Value="Bottom"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -136,6 +153,9 @@
                                     <Binding Path="BackgroundImagePath"/>
                                     <Binding Path="BackgroundImageHueDegrees"/>
                                     <Binding Path="BackgroundImageBrightness"/>
+                                    <Binding Path="BackgroundImageSaturation"/>
+                                    <Binding Path="BackgroundImageContrast"/>
+                                    <Binding Path="BackgroundImageBlackAndWhite"/>
                                 </MultiBinding>
                             </Image.Source>
                         </Image>

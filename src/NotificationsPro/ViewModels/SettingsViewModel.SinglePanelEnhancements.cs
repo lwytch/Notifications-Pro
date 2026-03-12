@@ -42,6 +42,23 @@ public partial class SettingsViewModel
 
     public bool HasCardBackgroundImage => !string.IsNullOrWhiteSpace(CardBackgroundImagePath);
 
+    private string _cardBackgroundMode = CardBackgroundModeHelper.Solid;
+    public string CardBackgroundMode
+    {
+        get => _cardBackgroundMode;
+        set
+        {
+            var normalized = CardBackgroundModeHelper.Normalize(value);
+            if (SetProperty(ref _cardBackgroundMode, normalized))
+            {
+                OnPropertyChanged(nameof(IsCardBackgroundImageMode));
+                QueueSave();
+            }
+        }
+    }
+
+    public bool IsCardBackgroundImageMode => string.Equals(CardBackgroundMode, CardBackgroundModeHelper.Image, StringComparison.OrdinalIgnoreCase);
+
     private double _cardBackgroundImageOpacity = 0.45;
     public double CardBackgroundImageOpacity
     {
@@ -75,6 +92,39 @@ public partial class SettingsViewModel
         }
     }
 
+    private double _cardBackgroundImageSaturation = 1.0;
+    public double CardBackgroundImageSaturation
+    {
+        get => _cardBackgroundImageSaturation;
+        set
+        {
+            if (SetProperty(ref _cardBackgroundImageSaturation, Math.Clamp(value, 0.0, 2.0)))
+                QueueSave();
+        }
+    }
+
+    private double _cardBackgroundImageContrast = 1.0;
+    public double CardBackgroundImageContrast
+    {
+        get => _cardBackgroundImageContrast;
+        set
+        {
+            if (SetProperty(ref _cardBackgroundImageContrast, Math.Clamp(value, 0.2, 2.0)))
+                QueueSave();
+        }
+    }
+
+    private bool _cardBackgroundImageBlackAndWhite;
+    public bool CardBackgroundImageBlackAndWhite
+    {
+        get => _cardBackgroundImageBlackAndWhite;
+        set
+        {
+            if (SetProperty(ref _cardBackgroundImageBlackAndWhite, value))
+                QueueSave();
+        }
+    }
+
     private string _cardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FillCard;
     public string CardBackgroundImageFitMode
     {
@@ -95,6 +145,18 @@ public partial class SettingsViewModel
         {
             var normalized = CardBackgroundImagePlacementHelper.Normalize(value);
             if (SetProperty(ref _cardBackgroundImagePlacement, normalized))
+                QueueSave();
+        }
+    }
+
+    private string _cardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Center;
+    public string CardBackgroundImageVerticalFocus
+    {
+        get => _cardBackgroundImageVerticalFocus;
+        set
+        {
+            var normalized = ImageVerticalFocusHelper.Normalize(value);
+            if (SetProperty(ref _cardBackgroundImageVerticalFocus, normalized))
                 QueueSave();
         }
     }
@@ -125,6 +187,73 @@ public partial class SettingsViewModel
         }
     }
 
+    private double _fullscreenOverlayImageHueDegrees;
+    public double FullscreenOverlayImageHueDegrees
+    {
+        get => _fullscreenOverlayImageHueDegrees;
+        set
+        {
+            if (SetProperty(ref _fullscreenOverlayImageHueDegrees, Math.Clamp(value, -180, 180)))
+                QueueSave();
+        }
+    }
+
+    private double _fullscreenOverlayImageBrightness = 1.0;
+    public double FullscreenOverlayImageBrightness
+    {
+        get => _fullscreenOverlayImageBrightness;
+        set
+        {
+            if (SetProperty(ref _fullscreenOverlayImageBrightness, Math.Clamp(value, 0.2, 2.0)))
+                QueueSave();
+        }
+    }
+
+    private double _fullscreenOverlayImageSaturation = 1.0;
+    public double FullscreenOverlayImageSaturation
+    {
+        get => _fullscreenOverlayImageSaturation;
+        set
+        {
+            if (SetProperty(ref _fullscreenOverlayImageSaturation, Math.Clamp(value, 0.0, 2.0)))
+                QueueSave();
+        }
+    }
+
+    private double _fullscreenOverlayImageContrast = 1.0;
+    public double FullscreenOverlayImageContrast
+    {
+        get => _fullscreenOverlayImageContrast;
+        set
+        {
+            if (SetProperty(ref _fullscreenOverlayImageContrast, Math.Clamp(value, 0.2, 2.0)))
+                QueueSave();
+        }
+    }
+
+    private bool _fullscreenOverlayImageBlackAndWhite;
+    public bool FullscreenOverlayImageBlackAndWhite
+    {
+        get => _fullscreenOverlayImageBlackAndWhite;
+        set
+        {
+            if (SetProperty(ref _fullscreenOverlayImageBlackAndWhite, value))
+                QueueSave();
+        }
+    }
+
+    private string _fullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Center;
+    public string FullscreenOverlayImageVerticalFocus
+    {
+        get => _fullscreenOverlayImageVerticalFocus;
+        set
+        {
+            var normalized = ImageVerticalFocusHelper.Normalize(value);
+            if (SetProperty(ref _fullscreenOverlayImageVerticalFocus, normalized))
+                QueueSave();
+        }
+    }
+
     private string _newNarrationKeyword = string.Empty;
     public string NewNarrationKeyword { get => _newNarrationKeyword; set => SetProperty(ref _newNarrationKeyword, value); }
 
@@ -142,8 +271,10 @@ public partial class SettingsViewModel
         SpokenNotificationTextFormatter.ModeTitleTimestamp,
         SpokenNotificationTextFormatter.ModeTitleBodyTimestamp
     };
+    public List<string> AvailableCardBackgroundModes { get; } = CardBackgroundModeHelper.KnownModes.ToList();
     public List<string> AvailableCardBackgroundImageFitModes { get; } = CardBackgroundImageFitModeHelper.KnownModes.ToList();
     public List<string> AvailableCardBackgroundImagePlacements { get; } = CardBackgroundImagePlacementHelper.KnownPlacements.ToList();
+    public List<string> AvailableImageVerticalFocusModes { get; } = ImageVerticalFocusHelper.KnownModes.ToList();
 
     public ICommand AddNarrationRuleCommand { get; private set; } = null!;
     public ICommand RemoveNarrationRuleCommand { get; private set; } = null!;
@@ -165,14 +296,28 @@ public partial class SettingsViewModel
     private void LoadSinglePanelEnhancements(AppSettings settings)
     {
         _showQuickTips = settings.ShowQuickTips;
+        _cardBackgroundMode = CardBackgroundModeHelper.Normalize(
+            string.IsNullOrWhiteSpace(settings.CardBackgroundMode) && !string.IsNullOrWhiteSpace(settings.CardBackgroundImagePath)
+                ? CardBackgroundModeHelper.Image
+                : settings.CardBackgroundMode);
         _cardBackgroundImagePath = settings.CardBackgroundImagePath?.Trim() ?? string.Empty;
         _cardBackgroundImageOpacity = Math.Clamp(settings.CardBackgroundImageOpacity, 0.0, 1.0);
         _cardBackgroundImageHueDegrees = Math.Clamp(settings.CardBackgroundImageHueDegrees, -180, 180);
         _cardBackgroundImageBrightness = Math.Clamp(settings.CardBackgroundImageBrightness, 0.2, 2.0);
+        _cardBackgroundImageSaturation = Math.Clamp(settings.CardBackgroundImageSaturation, 0.0, 2.0);
+        _cardBackgroundImageContrast = Math.Clamp(settings.CardBackgroundImageContrast, 0.2, 2.0);
+        _cardBackgroundImageBlackAndWhite = settings.CardBackgroundImageBlackAndWhite;
         _cardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.CardBackgroundImageFitMode);
         _cardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.Normalize(settings.CardBackgroundImagePlacement);
+        _cardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Normalize(settings.CardBackgroundImageVerticalFocus);
         _fullscreenOverlayImagePath = settings.FullscreenOverlayImagePath?.Trim() ?? string.Empty;
         _fullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.FullscreenOverlayImageFitMode);
+        _fullscreenOverlayImageHueDegrees = Math.Clamp(settings.FullscreenOverlayImageHueDegrees, -180, 180);
+        _fullscreenOverlayImageBrightness = Math.Clamp(settings.FullscreenOverlayImageBrightness, 0.2, 2.0);
+        _fullscreenOverlayImageSaturation = Math.Clamp(settings.FullscreenOverlayImageSaturation, 0.0, 2.0);
+        _fullscreenOverlayImageContrast = Math.Clamp(settings.FullscreenOverlayImageContrast, 0.2, 2.0);
+        _fullscreenOverlayImageBlackAndWhite = settings.FullscreenOverlayImageBlackAndWhite;
+        _fullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Normalize(settings.FullscreenOverlayImageVerticalFocus);
         _newNarrationKeyword = string.Empty;
 
         LoadHighlightEntries(settings);
@@ -180,15 +325,27 @@ public partial class SettingsViewModel
         LoadNarrationEntries(settings);
 
         OnPropertyChanged(nameof(ShowQuickTips));
+        OnPropertyChanged(nameof(CardBackgroundMode));
+        OnPropertyChanged(nameof(IsCardBackgroundImageMode));
         OnPropertyChanged(nameof(CardBackgroundImagePath));
         OnPropertyChanged(nameof(HasCardBackgroundImage));
         OnPropertyChanged(nameof(CardBackgroundImageOpacity));
         OnPropertyChanged(nameof(CardBackgroundImageHueDegrees));
         OnPropertyChanged(nameof(CardBackgroundImageBrightness));
+        OnPropertyChanged(nameof(CardBackgroundImageSaturation));
+        OnPropertyChanged(nameof(CardBackgroundImageContrast));
+        OnPropertyChanged(nameof(CardBackgroundImageBlackAndWhite));
         OnPropertyChanged(nameof(CardBackgroundImageFitMode));
         OnPropertyChanged(nameof(CardBackgroundImagePlacement));
+        OnPropertyChanged(nameof(CardBackgroundImageVerticalFocus));
         OnPropertyChanged(nameof(FullscreenOverlayImagePath));
         OnPropertyChanged(nameof(FullscreenOverlayImageFitMode));
+        OnPropertyChanged(nameof(FullscreenOverlayImageHueDegrees));
+        OnPropertyChanged(nameof(FullscreenOverlayImageBrightness));
+        OnPropertyChanged(nameof(FullscreenOverlayImageSaturation));
+        OnPropertyChanged(nameof(FullscreenOverlayImageContrast));
+        OnPropertyChanged(nameof(FullscreenOverlayImageBlackAndWhite));
+        OnPropertyChanged(nameof(FullscreenOverlayImageVerticalFocus));
         OnPropertyChanged(nameof(NewNarrationKeyword));
     }
 

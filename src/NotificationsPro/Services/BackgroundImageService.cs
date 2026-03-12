@@ -13,16 +13,22 @@ public sealed class BackgroundImageService
 
     private readonly ConcurrentDictionary<string, BitmapSource?> _imageCache = new(StringComparer.OrdinalIgnoreCase);
 
-    public BitmapSource? ResolveBackgroundImage(string filePath, double hueDegrees, double brightness)
+    public BitmapSource? ResolveBackgroundImage(
+        string filePath,
+        double hueDegrees,
+        double brightness,
+        double saturationAmount,
+        double contrastAmount,
+        bool blackAndWhite)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             return null;
 
-        var cacheKey = $"{filePath}|{hueDegrees:F0}|{brightness:F2}";
+        var cacheKey = $"{filePath}|{hueDegrees:F0}|{brightness:F2}|{saturationAmount:F2}|{contrastAmount:F2}|{blackAndWhite}";
         if (_imageCache.TryGetValue(cacheKey, out var cached))
             return cached;
 
-        var image = LoadAndTransform(filePath, hueDegrees, brightness);
+        var image = LoadAndTransform(filePath, hueDegrees, brightness, saturationAmount, contrastAmount, blackAndWhite);
         _imageCache[cacheKey] = image;
         return image;
     }
@@ -34,7 +40,13 @@ public sealed class BackgroundImageService
 
     public static string GetCustomBackgroundsDir() => CustomBackgroundsDir;
 
-    private static BitmapSource? LoadAndTransform(string filePath, double hueDegrees, double brightness)
+    private static BitmapSource? LoadAndTransform(
+        string filePath,
+        double hueDegrees,
+        double brightness,
+        double saturationAmount,
+        double contrastAmount,
+        bool blackAndWhite)
     {
         try
         {
@@ -65,6 +77,8 @@ public sealed class BackgroundImageService
 
             var normalizedHue = hueDegrees / 360.0;
             var normalizedBrightness = Math.Clamp(brightness, 0.2, 2.0);
+            var normalizedSaturation = Math.Clamp(saturationAmount, 0.0, 2.0);
+            var normalizedContrast = Math.Clamp(contrastAmount, 0.2, 2.0);
 
             for (var index = 0; index < pixels.Length; index += 4)
             {
@@ -72,13 +86,29 @@ public sealed class BackgroundImageService
                 var g = pixels[index + 1];
                 var r = pixels[index + 2];
 
-                RgbToHsv(r, g, b, out var hue, out var saturation, out var value);
+                RgbToHsv(r, g, b, out var hue, out var pixelSaturation, out var value);
                 hue = (hue + normalizedHue) % 1.0;
                 if (hue < 0)
                     hue += 1.0;
 
+                pixelSaturation = Math.Clamp(pixelSaturation * normalizedSaturation, 0.0, 1.0);
                 value = Math.Clamp(value * normalizedBrightness, 0.0, 1.0);
-                HsvToRgb(hue, saturation, value, out r, out g, out b);
+                HsvToRgb(hue, pixelSaturation, value, out r, out g, out b);
+
+                if (blackAndWhite)
+                {
+                    var luminance = (byte)Math.Clamp(
+                        Math.Round((0.2126 * r) + (0.7152 * g) + (0.0722 * b)),
+                        byte.MinValue,
+                        byte.MaxValue);
+                    r = luminance;
+                    g = luminance;
+                    b = luminance;
+                }
+
+                r = ApplyContrast(r, normalizedContrast);
+                g = ApplyContrast(g, normalizedContrast);
+                b = ApplyContrast(b, normalizedContrast);
 
                 pixels[index] = b;
                 pixels[index + 1] = g;
@@ -101,6 +131,13 @@ public sealed class BackgroundImageService
         {
             return null;
         }
+    }
+
+    private static byte ApplyContrast(byte channel, double contrast)
+    {
+        var normalized = channel / 255.0;
+        var adjusted = ((normalized - 0.5) * contrast) + 0.5;
+        return (byte)Math.Clamp(Math.Round(adjusted * 255.0), byte.MinValue, byte.MaxValue);
     }
 
     private static void RgbToHsv(byte rByte, byte gByte, byte bByte, out double hue, out double saturation, out double value)

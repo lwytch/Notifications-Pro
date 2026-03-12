@@ -462,8 +462,44 @@ Docs and release readiness:
 - [x] README/Help gap analysis: update README, in-app Help, example settings, and status text for advanced narration rules, card background images, voice setup, privacy disclosures, defaults, and troubleshooting without reintroducing multi-panel language.
 - [ ] Public repo sanitisation audit: review the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity that should be removed or deliberately disclosed before the repository is made public.
 
+### Milestone 19: Settings IA Cleanup & Advanced Image Controls
+**Status: In progress**
+
+Information architecture cleanup from the 2026-03-12 settings audit:
+- [ ] Sidebar order and naming cleanup: Reorder the settings tabs to `Appearance / Behavior / Apps / Filtering / Layout / Sounds / Accessibility / Streaming / System / Settings Window / Profiles / Help`, and rename `UI Styling` to `Settings Window` if it remains the home for settings-window chrome/theme controls.
+- [ ] Tab ownership cleanup: Move `Persistent Notifications` and `Auto-Duration` into `Behavior > Timing`, move `Per-App Speech` into `Apps`, move `Presentation Mode` into `Behavior`, move `Per-App Color Tinting` into `Appearance`, move `Always on Top` plus `Click-Through` into `Layout`, move `Show Quick Tips` into `Settings Window`, and relocate `Global Hotkeys` into a general controls/system home instead of leaving them under Accessibility.
+- [ ] Appearance flow cleanup: Re-sequence `Appearance` so quick-start controls (`Themes`, `Custom Themes`, `Theme Schedule`, `Density Presets`) appear before detailed typography/timestamp/color/image controls, and keep the lower half for secondary styling groups such as grouping, icons, and scrollbar options.
+- [x] Apps-tab cleanup: Make `Apps` the canonical per-app overrides surface by renaming the section to `Per-App Overrides`, moving per-app narration into it, adding app search plus `Only modified` filtering, and adding per-app clear/reset actions so large app lists stay manageable.
+- [ ] Scope signposting and discoverability: Add lightweight “configured in …” cross-links or helper rows between split concepts such as timestamp visibility vs timestamp styling, app grouping behavior vs grouping appearance, and default icon vs per-app icon overrides without duplicating the controls themselves.
+- [ ] Tooltip and inline-copy audit: Reduce non-critical inline guidance in dense tabs, keep privacy/access/live-status text inline where required, and move general usage hints into tooltips so sections stay readable.
+
+Control-system and visual-rhythm cleanup from the 2026-03-12 layout audit:
+- [ ] Shared form-control normalization: Split the current monospaced text-box style into semantic input styles (`general text` vs `structured value`), standardize control heights, and make sure normal text entry fields such as theme names, profile names, app filters, and general keyword inputs no longer inherit a technical monospace look.
+- [ ] Button tier cleanup: Define explicit shared button tiers for footer actions, standard form actions, compact inline actions, and token/chip actions so `Apply`, `Browse`, `Clear`, `Remove`, `Pick`, regex toggles, and list-row buttons all look related instead of individually sized.
+- [ ] Spacing-token cleanup: Normalize section spacing, field-label spacing, row spacing, nested-indent spacing, and first-control-after-header spacing so tabs stop relying on ad hoc local margin overrides that make some rows feel crushed and others too loose.
+- [ ] Slider-row consistency pass: Ensure slider sections consistently show current values where that helps comprehension, remove the remaining one-off slider rows that lack mirrored values, and align slider/value spacing across Appearance, Behavior, Accessibility, Layout, and System.
+- [ ] Repeated-card layout cleanup: Replace the improvised per-item card internals in `Filtering`, `Apps`, and similar list-heavy areas with one canonical repeated-card pattern that has a compact header, proper sub-field labels, and a consistent inline action cluster.
+- [ ] Responsive action-row cleanup: Replace cramped fixed-width or hard-column action rows with responsive patterns for compact mode, especially for width/height presets, add/remove rows, and browse/clear rows so the popup layout still looks deliberate at the smaller width.
+
+Background image and advanced visual-control gaps:
+- [x] Card background image treatment expansion: Add missing image-processing controls for notification cards, including at minimum `Black & White`, `Saturation`, and `Contrast`, while keeping existing `Fit`, `Placement`, `Opacity`, `Hue`, and `Brightness` controls coherent and export/import safe.
+- [x] Explicit card background mode: Add a clearer `Solid / Image` card-background mode so image-backed cards are an explicit styling decision instead of something users infer from whether an image path happens to be populated.
+- [x] Portrait-image handling pass: Add a practical portrait-safe crop/anchor option (for example `Top / Center / Bottom`) if current fit modes still crop tall artwork poorly in wide cards, and verify text readability across the built-in density presets.
+- [ ] Background-image control consistency: Align the control model between the global card background, per-app card background overrides, and fullscreen backdrop backgrounds so the same concepts (`Fit`, `Placement`, `Image Treatment`) behave consistently without forcing every surface to expose every option.
+- [x] Single-line banner compatibility guard: Keep banner mode on solid backgrounds only, but make that constraint explicit in the UI/help so users understand why card background images do not apply there.
+- [ ] Notification-style gap review: Evaluate a short list of additional high-value card-style controls during the redesign, especially `Timestamp Placement`, `Icon Placement`, and simple background-treatment presets, while explicitly avoiding expensive styling features that would regress rendering performance.
+
+Operational gaps:
+- [x] Real listener diagnostics: Add a `Run Capture Diagnostic` or equivalent action under `System > Notification Access` so users can distinguish overlay rendering issues from live WinRT/accessibility capture failures.
+- [ ] Regression hardening for settings moves: Extend tests to cover moved settings, settings defaults, export/import, reset defaults, and tab-navigation links so another IA pass does not quietly break persistence or discoverability.
+
+Post-redesign process guardrails:
+- [ ] Create a local `settings-ia-review` skill after the new layout is finalized: document the canonical tab ownership, approved tab order, and “do not duplicate controls across tabs” rules so future feature work follows the agreed information architecture.
+- [ ] Create a local `ui-form-rhythm-review` skill after the new layout is finalized: document the shared control tiers, spacing tokens, typography rules, inline action patterns, and compact-mode responsiveness checks so future UI changes preserve alignment and visual consistency.
+- [ ] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, and export/import coverage whenever a settings feature is added or reorganized.
+
 ## Current Focus
-Finish the remaining post-rollback release work: audit install/update settings persistence under MSIX upgrades and complete the public-repo sanitisation pass.
+Next planned pass: execute the settings IA cleanup from the 2026-03-12 audit while still completing the remaining release-readiness work (MSIX settings-persistence audit and public-repo sanitisation).
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

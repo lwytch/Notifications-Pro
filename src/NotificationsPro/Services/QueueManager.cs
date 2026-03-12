@@ -145,15 +145,23 @@ public class QueueManager : BaseViewModel
         }
 
         var item = new NotificationItem(appName, title, body);
-        item.BackgroundImagePath = settings.PerAppBackgroundImages.TryGetValue(appName, out var perAppBackgroundImage)
-            && !string.IsNullOrWhiteSpace(perAppBackgroundImage)
-                ? perAppBackgroundImage
-                : settings.CardBackgroundImagePath;
+        settings.PerAppBackgroundImages.TryGetValue(appName, out var perAppBackgroundImage);
+        var hasPerAppBackgroundImage = !string.IsNullOrWhiteSpace(perAppBackgroundImage);
+        item.BackgroundImageMode = hasPerAppBackgroundImage
+            ? CardBackgroundModeHelper.Image
+            : settings.CardBackgroundMode;
+        item.BackgroundImagePath = hasPerAppBackgroundImage
+            ? perAppBackgroundImage!
+            : settings.CardBackgroundImagePath;
         item.BackgroundImageOpacity = settings.CardBackgroundImageOpacity;
         item.BackgroundImageHueDegrees = settings.CardBackgroundImageHueDegrees;
         item.BackgroundImageBrightness = settings.CardBackgroundImageBrightness;
+        item.BackgroundImageSaturation = settings.CardBackgroundImageSaturation;
+        item.BackgroundImageContrast = settings.CardBackgroundImageContrast;
+        item.BackgroundImageBlackAndWhite = settings.CardBackgroundImageBlackAndWhite;
         item.BackgroundImageFitMode = settings.CardBackgroundImageFitMode;
         item.BackgroundImagePlacement = settings.CardBackgroundImagePlacement;
+        item.BackgroundImageVerticalFocus = settings.CardBackgroundImageVerticalFocus;
 
         ApplyNarrationRule(item, settings);
 

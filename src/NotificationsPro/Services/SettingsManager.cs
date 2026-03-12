@@ -43,10 +43,11 @@ public class SettingsManager
             if (File.Exists(_settingsPath))
             {
                 var json = File.ReadAllText(_settingsPath);
+                var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
                 var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
                 if (loaded != null)
                 {
-                    NormalizeLoadedSettings(loaded);
+                    NormalizeLoadedSettings(loaded, hasCardBackgroundMode);
                     Settings = loaded;
                 }
             }
@@ -75,7 +76,7 @@ public class SettingsManager
 
     public void Apply(AppSettings updated)
     {
-        NormalizeLoadedSettings(updated);
+        NormalizeLoadedSettings(updated, hasCardBackgroundMode: true);
         Settings = updated;
         Save();
         SettingsChanged?.Invoke();
@@ -88,7 +89,7 @@ public class SettingsManager
         SettingsChanged?.Invoke();
     }
 
-    private static void NormalizeLoadedSettings(AppSettings settings)
+    private static void NormalizeLoadedSettings(AppSettings settings, bool hasCardBackgroundMode)
     {
         settings.MutedApps ??= new List<string>();
         settings.HighlightKeywords ??= new List<string>();
@@ -104,6 +105,10 @@ public class SettingsManager
         settings.PerAppSounds ??= new Dictionary<string, string>();
         settings.PerAppBackgroundImages ??= new Dictionary<string, string>();
         settings.PresentationApps ??= new List<string>();
+        settings.CardBackgroundMode = CardBackgroundModeHelper.Normalize(
+            !hasCardBackgroundMode && !string.IsNullOrWhiteSpace(settings.CardBackgroundImagePath)
+                ? CardBackgroundModeHelper.Image
+                : settings.CardBackgroundMode);
         settings.CardBackgroundImageOpacity = double.IsNaN(settings.CardBackgroundImageOpacity)
             ? 0.45
             : Math.Clamp(settings.CardBackgroundImageOpacity, 0.0, 1.0);
@@ -113,8 +118,47 @@ public class SettingsManager
         settings.CardBackgroundImageBrightness = double.IsNaN(settings.CardBackgroundImageBrightness)
             ? 1.0
             : Math.Clamp(settings.CardBackgroundImageBrightness, 0.2, 2.0);
+        settings.CardBackgroundImageSaturation = double.IsNaN(settings.CardBackgroundImageSaturation)
+            ? 1.0
+            : Math.Clamp(settings.CardBackgroundImageSaturation, 0.0, 2.0);
+        settings.CardBackgroundImageContrast = double.IsNaN(settings.CardBackgroundImageContrast)
+            ? 1.0
+            : Math.Clamp(settings.CardBackgroundImageContrast, 0.2, 2.0);
         settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.CardBackgroundImageFitMode);
         settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.Normalize(settings.CardBackgroundImagePlacement);
+        settings.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Normalize(settings.CardBackgroundImageVerticalFocus);
+        settings.FullscreenOverlayImageHueDegrees = double.IsNaN(settings.FullscreenOverlayImageHueDegrees)
+            ? 0.0
+            : Math.Clamp(settings.FullscreenOverlayImageHueDegrees, -180, 180);
+        settings.FullscreenOverlayImageBrightness = double.IsNaN(settings.FullscreenOverlayImageBrightness)
+            ? 1.0
+            : Math.Clamp(settings.FullscreenOverlayImageBrightness, 0.2, 2.0);
+        settings.FullscreenOverlayImageSaturation = double.IsNaN(settings.FullscreenOverlayImageSaturation)
+            ? 1.0
+            : Math.Clamp(settings.FullscreenOverlayImageSaturation, 0.0, 2.0);
+        settings.FullscreenOverlayImageContrast = double.IsNaN(settings.FullscreenOverlayImageContrast)
+            ? 1.0
+            : Math.Clamp(settings.FullscreenOverlayImageContrast, 0.2, 2.0);
         settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.FullscreenOverlayImageFitMode);
+        settings.FullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Normalize(settings.FullscreenOverlayImageVerticalFocus);
+    }
+
+    private static bool JsonPropertyExists(string json, string propertyName)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+
+        return false;
     }
 }

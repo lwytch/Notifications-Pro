@@ -426,30 +426,41 @@ public class QueueManagerTests
     public void AddNotification_CopiesConfiguredCardBackgroundImageSettings()
     {
         var settings = CreateSettings();
+        settings.Settings.CardBackgroundMode = CardBackgroundModeHelper.Image;
         settings.Settings.CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
         settings.Settings.CardBackgroundImageOpacity = 0.6;
         settings.Settings.CardBackgroundImageHueDegrees = 24;
         settings.Settings.CardBackgroundImageBrightness = 1.2;
+        settings.Settings.CardBackgroundImageSaturation = 0.75;
+        settings.Settings.CardBackgroundImageContrast = 1.4;
+        settings.Settings.CardBackgroundImageBlackAndWhite = true;
         settings.Settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard;
         settings.Settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard;
+        settings.Settings.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Bottom;
         var queue = new QueueManager(settings);
 
         queue.AddNotification("X", "Post", "Body");
 
         Assert.Single(queue.VisibleNotifications);
         var item = queue.VisibleNotifications[0];
+        Assert.Equal(CardBackgroundModeHelper.Image, item.BackgroundImageMode);
         Assert.Equal(settings.Settings.CardBackgroundImagePath, item.BackgroundImagePath);
         Assert.Equal(0.6, item.BackgroundImageOpacity);
         Assert.Equal(24, item.BackgroundImageHueDegrees);
         Assert.Equal(1.2, item.BackgroundImageBrightness);
+        Assert.Equal(0.75, item.BackgroundImageSaturation);
+        Assert.Equal(1.4, item.BackgroundImageContrast);
+        Assert.True(item.BackgroundImageBlackAndWhite);
         Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, item.BackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, item.BackgroundImagePlacement);
+        Assert.Equal(ImageVerticalFocusHelper.Bottom, item.BackgroundImageVerticalFocus);
     }
 
     [Fact]
     public void AddNotification_UsesPerAppBackgroundImageOverride()
     {
         var settings = CreateSettings();
+        settings.Settings.CardBackgroundMode = CardBackgroundModeHelper.Solid;
         settings.Settings.CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\default.png";
         settings.Settings.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x-only.png";
         var queue = new QueueManager(settings);
@@ -460,6 +471,8 @@ public class QueueManagerTests
         Assert.Equal(2, queue.VisibleNotifications.Count);
         var xNotification = queue.VisibleNotifications.First(item => item.AppName == "X");
         var slackNotification = queue.VisibleNotifications.First(item => item.AppName == "Slack");
+        Assert.Equal(CardBackgroundModeHelper.Image, xNotification.BackgroundImageMode);
+        Assert.Equal(CardBackgroundModeHelper.Solid, slackNotification.BackgroundImageMode);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x-only.png", xNotification.BackgroundImagePath);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\default.png", slackNotification.BackgroundImagePath);
     }

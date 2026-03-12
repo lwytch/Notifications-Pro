@@ -25,6 +25,7 @@ Continue/
 .continue/
 .agents/
 .gemini/
+analysis/
 
 # NuGet
 packages/

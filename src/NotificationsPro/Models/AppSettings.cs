@@ -21,12 +21,17 @@ public class AppSettings
     public string AppNameColor { get; set; } = "#C8C8C8";
     public string BackgroundColor { get; set; } = "#202020";
     public double BackgroundOpacity { get; set; } = 0.94;
+    public string CardBackgroundMode { get; set; } = CardBackgroundModeHelper.Solid;
     public string CardBackgroundImagePath { get; set; } = string.Empty;
     public double CardBackgroundImageOpacity { get; set; } = 0.45;
     public double CardBackgroundImageHueDegrees { get; set; }
     public double CardBackgroundImageBrightness { get; set; } = 1.0;
+    public double CardBackgroundImageSaturation { get; set; } = 1.0;
+    public double CardBackgroundImageContrast { get; set; } = 1.0;
+    public bool CardBackgroundImageBlackAndWhite { get; set; } = false;
     public string CardBackgroundImageFitMode { get; set; } = "Fill Card";
     public string CardBackgroundImagePlacement { get; set; } = "Inside Padding";
+    public string CardBackgroundImageVerticalFocus { get; set; } = ImageVerticalFocusHelper.Center;
     public string AccentColor { get; set; } = "#0078D4";
 
     // Appearance — Card Shape
@@ -170,6 +175,12 @@ public class AppSettings
     public string FullscreenOverlayColor { get; set; } = "#000000";
     public string FullscreenOverlayImagePath { get; set; } = string.Empty;
     public string FullscreenOverlayImageFitMode { get; set; } = "Fill Card";
+    public double FullscreenOverlayImageHueDegrees { get; set; }
+    public double FullscreenOverlayImageBrightness { get; set; } = 1.0;
+    public double FullscreenOverlayImageSaturation { get; set; } = 1.0;
+    public double FullscreenOverlayImageContrast { get; set; } = 1.0;
+    public bool FullscreenOverlayImageBlackAndWhite { get; set; } = false;
+    public string FullscreenOverlayImageVerticalFocus { get; set; } = ImageVerticalFocusHelper.Center;
 
     // Streaming & Presentation (M10)
     public bool ChromaKeyEnabled { get; set; } = false;

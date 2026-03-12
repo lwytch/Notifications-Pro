@@ -74,14 +74,14 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
 - **Background opacity** — from fully opaque to near-transparent.
-- **Card background images** — optional local image per stacked notification card with opacity, hue, brightness, fit, and coverage controls. You can keep the image inside the padded content area or let it span the full card, while the normal background colour remains the fallback base.
+- **Card background images** — optional local image per stacked notification card with explicit `Solid / Image` mode plus opacity, hue, brightness, saturation, contrast, black-and-white, fit, coverage, and vertical-focus controls. You can keep the image inside the padded content area or let it span the full card, while the normal background colour remains the fallback base.
 - **Card shape** — corner radius, internal padding, card gap, outer margin.
 - **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
 - **Optional border** — thin border around each card, configurable colour and thickness.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
-- **Apps tab overrides** — assign per-app sound, icon, and card-background overrides once Notifications Pro has seen that app.
+- **Apps tab overrides** — assign per-app sound, icon, narration, and card-background overrides once Notifications Pro has seen that app, with app search, `Only modified`, and one-click reset.
 - **Apps tab stability** — per-app override controls now bind directly to the settings window, avoiding the repeated WPF popup-binding errors that could appear when opening the `Apps` tab.
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
@@ -115,14 +115,14 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 
 ### System Integration
 - **Start with Windows** — enables/disables the packaged Windows Startup Task for Notifications Pro.
-- **Notification access recovery** — the System tab shows current capture status, includes buttons to open Windows notification access and retry the direct WinRT access check, and exposes `Auto`, `Prefer WinRT`, and `Force Accessibility` capture modes.
+- **Notification access recovery** — the System tab shows current capture status, includes buttons to open Windows notification access, retry the direct WinRT access check, and run a capture diagnostic, and exposes `Auto`, `Prefer WinRT`, and `Force Accessibility` capture modes.
 - **Session archive** — optional RAM-only archive for the current app session, with clipboard export and no disk persistence of notification text.
 - **About dialog** — tray menu About shows the installed version, package identity, listener mode/status, runtime version, and project link.
 - **Tray listener health** — tray tooltip surfaces the active listener mode plus current status details for faster troubleshooting.
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
 - **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border).
 - **Settings popup mode** — settings window can float as a popup above the taskbar with optional auto-close.
-- **Quick tips toggle** — `Settings > System > Settings Experience` can turn the first-run guidance banner on or off without affecting notification capture.
+- **Quick tips toggle** — `Settings > Settings Window` can turn the first-run guidance banner on or off without affecting notification capture.
 
 ### Accessibility
 - **Accessibility mode** toggle — enables persistent notifications + system motion/contrast/text-scaling respect in one click.
@@ -130,7 +130,7 @@ A powerful Windows desktop productivity tool (C# .NET 8 + WPF) that captures nat
 - **Respect High Contrast** — adapts overlay colours when Windows High Contrast is active.
 - **Respect Text Scaling** — scales notification text with the Windows text-size accessibility setting.
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
-- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, and per-app `Read aloud` checkboxes. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
+- **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using any Windows-installed Microsoft-signed voice with adjustable speed and volume, a preview button, and per-app `Read aloud` checkboxes in `Settings > Apps`. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
 - **Scrollable overlay** — when content exceeds the max height, a scrollbar appears so no text is lost.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width (4–20 px) and opacity.
@@ -318,7 +318,7 @@ In **Settings > Accessibility > Spoken Notifications**, turn on **Read Notificat
 
 Choose from `Body Only`, `Title Only`, `Title + Body`, `Body + Timestamp`, `Title + Timestamp`, or `Title + Body + Timestamp`. You can also pick an installed Windows voice, adjust rate and volume, and use **Preview Voice** to test the current settings immediately.
 
-The same section also lets you control narration per app with a `Read aloud` checkbox. Unchecked apps still stay visible on screen but are ignored by narration. If you need finer control, `Settings > Filtering > Narration Rules` can force `Read Aloud` or `Skip Read Aloud` for matching title/body text, optionally limited to a specific app. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
+Per-app narration now lives in `Settings > Apps`, where each seen app has a `Read aloud` checkbox alongside its other app-specific overrides. Unchecked apps still stay visible on screen but are ignored by narration. If you need finer control, `Settings > Filtering > Narration Rules` can force `Read Aloud` or `Skip Read Aloud` for matching title/body text, optionally limited to a specific app. Visible cards are spoken once, so new arrivals do not replay cards that already finished speaking. Only Windows-installed Microsoft-signed voices appear in the picker.
 
 If you want to install more voices, Microsoft’s setup guides are:
 - [Customize Narrator voices](https://support.microsoft.com/windows/chapter-7-customizing-narrator-6e30e2d0-b2f3-b907-d264-a5d30502ad73)
@@ -380,6 +380,12 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.5
+- **Settings Ownership Cleanup**: `Behavior` now owns persistent and auto-duration timing, `Apps` now owns per-app `Read aloud` plus one-click override reset, `Layout` now owns Always on Top and Click-Through, and `Settings Window` now owns the quick-tips toggle.
+- **Advanced Background Image Controls**: Appearance now uses an explicit `Solid / Image` mode for card backgrounds and adds saturation, contrast, black-and-white, and vertical-focus controls. Fullscreen backdrops now expose the same image-treatment controls.
+- **App Management & Diagnostics**: `Apps` now includes app search and `Only modified` filtering, while `System > Notification Access` adds `Run Capture Diagnostic` for quick clipboard-friendly listener troubleshooting.
+- **Persistence Hardening**: Legacy imports/settings that already had a card background image now upgrade correctly to image mode, and the new image-treatment settings round-trip through save/load and export/import.
 
 ### Release v1.1.10.4
 - **Live Capture Identity Fix**: Packaged installs now keep the Windows package identity that MSIX already provides instead of forcing the fallback unpackaged AUMID, which could leave the app with split notification identities and stop live notification capture after updates.

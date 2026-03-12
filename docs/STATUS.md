@@ -23,7 +23,7 @@
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
-- Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, UI Styling, System, Profiles, Help) with a Windows-style dark default theme
+- Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, Settings Window, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
 - Apps tab now loads its per-app sound/icon/background controls through stable root-window bindings instead of popup-sensitive combo-box ancestor lookups
 - Apps tab background override display now reads from a one-way binding, so opening the tab and sending test notifications no longer tries to write back into the read-only display property
@@ -32,11 +32,12 @@
   - Appearance now focuses on visual styling only
   - Behavior now holds content/display behavior, timing, deduplication, quiet hours, and burst protection
   - Filtering now owns mute/highlight/narration targeting only
-  - Apps now owns per-app sound, icon, and card-background overrides
-  - Layout now owns fullscreen backdrop controls alongside monitor/size controls
+  - Apps now owns per-app sound, icon, narration, and card-background overrides, with search and `Only modified` filtering
+  - Layout now owns fullscreen backdrop controls plus overlay window interaction controls alongside monitor/size controls
   - Streaming now owns presentation mode and per-app tinting
   - Accessibility now owns the real global hotkey editor
-  - System now owns notification access recovery, toast suppression, session archive, overlay window toggles, and startup
+  - Settings Window now owns quick tips plus settings-window display/theme controls
+  - System now owns notification access recovery, capture diagnostics, toast suppression, session archive, and startup
 - Settings header now includes the same app icon used in the system tray
 - Settings window now uses the app tray icon in the title-bar icon slot
 - Settings header icon treatment simplified (no padded badge container) and app icon palette is now monochrome white/black
@@ -47,10 +48,13 @@
 - Notification cards now expose meaningful UI Automation names instead of the raw `NotificationsPro.Models.NotificationItem` class name
 - Global hotkey editor now matches the three implemented shortcuts (Show/Hide Overlay, Dismiss All, Toggle DND) instead of pointing at missing bindings
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
-- Accessibility tab now includes built-in spoken notifications with on/off toggle, multiple title/body/timestamp combinations, installed voice selection, speed/volume controls, per-app Read Aloud checkboxes, and a Preview Voice button
+- Accessibility tab now includes built-in spoken notifications with on/off toggle, multiple title/body/timestamp combinations, installed voice selection, speed/volume controls, and a Preview Voice button
+- Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that only Windows-installed Microsoft-signed voices appear in the picker
-- System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
+- System tab now exposes current notification-access status plus Open Windows Notification Access, Retry Access Check, a clipboard-friendly `Run Capture Diagnostic` action, and an Auto / Prefer WinRT / Force Accessibility capture-mode selector
+- Appearance now supports explicit `Solid` vs `Image` card background mode, plus saturation, contrast, black-and-white, and portrait-safe vertical-focus controls
+- Fullscreen backdrops now support the same image-treatment controls as card backgrounds: hue, brightness, saturation, contrast, black-and-white, fit, and vertical focus
 - Tray About dialog now shows the full installed package version, package identity, listener status, runtime version, and install path
 - Settings persistence audit fixed a save/load gap where text alignment was not round-tripping through the viewmodel layer
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
@@ -133,9 +137,9 @@
 - **Themes & Profiles (Milestone 6)**:
   - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
   - One-click theme apply sets overlay visual properties (colors, opacity, corner radius, accent, border)
-  - Optional "Link Overlay Theme to UI Theme" toggle in UI Styling controls whether theme apply also updates settings-window colors
+  - Optional "Link Overlay Theme to UI Theme" toggle in Settings Window controls whether theme apply also updates settings-window colors
   - Overlay theme apply now explicitly preserves current settings-window theme/palette when link toggle is off
-  - UI Styling theme preset dropdown now uses the same named theme presets as overlay themes (plus System and Custom)
+  - Settings Window theme preset dropdown now uses the same named theme presets as overlay themes (plus System and Custom)
   - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
   - Load, switch between, and delete custom themes from Settings > Appearance > Overlay Themes
   - Export full settings to a shareable JSON file
@@ -200,7 +204,7 @@
   - Overlay scrollbar controls (show/hide, width 4-20px, opacity)
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
   - Settings popup display mode — Window or Popup (toast-corner anchored on the taskbar monitor, auto-close option, reduced popup height at 55% of work area)
-  - Settings window rounded corners with adjustable radius slider (0–20px) in UI Styling — XAML clipping in popup mode, DWM corner preference in windowed mode
+  - Settings window rounded corners with adjustable radius slider (0–20px) in Settings Window — XAML clipping in popup mode, DWM corner preference in windowed mode
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
   - Per-app notification icons — 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) with icon size slider + custom image upload
@@ -243,7 +247,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 175 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, and rule/background-image persistence), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 176 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, and overflow summary semantics), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, and rule/background-image persistence), SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -309,8 +313,8 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Click-through mode allows clicking through the overlay to underlying apps
 - [ ] Position preset buttons move overlay to expected top/side anchors
 - [ ] "Reset to Defaults" restores all settings
-- [ ] UI Styling tab shows full settings-window color controls (including Surface Light/Hover and Secondary/Muted text)
-- [ ] UI Styling corner radius slider adjusts window rounding (0 = sharp, 20 = very round)
+- [ ] Settings Window tab shows full settings-window color controls (including Surface Light/Hover and Secondary/Muted text)
+- [ ] Settings Window corner radius slider adjusts window rounding (0 = sharp, 20 = very round)
 - [ ] Popup mode shows rounded corners via XAML clipping
 - [ ] Window mode applies DWM corner preference (round/small-round/no-round)
 - [ ] CLI: `--pause` starts app with notifications paused
@@ -346,7 +350,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Timestamp size slider in Appearance > Timestamp Appearance updates timestamp readability without affecting title/body sizes
 - [ ] Timestamp font-weight selector and color picker in Appearance > Timestamp Appearance update timestamp styling immediately
 - [ ] Filtering tab appears in Settings with per-app mute, keyword, and narration-rule sections
-- [ ] Apps tab appears in Settings with per-app sound, icon, and card-background overrides
+- [ ] Apps tab appears in Settings with per-app sound, icon, narration, and card-background overrides
 - [ ] Filtering > Keyword Highlighting rules can target Title Only / Body Only / Title + Body and optionally filter to a specific app
 - [ ] Filtering > Keyword Muting rules can target Title Only / Body Only / Title + Body and optionally filter to a specific app
 - [ ] Filtering > Narration Rules can force Read Aloud or Skip Read Aloud for matching notifications, with optional spoken-content override
@@ -359,7 +363,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Focus mode (tray menu) pauses notifications for selected duration with countdown
 - [ ] Quick Mute App submenu in tray menu shows seen apps with mute/unmute toggles
 - [ ] Appearance tab exposes built-in and custom overlay theme controls
-- [ ] UI Styling theme preset dropdown lists System + overlay theme names + Custom
+- [ ] Settings Window theme preset dropdown lists System + overlay theme names + Custom
 - [ ] Clicking a built-in theme applies its colors/shape to the overlay immediately
 - [ ] Saving a custom theme creates a file and it appears in the custom themes list
 - [ ] Deleting a custom theme removes it from the list and from disk

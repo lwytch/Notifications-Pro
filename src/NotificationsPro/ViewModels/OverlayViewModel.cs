@@ -79,6 +79,9 @@ public class OverlayViewModel : BaseViewModel
     private double _backgroundOpacity = 0.94;
     public double BackgroundOpacity { get => _backgroundOpacity; set => SetProperty(ref _backgroundOpacity, value); }
 
+    private string _cardBackgroundMode = CardBackgroundModeHelper.Solid;
+    public string CardBackgroundMode { get => _cardBackgroundMode; set => SetProperty(ref _cardBackgroundMode, value); }
+
     private string _cardBackgroundImagePath = string.Empty;
     public string CardBackgroundImagePath { get => _cardBackgroundImagePath; set => SetProperty(ref _cardBackgroundImagePath, value); }
 
@@ -91,11 +94,23 @@ public class OverlayViewModel : BaseViewModel
     private double _cardBackgroundImageBrightness = 1.0;
     public double CardBackgroundImageBrightness { get => _cardBackgroundImageBrightness; set => SetProperty(ref _cardBackgroundImageBrightness, value); }
 
+    private double _cardBackgroundImageSaturation = 1.0;
+    public double CardBackgroundImageSaturation { get => _cardBackgroundImageSaturation; set => SetProperty(ref _cardBackgroundImageSaturation, value); }
+
+    private double _cardBackgroundImageContrast = 1.0;
+    public double CardBackgroundImageContrast { get => _cardBackgroundImageContrast; set => SetProperty(ref _cardBackgroundImageContrast, value); }
+
+    private bool _cardBackgroundImageBlackAndWhite;
+    public bool CardBackgroundImageBlackAndWhite { get => _cardBackgroundImageBlackAndWhite; set => SetProperty(ref _cardBackgroundImageBlackAndWhite, value); }
+
     private string _cardBackgroundImageFitMode = "Fill Card";
     public string CardBackgroundImageFitMode { get => _cardBackgroundImageFitMode; set => SetProperty(ref _cardBackgroundImageFitMode, value); }
 
     private string _cardBackgroundImagePlacement = "Inside Padding";
     public string CardBackgroundImagePlacement { get => _cardBackgroundImagePlacement; set => SetProperty(ref _cardBackgroundImagePlacement, value); }
+
+    private string _cardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Center;
+    public string CardBackgroundImageVerticalFocus { get => _cardBackgroundImageVerticalFocus; set => SetProperty(ref _cardBackgroundImageVerticalFocus, value); }
 
     private string _accentColor = "#0078D4";
     public string AccentColor { get => _accentColor; set => SetProperty(ref _accentColor, value); }
@@ -592,12 +607,20 @@ public class OverlayViewModel : BaseViewModel
         AppNameColor = s.AppNameColor;
         BackgroundColor = s.BackgroundColor;
         BackgroundOpacity = s.BackgroundOpacity;
+        CardBackgroundMode = CardBackgroundModeHelper.Normalize(
+            string.IsNullOrWhiteSpace(s.CardBackgroundMode) && !string.IsNullOrWhiteSpace(s.CardBackgroundImagePath)
+                ? CardBackgroundModeHelper.Image
+                : s.CardBackgroundMode);
         CardBackgroundImagePath = s.CardBackgroundImagePath;
         CardBackgroundImageOpacity = s.CardBackgroundImageOpacity;
         CardBackgroundImageHueDegrees = s.CardBackgroundImageHueDegrees;
         CardBackgroundImageBrightness = s.CardBackgroundImageBrightness;
+        CardBackgroundImageSaturation = s.CardBackgroundImageSaturation;
+        CardBackgroundImageContrast = s.CardBackgroundImageContrast;
+        CardBackgroundImageBlackAndWhite = s.CardBackgroundImageBlackAndWhite;
         CardBackgroundImageFitMode = s.CardBackgroundImageFitMode;
         CardBackgroundImagePlacement = s.CardBackgroundImagePlacement;
+        CardBackgroundImageVerticalFocus = s.CardBackgroundImageVerticalFocus;
         AccentColor = s.AccentColor;
         HighlightColor = s.HighlightColor;
         CornerRadius = s.CornerRadius;

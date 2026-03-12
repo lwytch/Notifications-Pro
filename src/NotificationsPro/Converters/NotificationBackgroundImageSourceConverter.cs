@@ -13,8 +13,11 @@ public class NotificationBackgroundImageSourceConverter : IMultiValueConverter
         var path = values.ElementAtOrDefault(0) as string ?? string.Empty;
         var hue = values.ElementAtOrDefault(1) is double h ? h : 0.0;
         var brightness = values.ElementAtOrDefault(2) is double b ? b : 1.0;
+        var saturation = values.ElementAtOrDefault(3) is double s ? s : 1.0;
+        var contrast = values.ElementAtOrDefault(4) is double c ? c : 1.0;
+        var blackAndWhite = values.ElementAtOrDefault(5) is bool bw && bw;
 
-        return _backgroundImageService.ResolveBackgroundImage(path, hue, brightness);
+        return _backgroundImageService.ResolveBackgroundImage(path, hue, brightness, saturation, contrast, blackAndWhite);
     }
 
     public object[] ConvertBack(object? value, Type[] targetTypes, object parameter, CultureInfo culture)

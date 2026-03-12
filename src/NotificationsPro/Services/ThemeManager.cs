@@ -94,16 +94,17 @@ public class ThemeManager
             return null;
 
         var json = File.ReadAllText(filePath);
+        var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
         var imported = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
 
         if (imported != null)
-            SanitizeImportedSettings(imported);
+            SanitizeImportedSettings(imported, hasCardBackgroundMode);
 
         return imported;
     }
 
     /// <summary>Clamp imported settings to valid ranges to prevent corrupt/malicious values.</summary>
-    private static void SanitizeImportedSettings(AppSettings s)
+    private static void SanitizeImportedSettings(AppSettings s, bool hasCardBackgroundMode)
     {
         s.MaxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, 40);
         s.NotificationDuration = Math.Clamp(s.NotificationDuration, 1, 300);
@@ -114,16 +115,47 @@ public class ThemeManager
         s.FontSize = double.IsNaN(s.FontSize) ? 14 : Math.Clamp(s.FontSize, 6, 72);
         s.TitleFontSize = double.IsNaN(s.TitleFontSize) ? 16 : Math.Clamp(s.TitleFontSize, 6, 72);
         s.AppNameFontSize = double.IsNaN(s.AppNameFontSize) ? 14 : Math.Clamp(s.AppNameFontSize, 6, 72);
+        s.CardBackgroundMode = CardBackgroundModeHelper.Normalize(
+            !hasCardBackgroundMode && !string.IsNullOrWhiteSpace(s.CardBackgroundImagePath)
+                ? CardBackgroundModeHelper.Image
+                : s.CardBackgroundMode);
         s.CardBackgroundImageOpacity = double.IsNaN(s.CardBackgroundImageOpacity) ? 0.45 : Math.Clamp(s.CardBackgroundImageOpacity, 0.0, 1.0);
         s.CardBackgroundImageHueDegrees = double.IsNaN(s.CardBackgroundImageHueDegrees) ? 0.0 : Math.Clamp(s.CardBackgroundImageHueDegrees, -180, 180);
         s.CardBackgroundImageBrightness = double.IsNaN(s.CardBackgroundImageBrightness) ? 1.0 : Math.Clamp(s.CardBackgroundImageBrightness, 0.2, 2.0);
+        s.CardBackgroundImageSaturation = double.IsNaN(s.CardBackgroundImageSaturation) ? 1.0 : Math.Clamp(s.CardBackgroundImageSaturation, 0.0, 2.0);
+        s.CardBackgroundImageContrast = double.IsNaN(s.CardBackgroundImageContrast) ? 1.0 : Math.Clamp(s.CardBackgroundImageContrast, 0.2, 2.0);
         s.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.Normalize(s.CardBackgroundImageFitMode);
         s.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.Normalize(s.CardBackgroundImagePlacement);
+        s.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Normalize(s.CardBackgroundImageVerticalFocus);
+        s.FullscreenOverlayImageHueDegrees = double.IsNaN(s.FullscreenOverlayImageHueDegrees) ? 0.0 : Math.Clamp(s.FullscreenOverlayImageHueDegrees, -180, 180);
+        s.FullscreenOverlayImageBrightness = double.IsNaN(s.FullscreenOverlayImageBrightness) ? 1.0 : Math.Clamp(s.FullscreenOverlayImageBrightness, 0.2, 2.0);
+        s.FullscreenOverlayImageSaturation = double.IsNaN(s.FullscreenOverlayImageSaturation) ? 1.0 : Math.Clamp(s.FullscreenOverlayImageSaturation, 0.0, 2.0);
+        s.FullscreenOverlayImageContrast = double.IsNaN(s.FullscreenOverlayImageContrast) ? 1.0 : Math.Clamp(s.FullscreenOverlayImageContrast, 0.2, 2.0);
         s.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(s.FullscreenOverlayImageFitMode);
+        s.FullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Normalize(s.FullscreenOverlayImageVerticalFocus);
         s.HighlightRules ??= new List<HighlightRuleDefinition>();
         s.MuteRules ??= new List<MuteRuleDefinition>();
         s.NarrationRules ??= new List<NarrationRuleDefinition>();
         s.PerAppBackgroundImages ??= new Dictionary<string, string>();
+    }
+
+    private static bool JsonPropertyExists(string json, string propertyName)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+
+        return false;
     }
 
     private static string SanitizeFileName(string name)
