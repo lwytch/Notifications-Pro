@@ -987,7 +987,7 @@ public partial class SettingsViewModel : BaseViewModel
     public double SnapDistance { get => _snapDistance; set { if (SetProperty(ref _snapDistance, value)) QueueSave(); } }
 
     // Overlay scrollbar (M9.5)
-    private bool _overlayScrollbarVisible = true;
+    private bool _overlayScrollbarVisible;
     public bool OverlayScrollbarVisible { get => _overlayScrollbarVisible; set { if (SetProperty(ref _overlayScrollbarVisible, value)) QueueSave(); } }
 
     private double _overlayScrollbarWidth = 8;
@@ -1007,6 +1007,9 @@ public partial class SettingsViewModel : BaseViewModel
 
     private double _overlayScrollbarPadding = 1.5;
     public double OverlayScrollbarPadding { get => _overlayScrollbarPadding; set { if (SetProperty(ref _overlayScrollbarPadding, Math.Clamp(value, 0.0, 6.0))) QueueSave(); } }
+
+    private double _overlayScrollbarContentGap = 10;
+    public double OverlayScrollbarContentGap { get => _overlayScrollbarContentGap; set { if (SetProperty(ref _overlayScrollbarContentGap, Math.Clamp(value, 0.0, 24.0))) QueueSave(); } }
 
     private double _overlayScrollbarCornerRadius = 6;
     public double OverlayScrollbarCornerRadius { get => _overlayScrollbarCornerRadius; set { if (SetProperty(ref _overlayScrollbarCornerRadius, Math.Clamp(value, 0.0, 12.0))) QueueSave(); } }
@@ -1454,6 +1457,7 @@ public partial class SettingsViewModel : BaseViewModel
         _overlayScrollbarThumbColor = s.OverlayScrollbarThumbColor;
         _overlayScrollbarThumbHoverColor = s.OverlayScrollbarThumbHoverColor;
         _overlayScrollbarPadding = s.OverlayScrollbarPadding;
+        _overlayScrollbarContentGap = s.OverlayScrollbarContentGap;
         _overlayScrollbarCornerRadius = s.OverlayScrollbarCornerRadius;
         _overlayWidthDirty = false;
         OnPropertyChanged(nameof(IsStackedLayout));
@@ -1746,6 +1750,7 @@ public partial class SettingsViewModel : BaseViewModel
             OverlayScrollbarThumbColor = OverlayScrollbarThumbColor,
             OverlayScrollbarThumbHoverColor = OverlayScrollbarThumbHoverColor,
             OverlayScrollbarPadding = OverlayScrollbarPadding,
+            OverlayScrollbarContentGap = OverlayScrollbarContentGap,
             OverlayScrollbarCornerRadius = OverlayScrollbarCornerRadius,
             // Preserve position from current settings
             OverlayLeft = previousSettings.OverlayLeft,

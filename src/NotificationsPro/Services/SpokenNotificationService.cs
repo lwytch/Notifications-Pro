@@ -100,7 +100,7 @@ public sealed class SpokenNotificationService : IDisposable
     {
         var previewText = SpokenNotificationTextFormatter.BuildText(
             "Notifications Pro",
-            "Sample notification body. Build succeeded and the release package is ready.",
+            "Notifications Pro keeps important alerts readable, audible, and easy to follow on busy, high-resolution desktops.",
             DateTime.Now,
             settings.ReadNotificationsAloudMode,
             settings.TimestampDisplayMode);

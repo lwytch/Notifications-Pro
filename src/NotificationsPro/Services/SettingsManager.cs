@@ -130,6 +130,9 @@ public class SettingsManager
         settings.OverlayScrollbarPadding = double.IsNaN(settings.OverlayScrollbarPadding)
             ? 1.5
             : Math.Clamp(settings.OverlayScrollbarPadding, 0.0, 6.0);
+        settings.OverlayScrollbarContentGap = double.IsNaN(settings.OverlayScrollbarContentGap)
+            ? 10.0
+            : Math.Clamp(settings.OverlayScrollbarContentGap, 0.0, 24.0);
         settings.OverlayScrollbarCornerRadius = double.IsNaN(settings.OverlayScrollbarCornerRadius)
             ? 6.0
             : Math.Clamp(settings.OverlayScrollbarCornerRadius, 0.0, 12.0);

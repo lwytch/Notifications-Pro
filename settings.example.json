@@ -127,6 +127,7 @@
   "OverlayScrollbarThumbColor": "#4F4F4F",
   "OverlayScrollbarThumbHoverColor": "#0078D4",
   "OverlayScrollbarPadding": 1.5,
+  "OverlayScrollbarContentGap": 10,
   "OverlayScrollbarCornerRadius": 6,
   "OverlayVisible": true,
   "FullscreenOverlayMode": false,

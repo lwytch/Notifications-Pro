@@ -194,7 +194,7 @@ public partial class OverlayWindow : Window
         {
             var result = System.Windows.MessageBox.Show(
                 $"{vm.Queue.OverflowCount} notification(s) were not shown because the visible limit is currently {currentLimit}.\n\n" +
-                "Overflow content is discarded immediately for privacy, so it cannot be expanded later.\n\n" +
+                "The scrollbar only helps when the currently visible cards exceed the overlay height. Notifications beyond the visible limit are discarded immediately for privacy, so they cannot be expanded later.\n\n" +
                 $"Increase the visible limit to {suggestedLimit} for future notifications?",
                 "Overflow Summary",
                 MessageBoxButton.YesNo,
@@ -211,7 +211,7 @@ public partial class OverlayWindow : Window
 
         System.Windows.MessageBox.Show(
             $"{vm.Queue.OverflowCount} notification(s) were not shown while the overlay was already at its maximum visible limit of 40.\n\n" +
-            "Overflow content is discarded immediately for privacy, so it cannot be expanded later.",
+            "The scrollbar only helps when the currently visible cards exceed the overlay height. Notifications beyond the visible limit are discarded immediately for privacy, so they cannot be expanded later.",
             "Overflow Summary",
             MessageBoxButton.OK,
             MessageBoxImage.Information);

@@ -172,6 +172,7 @@ public class AppSettings
     public string OverlayScrollbarThumbColor { get; set; } = "#4F4F4F";
     public string OverlayScrollbarThumbHoverColor { get; set; } = "#0078D4";
     public double OverlayScrollbarPadding { get; set; } = 1.5;
+    public double OverlayScrollbarContentGap { get; set; } = 10;
     public double OverlayScrollbarCornerRadius { get; set; } = 6;
 
     // Overlay visibility

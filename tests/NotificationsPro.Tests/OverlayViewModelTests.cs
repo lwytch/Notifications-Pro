@@ -19,7 +19,7 @@ public class OverlayViewModelTests : IDisposable
     }
 
     [Fact]
-    public void OverlayScrollbarVisible_RaisesScrollbarVisibilityChanged()
+    public void OverlayScrollbarSettings_RaiseDependentProperties()
     {
         var settingsManager = new SettingsManager(_tempDir);
         settingsManager.Load();
@@ -35,13 +35,46 @@ public class OverlayViewModelTests : IDisposable
                     changedProperties.Add(args.PropertyName!);
             };
 
-            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
-
             viewModel.OverlayScrollbarVisible = true;
+            viewModel.OverlayScrollbarContentGap = 14;
 
-            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Visible, viewModel.ScrollbarVisibility);
+            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
             Assert.Contains(nameof(OverlayViewModel.OverlayScrollbarVisible), changedProperties);
             Assert.Contains(nameof(OverlayViewModel.ScrollbarVisibility), changedProperties);
+            Assert.Contains(nameof(OverlayViewModel.OverlayScrollbarContentGap), changedProperties);
+            Assert.Contains(nameof(OverlayViewModel.OverlayContentMargin), changedProperties);
+        }
+        finally
+        {
+            viewModel.Cleanup();
+        }
+    }
+
+    [Fact]
+    public void OverlayScrollbar_HidesWhenQueueIsEmpty_AndAddsConfiguredGapWhenVisible()
+    {
+        var settingsManager = new SettingsManager(_tempDir);
+        settingsManager.Load();
+        settingsManager.Settings.OverlayScrollbarVisible = true;
+        settingsManager.Settings.OverlayScrollbarContentGap = 12;
+
+        var queueManager = new QueueManager(settingsManager);
+        var viewModel = new OverlayViewModel(queueManager, settingsManager);
+
+        try
+        {
+            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
+            Assert.Equal(0, viewModel.OverlayContentMargin.Right);
+
+            queueManager.AddNotification("X", "Title", "Body");
+
+            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Visible, viewModel.ScrollbarVisibility);
+            Assert.Equal(12, viewModel.OverlayContentMargin.Right);
+
+            queueManager.ClearAll();
+
+            Assert.Equal(System.Windows.Controls.ScrollBarVisibility.Hidden, viewModel.ScrollbarVisibility);
+            Assert.Equal(0, viewModel.OverlayContentMargin.Right);
         }
         finally
         {

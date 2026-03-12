@@ -1064,7 +1064,7 @@
                             <ToggleButton DockPanel.Dock="Right" HorizontalAlignment="Right"
                                           Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding OverlayScrollbarVisible}"
-                                          ToolTip="Show or hide the styled overlay scrollbar. When enabled, the scrollbar stays visible so it can be themed consistently and grabbed quickly."/>
+                                          ToolTip="Show or hide the styled overlay scrollbar. When enabled, it stays visible while notification cards are present so it can be grabbed quickly, and it stays hidden while the waiting placeholder is showing."/>
                         </DockPanel>
 
                         <TextBlock Text="Scrollbar Width" Style="{StaticResource SettingLabel}" ToolTip="Controls how wide the scrollbar appears in the overlay"/>
@@ -1098,6 +1098,17 @@
                                     Minimum="0" Maximum="6" Value="{Binding OverlayScrollbarPadding}"
                                     TickFrequency="0.5" IsSnapToTickEnabled="True"
                                     ToolTip="Extra inset around the scrollbar track and thumb"/>
+                        </DockPanel>
+
+                        <TextBlock Text="Scrollbar Gap" Style="{StaticResource SettingLabel}" ToolTip="Spacing between the notification cards and the scrollbar column"/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding OverlayScrollbarContentGap, StringFormat='{}{0:0}'}"/><Run Text="px"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0" Maximum="24" Value="{Binding OverlayScrollbarContentGap}"
+                                    TickFrequency="1" IsSnapToTickEnabled="True"
+                                    ToolTip="Spacing between the notification cards and the scrollbar column"/>
                         </DockPanel>
 
                         <TextBlock Text="Scrollbar Corner Radius" Style="{StaticResource SettingLabel}" ToolTip="Rounds the scrollbar track and thumb"/>

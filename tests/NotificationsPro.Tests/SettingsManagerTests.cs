@@ -48,6 +48,7 @@ public class SettingsManagerTests : IDisposable
         Assert.False(sm.Settings.SingleLineAutoFullWidth);
         Assert.True(sm.Settings.NewestOnTop);
         Assert.False(sm.Settings.OverlayScrollbarVisible);
+        Assert.Equal(10, sm.Settings.OverlayScrollbarContentGap);
     }
 
     [Fact]
@@ -81,6 +82,7 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.OverlayScrollbarThumbColor = "#6A6A6A";
         sm.Settings.OverlayScrollbarThumbHoverColor = "#44AAFF";
         sm.Settings.OverlayScrollbarPadding = 2.5;
+        sm.Settings.OverlayScrollbarContentGap = 12;
         sm.Settings.OverlayScrollbarCornerRadius = 7;
         sm.Settings.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
         sm.Settings.FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png";
@@ -145,6 +147,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("#6A6A6A", sm2.Settings.OverlayScrollbarThumbColor);
         Assert.Equal("#44AAFF", sm2.Settings.OverlayScrollbarThumbHoverColor);
         Assert.Equal(2.5, sm2.Settings.OverlayScrollbarPadding);
+        Assert.Equal(12, sm2.Settings.OverlayScrollbarContentGap);
         Assert.Equal(7, sm2.Settings.OverlayScrollbarCornerRadius);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", sm2.Settings.PerAppBackgroundImages["X"]);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", sm2.Settings.FullscreenOverlayImagePath);
@@ -259,6 +262,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("#4F4F4F", settings.OverlayScrollbarThumbColor);
         Assert.Equal("#0078D4", settings.OverlayScrollbarThumbHoverColor);
         Assert.Equal(1.5, settings.OverlayScrollbarPadding);
+        Assert.Equal(10, settings.OverlayScrollbarContentGap);
         Assert.Equal(6, settings.OverlayScrollbarCornerRadius);
         Assert.False(settings.ReadNotificationsAloudEnabled);
         Assert.Equal(NarrationTriggerModeHelper.AllAllowedNotifications, settings.ReadNotificationsAloudTriggerMode);
@@ -297,7 +301,8 @@ public class SettingsManagerTests : IDisposable
               "CardBackgroundImageVerticalFocus": "Somewhere",
               "FullscreenOverlayImageSaturation": 3.0,
               "FullscreenOverlayImageContrast": 9.0,
-              "FullscreenOverlayImageVerticalFocus": "Elsewhere"
+              "FullscreenOverlayImageVerticalFocus": "Elsewhere",
+              "OverlayScrollbarContentGap": 99.0
             }
             """);
 
@@ -311,6 +316,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageSaturation);
         Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageContrast);
         Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.FullscreenOverlayImageVerticalFocus);
+        Assert.Equal(24.0, sm.Settings.OverlayScrollbarContentGap);
     }
 
     [Fact]

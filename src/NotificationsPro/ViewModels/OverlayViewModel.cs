@@ -266,6 +266,7 @@ public class OverlayViewModel : BaseViewModel
         {
             if (!SetProperty(ref _overlayScrollbarVisible, value)) return;
             OnPropertyChanged(nameof(ScrollbarVisibility));
+            OnPropertyChanged(nameof(OverlayContentMargin));
         }
     }
 
@@ -295,6 +296,17 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
+    private double _overlayScrollbarContentGap = 10;
+    public double OverlayScrollbarContentGap
+    {
+        get => _overlayScrollbarContentGap;
+        set
+        {
+            if (!SetProperty(ref _overlayScrollbarContentGap, value)) return;
+            OnPropertyChanged(nameof(OverlayContentMargin));
+        }
+    }
+
     private double _overlayScrollbarCornerRadius = 6;
     public double OverlayScrollbarCornerRadius
     {
@@ -307,8 +319,13 @@ public class OverlayViewModel : BaseViewModel
     }
 
     public System.Windows.Controls.ScrollBarVisibility ScrollbarVisibility =>
-        OverlayScrollbarVisible ? System.Windows.Controls.ScrollBarVisibility.Visible : System.Windows.Controls.ScrollBarVisibility.Hidden;
+        OverlayScrollbarVisible && _queueManager.VisibleNotifications.Count > 0
+            ? System.Windows.Controls.ScrollBarVisibility.Visible
+            : System.Windows.Controls.ScrollBarVisibility.Hidden;
     public Thickness OverlayScrollbarPaddingThickness => new(OverlayScrollbarPadding);
+    public Thickness OverlayContentMargin => ScrollbarVisibility == System.Windows.Controls.ScrollBarVisibility.Visible
+        ? new Thickness(0, 0, OverlayScrollbarContentGap, 0)
+        : new Thickness(0);
     public CornerRadius OverlayScrollbarCornerRadiusValue => new(OverlayScrollbarCornerRadius);
 
     // Content
@@ -692,8 +709,10 @@ public class OverlayViewModel : BaseViewModel
         OverlayScrollbarThumbColor = s.OverlayScrollbarThumbColor;
         OverlayScrollbarThumbHoverColor = s.OverlayScrollbarThumbHoverColor;
         OverlayScrollbarPadding = s.OverlayScrollbarPadding;
+        OverlayScrollbarContentGap = s.OverlayScrollbarContentGap;
         OverlayScrollbarCornerRadius = s.OverlayScrollbarCornerRadius;
         OnPropertyChanged(nameof(ScrollbarVisibility));
+        OnPropertyChanged(nameof(OverlayContentMargin));
         ShowNotificationIcons = s.ShowNotificationIcons;
         IconSize = s.IconSize;
         CurrentSettings = s;
@@ -758,6 +777,8 @@ public class OverlayViewModel : BaseViewModel
         EmptyStateVisibility = _queueManager.VisibleNotifications.Count == 0
             ? Visibility.Visible
             : Visibility.Collapsed;
+        OnPropertyChanged(nameof(ScrollbarVisibility));
+        OnPropertyChanged(nameof(OverlayContentMargin));
     }
 
     private static Duration DurationFor(double ms)

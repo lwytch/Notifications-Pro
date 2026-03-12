@@ -122,6 +122,7 @@ public class ThemeManager
         s.OverlayScrollbarThumbColor = string.IsNullOrWhiteSpace(s.OverlayScrollbarThumbColor) ? "#4F4F4F" : s.OverlayScrollbarThumbColor;
         s.OverlayScrollbarThumbHoverColor = string.IsNullOrWhiteSpace(s.OverlayScrollbarThumbHoverColor) ? "#0078D4" : s.OverlayScrollbarThumbHoverColor;
         s.OverlayScrollbarPadding = double.IsNaN(s.OverlayScrollbarPadding) ? 1.5 : Math.Clamp(s.OverlayScrollbarPadding, 0.0, 6.0);
+        s.OverlayScrollbarContentGap = double.IsNaN(s.OverlayScrollbarContentGap) ? 10.0 : Math.Clamp(s.OverlayScrollbarContentGap, 0.0, 24.0);
         s.OverlayScrollbarCornerRadius = double.IsNaN(s.OverlayScrollbarCornerRadius) ? 6.0 : Math.Clamp(s.OverlayScrollbarCornerRadius, 0.0, 12.0);
         s.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(s.ReadNotificationsAloudTriggerMode);
         s.CardBackgroundMode = CardBackgroundModeHelper.Normalize(

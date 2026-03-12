@@ -45,6 +45,7 @@ public class ThemePreset
     public bool ShowBorder { get; set; } = false;
     public double BorderThickness { get; set; } = 1;
     public double OverlayScrollbarPadding { get; set; } = 1.5;
+    public double OverlayScrollbarContentGap { get; set; } = 10;
     public double OverlayScrollbarCornerRadius { get; set; } = 6;
 
     /// <summary>
@@ -72,6 +73,7 @@ public class ThemePreset
         settings.ShowBorder = ShowBorder;
         settings.BorderThickness = BorderThickness;
         settings.OverlayScrollbarPadding = OverlayScrollbarPadding;
+        settings.OverlayScrollbarContentGap = OverlayScrollbarContentGap;
         settings.OverlayScrollbarCornerRadius = OverlayScrollbarCornerRadius;
     }
 
@@ -129,6 +131,7 @@ public class ThemePreset
             ShowBorder = settings.ShowBorder,
             BorderThickness = settings.BorderThickness,
             OverlayScrollbarPadding = settings.OverlayScrollbarPadding,
+            OverlayScrollbarContentGap = settings.OverlayScrollbarContentGap,
             OverlayScrollbarCornerRadius = settings.OverlayScrollbarCornerRadius,
             SettingsWindowBg = settings.SettingsWindowBg,
             SettingsWindowSurface = settings.SettingsWindowSurface,
@@ -164,7 +167,7 @@ public class ThemePreset
             SettingsWindowBorder = "#353535", SettingsWindowOpacity = 0.98,
             CornerRadius = 12, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = false, BorderThickness = 1,
-            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 6,
         },
         new()
         {
@@ -180,7 +183,7 @@ public class ThemePreset
             SettingsWindowBorder = "#363650", SettingsWindowOpacity = 0.98,
             CornerRadius = 12, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = false, BorderThickness = 1,
-            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 6,
         },
         new()
         {
@@ -191,7 +194,7 @@ public class ThemePreset
             OverlayScrollbarTrackColor = "#E8E8F0", OverlayScrollbarThumbColor = "#B0B0C0", OverlayScrollbarThumbHoverColor = "#5B7FFF",
             CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
-            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 6,
             SettingsWindowBg = "#F5F5F8", SettingsWindowSurface = "#FFFFFF",
             SettingsWindowSurfaceLight = "#E8E8F0", SettingsWindowSurfaceHover = "#DEDEE8",
             SettingsWindowText = "#222222", SettingsWindowTextSecondary = "#555555",
@@ -213,7 +216,7 @@ public class ThemePreset
             SettingsSurfaceOpacity = 0.15, SettingsElementOpacity = 0.50,
             CornerRadius = 16, Padding = 18, CardGap = 10, OuterMargin = 6,
             ShowAccent = false, AccentThickness = 3, ShowBorder = true, BorderThickness = 1,
-            OverlayScrollbarPadding = 2, OverlayScrollbarCornerRadius = 8,
+            OverlayScrollbarPadding = 2, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 8,
         },
         new()
         {
@@ -229,7 +232,7 @@ public class ThemePreset
             SettingsWindowBorder = "#FFFFFF", SettingsWindowOpacity = 1.0,
             CornerRadius = 0, Padding = 14, CardGap = 6, OuterMargin = 2,
             ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 2,
-            OverlayScrollbarPadding = 1, OverlayScrollbarCornerRadius = 0,
+            OverlayScrollbarPadding = 1, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 0,
         },
         new()
         {
@@ -245,7 +248,7 @@ public class ThemePreset
             SettingsWindowBorder = "#2B2B40", SettingsWindowOpacity = 0.98,
             CornerRadius = 6, Padding = 12, CardGap = 4, OuterMargin = 2,
             ShowAccent = false, AccentThickness = 2, ShowBorder = false, BorderThickness = 1,
-            OverlayScrollbarPadding = 1, OverlayScrollbarCornerRadius = 4,
+            OverlayScrollbarPadding = 1, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 4,
         },
         new()
         {
@@ -261,7 +264,7 @@ public class ThemePreset
             SettingsWindowBorder = "#425075", SettingsWindowOpacity = 0.98,
             CornerRadius = 10, Padding = 16, CardGap = 8, OuterMargin = 4,
             ShowAccent = true, AccentThickness = 4, ShowBorder = true, BorderThickness = 1,
-            OverlayScrollbarPadding = 1.5, OverlayScrollbarCornerRadius = 6,
+            OverlayScrollbarPadding = 1.5, OverlayScrollbarContentGap = 10, OverlayScrollbarCornerRadius = 6,
         },
     };
 }

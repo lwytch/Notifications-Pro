@@ -13,9 +13,23 @@
 
 ---
 
-A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay. Filter noise, style cards per app, narrate only the alerts that matter, and keep notification text RAM-only while it is visible on screen.
+A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay. It is especially useful on 4K, 5K, ultrawide, and multi-monitor setups where default Windows toasts are easy to miss. Filter noise, style cards per app, narrate only the alerts that matter, and keep notification text RAM-only while it is visible on screen.
 
 > Still in active development. I use it every day. More updates coming.
+
+## Why Notifications Pro Instead of Default Windows Notifications?
+
+| Default Windows notifications | Notifications Pro |
+|------------------------------|-------------------|
+| Small transient toasts that are easy to miss on 4K/5K/ultrawide displays | A resizable always-on-top overlay you can place exactly where you want, including a dedicated side monitor |
+| One-size-fits-all presentation | Per-app icons, sounds, card backgrounds, typography, timestamps, density, and grouping controls |
+| Limited control over what breaks focus | App mute, field-scoped rules, app-filtered rules, deduplication, quiet hours, burst protection, and focus mode |
+| No dedicated notification workspace | Put notifications on any monitor, use a fullscreen backdrop on a spare display, or pin the overlay to a consistent corner |
+| Basic speech/accessibility control | Built-in narration, per-app read aloud, rule-gated speech, Voice Access labels, auto-duration, and accessibility-aware styling |
+| System decides when to dismiss toasts | Persistent cards, auto-duration, hover-to-pause, and explicit visible-card limits |
+| Overflow and history behavior are opaque | RAM-only visible cards, overflow count only, and no disk history of notification content by default |
+
+Notifications Pro is built for people who need more control than Windows offers out of the box: developers watching builds and reviews, social/community managers tracking mentions, streamers keeping alerts readable on a second screen, and anyone using a high-resolution desktop where standard toasts disappear too quickly or too far into the corner.
 
 ## 🎯 Who is this for?
 
@@ -51,10 +65,10 @@ A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows 
 - **OBS fixed-window mode** — locks the overlay to a precise width/height for predictable window-capture in OBS/streaming tools.
 
 ### Layout Modes
-- **Stacked cards** — each notification is a separate card, scrollable when many accumulate.
+- **Stacked cards** — each notification is a separate card, and the optional scrollbar applies when the currently visible cards need more vertical space.
 - **Single-line banner mode** — all text compressed to a single line per notification, with optional wrapping and a configurable max-line count.
 - **Newest-on-top** toggle — controls whether new notifications appear at the top or bottom.
-- **Max visible** — configurable 1–40 visible cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards.
+- **Max visible** — configurable 1–40 visible cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards. The scrollbar does not resurrect those discarded overflow items.
 - **Max overlay height** — the overlay expands vertically up to this limit, then shows a scrollbar. Clamped to the active monitor work area.
 - **Width / height presets** — quick buttons for 1080p / 2K / 4K / 8K display sizes.
 
@@ -125,8 +139,8 @@ A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows 
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
 - **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using every voice Windows currently exposes to Notifications Pro through its app and desktop speech APIs, with adjustable speed, volume, preview, explicit trigger mode, a mirrored `Only speak matching rules` toggle in `Filtering`, and per-app `Read aloud` checkboxes in `Settings > Apps`. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
-- **Scrollable overlay** — when content exceeds the max height, a clickable scrollbar appears so no text is lost without giving up drag-anywhere behavior on the rest of the overlay.
-- **Overlay scrollbar customisation** — show/hide scrollbar, configurable width, opacity, track/thumb colours, inset padding, and corner radius, all carried by overlay themes.
+- **Scrollable overlay** — when visible cards exceed the max height, a clickable themed scrollbar keeps those visible cards readable without giving up drag-anywhere behavior on the rest of the overlay. It stays hidden while the idle `Waiting for notifications...` placeholder is showing.
+- **Overlay scrollbar customisation** — show/hide scrollbar, configurable width, opacity, track/thumb colours, inset padding, card-to-scrollbar gap, and corner radius, all carried by overlay themes.
 
 ### Automation & Scheduling
 - **CLI arguments** — `--pause`, `--resume`, `--theme <name>`, `--send-test`, `--hide`, and `--show` can control the app from shortcuts or scripts.
@@ -394,6 +408,12 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.15
+- **Scrollbar Polish**: `Settings > Appearance` now includes a card-to-scrollbar gap control, the themed scrollbar stays hidden while the idle `Waiting for notifications...` placeholder is showing, and the overlay keeps a cleaner separation between the cards and the scrollbar column when it is enabled.
+- **Overflow Clarity**: the overflow badge and its click action now explain the real privacy model more clearly: scrollbars only apply to currently visible cards, while notifications beyond `Max Visible` are discarded immediately and counted as `+N not shown`.
+- **Narration Preview Refresh**: `Preview Voice` now uses an app-focused sample line instead of the old release/build wording.
+- **README Positioning Refresh**: the README now opens with a clear “why use this instead of default Windows notifications” comparison and tighter high-resolution / dedicated-monitor positioning.
 
 ### Release v1.1.10.14
 - **Startup Repair Follow-Up**: installs that were already stamped during the earlier migration bug now repair their old `3` visible notifications, tiny overlay height, and broken animation timing on the next launch instead of staying stuck in that bad first-run state, even if the broken build had already bumped the stored schema once or left the old values in place under the current schema.

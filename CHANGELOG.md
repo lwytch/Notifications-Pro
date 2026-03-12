@@ -17,6 +17,7 @@
 - Startup defaults repair now follows settings schema version `4`, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on their next launch
 - Overlay hit-testing now treats the real scrollbar and search controls as client input regions, so the scrollbar can be clicked and dragged normally without sacrificing drag-anywhere behavior on the rest of the overlay
 - Overlay scrollbar toggling now updates the live overlay correctly, and the enabled state keeps the themed scrollbar visible instead of relying on WPF `Auto` visibility
+- Overlay scrollbar polish — the idle `Waiting for notifications...` placeholder no longer shows the themed scrollbar, the overflow affordance now explains that scrollbars only apply to currently visible cards, and `Preview Voice` now uses app-focused sample wording instead of build/release phrasing
 - Startup settings persistence now uses a one-time schema migration for legacy installs, so older `3`-visible / `300ms` / `480px` defaults upgrade once instead of resurfacing on later packaged launches
 - Apps tab per-app override cards were rebuilt into a cleaner aligned form layout, and app-specific background overrides now show a short status label with the full path moved into the tooltip
 - App-specific card background status text now sits vertically centered in its field instead of hugging the top edge
@@ -60,6 +61,7 @@
 
 ### Added
 - Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, and corner radius, and overlay themes now carry those scrollbar visuals with the rest of the overlay palette
+- Appearance now includes a card-to-scrollbar gap control so the themed scrollbar can be visually separated from stacked notification cards without changing the card padding itself
 - Overlay scrollbars now default to off on fresh settings so the first-run overlay stays visually clean unless the user explicitly enables themed scrollbars
 - `Refresh Voices` action in Accessibility so the narration voice picker can be rescanned without reopening the app after Windows voice changes
 - Settings IA polish pass — `Persistent Notifications` and `Auto-Duration` now live in `Behavior`, app-specific narration moved into `Apps`, overlay window interaction moved into `Layout`, quick tips moved into `Settings Window`, and `System` now includes a `Run Capture Diagnostic` action

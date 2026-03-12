@@ -536,7 +536,7 @@
                     </Setter>
                 </Style>
             </ScrollViewer.Resources>
-            <StackPanel>
+            <StackPanel Margin="{Binding OverlayContentMargin}">
                 <!-- Search bar (toggled via right-click context menu) -->
                 <Border Visibility="{Binding SearchBarVisibility}"
                         Margin="0,0,0,4"
@@ -698,7 +698,9 @@
                         Visibility="{Binding Queue.HasOverflow, Converter={StaticResource BoolToVis}}"
                         Margin="0,0,0,4" Padding="12,8"
                         CornerRadius="{Binding CornerRadius}"
-                        HorizontalAlignment="Left">
+                        HorizontalAlignment="Left"
+                        Cursor="Hand"
+                        ToolTip="Scrollbars only help when the currently visible cards exceed the overlay height. Notifications beyond Max Visible are discarded immediately for privacy and only counted here.">
                     <Border.Background>
                         <MultiBinding Converter="{StaticResource ColorToOpacityBrush}">
                             <Binding Path="BackgroundColor"/>
