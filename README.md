@@ -7,7 +7,7 @@
   
   [![Platform](https://img.shields.io/badge/Platform-Windows_10%20%7C%2011-blue.svg)]()
   [![Framework](https://img.shields.io/badge/Framework-.NET_8%20%7C%20WPF-purple.svg)]()
-  [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
+  [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
   [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg)]()
 </div>
 
@@ -66,7 +66,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 
 ### Layout Modes
 - **Stacked cards** — each notification is a separate card, and the optional scrollbar applies when the currently visible cards need more vertical space.
-- **Single-line banner mode** — all text compressed to a single line per notification, with optional wrapping and a configurable max-line count.
+- **Single-line banner mode** — all text compressed to a single line per notification, with optional wrapping and a configurable max-line count. Timestamps are rendered inline when enabled.
+- **Replace mode** — globally available text-replacement rendering that works across all layout modes.
 - **Newest-on-top** toggle — controls whether new notifications appear at the top or bottom.
 - **Retained notifications** — configurable 1–1000 retained cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards. The themed scrollbar is enabled by default for fresh installs but only appears when the retained cards overflow the overlay height; it does not resurrect discarded overflow items.
 - **Max overlay height** — the overlay expands vertically up to this limit, then shows a scrollbar. Clamped to the active monitor work area.
@@ -88,6 +89,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Optional border** — thin border around each card, configurable colour and thickness.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
+- **Dyslexia-friendly font** — bundled OpenDyslexic typeface with one-click preset buttons in `Appearance > Typography`.
 - **Apps tab overrides** — assign per-app `Read aloud`, sound, icon, and card-background overrides once Notifications Pro has seen that app, with app search, `Only modified`, and one-click reset.
 - **Apps tab stability** — per-app override controls now bind directly to the settings window, avoiding the repeated WPF popup-binding errors that could appear when opening the `Apps` tab.
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
@@ -127,6 +129,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **About dialog** — tray menu About shows the installed version, package identity, listener mode/status, runtime version, and project link.
 - **Tray listener health** — tray tooltip surfaces the active listener mode plus current status details for faster troubleshooting.
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
+- **Settings undo/redo** — Ctrl+Z and Ctrl+Y with a 50-entry history stack, plus undo/redo buttons in the settings header.
 - **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border).
 - **Settings popup mode** — settings window can float as a popup above the taskbar with optional auto-close.
 - **Quick tips toggle** — `Settings > Settings Window` can turn the first-run guidance banner on or off without affecting notification capture.
@@ -139,6 +142,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Auto-duration** — longer notifications stay visible longer so there is time to read them.
 - **Spoken notifications** — built-in narration can read multiple title/body/timestamp combinations, using every voice Windows currently exposes to Notifications Pro through its app and desktop speech APIs, with adjustable speed, volume, preview, explicit trigger mode, a mirrored `Only speak matching rules` toggle in `Filtering`, and per-app `Read aloud` checkboxes in `Settings > Apps`. Each visible card is spoken once, so newly arriving cards do not replay cards that already finished speaking.
 - **Microsoft Voice Access labels** — choose `Off`, `Body Only`, or `Title + Body + Timestamp` for the card-level UI Automation label used by Voice Access and similar assistive tools.
+- **Keyboard navigation** — Alt-key mnemonics for every settings tab, Escape to close, and full tab-cycle navigation across all controls.
 - **Scrollable overlay** — when visible cards exceed the max height, a clickable themed scrollbar keeps those visible cards readable without giving up drag-anywhere behavior on the rest of the overlay. It stays hidden while the idle `Waiting for notifications...` placeholder is showing.
 - **Overlay scrollbar customisation** — show/hide scrollbar, configurable width, opacity, track/thumb colours, inset padding, card-to-scrollbar gap, and corner radius, all carried by overlay themes.
 
@@ -277,7 +281,7 @@ Under `%AppData%\NotificationsPro\`:
 dotnet restore
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 192 unit tests
 ```
 
 ## Publish (self-contained)

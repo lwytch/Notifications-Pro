@@ -27,7 +27,7 @@ Thank you for your interest in contributing!
 - **Never persist notification content** — no files, database, cache, logs, or telemetry
 - Notification text exists only in RAM for rendering
 - Overflow stores only a count, never content
-- See `CLAUDE.md` for the full privacy policy
+- See `AGENTS.md` for the full privacy policy
 
 ### Before Submitting
 - [ ] `dotnet build` succeeds with no errors or warnings
@@ -60,4 +60,4 @@ Use [GitHub Issues](../../issues) to report bugs or request features. Include:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the GNU General Public License v3.0.

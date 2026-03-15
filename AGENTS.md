@@ -32,7 +32,7 @@ Please read `REPO_MAP.md` in the repository root for a breakdown of the architec
 
 ## Queue Logic Rules
 
-- Max visible notifications is configurable (default 3, range 1–40).
+- Max visible notifications is configurable (default 40, range 1–1000).
 - Additional notifications increment an overflow counter ("+N more") — do **not** store their content.
 - Each visible notification expires after configurable/system duration, then is discarded from memory.
 
