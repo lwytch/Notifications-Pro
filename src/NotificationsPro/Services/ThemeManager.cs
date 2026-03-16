@@ -98,19 +98,25 @@ public class ThemeManager
 
         var json = File.ReadAllText(filePath);
         var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
+        var hasNotificationAnimationStyle = JsonPropertyExists(json, nameof(AppSettings.NotificationAnimationStyle));
         var imported = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
 
         if (imported != null)
-            SanitizeImportedSettings(imported, hasCardBackgroundMode);
+            SanitizeImportedSettings(imported, hasCardBackgroundMode, hasNotificationAnimationStyle);
 
         return imported;
     }
 
     /// <summary>Clamp imported settings to valid ranges to prevent corrupt/malicious values.</summary>
-    private static void SanitizeImportedSettings(AppSettings s, bool hasCardBackgroundMode)
+    private static void SanitizeImportedSettings(AppSettings s, bool hasCardBackgroundMode, bool hasNotificationAnimationStyle)
     {
         s.MaxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         s.NotificationDuration = Math.Clamp(s.NotificationDuration, 1, 300);
+        s.NotificationAnimationStyle = NotificationAnimationStyleHelper.Normalize(
+            hasNotificationAnimationStyle
+                ? s.NotificationAnimationStyle
+                : NotificationAnimationStyleHelper.FromLegacyFadeOnly(s.FadeOnlyAnimation));
+        s.FadeOnlyAnimation = NotificationAnimationStyleHelper.IsLegacyFadeOnly(s.NotificationAnimationStyle);
         s.AnimationEasing = AnimationEasingHelper.Normalize(s.AnimationEasing);
         s.HighlightOverlayOpacity = double.IsNaN(s.HighlightOverlayOpacity) ? 0.25 : Math.Clamp(s.HighlightOverlayOpacity, 0.05, 0.80);
         s.HighlightAnimation = HighlightAnimationHelper.Normalize(s.HighlightAnimation);

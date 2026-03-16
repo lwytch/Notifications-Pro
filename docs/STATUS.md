@@ -30,7 +30,7 @@
 - Apps tab per-app override cards now use a cleaner aligned form layout, with a compact header, a consistent label/control rhythm, and a shortened background-image status display instead of dumping full file paths into the main form flow
 - Packaged MSIX startup now preserves package identity instead of forcing the unpackaged fallback AUMID, reducing the risk of live notification capture failing after updates
 - Startup settings now use a one-time schema migration instead of the welcome-tip flag to detect legacy defaults, so old `3`-visible / `300ms` / `480px` installs upgrade once without resetting current user choices on every launch
-- Startup defaults repair now follows schema version 4 and only fires for the real legacy-default signature, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on the next launch without overriding intentional later choices
+- Startup defaults repair now follows schema version 5 and only fires for the real legacy-default signature, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on the next launch without overriding intentional later choices
 - Overlay scrollbars now receive real client hit-testing over the scrollbar/search areas, so dragging still works across the cards while the scrollbar itself remains clickable and draggable
 - Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, card-to-scrollbar gap, and corner radius, and overlay themes carry those scrollbar settings with the rest of the visual palette
 - Overlay scrollbars now start enabled by default for fresh installs, stay hidden while the idle `Waiting for notifications...` placeholder is showing, and only appear when the currently retained cards really overflow the overlay height
@@ -84,7 +84,7 @@
   - single-line banner toggle
   - single-line wrap toggle, wrapped-banner max-lines control, and auto full-width toggle
   - stacked-order toggle (newest at top vs newest at bottom)
-  - fade-only animation toggle and wider animation speed range (0-1200ms)
+  - standard animation-style selector (`Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, `Pop`), motion direction for directional styles, and wider animation speed range (0-1200ms)
   - stacked-only text-limit controls (hidden while single-line mode is enabled)
 - Layout tab includes quick preset buttons for top/side placement
 - Layout tab monitor controls now use a cleaner layout (monitor picker row + right-aligned action buttons)
@@ -127,8 +127,8 @@
   - fallback extraction now splits repeated browser-host markers so simultaneous Chrome toasts (for example Reddit + X) dispatch as separate cards
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
-- Slide-in direction configurable (Left, Right, Top, Bottom) via Settings > Behavior > Animations
-- Entrance animations now support configurable easing (`EaseOut`, `Bounce`, `Elastic`, `Linear`) in addition to direction, duration, and fade-only mode
+- Standard entrance animations now support six styles (`Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, `Pop`) plus direction where relevant, configurable duration, and easing (`EaseOut`, `Bounce`, `Elastic`, `Linear`)
+- `Suppress Toast Popups` now removes WinRT toasts before forwarding them to the overlay queue, reducing the visible system-toast flash when suppression is enabled
 - Card load animations now ensure mutable transforms to avoid frozen-transform startup crashes
 - **Card interaction (Milestone 4)**:
   - Click to dismiss — click a notification card to immediately remove it
@@ -267,7 +267,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 202 unit tests covering QueueManager (including scoped highlight/mute/narration rules, live highlight re-evaluation, per-rule highlight styling, preview-notification injection, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), ThemeManager/ProfileManager filtering-round-trip coverage, spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 203 unit tests covering QueueManager (including scoped highlight/mute/narration rules, live highlight re-evaluation, per-rule highlight styling, preview-notification injection, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, animation-style migration, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), ThemeManager/ProfileManager filtering-round-trip coverage, spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -325,7 +325,8 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Overlay Width can be set beyond 1400px and preset buttons apply 1080p/2K/4K/8K values
 - [ ] Max Overlay Height can be set beyond 1200px and preset buttons apply 1080p/2K/4K/8K values
 - [ ] Changing font size does not reset manually resized overlay width in single-line mode
-- [ ] Fade-only animation option removes horizontal motion
+- [ ] Behavior > Animations > Animation Style offers `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, and `Pop`
+- [ ] Behavior > Animations > Motion Direction changes the entry side for directional styles (`Slide + Fade`, `Slide`, `Drift + Fade`)
 - [ ] Behavior > Animations > Animation Easing changes the card entrance feel (`EaseOut`, `Bounce`, `Elastic`, `Linear`)
 - [ ] Toggle switches animate smoothly
 - [ ] "Hide Overlay" / "Show Overlay" toggles the overlay window
@@ -362,7 +363,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Spoken notifications: Help tab voice setup links open Microsoft support pages
 - [ ] Notification Access: switching Capture Mode to Force Accessibility restores live notifications when WinRT is not delivering
 - [ ] Text Alignment persists after closing and reopening the app, and survives settings export/import
-- [ ] Notification slides in from each configured direction (Left/Right/Top/Bottom)
+- [ ] With a directional animation style selected, notifications enter from each configured direction (Left/Right/Top/Bottom)
 - [ ] Click a notification card to dismiss it instantly
 - [ ] Hover over overlay pauses all expiry timers; moving away resumes them
 - [ ] Right-click a card shows context menu (Dismiss, Copy Text, Clear All)
@@ -388,6 +389,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Behavior tab burst-protection toggle suppresses when too many notifications arrive quickly
 - [ ] Focus mode (tray menu) pauses notifications for selected duration with countdown
 - [ ] Quick Mute App submenu in tray menu shows seen apps with mute/unmute toggles
+- [ ] With `Suppress Toast Popups` enabled in WinRT mode, Windows toasts are removed early enough that they no longer visibly flash before the overlay card in normal use
 - [ ] Appearance tab exposes built-in and custom overlay theme controls
 - [ ] Settings Window theme preset dropdown lists System + overlay theme names + Custom
 - [ ] Clicking a built-in theme applies its colors/shape to the overlay immediately

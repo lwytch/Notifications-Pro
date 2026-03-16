@@ -1479,19 +1479,23 @@
                             <TextBlock Text="Enable Animations" Style="{StaticResource SettingLabel}" ToolTip="Smooth slide-in and fade-out transitions for notifications"/>
                         </DockPanel>
 
-                        <DockPanel Margin="0,0,0,8">
-                            <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding FadeOnlyAnimation}"
-                                          ToolTip="Use fade transitions only (no side movement)"/>
-                            <TextBlock Text="Fade-Only Animation" Style="{StaticResource SettingLabel}" ToolTip="Useful if motion is distracting or you prefer a calmer transition style"/>
-                        </DockPanel>
+                        <TextBlock Text="Animation Style" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Choose the entrance effect used for standard notifications. Slide-based styles respect Motion Direction, while Fade, Zoom + Fade, and Pop ignore it."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableNotificationAnimationStyles}"
+                                  SelectedItem="{Binding NotificationAnimationStyle}"
+                                  ToolTip="Slide + Fade matches the classic behavior. Drift + Fade is gentler, Zoom + Fade is centered, and Pop adds a short scale overshoot."
+                                  Margin="0,4,0,8"/>
 
-                        <TextBlock Text="Slide-In Direction" Style="{StaticResource SettingLabel}" ToolTip="Direction notifications slide in from (overridden when fade-only is enabled)"/>
+                        <TextBlock Text="Motion Direction" Style="{StaticResource SettingLabel}"
+                                   ToolTip="Choose which side directional animation styles come from. Fade, Zoom + Fade, and Pop ignore this setting."/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
                                   ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                   ItemsSource="{Binding AvailableSlideDirections}"
                                   SelectedItem="{Binding SlideInDirection}"
-                                  ToolTip="Which direction cards slide in from"
+                                  IsEnabled="{Binding SelectedNotificationAnimationStyleUsesDirection}"
+                                  ToolTip="Which side directional animation styles enter from."
                                   Margin="0,4,0,0"/>
 
                         <TextBlock Text="Animation Speed" Style="{StaticResource SettingLabel}" ToolTip="Default is 1200ms. 0 means instant transitions; higher values feel smoother and make the entry animation easier to notice."/>

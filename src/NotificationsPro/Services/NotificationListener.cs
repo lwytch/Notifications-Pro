@@ -286,15 +286,17 @@ public class NotificationListener
 
             var appName = NormalizeText(notification.AppInfo?.DisplayInfo?.DisplayName ?? string.Empty);
             var fields = BuildNotificationFields(texts, appName, assumeLeadingAppNameWhenUnknown: false);
-            _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
 
-            // Suppress the Windows toast popup by removing the notification from the system.
-            // Note: this also removes it from Windows notification center.
-            // Only active while the app is running — no cleanup needed on exit.
+            // Suppress the Windows toast popup before forwarding to the overlay so the system
+            // toast has less chance to flash first. The notification payload has already been
+            // captured into memory at this point, so forwarding can still succeed even if
+            // Windows removes the toast immediately.
             if (_settingsManager.Settings.SuppressToastPopups && _listener != null)
             {
                 try { _listener.RemoveNotification(notification.Id); } catch { }
             }
+
+            _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
         }
         catch { }
     }

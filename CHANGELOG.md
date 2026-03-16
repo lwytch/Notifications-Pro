@@ -14,6 +14,8 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- `Suppress Toast Popups` now removes WinRT toasts before forwarding the captured notification to the overlay queue, reducing the visible system-toast flash when suppression is enabled
+- Standard animation settings now round-trip through defaults, JSON import/export, and profile save/load, and legacy `FadeOnlyAnimation` installs migrate cleanly into the new animation-style model
 - Filtering now uses stacked single-column rule editors in compact popup mode, so highlight/mute/narration rules no longer rely on cramped multi-column rows or truncated action buttons
 - Highlight tint now composes beneath the notification content/background layers instead of washing over the text, improving readability on highlighted cards
 - Settings slider tracks now use a stronger visible rail, making highlight and other dense-card sliders readable again on darker surfaces
@@ -24,7 +26,7 @@
 - Highlighted cards no longer lose their left-edge frame when the accent stripe is disabled, and the tray About dialog now reports the current `GPL v3` license text
 - Loading a named profile or tray-applied theme now preserves the full settings-window palette/opacity state and refreshes the settings UI immediately instead of reverting to a preset snapshot
 - Fresh installs now enable the styled overlay scrollbar by default again, while still only surfacing it when the retained cards actually overflow the overlay height
-- Startup defaults repair now follows settings schema version `4`, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on their next launch
+- Startup defaults repair now follows settings schema version `5`, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on their next launch
 - Overlay hit-testing now treats the real scrollbar and search controls as client input regions, so the scrollbar can be clicked and dragged normally without sacrificing drag-anywhere behavior on the rest of the overlay
 - Overlay scrollbar toggling now updates the live overlay correctly, and the enabled state keeps the themed scrollbar visible instead of relying on WPF `Auto` visibility
 - Overlay scrollbar polish — the idle `Waiting for notifications...` placeholder no longer shows the themed scrollbar, the overflow affordance now explains that scrollbars only apply to currently visible cards, and `Preview Voice` now uses app-focused sample wording instead of build/release phrasing
@@ -66,6 +68,7 @@
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
 
 ### Added
+- Standard entrance animation styles in `Behavior > Animations` — notifications can now use `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, or `Pop`, while directional styles still respect the explicit motion-direction selector
 - Filtering tab redesign — highlight defaults are now separated from the rule list, the preview CTA is a smaller accent action, and highlight/mute/narration rules share a cleaner repeated-card layout
 - Highlight rules now support per-rule animation, border mode, tint opacity, and border width overrides, plus per-rule preview buttons and in-place keyword editing
 - Added profile-round-trip regression coverage for filtering/style settings, including rule overrides and compact settings-window mode

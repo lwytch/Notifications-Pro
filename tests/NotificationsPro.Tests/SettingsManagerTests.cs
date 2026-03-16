@@ -47,6 +47,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(3, sm.Settings.SingleLineMaxLines);
         Assert.False(sm.Settings.SingleLineAutoFullWidth);
         Assert.True(sm.Settings.NewestOnTop);
+        Assert.Equal(NotificationAnimationStyleHelper.SlideFade, sm.Settings.NotificationAnimationStyle);
         Assert.Equal(AnimationEasingHelper.EaseOut, sm.Settings.AnimationEasing);
         Assert.Equal(0.25, sm.Settings.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.None, sm.Settings.HighlightAnimation);
@@ -82,6 +83,8 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard;
         sm.Settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard;
         sm.Settings.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Top;
+        sm.Settings.NotificationAnimationStyle = NotificationAnimationStyleHelper.Pop;
+        sm.Settings.SlideInDirection = "Bottom";
         sm.Settings.AnimationEasing = AnimationEasingHelper.Bounce;
         sm.Settings.HighlightOverlayOpacity = 0.42;
         sm.Settings.HighlightAnimation = HighlightAnimationHelper.Shake;
@@ -151,6 +154,8 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, sm2.Settings.CardBackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, sm2.Settings.CardBackgroundImagePlacement);
         Assert.Equal(ImageVerticalFocusHelper.Top, sm2.Settings.CardBackgroundImageVerticalFocus);
+        Assert.Equal(NotificationAnimationStyleHelper.Pop, sm2.Settings.NotificationAnimationStyle);
+        Assert.Equal("Bottom", sm2.Settings.SlideInDirection);
         Assert.Equal(AnimationEasingHelper.Bounce, sm2.Settings.AnimationEasing);
         Assert.Equal(0.42, sm2.Settings.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.Shake, sm2.Settings.HighlightAnimation);
@@ -238,6 +243,7 @@ public class SettingsManagerTests : IDisposable
         Assert.False(settings.ClickThrough);
         Assert.True(settings.AnimationsEnabled);
         Assert.False(settings.FadeOnlyAnimation);
+        Assert.Equal(NotificationAnimationStyleHelper.SlideFade, settings.NotificationAnimationStyle);
         Assert.Equal("Left", settings.SlideInDirection);
         Assert.Equal(1200, settings.AnimationDurationMs);
         Assert.Equal(AnimationEasingHelper.EaseOut, settings.AnimationEasing);
@@ -312,6 +318,7 @@ public class SettingsManagerTests : IDisposable
             """
             {
               "MaxVisibleNotifications": 5000,
+              "NotificationAnimationStyle": "Spark Warp",
               "AnimationEasing": "Wild",
               "HighlightOverlayOpacity": 4.0,
               "HighlightAnimation": "Sparkle",
@@ -331,6 +338,7 @@ public class SettingsManagerTests : IDisposable
         sm.Load();
 
         Assert.Equal(AppSettings.MaxVisibleNotificationsUpperBound, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(NotificationAnimationStyleHelper.SlideFade, sm.Settings.NotificationAnimationStyle);
         Assert.Equal(AnimationEasingHelper.EaseOut, sm.Settings.AnimationEasing);
         Assert.Equal(0.80, sm.Settings.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.None, sm.Settings.HighlightAnimation);
@@ -343,6 +351,26 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageContrast);
         Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.FullscreenOverlayImageVerticalFocus);
         Assert.Equal(24.0, sm.Settings.OverlayScrollbarContentGap);
+    }
+
+    [Fact]
+    public void Load_MapsLegacyFadeOnlyAnimationToFadeStyle_WhenNewPropertyIsMissing()
+    {
+        var settingsPath = Path.Combine(_tempDir, "settings.json");
+        File.WriteAllText(settingsPath,
+            """
+            {
+              "FadeOnlyAnimation": true,
+              "SlideInDirection": "Right"
+            }
+            """);
+
+        var sm = CreateManager();
+        sm.Load();
+
+        Assert.Equal(NotificationAnimationStyleHelper.Fade, sm.Settings.NotificationAnimationStyle);
+        Assert.True(sm.Settings.FadeOnlyAnimation);
+        Assert.Equal("Right", sm.Settings.SlideInDirection);
     }
 
     [Fact]

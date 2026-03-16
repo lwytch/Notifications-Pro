@@ -229,6 +229,31 @@ public partial class SettingsViewModel : BaseViewModel
     private bool _fadeOnlyAnimation;
     public bool FadeOnlyAnimation { get => _fadeOnlyAnimation; set { if (SetProperty(ref _fadeOnlyAnimation, value)) QueueSave(); } }
 
+    private string _notificationAnimationStyle = NotificationAnimationStyleHelper.SlideFade;
+    public string NotificationAnimationStyle
+    {
+        get => _notificationAnimationStyle;
+        set
+        {
+            var normalized = NotificationAnimationStyleHelper.Normalize(value);
+            if (!SetProperty(ref _notificationAnimationStyle, normalized))
+                return;
+
+            var legacyFadeOnly = NotificationAnimationStyleHelper.IsLegacyFadeOnly(normalized);
+            if (_fadeOnlyAnimation != legacyFadeOnly)
+            {
+                _fadeOnlyAnimation = legacyFadeOnly;
+                OnPropertyChanged(nameof(FadeOnlyAnimation));
+            }
+
+            OnPropertyChanged(nameof(SelectedNotificationAnimationStyleUsesDirection));
+            QueueSave();
+        }
+    }
+
+    public bool SelectedNotificationAnimationStyleUsesDirection =>
+        NotificationAnimationStyleHelper.UsesDirection(NotificationAnimationStyle);
+
     private string _slideInDirection = "Left";
     public string SlideInDirection { get => _slideInDirection; set { if (SetProperty(ref _slideInDirection, value)) QueueSave(); } }
 
@@ -1052,6 +1077,7 @@ public partial class SettingsViewModel : BaseViewModel
         "Left", "Right", "Top", "Bottom"
     };
 
+    public List<string> AvailableNotificationAnimationStyles { get; } = NotificationAnimationStyleHelper.KnownModes.ToList();
     public List<string> AvailableAnimationEasings { get; } = AnimationEasingHelper.KnownModes.ToList();
 
     public List<string> AvailableTimestampDisplayModes { get; } = new()
@@ -1382,7 +1408,8 @@ public partial class SettingsViewModel : BaseViewModel
         _alwaysOnTop = s.AlwaysOnTop;
         _clickThrough = s.ClickThrough;
         _animationsEnabled = s.AnimationsEnabled;
-        _fadeOnlyAnimation = s.FadeOnlyAnimation;
+        _notificationAnimationStyle = NotificationAnimationStyleHelper.Normalize(s.NotificationAnimationStyle);
+        _fadeOnlyAnimation = NotificationAnimationStyleHelper.IsLegacyFadeOnly(_notificationAnimationStyle);
         _slideInDirection = s.SlideInDirection;
         _animationDurationMs = s.AnimationDurationMs;
         _animationEasing = AnimationEasingHelper.Normalize(s.AnimationEasing);
@@ -1718,7 +1745,8 @@ public partial class SettingsViewModel : BaseViewModel
             AlwaysOnTop = AlwaysOnTop,
             ClickThrough = ClickThrough,
             AnimationsEnabled = AnimationsEnabled,
-            FadeOnlyAnimation = FadeOnlyAnimation,
+            FadeOnlyAnimation = NotificationAnimationStyleHelper.IsLegacyFadeOnly(NotificationAnimationStyle),
+            NotificationAnimationStyle = NotificationAnimationStyleHelper.Normalize(NotificationAnimationStyle),
             SlideInDirection = SlideInDirection,
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
             AnimationEasing = AnimationEasingHelper.Normalize(AnimationEasing),

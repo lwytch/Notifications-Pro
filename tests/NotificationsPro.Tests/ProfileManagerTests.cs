@@ -29,6 +29,8 @@ public class ProfileManagerTests : IDisposable
             HighlightBorderThickness = 2.5,
             HighlightAnimation = HighlightAnimationHelper.Pulse,
             HighlightBorderMode = HighlightBorderModeHelper.FullBorder,
+            NotificationAnimationStyle = NotificationAnimationStyleHelper.ZoomFade,
+            SlideInDirection = "Right",
             CompactSettingsWindow = false,
             SettingsThemeMode = "Custom"
         };
@@ -50,6 +52,8 @@ public class ProfileManagerTests : IDisposable
         Assert.NotNull(loaded);
         Assert.Equal(SettingsManager.CurrentSettingsSchemaVersion, loaded!.SettingsSchemaVersion);
         Assert.Equal(2.5, loaded.HighlightBorderThickness);
+        Assert.Equal(NotificationAnimationStyleHelper.ZoomFade, loaded.NotificationAnimationStyle);
+        Assert.Equal("Right", loaded.SlideInDirection);
         Assert.False(loaded.CompactSettingsWindow);
         Assert.Single(loaded.HighlightRules);
         Assert.Equal(HighlightAnimationHelper.Flash, loaded.HighlightRules[0].Animation);

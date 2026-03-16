@@ -75,6 +75,7 @@ public class AppSettings
     public bool ClickThrough { get; set; } = false;
     public bool AnimationsEnabled { get; set; } = true;
     public bool FadeOnlyAnimation { get; set; } = false;
+    public string NotificationAnimationStyle { get; set; } = NotificationAnimationStyleHelper.SlideFade;
     public string SlideInDirection { get; set; } = "Left";
     public double AnimationDurationMs { get; set; } = 1200;
     public string AnimationEasing { get; set; } = AnimationEasingHelper.EaseOut;

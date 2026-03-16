@@ -50,7 +50,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Accessibility fallback** — uses `SetWinEventHook` + UI Automation to read toast text when the WinRT path is unavailable (e.g. unpackaged app restrictions). Simultaneous notifications are split into individual entries rather than merged.
 - **Capture mode selector** — `Settings > System > Notification Access` now offers `Auto`, `Prefer WinRT`, and `Force Accessibility` so you can recover quickly if live notifications stop flowing through the direct path.
 - **Polling guard** — a 2-second polling loop supplements the event-driven path for reliability; a flag prevents overlapping polls.
-- **Toast suppression** (optional) — after capturing a notification, the app can remove the native Windows toast popup so only the overlay shows. Requires the WinRT path. Off by default.
+- **Toast suppression** (optional) — after capturing a notification, the app can remove the native Windows toast popup so only the overlay shows. The WinRT path now attempts removal before the overlay card is queued to reduce visible flashing. Requires the WinRT path. Off by default.
 
 ### Overlay Window
 - Always-on-top, transparent, borderless — sits over any application.
@@ -101,7 +101,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **App grouping** — optional grouping by source app, with a separate appearance control so the grouping behaviour lives in `Behavior` and the styling lives in `Appearance`.
 - **Persistent notifications** — disable auto-expiry; cards stay until manually dismissed.
 - **Auto-duration** — extends display time based on notification length (configurable base seconds + seconds-per-line).
-- **Animations** — slide-in from Left / Right / Top / Bottom or fade-only, with configurable duration up to `1200ms`, selectable `EaseOut` / `Bounce` / `Elastic` / `Linear` easing, and that full range used as the default so the animation is actually visible out of the box.
+- **Animations** — choose from `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, or `Pop`; directional styles still respect Left / Right / Top / Bottom, duration is configurable up to `1200ms`, and motion easing can use `EaseOut`, `Bounce`, `Elastic`, or `Linear`.
 - **Deduplication** — suppress identical notifications within a configurable time window.
 - **Quiet hours** — block all notifications between configurable start/end times (supports overnight ranges).
 - **Burst protection** — cap the number of notifications accepted in a sliding time window to avoid floods.
@@ -416,6 +416,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.22
+- **Standard Animation Expansion**: `Behavior > Animations` now offers `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, and `Pop`, while directional styles still respect the explicit motion-direction selector.
+- **Suppression Timing Fix**: `Suppress Toast Popups` now removes WinRT toasts before the overlay queues the captured notification, reducing the split-second native-toast flash when suppression is enabled.
+- **Animation Persistence Hardening**: the new standard animation setting now round-trips through defaults, JSON export/import, and saved profiles instead of relying on the old fade-only toggle alone.
 
 ### Release v1.1.10.21
 - **Filtering Layout Polish**: `Settings > Filtering` now uses stacked single-column rule cards that hold up properly in compact popup mode, with wrapped action rows instead of squeezed/truncated controls.

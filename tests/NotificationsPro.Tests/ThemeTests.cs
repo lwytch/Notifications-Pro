@@ -358,6 +358,8 @@ public class ThemeTests : IDisposable
             MaxVisibleNotifications = 5,
             AppGroupingStyle = "Minimal Label",
             ShowAppGroupCounts = false,
+            NotificationAnimationStyle = NotificationAnimationStyleHelper.DriftFade,
+            SlideInDirection = "Bottom",
             AnimationEasing = AnimationEasingHelper.Elastic,
             HighlightOverlayOpacity = 0.31,
             HighlightAnimation = HighlightAnimationHelper.Pulse,
@@ -403,6 +405,8 @@ public class ThemeTests : IDisposable
         Assert.Equal(5, imported.MaxVisibleNotifications);
         Assert.Equal("Minimal Label", imported.AppGroupingStyle);
         Assert.False(imported.ShowAppGroupCounts);
+        Assert.Equal(NotificationAnimationStyleHelper.DriftFade, imported.NotificationAnimationStyle);
+        Assert.Equal("Bottom", imported.SlideInDirection);
         Assert.Equal(AnimationEasingHelper.Elastic, imported.AnimationEasing);
         Assert.Equal(0.31, imported.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.Pulse, imported.HighlightAnimation);

@@ -260,6 +260,28 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
+    private string _notificationAnimationStyle = NotificationAnimationStyleHelper.SlideFade;
+    public string NotificationAnimationStyle
+    {
+        get => _notificationAnimationStyle;
+        set
+        {
+            var normalized = NotificationAnimationStyleHelper.Normalize(value);
+            if (!SetProperty(ref _notificationAnimationStyle, normalized))
+                return;
+
+            var legacyFadeOnly = NotificationAnimationStyleHelper.IsLegacyFadeOnly(normalized);
+            if (_fadeOnlyAnimation != legacyFadeOnly)
+            {
+                _fadeOnlyAnimation = legacyFadeOnly;
+                OnPropertyChanged(nameof(FadeOnlyAnimation));
+            }
+
+            OnPropertyChanged(nameof(EnterOffset));
+            OnPropertyChanged(nameof(ExitOffset));
+        }
+    }
+
     private double _animationDurationMs = 1200;
     public double AnimationDurationMs
     {
@@ -524,8 +546,8 @@ public class OverlayViewModel : BaseViewModel
     };
 
     // Computed — animations
-    public double EnterOffset => AnimationsEnabled && !FadeOnlyAnimation ? -(OverlayWidth + 40) : 0;
-    public double ExitOffset => AnimationsEnabled && !FadeOnlyAnimation ? 50 : 0;
+    public double EnterOffset => AnimationsEnabled && NotificationAnimationStyleHelper.UsesDirection(NotificationAnimationStyle) ? -(OverlayWidth + 40) : 0;
+    public double ExitOffset => AnimationsEnabled && NotificationAnimationStyleHelper.UsesDirection(NotificationAnimationStyle) ? 50 : 0;
     public Duration EntryMotionDuration => DurationFor(AnimationDurationMs);
     public Duration EntryFadeDuration => DurationFor(AnimationDurationMs * 0.75);
     public Duration ExitMotionDuration => DurationFor(AnimationDurationMs);
@@ -750,8 +772,9 @@ public class OverlayViewModel : BaseViewModel
         // if the user has animations enabled to avoid "randomly no animation" behavior.
         var reduceMotion = s.RespectReduceMotion && !SystemParameters.ClientAreaAnimation;
         AnimationsEnabled = s.AnimationsEnabled;
-        FadeOnlyAnimation = s.FadeOnlyAnimation || reduceMotion;
-
+        NotificationAnimationStyle = reduceMotion
+            ? NotificationAnimationStyleHelper.Fade
+            : NotificationAnimationStyleHelper.Normalize(s.NotificationAnimationStyle);
         SlideInDirection = s.SlideInDirection;
         AnimationDurationMs = s.AnimationDurationMs;
         AnimationEasing = s.AnimationEasing;

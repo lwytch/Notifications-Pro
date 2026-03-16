@@ -60,6 +60,7 @@ Deduplication controls:
 
 Animation refinement:
 - [x] Slide-in direction (left / right / top / bottom — configurable via Settings > Behavior > Animations)
+- [x] Standard entrance animation expansion: replace the legacy fade-only entrance model with a richer set of standard notification animation styles, keep explicit direction control for directional motion, preserve reduced-motion behavior, and ensure the Behavior UI explains which styles respect direction versus pure fade/scale effects.
 
 Settings UI reorganization (Behavior tab has 6 concerns in one panel):
 - [ ] Split Behavior tab — move content/display controls to a separate tab from timing/window/animation (deferred)
@@ -510,7 +511,9 @@ Background image and advanced visual-control gaps:
 
 Operational gaps:
 - [x] Real listener diagnostics: Add a `Run Capture Diagnostic` or equivalent action under `System > Notification Access` so users can distinguish overlay rendering issues from live WinRT/accessibility capture failures.
+- [x] Toast suppression flash fix: tighten the WinRT suppression path so `Suppress Toast Popups` removes the system toast before overlay presentation when possible, avoid regressions in live capture, and document any remaining platform limits honestly.
 - [ ] Regression hardening for settings moves: Extend tests to cover moved settings, settings defaults, export/import, reset defaults, tab-navigation links, and filtering/profile regressions so another IA pass does not quietly break persistence or discoverability.
+- [x] Animation persistence hardening: add regression coverage for any new standard-animation settings so default values, JSON export/import, profile save/load, reset defaults, and legacy `FadeOnlyAnimation` migration all stay in sync.
 
 Post-redesign process guardrails:
 - [ ] Create a local `settings-ia-review` skill after the new layout is finalized: document the canonical tab ownership, approved tab order, and “do not duplicate controls across tabs” rules so future feature work follows the agreed information architecture.
@@ -518,7 +521,7 @@ Post-redesign process guardrails:
 - [x] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, profile save/load coverage, and export/import coverage whenever a settings feature is added or reorganized.
 
 ## Current Focus
-Next planned pass: continue the broader settings IA cleanup by tackling the remaining tab-ownership, shared-control, and regression-hardening items after the filtering follow-up and settings-regression skill pass.
+Next planned pass: continue the broader settings IA cleanup and remaining regression-hardening work now that the standard animation model, suppression timing, and animation persistence coverage have been shipped.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

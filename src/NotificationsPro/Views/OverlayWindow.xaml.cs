@@ -615,71 +615,180 @@ public partial class OverlayWindow : Window
     private async void OnCardLoaded(object sender, RoutedEventArgs e)
     {
         if (sender is not Border card) return;
-        var transform = EnsureMutableCardTransform(card);
         if (DataContext is not OverlayViewModel vm) return;
         var durationMs = vm.AnimationDurationMs;
-        var fadeOnly = vm.FadeOnlyAnimation;
-        var easing = CreateEntranceEasing(vm.AnimationEasing);
-
-        if (vm.AnimationsEnabled)
-        {
-            // Fade in
-            var fadeDuration = new Duration(TimeSpan.FromMilliseconds(durationMs * 0.75));
-            card.BeginAnimation(UIElement.OpacityProperty,
-                new DoubleAnimation(0, 1, fadeDuration));
-
-            if (!fadeOnly)
-            {
-                // Slide in from configured direction
-                var motionDuration = new Duration(TimeSpan.FromMilliseconds(durationMs));
-                var direction = vm.SlideInDirection;
-
-                switch (direction)
-                {
-                    case "Right":
-                        transform.BeginAnimation(TranslateTransform.XProperty,
-                            new DoubleAnimation(vm.OverlayWidth + 40, 0, motionDuration) { EasingFunction = easing });
-                        break;
-                    case "Top":
-                        transform.BeginAnimation(TranslateTransform.YProperty,
-                            new DoubleAnimation(-200, 0, motionDuration) { EasingFunction = easing });
-                        break;
-                    case "Bottom":
-                        transform.BeginAnimation(TranslateTransform.YProperty,
-                            new DoubleAnimation(200, 0, motionDuration) { EasingFunction = easing });
-                        break;
-                    default: // "Left"
-                        transform.BeginAnimation(TranslateTransform.XProperty,
-                            new DoubleAnimation(-(vm.OverlayWidth + 40), 0, motionDuration) { EasingFunction = easing });
-                        break;
-                }
-            }
-        }
+        PlayEntranceAnimation(card, vm);
 
         if (card.DataContext is NotificationItem item && item.IsHighlighted)
         {
-            var delay = vm.AnimationsEnabled && !fadeOnly && durationMs > 0
+            var delay = vm.AnimationsEnabled
+                && NotificationAnimationStyleHelper.ShouldDelayHighlight(vm.NotificationAnimationStyle)
+                && durationMs > 0
                 ? TimeSpan.FromMilliseconds(durationMs)
                 : TimeSpan.Zero;
             await PlayHighlightAnimationAsync(card, vm, delay);
         }
     }
 
-    private static TranslateTransform EnsureMutableCardTransform(Border card)
+    private static void PlayEntranceAnimation(Border card, OverlayViewModel vm)
     {
-        if (card.RenderTransform is TranslateTransform existingTransform)
-        {
-            if (!existingTransform.IsFrozen)
-                return existingTransform;
+        var (scale, translate) = EnsureMutableCardTransforms(card);
+        ResetCardTransforms(scale, translate);
+        card.BeginAnimation(UIElement.OpacityProperty, null);
+        card.Opacity = 1;
 
-            var clone = existingTransform.CloneCurrentValue();
-            card.RenderTransform = clone;
-            return clone;
+        if (!vm.AnimationsEnabled || vm.AnimationDurationMs <= 0)
+            return;
+
+        var style = NotificationAnimationStyleHelper.Normalize(vm.NotificationAnimationStyle);
+        var easing = CreateEntranceEasing(vm.AnimationEasing);
+        var motionDuration = new Duration(TimeSpan.FromMilliseconds(vm.AnimationDurationMs));
+        var fadeDuration = new Duration(TimeSpan.FromMilliseconds(vm.AnimationDurationMs * 0.75));
+
+        switch (style)
+        {
+            case NotificationAnimationStyleHelper.Slide:
+                StartDirectionalTranslation(card, vm, translate, 1.0, motionDuration, easing);
+                return;
+
+            case NotificationAnimationStyleHelper.Fade:
+                card.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation(0, 1, fadeDuration) { EasingFunction = easing });
+                return;
+
+            case NotificationAnimationStyleHelper.DriftFade:
+                card.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation(0, 1, fadeDuration) { EasingFunction = easing });
+                StartDirectionalTranslation(card, vm, translate, 0.22, motionDuration, easing);
+                return;
+
+            case NotificationAnimationStyleHelper.ZoomFade:
+                card.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation(0, 1, fadeDuration) { EasingFunction = easing });
+                scale.ScaleX = 0.88;
+                scale.ScaleY = 0.88;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty,
+                    new DoubleAnimation(0.88, 1.0, motionDuration) { EasingFunction = easing });
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty,
+                    new DoubleAnimation(0.88, 1.0, motionDuration) { EasingFunction = easing });
+                return;
+
+            case NotificationAnimationStyleHelper.Pop:
+                card.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(vm.AnimationDurationMs * 0.55))) { EasingFunction = easing });
+
+                var popScale = new DoubleAnimationUsingKeyFrames
+                {
+                    Duration = motionDuration.TimeSpan
+                };
+                popScale.KeyFrames.Add(new DiscreteDoubleKeyFrame(0.92, KeyTime.FromTimeSpan(TimeSpan.Zero)));
+                popScale.KeyFrames.Add(new EasingDoubleKeyFrame(1.04, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(vm.AnimationDurationMs * 0.58))));
+                popScale.KeyFrames.Add(new EasingDoubleKeyFrame(1.0, KeyTime.FromTimeSpan(motionDuration.TimeSpan)));
+                scale.ScaleX = 0.92;
+                scale.ScaleY = 0.92;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, popScale);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, popScale.Clone());
+                return;
+
+            default:
+                card.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation(0, 1, fadeDuration) { EasingFunction = easing });
+                StartDirectionalTranslation(card, vm, translate, 1.0, motionDuration, easing);
+                return;
+        }
+    }
+
+    private static void StartDirectionalTranslation(
+        Border card,
+        OverlayViewModel vm,
+        TranslateTransform transform,
+        double distanceFactor,
+        Duration motionDuration,
+        IEasingFunction? easing)
+    {
+        var offset = GetDirectionalOffset(card, vm, distanceFactor);
+        if (Math.Abs(offset.X) > 0.001)
+            transform.BeginAnimation(
+                TranslateTransform.XProperty,
+                new DoubleAnimation(offset.X, 0, motionDuration) { EasingFunction = easing });
+
+        if (Math.Abs(offset.Y) > 0.001)
+            transform.BeginAnimation(
+                TranslateTransform.YProperty,
+                new DoubleAnimation(offset.Y, 0, motionDuration) { EasingFunction = easing });
+    }
+
+    private static Vector GetDirectionalOffset(Border card, OverlayViewModel vm, double factor)
+    {
+        var horizontalDistance = Math.Max(vm.OverlayWidth + 40, 120) * factor;
+        var verticalDistance = Math.Max(card.ActualHeight + 48, 140) * factor;
+        var direction = vm.SlideInDirection?.Trim();
+
+        return direction switch
+        {
+            "Right" => new Vector(horizontalDistance, 0),
+            "Top" => new Vector(0, -verticalDistance),
+            "Bottom" => new Vector(0, verticalDistance),
+            _ => new Vector(-horizontalDistance, 0)
+        };
+    }
+
+    private static (ScaleTransform Scale, TranslateTransform Translate) EnsureMutableCardTransforms(Border card)
+    {
+        TransformGroup group;
+        if (card.RenderTransform is TransformGroup existingGroup)
+        {
+            group = existingGroup.IsFrozen ? existingGroup.CloneCurrentValue() : existingGroup;
+        }
+        else
+        {
+            group = new TransformGroup();
+            if (card.RenderTransform is ScaleTransform existingScale)
+                group.Children.Add(existingScale.IsFrozen ? existingScale.CloneCurrentValue() : existingScale);
+            else
+                group.Children.Add(new ScaleTransform(1, 1));
+
+            if (card.RenderTransform is TranslateTransform existingTranslate)
+                group.Children.Add(existingTranslate.IsFrozen ? existingTranslate.CloneCurrentValue() : existingTranslate);
+            else
+                group.Children.Add(new TranslateTransform());
         }
 
-        var newTransform = new TranslateTransform();
-        card.RenderTransform = newTransform;
-        return newTransform;
+        var scale = group.Children.OfType<ScaleTransform>().FirstOrDefault();
+        if (scale == null)
+        {
+            scale = new ScaleTransform(1, 1);
+            group.Children.Insert(0, scale);
+        }
+
+        var translate = group.Children.OfType<TranslateTransform>().FirstOrDefault();
+        if (translate == null)
+        {
+            translate = new TranslateTransform();
+            group.Children.Add(translate);
+        }
+
+        if (!ReferenceEquals(card.RenderTransform, group))
+            card.RenderTransform = group;
+
+        return (scale, translate);
+    }
+
+    private static void ResetCardTransforms(ScaleTransform scale, TranslateTransform translate)
+    {
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+        scale.ScaleX = 1;
+        scale.ScaleY = 1;
+        translate.BeginAnimation(TranslateTransform.XProperty, null);
+        translate.BeginAnimation(TranslateTransform.YProperty, null);
+        translate.X = 0;
+        translate.Y = 0;
     }
 
     private static IEasingFunction? CreateEntranceEasing(string easingMode)
@@ -765,7 +874,7 @@ public partial class OverlayWindow : Window
 
             case HighlightAnimationHelper.Shake:
             {
-                var transform = EnsureMutableCardTransform(card);
+                var transform = EnsureMutableCardTransforms(card).Translate;
                 var shake = new DoubleAnimationUsingKeyFrames
                 {
                     Duration = TimeSpan.FromMilliseconds(360)
@@ -806,9 +915,8 @@ public partial class OverlayWindow : Window
                 overlay.Opacity = 0;
         }
 
-        var transform = EnsureMutableCardTransform(card);
-        transform.BeginAnimation(TranslateTransform.XProperty, null);
-        transform.X = 0;
+        var (scale, translate) = EnsureMutableCardTransforms(card);
+        ResetCardTransforms(scale, translate);
     }
 
     private IEnumerable<Border> FindNotificationCards()

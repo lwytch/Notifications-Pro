@@ -1,5 +1,5 @@
 {
-  "SettingsSchemaVersion": 4,
+  "SettingsSchemaVersion": 5,
   "FontFamily": "Segoe UI",
   "FontSize": 14,
   "FontWeight": "Normal",
@@ -59,6 +59,7 @@
   "ClickThrough": false,
   "AnimationsEnabled": true,
   "FadeOnlyAnimation": false,
+  "NotificationAnimationStyle": "Slide + Fade",
   "SlideInDirection": "Left",
   "AnimationDurationMs": 1200,
   "AnimationEasing": "EaseOut",

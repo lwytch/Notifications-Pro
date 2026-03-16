@@ -9,7 +9,7 @@ namespace NotificationsPro.Services;
 
 public class SettingsManager
 {
-    public const int CurrentSettingsSchemaVersion = 4;
+    public const int CurrentSettingsSchemaVersion = 5;
 
     private static readonly string DefaultSettingsDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -50,10 +50,11 @@ public class SettingsManager
             {
                 var json = File.ReadAllText(_settingsPath);
                 var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
+                var hasNotificationAnimationStyle = JsonPropertyExists(json, nameof(AppSettings.NotificationAnimationStyle));
                 var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
                 if (loaded != null)
                 {
-                    NormalizeLoadedSettings(loaded, hasCardBackgroundMode);
+                    NormalizeLoadedSettings(loaded, hasCardBackgroundMode, hasNotificationAnimationStyle);
                     Settings = loaded;
                 }
             }
@@ -88,7 +89,7 @@ public class SettingsManager
 
     public void Apply(AppSettings updated)
     {
-        NormalizeLoadedSettings(updated, hasCardBackgroundMode: true);
+        NormalizeLoadedSettings(updated, hasCardBackgroundMode: true, hasNotificationAnimationStyle: true);
         Settings = updated;
         Save();
         SettingsChanged?.Invoke();
@@ -101,7 +102,7 @@ public class SettingsManager
         SettingsChanged?.Invoke();
     }
 
-    private static void NormalizeLoadedSettings(AppSettings settings, bool hasCardBackgroundMode)
+    private static void NormalizeLoadedSettings(AppSettings settings, bool hasCardBackgroundMode, bool hasNotificationAnimationStyle)
     {
         settings.MutedApps ??= new List<string>();
         settings.HighlightKeywords ??= new List<string>();
@@ -118,6 +119,11 @@ public class SettingsManager
         settings.PerAppBackgroundImages ??= new Dictionary<string, string>();
         settings.PresentationApps ??= new List<string>();
         settings.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(settings.ReadNotificationsAloudTriggerMode);
+        settings.NotificationAnimationStyle = NotificationAnimationStyleHelper.Normalize(
+            hasNotificationAnimationStyle
+                ? settings.NotificationAnimationStyle
+                : NotificationAnimationStyleHelper.FromLegacyFadeOnly(settings.FadeOnlyAnimation));
+        settings.FadeOnlyAnimation = NotificationAnimationStyleHelper.IsLegacyFadeOnly(settings.NotificationAnimationStyle);
         settings.AnimationEasing = AnimationEasingHelper.Normalize(settings.AnimationEasing);
         settings.HighlightOverlayOpacity = double.IsNaN(settings.HighlightOverlayOpacity)
             ? 0.25
