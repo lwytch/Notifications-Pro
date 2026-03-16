@@ -417,6 +417,12 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.24
+- **Managed Asset Path Hardening**: exported settings and saved profiles now serialize custom sound, icon, and background assets as portable Notifications Pro asset references instead of machine-specific absolute paths.
+- **Custom Sound Safety Tightening**: custom sounds now resolve only from trusted Windows sound identifiers or Notifications Pro's managed local sounds folder, preventing imported settings from pointing at arbitrary local or network paths.
+- **Startup Self-Notification Fix**: Notifications Pro now ignores its own startup/system notifications during capture, so `Suppress Toast Popups` no longer feeds a non-actionable first-launch card back into the overlay.
+- **Top-Edge Overlay Retention Fix**: overlays dragged to the top edge now stay top-anchored even when a tall stack temporarily reaches the bottom work-area bound, so expiry no longer drops the overlay to the bottom or reverses the stack direction.
+
 ### Release v1.1.10.23
 - **Overlay Anchor Retention Fix**: top-right and other non-bottom placements now keep their original vertical anchor when tall stacks shrink after expiry, so the overlay no longer drops to the bottom edge as cards disappear.
 - **Layout Stability Follow-Up**: the anchor logic now preserves the intended edge when a tall overlay happens to touch both the top and bottom work-area bounds at once, avoiding position drift during live resize/expiry changes.
