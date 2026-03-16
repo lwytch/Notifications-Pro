@@ -414,6 +414,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.19
+- **Live Highlight Animation Updates**: highlighted cards already on screen now re-evaluate when you change highlight rules or highlight animation settings, so current cards can switch tint/animation behavior without waiting for a new notification.
+- **Filtering Preview Action**: `Settings > Filtering` now includes `Send Highlight Preview`, which injects a local highlighted test card so you can verify highlight colour, border mode, and animation styling immediately.
+- **Preview Queue Reliability**: settings-triggered preview notifications now bypass pause/filter suppression and make room in the visible queue when needed so test cards always appear.
+
 ### Release v1.1.10.18
 - **Highlight Presentation Controls**: Added `Highlight Animation`, `Highlight Overlay Opacity`, and `Highlight Border Mode` so matched highlight rules can flash, pulse, shake, or render with a full frame even when the accent stripe is off.
 - **Entrance Motion Tuning**: Added `Animation Easing` in `Behavior > Animations` with `EaseOut`, `Bounce`, `Elastic`, and `Linear` options for card entrance motion.
