@@ -14,6 +14,7 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Existing highlighted cards now update live when you change highlight rules, tint opacity, or highlight animation settings instead of waiting for a brand-new notification
 - Highlighted cards no longer lose their left-edge frame when the accent stripe is disabled, and the tray About dialog now reports the current `GPL v3` license text
 - Loading a named profile or tray-applied theme now preserves the full settings-window palette/opacity state and refreshes the settings UI immediately instead of reverting to a preset snapshot
 - Fresh installs now enable the styled overlay scrollbar by default again, while still only surfacing it when the retained cards actually overflow the overlay height
@@ -64,6 +65,7 @@
 - Legacy settings/import files that predate `CardBackgroundMode` now upgrade correctly to image-backed cards when they already contain a card background image path, instead of silently normalizing back to `Solid`
 
 ### Added
+- Filtering now includes a `Send Highlight Preview` action that injects a local highlighted test notification so highlight colour, border mode, and animation styling can be checked immediately
 - Highlight effect controls in `Filtering` — highlighted cards now support configurable tint opacity, `Full Border` / `Accent Side Only` / `No Border` framing, and optional `Flash`, `Pulse`, or `Shake` emphasis
 - Entrance animation easing selection in `Behavior` — overlay card motion can now use `EaseOut`, `Bounce`, `Elastic`, or `Linear`
 - Retained-notification capacity now scales up to `1000` cards, while anything beyond the selected retained limit still stays privacy-safe as `+N not shown`

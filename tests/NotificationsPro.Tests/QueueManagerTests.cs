@@ -384,6 +384,68 @@ public class QueueManagerTests
     }
 
     [Fact]
+    public void SettingsChange_ReappliesHighlightRulesToVisibleNotifications()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProQueue_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var settings = new SettingsManager(tempDir);
+            settings.Settings.NotificationDuration = 60;
+            settings.Settings.AnimationDurationMs = 0;
+            var queue = new QueueManager(settings);
+
+            queue.AddNotification("App", "Normal message", "Nothing special");
+            Assert.False(queue.VisibleNotifications[0].IsHighlighted);
+
+            var updated = settings.Settings.Clone();
+            updated.HighlightRules.Add(new HighlightRuleDefinition
+            {
+                Keyword = "normal",
+                Scope = NotificationMatchScopeHelper.TitleOnly,
+                Color = "#33AA55"
+            });
+            settings.Apply(updated);
+
+            Assert.True(queue.VisibleNotifications[0].IsHighlighted);
+            Assert.Equal("#33AA55", queue.VisibleNotifications[0].HighlightColor);
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, true); } catch { }
+        }
+    }
+
+    [Fact]
+    public void AddPreviewNotification_BypassesPauseAndDoesNotTrackSeenApps()
+    {
+        var settings = CreateSettings();
+        settings.Settings.NotificationsPaused = true;
+        var queue = new QueueManager(settings);
+
+        queue.AddPreviewNotification("Preview App", "Preview title", "Preview body", isHighlighted: true, highlightColor: "#112233");
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.True(queue.VisibleNotifications[0].IsHighlighted);
+        Assert.Equal("#112233", queue.VisibleNotifications[0].HighlightColor);
+        Assert.Empty(queue.SeenAppNames);
+    }
+
+    [Fact]
+    public void AddPreviewNotification_MakesRoomWhenVisibleQueueIsFull()
+    {
+        var queue = new QueueManager(CreateSettings(maxVisible: 1));
+        queue.AddNotification("Existing", "1");
+
+        queue.AddPreviewNotification("Preview App", "Preview title", "Preview body", isHighlighted: true);
+
+        Assert.Single(queue.VisibleNotifications);
+        Assert.Equal("Preview title", queue.VisibleNotifications[0].Title);
+        Assert.True(queue.VisibleNotifications[0].IsHighlighted);
+    }
+
+    [Fact]
     public void AddNotification_MuteRuleCanFilterByApp()
     {
         var settings = CreateSettings();

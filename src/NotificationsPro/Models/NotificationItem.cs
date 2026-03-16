@@ -33,10 +33,35 @@ public class NotificationItem : INotifyPropertyChanged
         }
     }
 
-    public bool IsHighlighted { get; set; }
+    private bool _isHighlighted;
+    public bool IsHighlighted
+    {
+        get => _isHighlighted;
+        set
+        {
+            if (_isHighlighted == value)
+                return;
+
+            _isHighlighted = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>Per-notification highlight color (hex). Empty means fall back to the global HighlightColor.</summary>
-    public string HighlightColor { get; set; } = string.Empty;
+    private string _highlightColor = string.Empty;
+    public string HighlightColor
+    {
+        get => _highlightColor;
+        set
+        {
+            var normalized = value ?? string.Empty;
+            if (string.Equals(_highlightColor, normalized, StringComparison.Ordinal))
+                return;
+
+            _highlightColor = normalized;
+            OnPropertyChanged();
+        }
+    }
     public string BackgroundImageMode { get; set; } = Helpers.CardBackgroundModeHelper.Solid;
     public string BackgroundImagePath { get; set; } = string.Empty;
     public double BackgroundImageOpacity { get; set; } = 0.45;
@@ -50,6 +75,7 @@ public class NotificationItem : INotifyPropertyChanged
     public string BackgroundImageVerticalFocus { get; set; } = Helpers.ImageVerticalFocusHelper.Center;
     public bool? ReadAloudEnabledOverride { get; set; }
     public string ReadAloudModeOverride { get; set; } = string.Empty;
+    public bool IsLocalPreview { get; set; }
 
     public void NotifyTimestampChanged() => OnPropertyChanged(nameof(RelativeTimeText));
 

@@ -456,6 +456,8 @@ Targeted rules and narration:
 
 Visual customisation:
 - [x] Background image card mode: add optional image-backed notification cards for the single-panel app so each visible notification can render an image instead of a flat background colour, with privacy-safe local asset storage plus opacity, hue, and brightness controls.
+- [x] Highlight live-update pass: visible notifications should re-evaluate highlight matches when filtering/highlight settings change, and existing highlighted cards should resync the current highlight animation/overlay treatment without waiting for a brand-new notification.
+- [x] Filtering preview control: add a Filtering-tab test notification action that injects a local highlighted preview so users can verify highlight colour, border mode, and animation styling without waiting for a real toast.
 
 Settings UX and persistence:
 - [x] Quick tips control: add an explicit user-facing toggle so tray/settings first-run guidance can be turned off without relying on the one-time welcome-state flag alone.

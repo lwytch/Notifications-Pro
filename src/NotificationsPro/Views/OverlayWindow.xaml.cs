@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -32,6 +33,7 @@ public partial class OverlayWindow : Window
     private bool _dragOccurredSinceMouseDown;
     private bool _isHoveringOverlay;
     private DispatcherTimer? _hoverCheckTimer;
+    private string _lastHighlightVisualSignature = string.Empty;
 
     // Win32 messages
     private const int WM_NCHITTEST = 0x0084;
@@ -261,6 +263,7 @@ public partial class OverlayWindow : Window
         InvalidateArrange();
         UpdateLayout();
         UpdateScrollbarOverflowState();
+        _lastHighlightVisualSignature = BuildHighlightVisualSignature(settings);
 
         _settingsManager.SettingsChanged += OnSettingsChanged;
     }
@@ -309,6 +312,13 @@ public partial class OverlayWindow : Window
             InvalidateArrange();
             UpdateLayout();
             UpdateScrollbarOverflowState();
+
+            var highlightVisualSignature = BuildHighlightVisualSignature(settings);
+            if (!string.Equals(_lastHighlightVisualSignature, highlightVisualSignature, StringComparison.Ordinal))
+            {
+                _lastHighlightVisualSignature = highlightVisualSignature;
+                SyncVisibleHighlightAnimations();
+            }
         });
     }
 
@@ -324,6 +334,15 @@ public partial class OverlayWindow : Window
 
         var hasScrollableOverflow = NotificationScrollViewer.ScrollableHeight > 0.5;
         vm.SetScrollableOverflow(hasScrollableOverflow);
+    }
+
+    private void SyncVisibleHighlightAnimations()
+    {
+        if (DataContext is not OverlayViewModel vm)
+            return;
+
+        foreach (var card in FindNotificationCards())
+            ApplyCurrentHighlightVisualState(card, vm);
     }
 
     private void ApplyObsFixedWindowMode(AppSettings settings)
@@ -762,6 +781,37 @@ public partial class OverlayWindow : Window
         }
     }
 
+    private static void ApplyCurrentHighlightVisualState(Border card, OverlayViewModel vm)
+    {
+        if (card.DataContext is not NotificationItem item)
+            return;
+
+        ResetHighlightAnimations(card, vm, item.IsHighlighted);
+        if (item.IsHighlighted)
+            _ = PlayHighlightAnimationAsync(card, vm, TimeSpan.Zero);
+    }
+
+    private static void ResetHighlightAnimations(Border card, OverlayViewModel vm, bool isHighlighted)
+    {
+        var overlay = FindNamedDescendant<Border>(card, "HighlightOverlay");
+        if (overlay != null)
+        {
+            overlay.BeginAnimation(UIElement.OpacityProperty, null);
+            overlay.Opacity = isHighlighted ? Math.Clamp(vm.HighlightOverlayOpacity, 0.05, 0.80) : 0;
+        }
+
+        var transform = EnsureMutableCardTransform(card);
+        transform.BeginAnimation(TranslateTransform.XProperty, null);
+        transform.X = 0;
+    }
+
+    private IEnumerable<Border> FindNotificationCards()
+    {
+        return FindDescendants<Border>(NotificationItemsControl)
+            .Where(card => string.Equals(card.Name, "Card", StringComparison.Ordinal)
+                && card.DataContext is NotificationItem);
+    }
+
     private static T? FindNamedDescendant<T>(DependencyObject root, string name) where T : FrameworkElement
     {
         var childCount = VisualTreeHelper.GetChildrenCount(root);
@@ -777,6 +827,50 @@ public partial class OverlayWindow : Window
         }
 
         return null;
+    }
+
+    private static IEnumerable<T> FindDescendants<T>(DependencyObject root) where T : DependencyObject
+    {
+        var childCount = VisualTreeHelper.GetChildrenCount(root);
+        for (var i = 0; i < childCount; i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is T match)
+                yield return match;
+
+            foreach (var nested in FindDescendants<T>(child))
+                yield return nested;
+        }
+    }
+
+    private static string BuildHighlightVisualSignature(AppSettings settings)
+    {
+        var builder = new StringBuilder();
+        builder.Append(settings.AnimationsEnabled)
+            .Append('|').Append(settings.HighlightColor)
+            .Append('|').Append(settings.HighlightAnimation)
+            .Append('|').Append(settings.HighlightBorderMode)
+            .Append('|').Append(settings.HighlightOverlayOpacity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+
+        foreach (var rule in settings.HighlightRules)
+        {
+            builder.Append("|rule:")
+                .Append(rule.Keyword)
+                .Append(':').Append(rule.Color)
+                .Append(':').Append(rule.IsRegex)
+                .Append(':').Append(rule.Scope)
+                .Append(':').Append(rule.AppFilter);
+        }
+
+        foreach (var keyword in settings.HighlightKeywords)
+        {
+            builder.Append("|legacy:")
+                .Append(keyword)
+                .Append(':').Append(settings.HighlightKeywordRegexFlags.TryGetValue(keyword, out var isRegex) && isRegex)
+                .Append(':').Append(settings.PerKeywordColors.TryGetValue(keyword, out var keywordColor) ? keywordColor : string.Empty);
+        }
+
+        return builder.ToString();
     }
 
     private NotificationItem? FindNotificationAtScreenPoint(IntPtr lParam)

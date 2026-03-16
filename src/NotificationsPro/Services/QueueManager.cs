@@ -84,10 +84,6 @@ public class QueueManager : BaseViewModel
         if (string.IsNullOrWhiteSpace(title) && string.IsNullOrWhiteSpace(body))
             return;
 
-        // Track seen app names (RAM only for settings UI)
-        if (!string.IsNullOrWhiteSpace(appName))
-            SeenAppNames.Add(appName);
-
         // Check quiet hours
         if (IsInQuietHours())
             return;
@@ -124,74 +120,32 @@ public class QueueManager : BaseViewModel
         _recentNotificationTimes.RemoveAll(t => t < burstCutoff);
         _recentNotificationTimes.Add(DateTime.Now);
 
-        int maxVisible = Math.Clamp(settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
-
-        // Replace mode: clear all current notifications so the new one
-        // takes their place instead of stacking or going to overflow.
-        if (settings.ReplaceMode && _visibleNotifications.Count > 0)
-        {
-            foreach (var old in _visibleNotifications.ToList())
-            {
-                if (_expiryTimers.TryGetValue(old, out var t)) { t.Stop(); _expiryTimers.Remove(old); }
-                _visibleNotifications.Remove(old);
-            }
-            OverflowCount = 0;
-        }
-
-        if (_visibleNotifications.Count >= maxVisible)
-        {
-            OverflowCount++;
-            return;
-        }
-
         var item = new NotificationItem(appName, title, body);
-        settings.PerAppBackgroundImages.TryGetValue(appName, out var perAppBackgroundImage);
-        var hasPerAppBackgroundImage = !string.IsNullOrWhiteSpace(perAppBackgroundImage);
-        item.BackgroundImageMode = hasPerAppBackgroundImage
-            ? CardBackgroundModeHelper.Image
-            : settings.CardBackgroundMode;
-        item.BackgroundImagePath = hasPerAppBackgroundImage
-            ? perAppBackgroundImage!
-            : settings.CardBackgroundImagePath;
-        item.BackgroundImageOpacity = settings.CardBackgroundImageOpacity;
-        item.BackgroundImageHueDegrees = settings.CardBackgroundImageHueDegrees;
-        item.BackgroundImageBrightness = settings.CardBackgroundImageBrightness;
-        item.BackgroundImageSaturation = settings.CardBackgroundImageSaturation;
-        item.BackgroundImageContrast = settings.CardBackgroundImageContrast;
-        item.BackgroundImageBlackAndWhite = settings.CardBackgroundImageBlackAndWhite;
-        item.BackgroundImageFitMode = settings.CardBackgroundImageFitMode;
-        item.BackgroundImagePlacement = settings.CardBackgroundImagePlacement;
-        item.BackgroundImageVerticalFocus = settings.CardBackgroundImageVerticalFocus;
-
+        ApplyVisualSettings(item, settings);
         ApplyNarrationRule(item, settings);
+        ApplyHighlightState(item, settings);
+        EnqueueNotification(item, settings, trackSeenApp: true, archiveNotification: true, ensureVisible: false, raiseEvents: true);
+    }
 
-        // Check highlight keywords/rules — find the first match and use its configured color.
-        var highlightColor =
-            NotificationRuleMatcher.FindMatchingHighlightColor(settings.HighlightRules, appName, title, body, settings.HighlightColor)
-            ?? FindMatchingLegacyKeywordColor(settings.HighlightKeywords, settings.HighlightKeywordRegexFlags, settings.PerKeywordColors, settings.HighlightColor, title, body);
-        if (highlightColor != null)
-        {
-            item.IsHighlighted = true;
-            item.HighlightColor = highlightColor;
-        }
+    public void AddPreviewNotification(string appName, string title, string body, bool isHighlighted = false, string? highlightColor = null)
+    {
+        appName = appName?.Trim() ?? string.Empty;
+        title = title?.Trim() ?? string.Empty;
+        body = body?.Trim() ?? string.Empty;
 
-        if (settings.NewestOnTop)
-            _visibleNotifications.Insert(0, item);
-        else
-            _visibleNotifications.Add(item);
-        StartExpiryTimer(item);
+        if (string.IsNullOrWhiteSpace(title) && string.IsNullOrWhiteSpace(body))
+            return;
 
-        // Add to session archive (RAM only, never persisted)
-        if (settings.SessionArchiveEnabled)
-        {
-            var maxArchive = Math.Clamp(settings.SessionArchiveMaxItems, 10, 1000);
-            SessionArchive.Add(new ArchiveEntry(appName, title, body, item.ReceivedAt));
-            while (SessionArchive.Count > maxArchive)
-                SessionArchive.RemoveAt(0);
-        }
+        var settings = _settingsManager.Settings;
+        var item = new NotificationItem(appName, title, body);
+        item.IsLocalPreview = true;
+        ApplyVisualSettings(item, settings);
+        item.IsHighlighted = isHighlighted;
+        item.HighlightColor = isHighlighted
+            ? string.IsNullOrWhiteSpace(highlightColor) ? settings.HighlightColor : highlightColor.Trim()
+            : string.Empty;
 
-        NotificationAdded?.Invoke(appName);
-        NotificationDisplayed?.Invoke(item);
+        EnqueueNotification(item, settings, trackSeenApp: false, archiveNotification: false, ensureVisible: true, raiseEvents: false);
     }
 
     /// <summary>
@@ -446,6 +400,7 @@ public class QueueManager : BaseViewModel
     private void OnSettingsChanged()
     {
         ReorderByConfiguredDirection();
+        ReapplyVisibleNotificationHighlights();
 
         var maxVisible = Math.Clamp(_settingsManager.Settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         while (_visibleNotifications.Count > maxVisible)
@@ -489,5 +444,131 @@ public class QueueManager : BaseViewModel
     {
         if (_visibleNotifications.Count == 0 && OverflowCount > 0)
             OverflowCount = 0;
+    }
+
+    private void EnqueueNotification(
+        NotificationItem item,
+        AppSettings settings,
+        bool trackSeenApp,
+        bool archiveNotification,
+        bool ensureVisible,
+        bool raiseEvents)
+    {
+        if (trackSeenApp && !string.IsNullOrWhiteSpace(item.AppName))
+            SeenAppNames.Add(item.AppName);
+
+        var maxVisible = Math.Clamp(settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
+
+        if (settings.ReplaceMode && _visibleNotifications.Count > 0)
+        {
+            foreach (var old in _visibleNotifications.ToList())
+            {
+                if (_expiryTimers.TryGetValue(old, out var existingTimer))
+                {
+                    existingTimer.Stop();
+                    _expiryTimers.Remove(old);
+                }
+
+                _visibleNotifications.Remove(old);
+            }
+
+            OverflowCount = 0;
+        }
+
+        if (_visibleNotifications.Count >= maxVisible)
+        {
+            if (ensureVisible)
+            {
+                RemoveOldestVisibleNotification();
+            }
+            else
+            {
+                OverflowCount++;
+                return;
+            }
+        }
+
+        if (settings.NewestOnTop)
+            _visibleNotifications.Insert(0, item);
+        else
+            _visibleNotifications.Add(item);
+
+        StartExpiryTimer(item);
+
+        if (archiveNotification && settings.SessionArchiveEnabled)
+        {
+            var maxArchive = Math.Clamp(settings.SessionArchiveMaxItems, 10, 1000);
+            SessionArchive.Add(new ArchiveEntry(item.AppName, item.Title, item.Body, item.ReceivedAt));
+            while (SessionArchive.Count > maxArchive)
+                SessionArchive.RemoveAt(0);
+        }
+
+        if (!raiseEvents)
+            return;
+
+        NotificationAdded?.Invoke(item.AppName);
+        NotificationDisplayed?.Invoke(item);
+    }
+
+    private void ApplyVisualSettings(NotificationItem item, AppSettings settings)
+    {
+        settings.PerAppBackgroundImages.TryGetValue(item.AppName, out var perAppBackgroundImage);
+        var hasPerAppBackgroundImage = !string.IsNullOrWhiteSpace(perAppBackgroundImage);
+        item.BackgroundImageMode = hasPerAppBackgroundImage
+            ? CardBackgroundModeHelper.Image
+            : settings.CardBackgroundMode;
+        item.BackgroundImagePath = hasPerAppBackgroundImage
+            ? perAppBackgroundImage!
+            : settings.CardBackgroundImagePath;
+        item.BackgroundImageOpacity = settings.CardBackgroundImageOpacity;
+        item.BackgroundImageHueDegrees = settings.CardBackgroundImageHueDegrees;
+        item.BackgroundImageBrightness = settings.CardBackgroundImageBrightness;
+        item.BackgroundImageSaturation = settings.CardBackgroundImageSaturation;
+        item.BackgroundImageContrast = settings.CardBackgroundImageContrast;
+        item.BackgroundImageBlackAndWhite = settings.CardBackgroundImageBlackAndWhite;
+        item.BackgroundImageFitMode = settings.CardBackgroundImageFitMode;
+        item.BackgroundImagePlacement = settings.CardBackgroundImagePlacement;
+        item.BackgroundImageVerticalFocus = settings.CardBackgroundImageVerticalFocus;
+    }
+
+    private void ApplyHighlightState(NotificationItem item, AppSettings settings)
+    {
+        if (item.IsLocalPreview && item.IsHighlighted)
+            return;
+
+        var highlightColor = FindMatchingHighlightColor(settings, item.AppName, item.Title, item.Body);
+        item.IsHighlighted = highlightColor != null;
+        item.HighlightColor = highlightColor ?? string.Empty;
+    }
+
+    private void ReapplyVisibleNotificationHighlights()
+    {
+        var settings = _settingsManager.Settings;
+        foreach (var notification in _visibleNotifications)
+            ApplyHighlightState(notification, settings);
+    }
+
+    private void RemoveOldestVisibleNotification()
+    {
+        if (_visibleNotifications.Count == 0)
+            return;
+
+        var oldestIndex = _settingsManager.Settings.NewestOnTop
+            ? _visibleNotifications.Count - 1
+            : 0;
+        var oldest = _visibleNotifications[oldestIndex];
+        if (_expiryTimers.TryGetValue(oldest, out var timer))
+        {
+            timer.Stop();
+            _expiryTimers.Remove(oldest);
+        }
+
+        _visibleNotifications.RemoveAt(oldestIndex);
+    }
+
+    private static string? FindMatchingHighlightColor(AppSettings settings, string appName, string title, string body)
+    {
+        return NotificationRuleMatcher.FindMatchingHighlightColor(settings.HighlightRules, appName, title, body, settings.HighlightColor)
+            ?? FindMatchingLegacyKeywordColor(settings.HighlightKeywords, settings.HighlightKeywordRegexFlags, settings.PerKeywordColors, settings.HighlightColor, title, body);
     }
 }

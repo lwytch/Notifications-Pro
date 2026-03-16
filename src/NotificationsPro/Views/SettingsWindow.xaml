@@ -1633,6 +1633,12 @@
                                   Margin="0,4,0,0"
                                   ToolTip="Full Border is the safest default when the accent stripe is hidden."/>
 
+                        <Button Content="Send Highlight Preview"
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding PreviewHighlightNotificationCommand}"
+                                Margin="0,10,0,0"
+                                ToolTip="Injects a local highlighted preview so you can verify the current filtering animation, tint, and border styling immediately."/>
+
                         <Grid Margin="0,8,0,8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>

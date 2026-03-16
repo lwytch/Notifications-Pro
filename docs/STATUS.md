@@ -141,10 +141,11 @@
   - Field-scoped highlight, mute, and narration rules — rules can target `Title Only`, `Body Only`, or `Title + Body` with optional regex matching
   - App-filtered rules — highlight, mute, and narration rules can be limited to app names such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`
   - Highlight presentation controls — highlighted cards can now use configurable tint opacity, `Full Border` / `Accent Side Only` / `No Border` framing, plus `Flash`, `Pulse`, or `Shake` emphasis when they appear
+  - Visible highlighted cards now re-evaluate live when highlight rules or highlight animation settings change, so current cards update without waiting for a new notification
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
-  - Filtering tab now includes per-app muting, scoped keyword management, and narration-rule overrides
+  - Filtering tab now includes per-app muting, scoped keyword management, narration-rule overrides, and a local `Send Highlight Preview` action for testing highlight styling
   - Apps tab now includes per-app sound, icon, and card-background overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
@@ -261,7 +262,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 196 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 199 unit tests covering QueueManager (including scoped highlight/mute/narration rules, live highlight re-evaluation, preview-notification injection, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -375,6 +376,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Unmuting an app from Filtering tab restores notifications
 - [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color
 - [ ] Filtering > Highlight Animation / Highlight Overlay Opacity / Highlight Border Mode visibly change highlighted cards, and `Full Border` still frames the card when the accent stripe is disabled
+- [ ] Filtering > Send Highlight Preview injects a local highlighted test card, and changing the highlight animation while that card is visible updates the current card immediately
 - [ ] Adding a mute keyword suppresses notifications containing that word
 - [ ] Quiet hours toggle suppresses all notifications between configured times
 - [ ] Behavior tab burst-protection toggle suppresses when too many notifications arrive quickly

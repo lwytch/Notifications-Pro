@@ -583,7 +583,8 @@
                 </Border>
 
                 <!-- Notification items -->
-                <ItemsControl ItemsSource="{Binding NotificationsView}"
+                <ItemsControl x:Name="NotificationItemsControl"
+                              ItemsSource="{Binding NotificationsView}"
                               AutomationProperties.Name="Visible notifications"
                               ItemTemplate="{StaticResource NotificationCardTemplate}">
                     <ItemsControl.ItemContainerStyle>

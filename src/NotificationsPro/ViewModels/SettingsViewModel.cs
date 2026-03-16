@@ -1102,6 +1102,7 @@ public partial class SettingsViewModel : BaseViewModel
     public ICommand SetOverlayHeightPresetCommand { get; }
     public ICommand AddHighlightKeywordCommand { get; }
     public ICommand RemoveHighlightKeywordCommand { get; }
+    public ICommand PreviewHighlightNotificationCommand { get; }
     public ICommand AddMuteKeywordCommand { get; }
     public ICommand RemoveMuteKeywordCommand { get; }
     public ICommand ToggleMuteAppCommand { get; }
@@ -1215,6 +1216,7 @@ public partial class SettingsViewModel : BaseViewModel
         SetOverlayHeightPresetCommand = new RelayCommand(SetOverlayHeightPreset);
         AddHighlightKeywordCommand = new RelayCommand(_ => AddHighlightKeyword());
         RemoveHighlightKeywordCommand = new RelayCommand(RemoveHighlightKeyword);
+        PreviewHighlightNotificationCommand = new RelayCommand(SendHighlightPreviewNotification);
         AddMuteKeywordCommand = new RelayCommand(_ => AddMuteKeyword());
         RemoveMuteKeywordCommand = new RelayCommand(RemoveMuteKeyword);
         InitializeSinglePanelEnhancementCommands();
@@ -1877,7 +1879,42 @@ public partial class SettingsViewModel : BaseViewModel
         var body = $"{PreviewBodies[cycleIndex]} [Preview {sequence}]";
         _previewIndex++;
 
-        _queueManager.AddNotification(appName, title, body);
+        _queueManager.AddPreviewNotification(appName, title, body);
+    }
+
+    private void SendHighlightPreviewNotification()
+    {
+        _saveDebounce.Stop();
+        SaveSettings();
+
+        var pendingKeyword = NewHighlightKeyword?.Trim();
+        var configuredEntry = HighlightKeywordEntries.FirstOrDefault();
+        var keyword = !string.IsNullOrWhiteSpace(pendingKeyword)
+            ? pendingKeyword
+            : configuredEntry?.Keyword;
+        if (string.IsNullOrWhiteSpace(keyword))
+            keyword = "urgent";
+
+        var previewScope = configuredEntry?.Scope ?? NotificationMatchScopeHelper.TitleAndBody;
+        var previewColor = !string.IsNullOrWhiteSpace(configuredEntry?.Color)
+            ? configuredEntry!.Color
+            : HighlightColor;
+        var previewAppName = !string.IsNullOrWhiteSpace(configuredEntry?.AppFilter)
+            ? configuredEntry!.AppFilter.Trim()
+            : "Filter Preview";
+        var (title, body) = BuildHighlightPreviewMessage(keyword, previewScope);
+
+        _queueManager.AddPreviewNotification(previewAppName, title, body, isHighlighted: true, highlightColor: previewColor);
+    }
+
+    private static (string Title, string Body) BuildHighlightPreviewMessage(string keyword, string scope)
+    {
+        return NotificationMatchScopeHelper.Normalize(scope) switch
+        {
+            NotificationMatchScopeHelper.TitleOnly => ($"Preview: {keyword}", "Filtering preview for a title-only highlight rule."),
+            NotificationMatchScopeHelper.BodyOnly => ("Highlight preview", $"This body matches the current highlight preview using {keyword}."),
+            _ => ($"Preview: {keyword}", $"This filtering preview repeats {keyword} in the body so title + body matches are obvious.")
+        };
     }
 
     private void MoveOverlayPreset(object? parameter)
