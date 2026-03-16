@@ -65,8 +65,11 @@ appsettings.*.json
 *.token
 *.key
 *.pem
+*.p12
 *.pfx
 *.credentials
+secrets.*
+!secrets.example.*
 # Local Build Scripts and Runbooks
 scripts/app-packaging/
 runbooks/
