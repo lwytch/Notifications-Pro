@@ -96,6 +96,7 @@ public class AppSettings
     public double HighlightOverlayOpacity { get; set; } = 0.25;
     public string HighlightAnimation { get; set; } = HighlightAnimationHelper.None;
     public string HighlightBorderMode { get; set; } = HighlightBorderModeHelper.FullBorder;
+    public double HighlightBorderThickness { get; set; } = 1;
     public List<string> SpokenMutedApps { get; set; } = new();
 
     // Notification icons (M9.5)

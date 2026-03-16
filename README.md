@@ -87,7 +87,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
 - **Optional border** — thin border around each card, configurable colour and thickness.
-- **Highlight styling** — matched highlight rules can add configurable tint opacity, choose a full border / accent-side-only / no-border frame, and optionally play `Flash`, `Pulse`, or `Shake` emphasis when the card appears.
+- **Highlight styling** — matched highlight rules can add configurable tint opacity, explicit highlight border width, choose a full border / accent-side-only / no-border frame, optionally play `Flash`, `Pulse`, or `Shake`, and individual highlight rules can override those treatments directly from `Settings > Filtering`.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
 - **Dyslexia-friendly font** — bundled OpenDyslexic typeface with one-click preset buttons in `Appearance > Typography`.
@@ -282,7 +282,7 @@ Under `%AppData%\NotificationsPro\`:
 dotnet restore
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 199 unit tests
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 202 unit tests
 ```
 
 ## Publish (self-contained)
@@ -413,6 +413,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.20
+- **Filtering Tab Redesign**: `Settings > Filtering` now separates global highlight defaults from per-rule editing and uses a cleaner repeated-card layout for highlight, mute, and narration rules.
+- **Per-Rule Highlight Styling**: highlight rules can now override animation, border mode, tint opacity, and border width per rule, and existing rule keywords can be edited in place instead of forcing delete-and-recreate.
+- **Profile Capture Hardening**: saving a profile now flushes the current settings state first, so newly edited filtering rules and compact settings-window state are included reliably.
 
 ### Release v1.1.10.19
 - **Live Highlight Animation Updates**: highlighted cards already on screen now re-evaluate when you change highlight rules or highlight animation settings, so current cards can switch tint/animation behavior without waiting for a new notification.

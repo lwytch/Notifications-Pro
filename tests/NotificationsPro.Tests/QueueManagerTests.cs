@@ -2,6 +2,7 @@ using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 using System.IO;
+using System.Windows;
 
 namespace NotificationsPro.Tests;
 
@@ -384,6 +385,37 @@ public class QueueManagerTests
     }
 
     [Fact]
+    public void AddNotification_HighlightRuleAppliesResolvedStylingOverrides()
+    {
+        var settings = CreateSettings();
+        settings.Settings.HighlightAnimation = HighlightAnimationHelper.None;
+        settings.Settings.HighlightOverlayOpacity = 0.25;
+        settings.Settings.HighlightBorderMode = HighlightBorderModeHelper.FullBorder;
+        settings.Settings.HighlightBorderThickness = 1;
+        settings.Settings.HighlightRules.Add(new HighlightRuleDefinition
+        {
+            Keyword = "urgent",
+            Scope = NotificationMatchScopeHelper.TitleOnly,
+            Color = "#FF6600",
+            Animation = HighlightAnimationHelper.Flash,
+            OverlayOpacity = 0.6,
+            BorderMode = HighlightBorderModeHelper.AccentSideOnly,
+            BorderThickness = 2.5
+        });
+        var queue = new QueueManager(settings);
+
+        queue.AddNotification("App", "Urgent issue", "Body does not matter");
+
+        Assert.Single(queue.VisibleNotifications);
+        var item = queue.VisibleNotifications[0];
+        Assert.True(item.IsHighlighted);
+        Assert.Equal("#FF6600", item.HighlightColor);
+        Assert.Equal(HighlightAnimationHelper.Flash, item.HighlightAnimation);
+        Assert.Equal(0.6, item.HighlightOverlayOpacity);
+        Assert.Equal(new Thickness(0, 2.5, 2.5, 2.5), item.HighlightCardBorderThickness);
+    }
+
+    [Fact]
     public void SettingsChange_ReappliesHighlightRulesToVisibleNotifications()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "NotificationsProQueue_" + Guid.NewGuid().ToString("N"));
@@ -404,12 +436,20 @@ public class QueueManagerTests
             {
                 Keyword = "normal",
                 Scope = NotificationMatchScopeHelper.TitleOnly,
-                Color = "#33AA55"
+                Color = "#33AA55",
+                Animation = HighlightAnimationHelper.Pulse,
+                OverlayOpacity = 0.55,
+                BorderMode = HighlightBorderModeHelper.AccentSideOnly,
+                BorderThickness = 3
             });
             settings.Apply(updated);
 
-            Assert.True(queue.VisibleNotifications[0].IsHighlighted);
-            Assert.Equal("#33AA55", queue.VisibleNotifications[0].HighlightColor);
+            var item = queue.VisibleNotifications[0];
+            Assert.True(item.IsHighlighted);
+            Assert.Equal("#33AA55", item.HighlightColor);
+            Assert.Equal(HighlightAnimationHelper.Pulse, item.HighlightAnimation);
+            Assert.Equal(0.55, item.HighlightOverlayOpacity);
+            Assert.Equal(new Thickness(0, 3, 3, 3), item.HighlightCardBorderThickness);
         }
         finally
         {
@@ -430,6 +470,29 @@ public class QueueManagerTests
         Assert.True(queue.VisibleNotifications[0].IsHighlighted);
         Assert.Equal("#112233", queue.VisibleNotifications[0].HighlightColor);
         Assert.Empty(queue.SeenAppNames);
+    }
+
+    [Fact]
+    public void AddPreviewNotification_AppliesExplicitHighlightStyleOverrides()
+    {
+        var queue = new QueueManager(CreateSettings());
+
+        queue.AddPreviewNotification(
+            "Preview App",
+            "Preview title",
+            "Preview body",
+            isHighlighted: true,
+            highlightColor: "#112233",
+            highlightAnimation: HighlightAnimationHelper.Shake,
+            highlightOverlayOpacity: 0.65,
+            highlightBorderMode: HighlightBorderModeHelper.FullBorder,
+            highlightBorderThickness: 4);
+
+        var item = queue.VisibleNotifications[0];
+        Assert.Equal("#112233", item.HighlightColor);
+        Assert.Equal(HighlightAnimationHelper.Shake, item.HighlightAnimation);
+        Assert.Equal(0.65, item.HighlightOverlayOpacity);
+        Assert.Equal(new Thickness(4), item.HighlightCardBorderThickness);
     }
 
     [Fact]

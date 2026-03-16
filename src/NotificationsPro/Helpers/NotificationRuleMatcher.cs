@@ -36,15 +36,21 @@ public static class NotificationRuleMatcher
         string body,
         string fallbackColor)
     {
-        foreach (var rule in rules)
-        {
-            if (!Matches(appName, title, body, rule.Keyword, rule.IsRegex, rule.Scope, rule.AppFilter))
-                continue;
+        var matchedRule = FindMatchingHighlightRule(rules, appName, title, body);
+        if (matchedRule == null)
+            return null;
 
-            return string.IsNullOrWhiteSpace(rule.Color) ? fallbackColor : rule.Color;
-        }
+        return string.IsNullOrWhiteSpace(matchedRule.Color) ? fallbackColor : matchedRule.Color;
+    }
 
-        return null;
+    public static HighlightRuleDefinition? FindMatchingHighlightRule(
+        IEnumerable<HighlightRuleDefinition> rules,
+        string appName,
+        string title,
+        string body)
+    {
+        return rules.FirstOrDefault(rule =>
+            Matches(appName, title, body, rule.Keyword, rule.IsRegex, rule.Scope, rule.AppFilter));
     }
 
     public static NarrationRuleDefinition? FindMatchingNarrationRule(

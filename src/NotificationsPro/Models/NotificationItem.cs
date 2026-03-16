@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using NotificationsPro.Helpers;
 
 namespace NotificationsPro.Models;
 
@@ -62,6 +64,51 @@ public class NotificationItem : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
+    private string _highlightAnimation = HighlightAnimationHelper.None;
+    public string HighlightAnimation
+    {
+        get => _highlightAnimation;
+        set
+        {
+            var normalized = HighlightAnimationHelper.Normalize(value);
+            if (string.Equals(_highlightAnimation, normalized, StringComparison.Ordinal))
+                return;
+
+            _highlightAnimation = normalized;
+            OnPropertyChanged();
+        }
+    }
+
+    private double _highlightOverlayOpacity = 0.25;
+    public double HighlightOverlayOpacity
+    {
+        get => _highlightOverlayOpacity;
+        set
+        {
+            var normalized = double.IsNaN(value) ? 0.25 : Math.Clamp(value, 0.05, 0.80);
+            if (Math.Abs(_highlightOverlayOpacity - normalized) < 0.0001)
+                return;
+
+            _highlightOverlayOpacity = normalized;
+            OnPropertyChanged();
+        }
+    }
+
+    private Thickness _highlightCardBorderThickness = new(1);
+    public Thickness HighlightCardBorderThickness
+    {
+        get => _highlightCardBorderThickness;
+        set
+        {
+            if (_highlightCardBorderThickness.Equals(value))
+                return;
+
+            _highlightCardBorderThickness = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string BackgroundImageMode { get; set; } = Helpers.CardBackgroundModeHelper.Solid;
     public string BackgroundImagePath { get; set; } = string.Empty;
     public double BackgroundImageOpacity { get; set; } = 0.45;

@@ -78,6 +78,7 @@
   "HighlightOverlayOpacity": 0.25,
   "HighlightAnimation": "None",
   "HighlightBorderMode": "Full Border",
+  "HighlightBorderThickness": 1.0,
   "SpokenMutedApps": [],
   "ShowNotificationIcons": false,
   "IconSize": 24,

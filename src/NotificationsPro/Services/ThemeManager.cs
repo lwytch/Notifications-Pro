@@ -115,6 +115,7 @@ public class ThemeManager
         s.HighlightOverlayOpacity = double.IsNaN(s.HighlightOverlayOpacity) ? 0.25 : Math.Clamp(s.HighlightOverlayOpacity, 0.05, 0.80);
         s.HighlightAnimation = HighlightAnimationHelper.Normalize(s.HighlightAnimation);
         s.HighlightBorderMode = HighlightBorderModeHelper.Normalize(s.HighlightBorderMode);
+        s.HighlightBorderThickness = double.IsNaN(s.HighlightBorderThickness) ? 1 : Math.Clamp(s.HighlightBorderThickness, 0.5, 8.0);
         s.OverlayWidth = double.IsNaN(s.OverlayWidth) ? 340 : Math.Clamp(s.OverlayWidth, 220, 7680);
         s.OverlayMaxHeight = double.IsNaN(s.OverlayMaxHeight) ? 800 : Math.Clamp(s.OverlayMaxHeight, 200, 4320);
         s.BurstLimitCount = Math.Clamp(s.BurstLimitCount, 1, 100);
@@ -151,6 +152,23 @@ public class ThemeManager
         s.MuteRules ??= new List<MuteRuleDefinition>();
         s.NarrationRules ??= new List<NarrationRuleDefinition>();
         s.PerAppBackgroundImages ??= new Dictionary<string, string>();
+        foreach (var rule in s.HighlightRules)
+        {
+            rule.Scope = NotificationMatchScopeHelper.Normalize(rule.Scope);
+            rule.AppFilter = rule.AppFilter?.Trim() ?? string.Empty;
+            rule.Animation = string.IsNullOrWhiteSpace(rule.Animation)
+                ? string.Empty
+                : HighlightAnimationHelper.Normalize(rule.Animation);
+            rule.BorderMode = string.IsNullOrWhiteSpace(rule.BorderMode)
+                ? string.Empty
+                : HighlightBorderModeHelper.Normalize(rule.BorderMode);
+            rule.OverlayOpacity = rule.OverlayOpacity.HasValue
+                ? Math.Clamp(rule.OverlayOpacity.Value, 0.05, 0.80)
+                : null;
+            rule.BorderThickness = rule.BorderThickness.HasValue
+                ? Math.Clamp(rule.BorderThickness.Value, 0.5, 8.0)
+                : null;
+        }
         s.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(s);
     }
 

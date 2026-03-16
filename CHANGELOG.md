@@ -14,6 +14,8 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Filtering highlight styling no longer reuses the normal card-border width implicitly; highlighted notifications now have an explicit highlight border-width control and resolved per-notification highlight styling in the overlay
+- Saving a profile now flushes the current debounced settings state first, so newly edited filtering rules, settings-window state, and other in-flight changes are not lost in saved profiles
 - Existing highlighted cards now update live when you change highlight rules, tint opacity, or highlight animation settings instead of waiting for a brand-new notification
 - Highlighted cards no longer lose their left-edge frame when the accent stripe is disabled, and the tray About dialog now reports the current `GPL v3` license text
 - Loading a named profile or tray-applied theme now preserves the full settings-window palette/opacity state and refreshes the settings UI immediately instead of reverting to a preset snapshot
@@ -58,6 +60,11 @@
 - Spoken-notification selectors no longer render with the extra left indentation that made the section look misaligned
 - Notification cards now expose meaningful Windows UI Automation names instead of the raw model class name
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
+
+### Added
+- Filtering tab redesign — highlight defaults are now separated from the rule list, the preview CTA is a smaller accent action, and highlight/mute/narration rules share a cleaner repeated-card layout
+- Highlight rules now support per-rule animation, border mode, tint opacity, and border width overrides, plus per-rule preview buttons and in-place keyword editing
+- Added profile-round-trip regression coverage for filtering/style settings, including rule overrides and compact settings-window mode
 - Memory leak: OverlayWindow now unsubscribes from SettingsChanged event on close (prevents GC retention)
 - Crash guard: 0-monitor fallback in popup positioning handles empty Screen.AllScreens safely
 - Event leak: SystemParameters.StaticPropertyChanged handler properly unsubscribed on app exit

@@ -258,6 +258,9 @@ public partial class SettingsViewModel : BaseViewModel
     private string _highlightBorderMode = HighlightBorderModeHelper.FullBorder;
     public string HighlightBorderMode { get => _highlightBorderMode; set { if (SetProperty(ref _highlightBorderMode, HighlightBorderModeHelper.Normalize(value))) QueueSave(); } }
 
+    private double _highlightBorderThickness = 1;
+    public double HighlightBorderThickness { get => _highlightBorderThickness; set { if (SetProperty(ref _highlightBorderThickness, Math.Clamp(value, 0.5, 8.0))) QueueSave(); } }
+
     private string _newHighlightKeyword = string.Empty;
     public string NewHighlightKeyword { get => _newHighlightKeyword; set => SetProperty(ref _newHighlightKeyword, value); }
 
@@ -1058,6 +1061,8 @@ public partial class SettingsViewModel : BaseViewModel
 
     public List<string> AvailableHighlightAnimations { get; } = HighlightAnimationHelper.KnownModes.ToList();
     public List<string> AvailableHighlightBorderModes { get; } = HighlightBorderModeHelper.KnownModes.ToList();
+    public List<string> AvailableHighlightAnimationOverrides { get; } = new(new[] { KeywordHighlightEntry.UseGlobalSetting }.Concat(HighlightAnimationHelper.KnownModes));
+    public List<string> AvailableHighlightBorderModeOverrides { get; } = new(new[] { KeywordHighlightEntry.UseGlobalSetting }.Concat(HighlightBorderModeHelper.KnownModes));
 
     public List<string> AvailableAppGroupingStyles { get; } = new()
     {
@@ -1387,6 +1392,7 @@ public partial class SettingsViewModel : BaseViewModel
         _highlightOverlayOpacity = Math.Clamp(s.HighlightOverlayOpacity, 0.05, 0.80);
         _highlightAnimation = HighlightAnimationHelper.Normalize(s.HighlightAnimation);
         _highlightBorderMode = HighlightBorderModeHelper.Normalize(s.HighlightBorderMode);
+        _highlightBorderThickness = double.IsNaN(s.HighlightBorderThickness) ? 1 : Math.Clamp(s.HighlightBorderThickness, 0.5, 8.0);
         _showNotificationIcons = s.ShowNotificationIcons;
         _iconSize = s.IconSize;
         _defaultIconPreset = s.DefaultIconPreset;
@@ -1563,7 +1569,9 @@ public partial class SettingsViewModel : BaseViewModel
     private void SaveProfile()
     {
         if (string.IsNullOrWhiteSpace(NewProfileName)) return;
-        _profileManager.SaveProfile(NewProfileName, _settingsManager.Settings);
+        _saveDebounce.Stop();
+        SaveSettings();
+        _profileManager.SaveProfile(NewProfileName, _settingsManager.Settings.Clone());
         NewProfileName = "";
         RefreshProfiles();
     }
@@ -1720,6 +1728,7 @@ public partial class SettingsViewModel : BaseViewModel
             HighlightOverlayOpacity = Math.Clamp(HighlightOverlayOpacity, 0.05, 0.80),
             HighlightAnimation = HighlightAnimationHelper.Normalize(HighlightAnimation),
             HighlightBorderMode = HighlightBorderModeHelper.Normalize(HighlightBorderMode),
+            HighlightBorderThickness = Math.Clamp(HighlightBorderThickness, 0.5, 8.0),
             HighlightRules = BuildHighlightRules(),
             HighlightKeywords = HighlightKeywordEntries.Select(e => e.Keyword).ToList(),
             PerKeywordColors = HighlightKeywordEntries
@@ -1839,6 +1848,7 @@ public partial class SettingsViewModel : BaseViewModel
             SettingsWindowAccent = SettingsWindowAccent,
             SettingsWindowBorder = SettingsWindowBorder,
             SettingsWindowCornerRadius = SettingsWindowCornerRadius,
+            CompactSettingsWindow = CompactSettingsWindow,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
             StartWithWindows = StartWithWindows,
             SelectedMonitorIndex = SelectedMonitorIndex,
@@ -1882,14 +1892,17 @@ public partial class SettingsViewModel : BaseViewModel
         _queueManager.AddPreviewNotification(appName, title, body);
     }
 
-    private void SendHighlightPreviewNotification()
+    private void SendHighlightPreviewNotification(object? parameter)
     {
         _saveDebounce.Stop();
         SaveSettings();
 
+        var selectedEntry = parameter as KeywordHighlightEntry;
         var pendingKeyword = NewHighlightKeyword?.Trim();
-        var configuredEntry = HighlightKeywordEntries.FirstOrDefault();
-        var keyword = !string.IsNullOrWhiteSpace(pendingKeyword)
+        var configuredEntry = selectedEntry ?? HighlightKeywordEntries.FirstOrDefault();
+        var keyword = !string.IsNullOrWhiteSpace(selectedEntry?.Keyword)
+            ? selectedEntry.Keyword
+            : !string.IsNullOrWhiteSpace(pendingKeyword)
             ? pendingKeyword
             : configuredEntry?.Keyword;
         if (string.IsNullOrWhiteSpace(keyword))
@@ -1899,12 +1912,35 @@ public partial class SettingsViewModel : BaseViewModel
         var previewColor = !string.IsNullOrWhiteSpace(configuredEntry?.Color)
             ? configuredEntry!.Color
             : HighlightColor;
+        var previewAnimation = configuredEntry == null
+            || string.Equals(configuredEntry.Animation, KeywordHighlightEntry.UseGlobalSetting, StringComparison.OrdinalIgnoreCase)
+                ? HighlightAnimation
+                : configuredEntry.Animation;
+        var previewBorderMode = configuredEntry == null
+            || string.Equals(configuredEntry.BorderMode, KeywordHighlightEntry.UseGlobalSetting, StringComparison.OrdinalIgnoreCase)
+                ? HighlightBorderMode
+                : configuredEntry.BorderMode;
+        var previewOverlayOpacity = configuredEntry?.UseCustomOverlayOpacity == true
+            ? configuredEntry.OverlayOpacity
+            : HighlightOverlayOpacity;
+        var previewBorderThickness = configuredEntry?.UseCustomBorderThickness == true
+            ? configuredEntry.BorderThickness
+            : HighlightBorderThickness;
         var previewAppName = !string.IsNullOrWhiteSpace(configuredEntry?.AppFilter)
             ? configuredEntry!.AppFilter.Trim()
             : "Filter Preview";
         var (title, body) = BuildHighlightPreviewMessage(keyword, previewScope);
 
-        _queueManager.AddPreviewNotification(previewAppName, title, body, isHighlighted: true, highlightColor: previewColor);
+        _queueManager.AddPreviewNotification(
+            previewAppName,
+            title,
+            body,
+            isHighlighted: true,
+            highlightColor: previewColor,
+            highlightAnimation: previewAnimation,
+            highlightOverlayOpacity: previewOverlayOpacity,
+            highlightBorderMode: previewBorderMode,
+            highlightBorderThickness: previewBorderThickness);
     }
 
     private static (string Title, string Body) BuildHighlightPreviewMessage(string keyword, string scope)

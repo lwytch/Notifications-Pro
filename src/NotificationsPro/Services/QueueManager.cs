@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Threading;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
@@ -128,6 +129,18 @@ public class QueueManager : BaseViewModel
     }
 
     public void AddPreviewNotification(string appName, string title, string body, bool isHighlighted = false, string? highlightColor = null)
+        => AddPreviewNotification(appName, title, body, isHighlighted, highlightColor, null, null, null, null);
+
+    public void AddPreviewNotification(
+        string appName,
+        string title,
+        string body,
+        bool isHighlighted,
+        string? highlightColor,
+        string? highlightAnimation,
+        double? highlightOverlayOpacity,
+        string? highlightBorderMode,
+        double? highlightBorderThickness)
     {
         appName = appName?.Trim() ?? string.Empty;
         title = title?.Trim() ?? string.Empty;
@@ -141,9 +154,24 @@ public class QueueManager : BaseViewModel
         item.IsLocalPreview = true;
         ApplyVisualSettings(item, settings);
         item.IsHighlighted = isHighlighted;
-        item.HighlightColor = isHighlighted
-            ? string.IsNullOrWhiteSpace(highlightColor) ? settings.HighlightColor : highlightColor.Trim()
-            : string.Empty;
+        if (isHighlighted)
+        {
+            item.HighlightColor = string.IsNullOrWhiteSpace(highlightColor) ? settings.HighlightColor : highlightColor.Trim();
+            item.HighlightAnimation = string.IsNullOrWhiteSpace(highlightAnimation)
+                ? settings.HighlightAnimation
+                : HighlightAnimationHelper.Normalize(highlightAnimation);
+            item.HighlightOverlayOpacity = highlightOverlayOpacity ?? settings.HighlightOverlayOpacity;
+            item.HighlightCardBorderThickness = BuildHighlightCardBorderThickness(
+                string.IsNullOrWhiteSpace(highlightBorderMode) ? settings.HighlightBorderMode : HighlightBorderModeHelper.Normalize(highlightBorderMode),
+                highlightBorderThickness ?? settings.HighlightBorderThickness);
+        }
+        else
+        {
+            item.HighlightColor = string.Empty;
+            item.HighlightAnimation = settings.HighlightAnimation;
+            item.HighlightOverlayOpacity = settings.HighlightOverlayOpacity;
+            item.HighlightCardBorderThickness = BuildHighlightCardBorderThickness(settings.HighlightBorderMode, settings.HighlightBorderThickness);
+        }
 
         EnqueueNotification(item, settings, trackSeenApp: false, archiveNotification: false, ensureVisible: true, raiseEvents: false);
     }
@@ -536,9 +564,46 @@ public class QueueManager : BaseViewModel
         if (item.IsLocalPreview && item.IsHighlighted)
             return;
 
-        var highlightColor = FindMatchingHighlightColor(settings, item.AppName, item.Title, item.Body);
-        item.IsHighlighted = highlightColor != null;
-        item.HighlightColor = highlightColor ?? string.Empty;
+        var matchedRule = NotificationRuleMatcher.FindMatchingHighlightRule(settings.HighlightRules, item.AppName, item.Title, item.Body);
+        if (matchedRule != null)
+        {
+            ApplyResolvedHighlightState(
+                item,
+                settings,
+                string.IsNullOrWhiteSpace(matchedRule.Color) ? settings.HighlightColor : matchedRule.Color,
+                string.IsNullOrWhiteSpace(matchedRule.Animation) ? settings.HighlightAnimation : matchedRule.Animation,
+                matchedRule.OverlayOpacity ?? settings.HighlightOverlayOpacity,
+                string.IsNullOrWhiteSpace(matchedRule.BorderMode) ? settings.HighlightBorderMode : matchedRule.BorderMode,
+                matchedRule.BorderThickness ?? settings.HighlightBorderThickness);
+            return;
+        }
+
+        var legacyHighlightColor = FindMatchingLegacyKeywordColor(
+            settings.HighlightKeywords,
+            settings.HighlightKeywordRegexFlags,
+            settings.PerKeywordColors,
+            settings.HighlightColor,
+            item.Title,
+            item.Body);
+
+        if (legacyHighlightColor != null)
+        {
+            ApplyResolvedHighlightState(
+                item,
+                settings,
+                legacyHighlightColor,
+                settings.HighlightAnimation,
+                settings.HighlightOverlayOpacity,
+                settings.HighlightBorderMode,
+                settings.HighlightBorderThickness);
+            return;
+        }
+
+        item.IsHighlighted = false;
+        item.HighlightColor = string.Empty;
+        item.HighlightAnimation = settings.HighlightAnimation;
+        item.HighlightOverlayOpacity = settings.HighlightOverlayOpacity;
+        item.HighlightCardBorderThickness = BuildHighlightCardBorderThickness(settings.HighlightBorderMode, settings.HighlightBorderThickness);
     }
 
     private void ReapplyVisibleNotificationHighlights()
@@ -566,9 +631,31 @@ public class QueueManager : BaseViewModel
         _visibleNotifications.RemoveAt(oldestIndex);
     }
 
-    private static string? FindMatchingHighlightColor(AppSettings settings, string appName, string title, string body)
+    private static void ApplyResolvedHighlightState(
+        NotificationItem item,
+        AppSettings settings,
+        string highlightColor,
+        string highlightAnimation,
+        double highlightOverlayOpacity,
+        string highlightBorderMode,
+        double highlightBorderThickness)
     {
-        return NotificationRuleMatcher.FindMatchingHighlightColor(settings.HighlightRules, appName, title, body, settings.HighlightColor)
-            ?? FindMatchingLegacyKeywordColor(settings.HighlightKeywords, settings.HighlightKeywordRegexFlags, settings.PerKeywordColors, settings.HighlightColor, title, body);
+        item.IsHighlighted = true;
+        item.HighlightColor = string.IsNullOrWhiteSpace(highlightColor) ? settings.HighlightColor : highlightColor;
+        item.HighlightAnimation = HighlightAnimationHelper.Normalize(highlightAnimation);
+        item.HighlightOverlayOpacity = highlightOverlayOpacity;
+        item.HighlightCardBorderThickness = BuildHighlightCardBorderThickness(highlightBorderMode, highlightBorderThickness);
+    }
+
+    private static Thickness BuildHighlightCardBorderThickness(string borderMode, double borderThickness)
+    {
+        var normalizedMode = HighlightBorderModeHelper.Normalize(borderMode);
+        var normalizedThickness = double.IsNaN(borderThickness) ? 1 : Math.Clamp(borderThickness, 0.5, 8.0);
+        return normalizedMode switch
+        {
+            HighlightBorderModeHelper.NoBorder => new Thickness(0),
+            HighlightBorderModeHelper.AccentSideOnly => new Thickness(0, normalizedThickness, normalizedThickness, normalizedThickness),
+            _ => new Thickness(normalizedThickness)
+        };
     }
 }

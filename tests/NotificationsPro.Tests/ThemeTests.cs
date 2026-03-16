@@ -362,6 +362,7 @@ public class ThemeTests : IDisposable
             HighlightOverlayOpacity = 0.31,
             HighlightAnimation = HighlightAnimationHelper.Pulse,
             HighlightBorderMode = HighlightBorderModeHelper.NoBorder,
+            HighlightBorderThickness = 2.5,
             ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleTimestamp,
             SpokenMutedApps = new() { "Teams", "Outlook" },
             NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility,
@@ -373,10 +374,20 @@ public class ThemeTests : IDisposable
             CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard,
             FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png",
             FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize,
+            CompactSettingsWindow = false,
             ShowQuickTips = false,
         };
         original.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
-        original.HighlightRules.Add(new HighlightRuleDefinition { Keyword = "headline", Scope = NotificationMatchScopeHelper.TitleOnly, AppFilter = "X" });
+        original.HighlightRules.Add(new HighlightRuleDefinition
+        {
+            Keyword = "headline",
+            Scope = NotificationMatchScopeHelper.TitleOnly,
+            AppFilter = "X",
+            Animation = HighlightAnimationHelper.Shake,
+            BorderMode = HighlightBorderModeHelper.AccentSideOnly,
+            OverlayOpacity = 0.52,
+            BorderThickness = 3.5
+        });
         original.MuteRules.Add(new MuteRuleDefinition { Keyword = "spoiler", Scope = NotificationMatchScopeHelper.BodyOnly });
         original.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@openai", Scope = NotificationMatchScopeHelper.BodyOnly, ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly });
 
@@ -396,6 +407,7 @@ public class ThemeTests : IDisposable
         Assert.Equal(0.31, imported.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.Pulse, imported.HighlightAnimation);
         Assert.Equal(HighlightBorderModeHelper.NoBorder, imported.HighlightBorderMode);
+        Assert.Equal(2.5, imported.HighlightBorderThickness);
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleTimestamp, imported.ReadNotificationsAloudMode);
         Assert.Equal(new[] { "Teams", "Outlook" }, imported.SpokenMutedApps);
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, imported.NotificationCaptureMode);
@@ -408,10 +420,15 @@ public class ThemeTests : IDisposable
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", imported.FullscreenOverlayImagePath);
         Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, imported.FullscreenOverlayImageFitMode);
         Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", imported.PerAppBackgroundImages["X"]);
+        Assert.False(imported.CompactSettingsWindow);
         Assert.False(imported.ShowQuickTips);
         Assert.Single(imported.HighlightRules);
         Assert.Single(imported.MuteRules);
         Assert.Single(imported.NarrationRules);
+        Assert.Equal(HighlightAnimationHelper.Shake, imported.HighlightRules[0].Animation);
+        Assert.Equal(HighlightBorderModeHelper.AccentSideOnly, imported.HighlightRules[0].BorderMode);
+        Assert.Equal(0.52, imported.HighlightRules[0].OverlayOpacity);
+        Assert.Equal(3.5, imported.HighlightRules[0].BorderThickness);
     }
 
     [Fact]

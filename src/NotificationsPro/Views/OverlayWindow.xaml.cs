@@ -705,7 +705,10 @@ public partial class OverlayWindow : Window
 
     private static async Task PlayHighlightAnimationAsync(Border card, OverlayViewModel vm, TimeSpan delay)
     {
-        var highlightAnimation = HighlightAnimationHelper.Normalize(vm.HighlightAnimation);
+        if (card.DataContext is not NotificationItem item)
+            return;
+
+        var highlightAnimation = HighlightAnimationHelper.Normalize(item.HighlightAnimation);
         if (!vm.AnimationsEnabled || highlightAnimation == HighlightAnimationHelper.None)
             return;
 
@@ -723,7 +726,7 @@ public partial class OverlayWindow : Window
                 if (overlay == null)
                     return;
 
-                var baseOpacity = Math.Clamp(vm.HighlightOverlayOpacity, 0.05, 0.80);
+                var baseOpacity = Math.Clamp(item.HighlightOverlayOpacity, 0.05, 0.80);
                 var flash = new DoubleAnimationUsingKeyFrames
                 {
                     Duration = TimeSpan.FromMilliseconds(540)
@@ -746,7 +749,7 @@ public partial class OverlayWindow : Window
                 if (overlay == null)
                     return;
 
-                var baseOpacity = Math.Clamp(vm.HighlightOverlayOpacity, 0.05, 0.80);
+                var baseOpacity = Math.Clamp(item.HighlightOverlayOpacity, 0.05, 0.80);
                 overlay.BeginAnimation(
                     UIElement.OpacityProperty,
                     new DoubleAnimation
@@ -786,18 +789,21 @@ public partial class OverlayWindow : Window
         if (card.DataContext is not NotificationItem item)
             return;
 
-        ResetHighlightAnimations(card, vm, item.IsHighlighted);
+        ResetHighlightAnimations(card, item.IsHighlighted);
         if (item.IsHighlighted)
             _ = PlayHighlightAnimationAsync(card, vm, TimeSpan.Zero);
     }
 
-    private static void ResetHighlightAnimations(Border card, OverlayViewModel vm, bool isHighlighted)
+    private static void ResetHighlightAnimations(Border card, bool isHighlighted)
     {
         var overlay = FindNamedDescendant<Border>(card, "HighlightOverlay");
         if (overlay != null)
         {
             overlay.BeginAnimation(UIElement.OpacityProperty, null);
-            overlay.Opacity = isHighlighted ? Math.Clamp(vm.HighlightOverlayOpacity, 0.05, 0.80) : 0;
+            if (card.DataContext is NotificationItem item)
+                overlay.Opacity = isHighlighted ? Math.Clamp(item.HighlightOverlayOpacity, 0.05, 0.80) : 0;
+            else
+                overlay.Opacity = 0;
         }
 
         var transform = EnsureMutableCardTransform(card);
@@ -850,7 +856,8 @@ public partial class OverlayWindow : Window
             .Append('|').Append(settings.HighlightColor)
             .Append('|').Append(settings.HighlightAnimation)
             .Append('|').Append(settings.HighlightBorderMode)
-            .Append('|').Append(settings.HighlightOverlayOpacity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+            .Append('|').Append(settings.HighlightOverlayOpacity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture))
+            .Append('|').Append(settings.HighlightBorderThickness.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
 
         foreach (var rule in settings.HighlightRules)
         {
@@ -859,7 +866,11 @@ public partial class OverlayWindow : Window
                 .Append(':').Append(rule.Color)
                 .Append(':').Append(rule.IsRegex)
                 .Append(':').Append(rule.Scope)
-                .Append(':').Append(rule.AppFilter);
+                .Append(':').Append(rule.AppFilter)
+                .Append(':').Append(rule.Animation)
+                .Append(':').Append(rule.BorderMode)
+                .Append(':').Append(rule.OverlayOpacity?.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty)
+                .Append(':').Append(rule.BorderThickness?.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty);
         }
 
         foreach (var keyword in settings.HighlightKeywords)

@@ -136,6 +136,17 @@ public class OverlayViewModel : BaseViewModel
         }
     }
 
+    private double _highlightBorderThickness = 1;
+    public double HighlightBorderThickness
+    {
+        get => _highlightBorderThickness;
+        set
+        {
+            if (!SetProperty(ref _highlightBorderThickness, Math.Clamp(value, 0.5, 8.0))) return;
+            OnPropertyChanged(nameof(HighlightCardBorderThickness));
+        }
+    }
+
     // Card shape
     private double _cornerRadius = 12;
     public double CornerRadius { get => _cornerRadius; set => SetProperty(ref _cornerRadius, value); }
@@ -508,8 +519,8 @@ public class OverlayViewModel : BaseViewModel
     public Thickness HighlightCardBorderThickness => HighlightBorderMode switch
     {
         HighlightBorderModeHelper.NoBorder => new Thickness(0),
-        HighlightBorderModeHelper.AccentSideOnly => new Thickness(0, GetHighlightBorderEdgeThickness(), GetHighlightBorderEdgeThickness(), GetHighlightBorderEdgeThickness()),
-        _ => new Thickness(GetHighlightBorderEdgeThickness())
+        HighlightBorderModeHelper.AccentSideOnly => new Thickness(0, HighlightBorderThickness, HighlightBorderThickness, HighlightBorderThickness),
+        _ => new Thickness(HighlightBorderThickness)
     };
 
     // Computed — animations
@@ -723,6 +734,7 @@ public class OverlayViewModel : BaseViewModel
         HighlightOverlayOpacity = s.HighlightOverlayOpacity;
         HighlightAnimation = s.HighlightAnimation;
         HighlightBorderMode = s.HighlightBorderMode;
+        HighlightBorderThickness = s.HighlightBorderThickness;
         CornerRadius = s.CornerRadius;
         Padding = s.Padding;
         CardGap = s.CardGap;
@@ -842,10 +854,4 @@ public class OverlayViewModel : BaseViewModel
         };
     }
 
-    private double GetHighlightBorderEdgeThickness()
-    {
-        return ShowBorder
-            ? Math.Max(1, BorderThickness)
-            : 1;
-    }
 }

@@ -6,7 +6,20 @@ namespace NotificationsPro.ViewModels;
 
 public class NarrationRuleEntry : INotifyPropertyChanged
 {
-    public string Keyword { get; }
+    private string _keyword;
+    public string Keyword
+    {
+        get => _keyword;
+        set
+        {
+            var normalized = value?.Trim() ?? string.Empty;
+            if (string.Equals(_keyword, normalized, StringComparison.Ordinal))
+                return;
+
+            _keyword = normalized;
+            OnPropertyChanged();
+        }
+    }
 
     private bool _isRegex;
     public bool IsRegex
@@ -67,7 +80,7 @@ public class NarrationRuleEntry : INotifyPropertyChanged
         string? action = null,
         string? readMode = null)
     {
-        Keyword = keyword;
+        _keyword = keyword?.Trim() ?? string.Empty;
         _isRegex = isRegex;
         _scope = NotificationMatchScopeHelper.Normalize(scope);
         _appFilter = appFilter?.Trim() ?? string.Empty;

@@ -362,7 +362,11 @@ public partial class SettingsViewModel
                     string.IsNullOrWhiteSpace(rule.Color) ? settings.HighlightColor : rule.Color,
                     rule.IsRegex,
                     rule.Scope,
-                    rule.AppFilter);
+                    rule.AppFilter,
+                    rule.Animation,
+                    rule.BorderMode,
+                    rule.OverlayOpacity,
+                    rule.BorderThickness);
                 entry.PropertyChanged += (_, _) => QueueSave();
                 HighlightKeywordEntries.Add(entry);
             }
@@ -435,7 +439,15 @@ public partial class SettingsViewModel
                 Color = entry.Color,
                 IsRegex = entry.IsRegex,
                 Scope = NotificationMatchScopeHelper.Normalize(entry.Scope),
-                AppFilter = entry.AppFilter?.Trim() ?? string.Empty
+                AppFilter = entry.AppFilter?.Trim() ?? string.Empty,
+                Animation = string.Equals(entry.Animation, KeywordHighlightEntry.UseGlobalSetting, StringComparison.OrdinalIgnoreCase)
+                    ? string.Empty
+                    : HighlightAnimationHelper.Normalize(entry.Animation),
+                BorderMode = string.Equals(entry.BorderMode, KeywordHighlightEntry.UseGlobalSetting, StringComparison.OrdinalIgnoreCase)
+                    ? string.Empty
+                    : HighlightBorderModeHelper.Normalize(entry.BorderMode),
+                OverlayOpacity = entry.UseCustomOverlayOpacity ? Math.Clamp(entry.OverlayOpacity, 0.05, 0.80) : null,
+                BorderThickness = entry.UseCustomBorderThickness ? Math.Clamp(entry.BorderThickness, 0.5, 8.0) : null
             })
             .ToList();
     }

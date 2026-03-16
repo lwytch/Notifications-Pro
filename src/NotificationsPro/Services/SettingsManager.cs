@@ -124,6 +124,9 @@ public class SettingsManager
             : Math.Clamp(settings.HighlightOverlayOpacity, 0.05, 0.80);
         settings.HighlightAnimation = HighlightAnimationHelper.Normalize(settings.HighlightAnimation);
         settings.HighlightBorderMode = HighlightBorderModeHelper.Normalize(settings.HighlightBorderMode);
+        settings.HighlightBorderThickness = double.IsNaN(settings.HighlightBorderThickness)
+            ? 1
+            : Math.Clamp(settings.HighlightBorderThickness, 0.5, 8.0);
         settings.MaxVisibleNotifications = Math.Clamp(settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         settings.OverlayScrollbarTrackColor = string.IsNullOrWhiteSpace(settings.OverlayScrollbarTrackColor)
             ? "#141414"
@@ -179,6 +182,23 @@ public class SettingsManager
             : Math.Clamp(settings.FullscreenOverlayImageContrast, 0.2, 2.0);
         settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.FullscreenOverlayImageFitMode);
         settings.FullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Normalize(settings.FullscreenOverlayImageVerticalFocus);
+        foreach (var rule in settings.HighlightRules)
+        {
+            rule.Scope = NotificationMatchScopeHelper.Normalize(rule.Scope);
+            rule.AppFilter = rule.AppFilter?.Trim() ?? string.Empty;
+            rule.Animation = string.IsNullOrWhiteSpace(rule.Animation)
+                ? string.Empty
+                : HighlightAnimationHelper.Normalize(rule.Animation);
+            rule.BorderMode = string.IsNullOrWhiteSpace(rule.BorderMode)
+                ? string.Empty
+                : HighlightBorderModeHelper.Normalize(rule.BorderMode);
+            rule.OverlayOpacity = rule.OverlayOpacity.HasValue
+                ? Math.Clamp(rule.OverlayOpacity.Value, 0.05, 0.80)
+                : null;
+            rule.BorderThickness = rule.BorderThickness.HasValue
+                ? Math.Clamp(rule.BorderThickness.Value, 0.5, 8.0)
+                : null;
+        }
         settings.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(settings);
     }
 

@@ -49,7 +49,10 @@ public class ProfileManager
         Directory.CreateDirectory(_profilesDir);
         var filename = SanitizeFileName(name) + ".json";
         var path = Path.Combine(_profilesDir, filename);
-        var json = JsonSerializer.Serialize(settings, JsonOptions);
+        var snapshot = settings.Clone();
+        if (!snapshot.SettingsSchemaVersion.HasValue || snapshot.SettingsSchemaVersion.Value < SettingsManager.CurrentSettingsSchemaVersion)
+            snapshot.SettingsSchemaVersion = SettingsManager.CurrentSettingsSchemaVersion;
+        var json = JsonSerializer.Serialize(snapshot, JsonOptions);
         File.WriteAllText(path, json);
     }
 

@@ -445,12 +445,12 @@
                             Value="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
                     <!-- Show the background tint overlay -->
                     <Setter TargetName="HighlightOverlay" Property="Opacity"
-                            Value="{Binding DataContext.HighlightOverlayOpacity, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            Value="{Binding HighlightOverlayOpacity}"/>
                     <!-- Also frame the outer card with the highlight colour -->
                     <Setter TargetName="Card" Property="BorderBrush"
                             Value="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
                     <Setter TargetName="Card" Property="BorderThickness"
-                            Value="{Binding DataContext.HighlightCardBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            Value="{Binding HighlightCardBorderThickness}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>
