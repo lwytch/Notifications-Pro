@@ -830,7 +830,11 @@ public partial class App : Application
         if (_profileManager == null || _settingsManager == null) return;
         var profile = _profileManager.LoadProfile(profileName);
         if (profile != null)
+        {
+            profile.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(profile);
             _settingsManager.Apply(profile);
+            _settingsViewModel?.ReloadFromCurrentSettings();
+        }
     }
 
     private void ApplyThemeFromTray(ThemePreset theme)
@@ -850,6 +854,7 @@ public partial class App : Application
             CopySettingsUiTheme(current, updated);
         }
         _settingsManager.Apply(updated);
+        _settingsViewModel?.ReloadFromCurrentSettings();
     }
 
     private static void CopySettingsUiTheme(AppSettings source, AppSettings target)
@@ -864,6 +869,9 @@ public partial class App : Application
         target.SettingsWindowTextMuted = source.SettingsWindowTextMuted;
         target.SettingsWindowAccent = source.SettingsWindowAccent;
         target.SettingsWindowBorder = source.SettingsWindowBorder;
+        target.SettingsWindowOpacity = source.SettingsWindowOpacity;
+        target.SettingsSurfaceOpacity = source.SettingsSurfaceOpacity;
+        target.SettingsElementOpacity = source.SettingsElementOpacity;
     }
 
     public void ShowSettingsForApp(string appName)
@@ -924,7 +932,7 @@ public partial class App : Application
             $"Status: {listenerStatus}\n" +
             $"Install Path: {installPath}\n" +
             $".NET {Environment.Version}\n\n" +
-            $"License: MIT\n" +
+            $"License: GPL v3\n" +
             $"GitHub: github.com/lwytch/Notifications-Pro",
             "About Notifications Pro",
             MessageBoxButton.OK,

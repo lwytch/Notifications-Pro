@@ -73,3 +73,6 @@ runbooks/
 
 #### Ignore Project Summary Json
 _cv_project_export.json
+
+###Ignore temp_Plan.md
+temp_Plan.md

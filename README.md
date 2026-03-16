@@ -87,6 +87,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
 - **Optional border** — thin border around each card, configurable colour and thickness.
+- **Highlight styling** — matched highlight rules can add configurable tint opacity, choose a full border / accent-side-only / no-border frame, and optionally play `Flash`, `Pulse`, or `Shake` emphasis when the card appears.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
 - **Dyslexia-friendly font** — bundled OpenDyslexic typeface with one-click preset buttons in `Appearance > Typography`.
@@ -100,7 +101,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **App grouping** — optional grouping by source app, with a separate appearance control so the grouping behaviour lives in `Behavior` and the styling lives in `Appearance`.
 - **Persistent notifications** — disable auto-expiry; cards stay until manually dismissed.
 - **Auto-duration** — extends display time based on notification length (configurable base seconds + seconds-per-line).
-- **Animations** — slide-in from Left / Right / Top / Bottom or fade-only, with configurable duration up to `1200ms` and that full range used as the default so the animation is actually visible out of the box.
+- **Animations** — slide-in from Left / Right / Top / Bottom or fade-only, with configurable duration up to `1200ms`, selectable `EaseOut` / `Bounce` / `Elastic` / `Linear` easing, and that full range used as the default so the animation is actually visible out of the box.
 - **Deduplication** — suppress identical notifications within a configurable time window.
 - **Quiet hours** — block all notifications between configurable start/end times (supports overnight ranges).
 - **Burst protection** — cap the number of notifications accepted in a sliding time window to avoid floods.
@@ -281,7 +282,7 @@ Under `%AppData%\NotificationsPro\`:
 dotnet restore
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 192 unit tests
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 196 unit tests
 ```
 
 ## Publish (self-contained)
@@ -412,6 +413,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.18
+- **Highlight Presentation Controls**: Added `Highlight Animation`, `Highlight Overlay Opacity`, and `Highlight Border Mode` so matched highlight rules can flash, pulse, shake, or render with a full frame even when the accent stripe is off.
+- **Entrance Motion Tuning**: Added `Animation Easing` in `Behavior > Animations` with `EaseOut`, `Bounce`, `Elastic`, and `Linear` options for card entrance motion.
+- **Profile & UI Theme Persistence Fixes**: Loading saved profiles or tray-applied themes now keeps the full settings-window palette and opacity state intact, refreshes the Settings UI immediately, and the tray `About` dialog now reports the current `GPL v3` license.
 
 ### Release v1.1.10.17
 - **Retained Notifications Expanded**: the live overlay can now retain up to `1000` cards instead of capping out at `40`, while keeping the same privacy model where anything beyond your selected retained limit is counted only as `+N not shown`.

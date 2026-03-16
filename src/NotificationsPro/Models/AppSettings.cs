@@ -77,6 +77,7 @@ public class AppSettings
     public bool FadeOnlyAnimation { get; set; } = false;
     public string SlideInDirection { get; set; } = "Left";
     public double AnimationDurationMs { get; set; } = 1200;
+    public string AnimationEasing { get; set; } = AnimationEasingHelper.EaseOut;
     public bool NotificationsPaused { get; set; } = false;
     public bool DeduplicationEnabled { get; set; } = true;
     public double DeduplicationWindowSeconds { get; set; } = 2;
@@ -92,6 +93,9 @@ public class AppSettings
     public List<MuteRuleDefinition> MuteRules { get; set; } = new();
     public List<NarrationRuleDefinition> NarrationRules { get; set; } = new();
     public string HighlightColor { get; set; } = "#FFD700";
+    public double HighlightOverlayOpacity { get; set; } = 0.25;
+    public string HighlightAnimation { get; set; } = HighlightAnimationHelper.None;
+    public string HighlightBorderMode { get; set; } = HighlightBorderModeHelper.FullBorder;
     public List<string> SpokenMutedApps { get; set; } = new();
 
     // Notification icons (M9.5)

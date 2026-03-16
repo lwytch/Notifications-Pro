@@ -1,4 +1,5 @@
 using System.Text.Json;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 
@@ -32,6 +33,10 @@ public class M95Tests
         Assert.Equal("Relative", s.TimestampDisplayMode);
         Assert.Equal("Normal", s.TimestampFontWeight);
         Assert.Equal("#C8C8C8", s.TimestampColor);
+        Assert.Equal(AnimationEasingHelper.EaseOut, s.AnimationEasing);
+        Assert.Equal(0.25, s.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.None, s.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.FullBorder, s.HighlightBorderMode);
         Assert.True(s.OverlayScrollbarVisible);
         Assert.Equal(8, s.OverlayScrollbarWidth);
         Assert.Equal(1.0, s.OverlayScrollbarOpacity);
@@ -89,6 +94,10 @@ public class M95Tests
             TimestampDisplayMode = "DateTime",
             TimestampFontWeight = "SemiBold",
             TimestampColor = "#AABBCC",
+            AnimationEasing = AnimationEasingHelper.Bounce,
+            HighlightOverlayOpacity = 0.42,
+            HighlightAnimation = HighlightAnimationHelper.Flash,
+            HighlightBorderMode = HighlightBorderModeHelper.NoBorder,
             OverlayScrollbarVisible = false,
             OverlayScrollbarWidth = 12,
             OverlayScrollbarOpacity = 0.5,
@@ -117,6 +126,10 @@ public class M95Tests
         Assert.Equal("DateTime", clone.TimestampDisplayMode);
         Assert.Equal("SemiBold", clone.TimestampFontWeight);
         Assert.Equal("#AABBCC", clone.TimestampColor);
+        Assert.Equal(AnimationEasingHelper.Bounce, clone.AnimationEasing);
+        Assert.Equal(0.42, clone.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.Flash, clone.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.NoBorder, clone.HighlightBorderMode);
         Assert.False(clone.OverlayScrollbarVisible);
         Assert.Equal(12, clone.OverlayScrollbarWidth);
         Assert.Equal(0.5, clone.OverlayScrollbarOpacity);
@@ -150,6 +163,10 @@ public class M95Tests
             TimestampDisplayMode = "Time",
             TimestampFontWeight = "Medium",
             TimestampColor = "#334455",
+            AnimationEasing = AnimationEasingHelper.Elastic,
+            HighlightOverlayOpacity = 0.33,
+            HighlightAnimation = HighlightAnimationHelper.Pulse,
+            HighlightBorderMode = HighlightBorderModeHelper.AccentSideOnly,
             OverlayScrollbarWidth = 16,
             OverlayScrollbarTrackColor = "#121212",
             OverlayScrollbarThumbColor = "#666666",
@@ -178,6 +195,10 @@ public class M95Tests
         Assert.Equal("Time", deserialized.TimestampDisplayMode);
         Assert.Equal("Medium", deserialized.TimestampFontWeight);
         Assert.Equal("#334455", deserialized.TimestampColor);
+        Assert.Equal(AnimationEasingHelper.Elastic, deserialized.AnimationEasing);
+        Assert.Equal(0.33, deserialized.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.Pulse, deserialized.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.AccentSideOnly, deserialized.HighlightBorderMode);
         Assert.Equal(16, deserialized.OverlayScrollbarWidth);
         Assert.Equal("#121212", deserialized.OverlayScrollbarTrackColor);
         Assert.Equal("#666666", deserialized.OverlayScrollbarThumbColor);

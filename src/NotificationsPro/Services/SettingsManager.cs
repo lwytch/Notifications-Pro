@@ -118,6 +118,12 @@ public class SettingsManager
         settings.PerAppBackgroundImages ??= new Dictionary<string, string>();
         settings.PresentationApps ??= new List<string>();
         settings.ReadNotificationsAloudTriggerMode = NarrationTriggerModeHelper.Normalize(settings.ReadNotificationsAloudTriggerMode);
+        settings.AnimationEasing = AnimationEasingHelper.Normalize(settings.AnimationEasing);
+        settings.HighlightOverlayOpacity = double.IsNaN(settings.HighlightOverlayOpacity)
+            ? 0.25
+            : Math.Clamp(settings.HighlightOverlayOpacity, 0.05, 0.80);
+        settings.HighlightAnimation = HighlightAnimationHelper.Normalize(settings.HighlightAnimation);
+        settings.HighlightBorderMode = HighlightBorderModeHelper.Normalize(settings.HighlightBorderMode);
         settings.MaxVisibleNotifications = Math.Clamp(settings.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         settings.OverlayScrollbarTrackColor = string.IsNullOrWhiteSpace(settings.OverlayScrollbarTrackColor)
             ? "#141414"
@@ -173,6 +179,7 @@ public class SettingsManager
             : Math.Clamp(settings.FullscreenOverlayImageContrast, 0.2, 2.0);
         settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.Normalize(settings.FullscreenOverlayImageFitMode);
         settings.FullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Normalize(settings.FullscreenOverlayImageVerticalFocus);
+        settings.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(settings);
     }
 
     private static bool JsonPropertyExists(string json, string propertyName)

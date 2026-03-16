@@ -47,6 +47,10 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(3, sm.Settings.SingleLineMaxLines);
         Assert.False(sm.Settings.SingleLineAutoFullWidth);
         Assert.True(sm.Settings.NewestOnTop);
+        Assert.Equal(AnimationEasingHelper.EaseOut, sm.Settings.AnimationEasing);
+        Assert.Equal(0.25, sm.Settings.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.None, sm.Settings.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.FullBorder, sm.Settings.HighlightBorderMode);
         Assert.True(sm.Settings.OverlayScrollbarVisible);
         Assert.Equal(10, sm.Settings.OverlayScrollbarContentGap);
     }
@@ -78,6 +82,10 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard;
         sm.Settings.CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard;
         sm.Settings.CardBackgroundImageVerticalFocus = ImageVerticalFocusHelper.Top;
+        sm.Settings.AnimationEasing = AnimationEasingHelper.Bounce;
+        sm.Settings.HighlightOverlayOpacity = 0.42;
+        sm.Settings.HighlightAnimation = HighlightAnimationHelper.Shake;
+        sm.Settings.HighlightBorderMode = HighlightBorderModeHelper.NoBorder;
         sm.Settings.OverlayScrollbarTrackColor = "#101010";
         sm.Settings.OverlayScrollbarThumbColor = "#6A6A6A";
         sm.Settings.OverlayScrollbarThumbHoverColor = "#44AAFF";
@@ -143,6 +151,10 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, sm2.Settings.CardBackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, sm2.Settings.CardBackgroundImagePlacement);
         Assert.Equal(ImageVerticalFocusHelper.Top, sm2.Settings.CardBackgroundImageVerticalFocus);
+        Assert.Equal(AnimationEasingHelper.Bounce, sm2.Settings.AnimationEasing);
+        Assert.Equal(0.42, sm2.Settings.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.Shake, sm2.Settings.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.NoBorder, sm2.Settings.HighlightBorderMode);
         Assert.Equal("#101010", sm2.Settings.OverlayScrollbarTrackColor);
         Assert.Equal("#6A6A6A", sm2.Settings.OverlayScrollbarThumbColor);
         Assert.Equal("#44AAFF", sm2.Settings.OverlayScrollbarThumbHoverColor);
@@ -228,6 +240,7 @@ public class SettingsManagerTests : IDisposable
         Assert.False(settings.FadeOnlyAnimation);
         Assert.Equal("Left", settings.SlideInDirection);
         Assert.Equal(1200, settings.AnimationDurationMs);
+        Assert.Equal(AnimationEasingHelper.EaseOut, settings.AnimationEasing);
         Assert.True(settings.ShowTimestamp);
         Assert.Equal(11, settings.TimestampFontSize);
         Assert.Equal("Relative", settings.TimestampDisplayMode);
@@ -242,6 +255,9 @@ public class SettingsManagerTests : IDisposable
         Assert.Empty(settings.MuteRules);
         Assert.Empty(settings.NarrationRules);
         Assert.Equal("#FFD700", settings.HighlightColor);
+        Assert.Equal(0.25, settings.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.None, settings.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.FullBorder, settings.HighlightBorderMode);
         Assert.Empty(settings.SpokenMutedApps);
         Assert.False(settings.QuietHoursEnabled);
         Assert.Equal("22:00", settings.QuietHoursStart);
@@ -296,6 +312,10 @@ public class SettingsManagerTests : IDisposable
             """
             {
               "MaxVisibleNotifications": 5000,
+              "AnimationEasing": "Wild",
+              "HighlightOverlayOpacity": 4.0,
+              "HighlightAnimation": "Sparkle",
+              "HighlightBorderMode": "Halo",
               "CardBackgroundImagePath": "C:\\Users\\demo\\AppData\\Roaming\\NotificationsPro\\backgrounds\\legacy.png",
               "CardBackgroundImageSaturation": 5.0,
               "CardBackgroundImageContrast": -2.0,
@@ -311,6 +331,10 @@ public class SettingsManagerTests : IDisposable
         sm.Load();
 
         Assert.Equal(AppSettings.MaxVisibleNotificationsUpperBound, sm.Settings.MaxVisibleNotifications);
+        Assert.Equal(AnimationEasingHelper.EaseOut, sm.Settings.AnimationEasing);
+        Assert.Equal(0.80, sm.Settings.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.None, sm.Settings.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.FullBorder, sm.Settings.HighlightBorderMode);
         Assert.Equal(CardBackgroundModeHelper.Image, sm.Settings.CardBackgroundMode);
         Assert.Equal(2.0, sm.Settings.CardBackgroundImageSaturation);
         Assert.Equal(0.2, sm.Settings.CardBackgroundImageContrast);

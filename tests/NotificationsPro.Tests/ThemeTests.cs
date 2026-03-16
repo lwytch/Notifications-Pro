@@ -146,6 +146,62 @@ public class ThemeTests : IDisposable
     }
 
     [Fact]
+    public void ApplySettingsWindowTo_CopiesOpacityFields()
+    {
+        var theme = new ThemePreset
+        {
+            SettingsWindowOpacity = 0.81,
+            SettingsSurfaceOpacity = 0.42,
+            SettingsElementOpacity = 0.66
+        };
+
+        var settings = new AppSettings();
+        theme.ApplySettingsWindowTo(settings);
+
+        Assert.Equal(0.81, settings.SettingsWindowOpacity);
+        Assert.Equal(0.42, settings.SettingsSurfaceOpacity);
+        Assert.Equal(0.66, settings.SettingsElementOpacity);
+    }
+
+    [Fact]
+    public void ResolveThemeModeForLoadedSettings_FallsBackToCustom_WhenPaletteDiffersFromPreset()
+    {
+        var settings = new AppSettings
+        {
+            SettingsThemeMode = "Windows Dark",
+            SettingsWindowBg = "#010101"
+        };
+
+        var resolved = SettingsThemeService.ResolveThemeModeForLoadedSettings(settings);
+
+        Assert.Equal("Custom", resolved);
+    }
+
+    [Fact]
+    public void ResolveThemeModeForLoadedSettings_KeepsPreset_WhenPaletteMatchesPreset()
+    {
+        var settings = new AppSettings();
+
+        var resolved = SettingsThemeService.ResolveThemeModeForLoadedSettings(settings);
+
+        Assert.Equal("Windows Dark", resolved);
+    }
+
+    [Fact]
+    public void ResolveThemeModeForLoadedSettings_PreservesSystemMode()
+    {
+        var settings = new AppSettings
+        {
+            SettingsThemeMode = "System",
+            SettingsWindowBg = "#010101"
+        };
+
+        var resolved = SettingsThemeService.ResolveThemeModeForLoadedSettings(settings);
+
+        Assert.Equal("System", resolved);
+    }
+
+    [Fact]
     public void FromSettings_CapturesVisualProperties()
     {
         var settings = new AppSettings
@@ -302,6 +358,10 @@ public class ThemeTests : IDisposable
             MaxVisibleNotifications = 5,
             AppGroupingStyle = "Minimal Label",
             ShowAppGroupCounts = false,
+            AnimationEasing = AnimationEasingHelper.Elastic,
+            HighlightOverlayOpacity = 0.31,
+            HighlightAnimation = HighlightAnimationHelper.Pulse,
+            HighlightBorderMode = HighlightBorderModeHelper.NoBorder,
             ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleTimestamp,
             SpokenMutedApps = new() { "Teams", "Outlook" },
             NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility,
@@ -332,6 +392,10 @@ public class ThemeTests : IDisposable
         Assert.Equal(5, imported.MaxVisibleNotifications);
         Assert.Equal("Minimal Label", imported.AppGroupingStyle);
         Assert.False(imported.ShowAppGroupCounts);
+        Assert.Equal(AnimationEasingHelper.Elastic, imported.AnimationEasing);
+        Assert.Equal(0.31, imported.HighlightOverlayOpacity);
+        Assert.Equal(HighlightAnimationHelper.Pulse, imported.HighlightAnimation);
+        Assert.Equal(HighlightBorderModeHelper.NoBorder, imported.HighlightBorderMode);
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleTimestamp, imported.ReadNotificationsAloudMode);
         Assert.Equal(new[] { "Teams", "Outlook" }, imported.SpokenMutedApps);
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, imported.NotificationCaptureMode);

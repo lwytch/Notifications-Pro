@@ -111,6 +111,10 @@ public class ThemeManager
     {
         s.MaxVisibleNotifications = Math.Clamp(s.MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound);
         s.NotificationDuration = Math.Clamp(s.NotificationDuration, 1, 300);
+        s.AnimationEasing = AnimationEasingHelper.Normalize(s.AnimationEasing);
+        s.HighlightOverlayOpacity = double.IsNaN(s.HighlightOverlayOpacity) ? 0.25 : Math.Clamp(s.HighlightOverlayOpacity, 0.05, 0.80);
+        s.HighlightAnimation = HighlightAnimationHelper.Normalize(s.HighlightAnimation);
+        s.HighlightBorderMode = HighlightBorderModeHelper.Normalize(s.HighlightBorderMode);
         s.OverlayWidth = double.IsNaN(s.OverlayWidth) ? 340 : Math.Clamp(s.OverlayWidth, 220, 7680);
         s.OverlayMaxHeight = double.IsNaN(s.OverlayMaxHeight) ? 800 : Math.Clamp(s.OverlayMaxHeight, 200, 4320);
         s.BurstLimitCount = Math.Clamp(s.BurstLimitCount, 1, 100);
@@ -147,6 +151,7 @@ public class ThemeManager
         s.MuteRules ??= new List<MuteRuleDefinition>();
         s.NarrationRules ??= new List<NarrationRuleDefinition>();
         s.PerAppBackgroundImages ??= new Dictionary<string, string>();
+        s.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(s);
     }
 
     private static bool JsonPropertyExists(string json, string propertyName)

@@ -124,6 +124,7 @@
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
 - Slide-in direction configurable (Left, Right, Top, Bottom) via Settings > Behavior > Animations
+- Entrance animations now support configurable easing (`EaseOut`, `Bounce`, `Elastic`, `Linear`) in addition to direction, duration, and fade-only mode
 - Card load animations now ensure mutable transforms to avoid frozen-transform startup crashes
 - **Card interaction (Milestone 4)**:
   - Click to dismiss — click a notification card to immediately remove it
@@ -139,6 +140,7 @@
   - Keyword muting — silently suppress notifications containing configured keywords
   - Field-scoped highlight, mute, and narration rules — rules can target `Title Only`, `Body Only`, or `Title + Body` with optional regex matching
   - App-filtered rules — highlight, mute, and narration rules can be limited to app names such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`
+  - Highlight presentation controls — highlighted cards can now use configurable tint opacity, `Full Border` / `Accent Side Only` / `No Border` framing, plus `Flash`, `Pulse`, or `Shake` emphasis when they appear
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
@@ -157,6 +159,7 @@
   - Import settings from a JSON file
   - Theme quick-switch submenu in tray menu (built-in + custom themes)
   - Profiles tab in Settings now focuses on import/export of full settings profiles
+  - Profile loads now preserve custom settings-window palette/opacity values instead of snapping non-Custom UI themes back to preset defaults
 - **Accessibility & Inclusivity (Milestone 7)**:
   - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
   - Auto-duration — longer notifications get more display time based on estimated line count
@@ -258,7 +261,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 192 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, scrollbar-gap persistence, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 196 unit tests covering QueueManager (including scoped highlight/mute/narration rules, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ThemeManager, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
@@ -317,6 +320,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Max Overlay Height can be set beyond 1200px and preset buttons apply 1080p/2K/4K/8K values
 - [ ] Changing font size does not reset manually resized overlay width in single-line mode
 - [ ] Fade-only animation option removes horizontal motion
+- [ ] Behavior > Animations > Animation Easing changes the card entrance feel (`EaseOut`, `Bounce`, `Elastic`, `Linear`)
 - [ ] Toggle switches animate smoothly
 - [ ] "Hide Overlay" / "Show Overlay" toggles the overlay window
 - [ ] "Pause Notifications" / "Resume Notifications" pauses/resumes
@@ -340,6 +344,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Profiles: saving a profile creates a JSON file in %AppData%\NotificationsPro\profiles\
 - [ ] Profiles: loading a profile restores all settings
 - [ ] Profiles: tray menu "Switch Profile" lists saved profiles
+- [ ] Profiles: loading from both Settings and tray preserves custom settings-window palette/opacity values instead of reverting to a preset
 - [ ] Group by App: toggle in Behavior groups notifications under app name headers
 - [ ] Keyboard: Alt+key mnemonics navigate to correct tabs
 - [ ] Keyboard: Escape closes settings window
@@ -369,6 +374,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Muting an app from card context menu suppresses future notifications from that app
 - [ ] Unmuting an app from Filtering tab restores notifications
 - [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color
+- [ ] Filtering > Highlight Animation / Highlight Overlay Opacity / Highlight Border Mode visibly change highlighted cards, and `Full Border` still frames the card when the accent stripe is disabled
 - [ ] Adding a mute keyword suppresses notifications containing that word
 - [ ] Quiet hours toggle suppresses all notifications between configured times
 - [ ] Behavior tab burst-protection toggle suppresses when too many notifications arrive quickly
@@ -448,4 +454,5 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 
 ## Known Limitations
 - Signed MSIX packaging is the supported install path; unpackaged source runs may have limited WinRT notification access
+- MSIX signing now prefers a matching local certificate-store identity and only uses a local `.pfx` as an explicit fallback; if no password is supplied for the fallback path, the script fails fast instead of waiting on a hidden prompt
 - Unpackaged desktop apps may have limited UserNotificationListener support

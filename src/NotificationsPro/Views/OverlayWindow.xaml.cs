@@ -8,6 +8,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.IO;
+using System.Threading.Tasks;
 using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
@@ -592,46 +593,56 @@ public partial class OverlayWindow : Window
             _bottomEdgeOffset = Math.Max(0, bottomGap);
     }
 
-    private void OnCardLoaded(object sender, RoutedEventArgs e)
+    private async void OnCardLoaded(object sender, RoutedEventArgs e)
     {
         if (sender is not Border card) return;
         var transform = EnsureMutableCardTransform(card);
         if (DataContext is not OverlayViewModel vm) return;
-        if (!vm.AnimationsEnabled) return;
-
         var durationMs = vm.AnimationDurationMs;
         var fadeOnly = vm.FadeOnlyAnimation;
-        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        var easing = CreateEntranceEasing(vm.AnimationEasing);
 
-        // Fade in
-        var fadeDuration = new Duration(TimeSpan.FromMilliseconds(durationMs * 0.75));
-        card.BeginAnimation(UIElement.OpacityProperty,
-            new DoubleAnimation(0, 1, fadeDuration));
-
-        if (fadeOnly) return;
-
-        // Slide in from configured direction
-        var motionDuration = new Duration(TimeSpan.FromMilliseconds(durationMs));
-        var direction = vm.SlideInDirection;
-
-        switch (direction)
+        if (vm.AnimationsEnabled)
         {
-            case "Right":
-                transform.BeginAnimation(TranslateTransform.XProperty,
-                    new DoubleAnimation(vm.OverlayWidth + 40, 0, motionDuration) { EasingFunction = easing });
-                break;
-            case "Top":
-                transform.BeginAnimation(TranslateTransform.YProperty,
-                    new DoubleAnimation(-200, 0, motionDuration) { EasingFunction = easing });
-                break;
-            case "Bottom":
-                transform.BeginAnimation(TranslateTransform.YProperty,
-                    new DoubleAnimation(200, 0, motionDuration) { EasingFunction = easing });
-                break;
-            default: // "Left"
-                transform.BeginAnimation(TranslateTransform.XProperty,
-                    new DoubleAnimation(-(vm.OverlayWidth + 40), 0, motionDuration) { EasingFunction = easing });
-                break;
+            // Fade in
+            var fadeDuration = new Duration(TimeSpan.FromMilliseconds(durationMs * 0.75));
+            card.BeginAnimation(UIElement.OpacityProperty,
+                new DoubleAnimation(0, 1, fadeDuration));
+
+            if (!fadeOnly)
+            {
+                // Slide in from configured direction
+                var motionDuration = new Duration(TimeSpan.FromMilliseconds(durationMs));
+                var direction = vm.SlideInDirection;
+
+                switch (direction)
+                {
+                    case "Right":
+                        transform.BeginAnimation(TranslateTransform.XProperty,
+                            new DoubleAnimation(vm.OverlayWidth + 40, 0, motionDuration) { EasingFunction = easing });
+                        break;
+                    case "Top":
+                        transform.BeginAnimation(TranslateTransform.YProperty,
+                            new DoubleAnimation(-200, 0, motionDuration) { EasingFunction = easing });
+                        break;
+                    case "Bottom":
+                        transform.BeginAnimation(TranslateTransform.YProperty,
+                            new DoubleAnimation(200, 0, motionDuration) { EasingFunction = easing });
+                        break;
+                    default: // "Left"
+                        transform.BeginAnimation(TranslateTransform.XProperty,
+                            new DoubleAnimation(-(vm.OverlayWidth + 40), 0, motionDuration) { EasingFunction = easing });
+                        break;
+                }
+            }
+        }
+
+        if (card.DataContext is NotificationItem item && item.IsHighlighted)
+        {
+            var delay = vm.AnimationsEnabled && !fadeOnly && durationMs > 0
+                ? TimeSpan.FromMilliseconds(durationMs)
+                : TimeSpan.Zero;
+            await PlayHighlightAnimationAsync(card, vm, delay);
         }
     }
 
@@ -650,6 +661,122 @@ public partial class OverlayWindow : Window
         var newTransform = new TranslateTransform();
         card.RenderTransform = newTransform;
         return newTransform;
+    }
+
+    private static IEasingFunction? CreateEntranceEasing(string easingMode)
+    {
+        return AnimationEasingHelper.Normalize(easingMode) switch
+        {
+            AnimationEasingHelper.Bounce => new BounceEase
+            {
+                EasingMode = EasingMode.EaseOut,
+                Bounces = 2,
+                Bounciness = 2
+            },
+            AnimationEasingHelper.Elastic => new ElasticEase
+            {
+                EasingMode = EasingMode.EaseOut,
+                Oscillations = 1,
+                Springiness = 4
+            },
+            AnimationEasingHelper.Linear => null,
+            _ => new CubicEase { EasingMode = EasingMode.EaseOut }
+        };
+    }
+
+    private static async Task PlayHighlightAnimationAsync(Border card, OverlayViewModel vm, TimeSpan delay)
+    {
+        var highlightAnimation = HighlightAnimationHelper.Normalize(vm.HighlightAnimation);
+        if (!vm.AnimationsEnabled || highlightAnimation == HighlightAnimationHelper.None)
+            return;
+
+        if (delay > TimeSpan.Zero)
+            await Task.Delay(delay);
+
+        if (!card.IsLoaded)
+            return;
+
+        switch (highlightAnimation)
+        {
+            case HighlightAnimationHelper.Flash:
+            {
+                var overlay = FindNamedDescendant<Border>(card, "HighlightOverlay");
+                if (overlay == null)
+                    return;
+
+                var baseOpacity = Math.Clamp(vm.HighlightOverlayOpacity, 0.05, 0.80);
+                var flash = new DoubleAnimationUsingKeyFrames
+                {
+                    Duration = TimeSpan.FromMilliseconds(540)
+                };
+                flash.KeyFrames.Add(new DiscreteDoubleKeyFrame(baseOpacity, KeyTime.FromTimeSpan(TimeSpan.Zero)));
+                flash.KeyFrames.Add(new EasingDoubleKeyFrame(0.0, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(90))));
+                flash.KeyFrames.Add(new EasingDoubleKeyFrame(baseOpacity, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(180))));
+                flash.KeyFrames.Add(new EasingDoubleKeyFrame(0.0, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(270))));
+                flash.KeyFrames.Add(new EasingDoubleKeyFrame(baseOpacity, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(360))));
+                flash.KeyFrames.Add(new EasingDoubleKeyFrame(0.0, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(450))));
+                flash.KeyFrames.Add(new EasingDoubleKeyFrame(baseOpacity, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(540))));
+                flash.Completed += (_, _) => overlay.Opacity = baseOpacity;
+                overlay.BeginAnimation(UIElement.OpacityProperty, flash);
+                break;
+            }
+
+            case HighlightAnimationHelper.Pulse:
+            {
+                var overlay = FindNamedDescendant<Border>(card, "HighlightOverlay");
+                if (overlay == null)
+                    return;
+
+                var baseOpacity = Math.Clamp(vm.HighlightOverlayOpacity, 0.05, 0.80);
+                overlay.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = Math.Max(0.02, baseOpacity * 0.45),
+                        To = baseOpacity,
+                        Duration = TimeSpan.FromMilliseconds(700),
+                        AutoReverse = true,
+                        RepeatBehavior = RepeatBehavior.Forever
+                    });
+                break;
+            }
+
+            case HighlightAnimationHelper.Shake:
+            {
+                var transform = EnsureMutableCardTransform(card);
+                var shake = new DoubleAnimationUsingKeyFrames
+                {
+                    Duration = TimeSpan.FromMilliseconds(360)
+                };
+                shake.KeyFrames.Add(new DiscreteDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.Zero)));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(-10, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(50))));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(10, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(100))));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(-8, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(150))));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(8, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(210))));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(-4, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(270))));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(4, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(320))));
+                shake.KeyFrames.Add(new EasingDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(360))));
+                transform.BeginAnimation(TranslateTransform.XProperty, shake);
+                break;
+            }
+        }
+    }
+
+    private static T? FindNamedDescendant<T>(DependencyObject root, string name) where T : FrameworkElement
+    {
+        var childCount = VisualTreeHelper.GetChildrenCount(root);
+        for (var i = 0; i < childCount; i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is T match && string.Equals(match.Name, name, StringComparison.Ordinal))
+                return match;
+
+            var nested = FindNamedDescendant<T>(child, name);
+            if (nested != null)
+                return nested;
+        }
+
+        return null;
     }
 
     private NotificationItem? FindNotificationAtScreenPoint(IntPtr lParam)

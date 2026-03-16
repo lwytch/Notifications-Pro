@@ -119,6 +119,23 @@ public class OverlayViewModel : BaseViewModel
     private string _highlightColor = "#FFD700";
     public string HighlightColor { get => _highlightColor; set => SetProperty(ref _highlightColor, value); }
 
+    private double _highlightOverlayOpacity = 0.25;
+    public double HighlightOverlayOpacity { get => _highlightOverlayOpacity; set => SetProperty(ref _highlightOverlayOpacity, Math.Clamp(value, 0.05, 0.80)); }
+
+    private string _highlightAnimation = HighlightAnimationHelper.None;
+    public string HighlightAnimation { get => _highlightAnimation; set => SetProperty(ref _highlightAnimation, HighlightAnimationHelper.Normalize(value)); }
+
+    private string _highlightBorderMode = HighlightBorderModeHelper.FullBorder;
+    public string HighlightBorderMode
+    {
+        get => _highlightBorderMode;
+        set
+        {
+            if (!SetProperty(ref _highlightBorderMode, HighlightBorderModeHelper.Normalize(value))) return;
+            OnPropertyChanged(nameof(HighlightCardBorderThickness));
+        }
+    }
+
     // Card shape
     private double _cornerRadius = 12;
     public double CornerRadius { get => _cornerRadius; set => SetProperty(ref _cornerRadius, value); }
@@ -156,6 +173,7 @@ public class OverlayViewModel : BaseViewModel
         {
             if (!SetProperty(ref _showAccent, value)) return;
             OnPropertyChanged(nameof(AccentBorderThickness));
+            OnPropertyChanged(nameof(HighlightCardBorderThickness));
         }
     }
 
@@ -192,6 +210,7 @@ public class OverlayViewModel : BaseViewModel
         {
             if (!SetProperty(ref _borderThickness, value)) return;
             OnPropertyChanged(nameof(CardBorderThickness));
+            OnPropertyChanged(nameof(HighlightCardBorderThickness));
         }
     }
 
@@ -243,6 +262,9 @@ public class OverlayViewModel : BaseViewModel
             OnPropertyChanged(nameof(ExitFadeDuration));
         }
     }
+
+    private string _animationEasing = AnimationEasingHelper.EaseOut;
+    public string AnimationEasing { get => _animationEasing; set => SetProperty(ref _animationEasing, AnimationEasingHelper.Normalize(value)); }
 
     private double _overlayWidth = 380;
     public double OverlayWidth
@@ -483,6 +505,12 @@ public class OverlayViewModel : BaseViewModel
     public Thickness CardBorderThickness => ShowBorder
         ? new Thickness(BorderThickness)
         : new Thickness(0);
+    public Thickness HighlightCardBorderThickness => HighlightBorderMode switch
+    {
+        HighlightBorderModeHelper.NoBorder => new Thickness(0),
+        HighlightBorderModeHelper.AccentSideOnly => new Thickness(0, GetHighlightBorderEdgeThickness(), GetHighlightBorderEdgeThickness(), GetHighlightBorderEdgeThickness()),
+        _ => new Thickness(GetHighlightBorderEdgeThickness())
+    };
 
     // Computed — animations
     public double EnterOffset => AnimationsEnabled && !FadeOnlyAnimation ? -(OverlayWidth + 40) : 0;
@@ -692,6 +720,9 @@ public class OverlayViewModel : BaseViewModel
         CardBackgroundImageVerticalFocus = s.CardBackgroundImageVerticalFocus;
         AccentColor = s.AccentColor;
         HighlightColor = s.HighlightColor;
+        HighlightOverlayOpacity = s.HighlightOverlayOpacity;
+        HighlightAnimation = s.HighlightAnimation;
+        HighlightBorderMode = s.HighlightBorderMode;
         CornerRadius = s.CornerRadius;
         Padding = s.Padding;
         CardGap = s.CardGap;
@@ -711,6 +742,7 @@ public class OverlayViewModel : BaseViewModel
 
         SlideInDirection = s.SlideInDirection;
         AnimationDurationMs = s.AnimationDurationMs;
+        AnimationEasing = s.AnimationEasing;
         OverlayWidth = s.OverlayWidth;
         OverlayMaxHeight = s.OverlayMaxHeight;
         OverlayScrollbarVisible = s.OverlayScrollbarVisible;
@@ -770,6 +802,7 @@ public class OverlayViewModel : BaseViewModel
         OnPropertyChanged(nameof(OuterContentMargin));
         OnPropertyChanged(nameof(AccentBorderThickness));
         OnPropertyChanged(nameof(CardBorderThickness));
+        OnPropertyChanged(nameof(HighlightCardBorderThickness));
         OnPropertyChanged(nameof(StackedContentVisibility));
         OnPropertyChanged(nameof(SingleLineContentVisibility));
         OnPropertyChanged(nameof(SingleLineCompactVisibility));
@@ -807,5 +840,12 @@ public class OverlayViewModel : BaseViewModel
             "Minimal Label" => "Minimal Label",
             _ => "Framed Group"
         };
+    }
+
+    private double GetHighlightBorderEdgeThickness()
+    {
+        return ShowBorder
+            ? Math.Max(1, BorderThickness)
+            : 1;
     }
 }

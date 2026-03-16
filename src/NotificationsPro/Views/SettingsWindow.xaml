@@ -1423,6 +1423,14 @@
                                     ToolTip="Duration of slide/fade animations in milliseconds. 1200ms is the recommended default."/>
                         </DockPanel>
 
+                        <TextBlock Text="Animation Easing" Style="{StaticResource SettingLabel}" ToolTip="How the entrance animation accelerates and settles into place."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableAnimationEasings}"
+                                  SelectedItem="{Binding AnimationEasing}"
+                                  ToolTip="EaseOut is the default. Bounce and Elastic are more playful, while Linear stays mechanical."
+                                  Margin="0,4,0,0"/>
+
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="DEDUPLICATION" Style="{StaticResource SectionHeader}"/>
                         </Border>
@@ -1597,6 +1605,33 @@
                                     Tag="HighlightColor" Click="OnPickColorClick"
                                     ToolTip="Open color picker for the default highlight color"/>
                         </Grid>
+
+                        <TextBlock Text="Highlight Animation" Style="{StaticResource SettingLabel}" ToolTip="Optional visual effect that plays when a highlighted notification appears."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableHighlightAnimations}"
+                                  SelectedItem="{Binding HighlightAnimation}"
+                                  Margin="0,4,0,0"
+                                  ToolTip="Flash blinks the tint, Pulse gently breathes it, and Shake nudges the card for emphasis."/>
+
+                        <TextBlock Text="Highlight Overlay Opacity" Style="{StaticResource SettingLabel}" ToolTip="Controls how strong the highlight tint appears behind the notification content."/>
+                        <DockPanel Margin="0,4,0,0">
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                <Run Text="{Binding HighlightOverlayOpacity, StringFormat='{}{0:P0}'}"/>
+                            </TextBlock>
+                            <Slider Style="{StaticResource SettingsSlider}"
+                                    Minimum="0.05" Maximum="0.80" Value="{Binding HighlightOverlayOpacity}"
+                                    TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                    ToolTip="Higher values make highlighted cards more obvious; lower values keep the tint subtle."/>
+                        </DockPanel>
+
+                        <TextBlock Text="Highlight Border Mode" Style="{StaticResource SettingLabel}" ToolTip="Choose whether highlighted cards use a full outline, only rely on the accent side, or show no extra border."/>
+                        <ComboBox Style="{StaticResource SettingsComboBox}"
+                                  ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                  ItemsSource="{Binding AvailableHighlightBorderModes}"
+                                  SelectedItem="{Binding HighlightBorderMode}"
+                                  Margin="0,4,0,0"
+                                  ToolTip="Full Border is the safest default when the accent stripe is hidden."/>
 
                         <Grid Margin="0,8,0,8">
                             <Grid.ColumnDefinitions>

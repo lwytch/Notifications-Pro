@@ -161,6 +161,43 @@ public static class SettingsThemeService
         return false;
     }
 
+    public static string ResolveThemeModeForLoadedSettings(AppSettings settings)
+    {
+        var normalized = NormalizeThemeMode(settings.SettingsThemeMode);
+        if (string.Equals(normalized, ModeCustom, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(normalized, ModeSystem, StringComparison.OrdinalIgnoreCase))
+            return normalized;
+
+        if (TryGetPresetColors(normalized, out var presetColors)
+            && !MatchesSettingsWindowPalette(settings, presetColors))
+        {
+            return ModeCustom;
+        }
+
+        return normalized;
+    }
+
+    private static bool MatchesSettingsWindowPalette(AppSettings settings, IReadOnlyList<string> presetColors)
+    {
+        if (presetColors.Count < 9)
+            return false;
+
+        return HexEquals(settings.SettingsWindowBg, presetColors[0])
+            && HexEquals(settings.SettingsWindowSurface, presetColors[1])
+            && HexEquals(settings.SettingsWindowSurfaceLight, presetColors[2])
+            && HexEquals(settings.SettingsWindowSurfaceHover, presetColors[3])
+            && HexEquals(settings.SettingsWindowText, presetColors[4])
+            && HexEquals(settings.SettingsWindowTextSecondary, presetColors[5])
+            && HexEquals(settings.SettingsWindowTextMuted, presetColors[6])
+            && HexEquals(settings.SettingsWindowAccent, presetColors[7])
+            && HexEquals(settings.SettingsWindowBorder, presetColors[8]);
+    }
+
+    private static bool HexEquals(string? left, string? right)
+    {
+        return string.Equals(left?.Trim(), right?.Trim(), StringComparison.OrdinalIgnoreCase);
+    }
+
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
     {
         try

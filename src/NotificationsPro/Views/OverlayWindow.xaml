@@ -444,11 +444,13 @@
                     <Setter TargetName="AccentBorder" Property="BorderBrush"
                             Value="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
                     <!-- Show the background tint overlay -->
-                    <Setter TargetName="HighlightOverlay" Property="Opacity" Value="0.18"/>
+                    <Setter TargetName="HighlightOverlay" Property="Opacity"
+                            Value="{Binding DataContext.HighlightOverlayOpacity, RelativeSource={RelativeSource AncestorType=Window}}"/>
                     <!-- Also frame the outer card with the highlight colour -->
                     <Setter TargetName="Card" Property="BorderBrush"
                             Value="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
-                    <Setter TargetName="Card" Property="BorderThickness" Value="0,1,1,1"/>
+                    <Setter TargetName="Card" Property="BorderThickness"
+                            Value="{Binding DataContext.HighlightCardBorderThickness, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsExpiring}" Value="True">
                     <DataTrigger.EnterActions>

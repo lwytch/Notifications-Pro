@@ -92,6 +92,8 @@ public class ThemePreset
         settings.SettingsWindowAccent = SettingsWindowAccent;
         settings.SettingsWindowBorder = SettingsWindowBorder;
         settings.SettingsWindowOpacity = SettingsWindowOpacity;
+        settings.SettingsSurfaceOpacity = SettingsSurfaceOpacity;
+        settings.SettingsElementOpacity = SettingsElementOpacity;
     }
 
     /// <summary>

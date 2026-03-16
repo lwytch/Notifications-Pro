@@ -280,7 +280,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 **Status: In Progress**
 
 - [x] Security Strategy: Remove currently-tracked `.agents` directory (`git rm -r --cached .agents`).
-- [x] Legal Strategy: Add an open-source `LICENSE` (e.g., MIT) to the repo root.
+- [x] Legal Strategy: Add an open-source `GPL v3` `LICENSE` to the repo root.
 - [x] Legal Strategy: Add an explicit "Disclaimer of Liability" and "As-Is" warranty section to `README.md`.
 - [x] Packaging Strategy: Implement an MSIX packaging project (`.wapproj`) to bundle the WPF app and grant native WinRT permissions.
 - [x] Update Strategy: Configure an `.appinstaller` file with the MSIX to support automatic over-the-air client updates.
@@ -423,6 +423,8 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Single-Line Banner mode natively renders the timestamp inline.
 - [x] Detached "Replace Mode" so it can be used globally outside of single-line structures.
 - [x] Settings information architecture pass — audit every tab, move misplaced controls into logical homes, fix the broken text-alignment path, repair the hotkey editor, and refresh in-app help/documentation to match the revised layout.
+- [x] Highlight and animation refinement pass — highlighted cards now support configurable tint opacity, border framing, and `Flash` / `Pulse` / `Shake` emphasis, and entrance motion now exposes `EaseOut` / `Bounce` / `Elastic` / `Linear` easing in Behavior.
+- [x] Profile/theme persistence hardening — loading profiles or tray-applied themes now preserves the full settings-window palette/opacity state, refreshes the settings UI immediately, and the tray About dialog reflects the current GPL v3 license.
 
 ### Milestone 15: Voice Access & Accessibility Hardening
 **Status: Complete**
@@ -465,6 +467,7 @@ Docs and release readiness:
 - [x] README workflow guides: add dedicated sections for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, covering setup, browser-hosted app limitations, per-app narration, privacy limits, and troubleshooting for services such as X, Reddit, Instagram, Codex, and Antigravity in the single-panel app.
 - [x] README/Help gap analysis: update README, in-app Help, example settings, and status text for advanced narration rules, card background images, voice setup, privacy disclosures, defaults, and troubleshooting without reintroducing multi-panel language.
 - [x] Public repo sanitisation audit: reviewed the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity, and recorded the findings in `analysis/public-release-audit-2026-03-12.md`.
+- [x] Packaging automation hardening: prefer local certificate-store identities for MSIX signing, support explicit env-var overrides, and fail fast when a PFX password is unavailable instead of hanging on a hidden prompt.
 - [ ] Public release follow-through: rotate the exposed signing credential, decide whether to rewrite history to remove the old secret-bearing signing-script revision and local-path-heavy commit messages, and confirm whether the package publisher identity should stay public as-is.
 
 ### Milestone 19: Settings IA Cleanup & Advanced Image Controls

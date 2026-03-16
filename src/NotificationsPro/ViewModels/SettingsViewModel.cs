@@ -235,6 +235,9 @@ public partial class SettingsViewModel : BaseViewModel
     private double _animationDurationMs = 1200;
     public double AnimationDurationMs { get => _animationDurationMs; set { if (SetProperty(ref _animationDurationMs, value)) QueueSave(); } }
 
+    private string _animationEasing = AnimationEasingHelper.EaseOut;
+    public string AnimationEasing { get => _animationEasing; set { if (SetProperty(ref _animationEasing, AnimationEasingHelper.Normalize(value))) QueueSave(); } }
+
     // Deduplication
     private bool _deduplicationEnabled = true;
     public bool DeduplicationEnabled { get => _deduplicationEnabled; set { if (SetProperty(ref _deduplicationEnabled, value)) QueueSave(); } }
@@ -245,6 +248,15 @@ public partial class SettingsViewModel : BaseViewModel
     // Filtering
     private string _highlightColor = "#FFD700";
     public string HighlightColor { get => _highlightColor; set { if (SetProperty(ref _highlightColor, value)) QueueSave(); } }
+
+    private double _highlightOverlayOpacity = 0.25;
+    public double HighlightOverlayOpacity { get => _highlightOverlayOpacity; set { if (SetProperty(ref _highlightOverlayOpacity, Math.Clamp(value, 0.05, 0.80))) QueueSave(); } }
+
+    private string _highlightAnimation = HighlightAnimationHelper.None;
+    public string HighlightAnimation { get => _highlightAnimation; set { if (SetProperty(ref _highlightAnimation, HighlightAnimationHelper.Normalize(value))) QueueSave(); } }
+
+    private string _highlightBorderMode = HighlightBorderModeHelper.FullBorder;
+    public string HighlightBorderMode { get => _highlightBorderMode; set { if (SetProperty(ref _highlightBorderMode, HighlightBorderModeHelper.Normalize(value))) QueueSave(); } }
 
     private string _newHighlightKeyword = string.Empty;
     public string NewHighlightKeyword { get => _newHighlightKeyword; set => SetProperty(ref _newHighlightKeyword, value); }
@@ -655,13 +667,13 @@ public partial class SettingsViewModel : BaseViewModel
     public string SettingsWindowBg { get => _settingsWindowBg; set => SetSettingsWindowColor(ref _settingsWindowBg, value); }
 
     private double _settingsWindowOpacity = 0.95;
-    public double SettingsWindowOpacity { get => _settingsWindowOpacity; set { if (SetProperty(ref _settingsWindowOpacity, value)) QueueSave(); } }
+    public double SettingsWindowOpacity { get => _settingsWindowOpacity; set => SetSettingsThemeOpacity(ref _settingsWindowOpacity, value); }
 
     private double _settingsSurfaceOpacity = 1.0;
-    public double SettingsSurfaceOpacity { get => _settingsSurfaceOpacity; set { if (SetProperty(ref _settingsSurfaceOpacity, value)) QueueSave(); } }
+    public double SettingsSurfaceOpacity { get => _settingsSurfaceOpacity; set => SetSettingsThemeOpacity(ref _settingsSurfaceOpacity, value); }
 
     private double _settingsElementOpacity = 1.0;
-    public double SettingsElementOpacity { get => _settingsElementOpacity; set { if (SetProperty(ref _settingsElementOpacity, value)) QueueSave(); } }
+    public double SettingsElementOpacity { get => _settingsElementOpacity; set => SetSettingsThemeOpacity(ref _settingsElementOpacity, value); }
 
     private string _settingsWindowSurface = "#1C1C1C";
     public string SettingsWindowSurface { get => _settingsWindowSurface; set => SetSettingsWindowColor(ref _settingsWindowSurface, value); }
@@ -709,6 +721,15 @@ public partial class SettingsViewModel : BaseViewModel
             _settingsThemeMode = "Custom";
             OnPropertyChanged(nameof(SettingsThemeMode));
         }
+
+        QueueSave();
+        ApplySettingsTheme();
+    }
+
+    private void SetSettingsThemeOpacity(ref double backingField, double value)
+    {
+        if (!SetProperty(ref backingField, value))
+            return;
 
         QueueSave();
         ApplySettingsTheme();
@@ -800,6 +821,8 @@ public partial class SettingsViewModel : BaseViewModel
         target.SettingsWindowAccent = source.SettingsWindowAccent;
         target.SettingsWindowBorder = source.SettingsWindowBorder;
         target.SettingsWindowOpacity = source.SettingsWindowOpacity;
+        target.SettingsSurfaceOpacity = source.SettingsSurfaceOpacity;
+        target.SettingsElementOpacity = source.SettingsElementOpacity;
     }
 
     private void RefreshSettingsThemeModeOptions()
@@ -1026,10 +1049,15 @@ public partial class SettingsViewModel : BaseViewModel
         "Left", "Right", "Top", "Bottom"
     };
 
+    public List<string> AvailableAnimationEasings { get; } = AnimationEasingHelper.KnownModes.ToList();
+
     public List<string> AvailableTimestampDisplayModes { get; } = new()
     {
         "Relative", "Time", "DateTime"
     };
+
+    public List<string> AvailableHighlightAnimations { get; } = HighlightAnimationHelper.KnownModes.ToList();
+    public List<string> AvailableHighlightBorderModes { get; } = HighlightBorderModeHelper.KnownModes.ToList();
 
     public List<string> AvailableAppGroupingStyles { get; } = new()
     {
@@ -1350,9 +1378,13 @@ public partial class SettingsViewModel : BaseViewModel
         _fadeOnlyAnimation = s.FadeOnlyAnimation;
         _slideInDirection = s.SlideInDirection;
         _animationDurationMs = s.AnimationDurationMs;
+        _animationEasing = AnimationEasingHelper.Normalize(s.AnimationEasing);
         _deduplicationEnabled = s.DeduplicationEnabled;
         _deduplicationWindowSeconds = s.DeduplicationWindowSeconds;
         _highlightColor = s.HighlightColor;
+        _highlightOverlayOpacity = Math.Clamp(s.HighlightOverlayOpacity, 0.05, 0.80);
+        _highlightAnimation = HighlightAnimationHelper.Normalize(s.HighlightAnimation);
+        _highlightBorderMode = HighlightBorderModeHelper.Normalize(s.HighlightBorderMode);
         _showNotificationIcons = s.ShowNotificationIcons;
         _iconSize = s.IconSize;
         _defaultIconPreset = s.DefaultIconPreset;
@@ -1411,7 +1443,7 @@ public partial class SettingsViewModel : BaseViewModel
         _fullscreenOverlayColor = s.FullscreenOverlayColor;
         _settingsDisplayMode = s.SettingsDisplayMode;
         _popupAutoClose = s.PopupAutoClose;
-        _settingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(s.SettingsThemeMode);
+        _settingsThemeMode = Services.SettingsThemeService.ResolveThemeModeForLoadedSettings(s);
         _settingsWindowBg = s.SettingsWindowBg;
         _settingsWindowOpacity = s.SettingsWindowOpacity;
         _settingsSurfaceOpacity = s.SettingsSurfaceOpacity;
@@ -1513,6 +1545,12 @@ public partial class SettingsViewModel : BaseViewModel
         }
     }
 
+    public void ReloadFromCurrentSettings()
+    {
+        LoadFromSettings();
+        NotifyAllPropertiesChanged();
+    }
+
     private void RefreshProfiles()
     {
         SavedProfiles.Clear();
@@ -1533,8 +1571,9 @@ public partial class SettingsViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(name)) return;
         var profile = _profileManager.LoadProfile(name);
         if (profile == null) return;
+        profile.SettingsThemeMode = Services.SettingsThemeService.ResolveThemeModeForLoadedSettings(profile);
         _settingsManager.Apply(profile);
-        LoadFromSettings();
+        ReloadFromCurrentSettings();
     }
 
     private void DeleteProfile(string? name)
@@ -1672,9 +1711,13 @@ public partial class SettingsViewModel : BaseViewModel
             FadeOnlyAnimation = FadeOnlyAnimation,
             SlideInDirection = SlideInDirection,
             AnimationDurationMs = Math.Max(0, AnimationDurationMs),
+            AnimationEasing = AnimationEasingHelper.Normalize(AnimationEasing),
             DeduplicationEnabled = DeduplicationEnabled,
             DeduplicationWindowSeconds = DeduplicationWindowSeconds,
             HighlightColor = HighlightColor,
+            HighlightOverlayOpacity = Math.Clamp(HighlightOverlayOpacity, 0.05, 0.80),
+            HighlightAnimation = HighlightAnimationHelper.Normalize(HighlightAnimation),
+            HighlightBorderMode = HighlightBorderModeHelper.Normalize(HighlightBorderMode),
             HighlightRules = BuildHighlightRules(),
             HighlightKeywords = HighlightKeywordEntries.Select(e => e.Keyword).ToList(),
             PerKeywordColors = HighlightKeywordEntries
