@@ -57,8 +57,9 @@
 - Accessibility tab now surfaces live hotkey registration errors when a combo is invalid or already taken by Windows/another app
 - Accessibility tab now includes built-in spoken notifications with on/off toggle, explicit narration trigger mode (`All Allowed Notifications` vs `Only Matching Narration Rules`), multiple title/body/timestamp combinations, voice selection across the Windows app and desktop speech APIs, speed/volume controls, plus Preview Voice and Refresh Voices actions
 - Filtering > Narration Rules now exposes an `Only speak matching rules` toggle that mirrors the Accessibility narration trigger, so rule-gated speech can be enabled where narration rules are configured
-- Filtering now separates global highlight defaults from per-rule editing, uses a cleaner repeated-card rule layout, and promotes `Send Highlight Preview Notification` into a clearer accent action instead of a generic oversized secondary button
+- Filtering now separates global highlight defaults from per-rule editing, uses a single-column compact-friendly repeated-card layout, and promotes `Send Highlight Preview` into a clearer accent action instead of a generic oversized secondary button
 - Highlight rules now support per-rule animation, border-mode, tint-opacity, and border-width overrides, and existing rules can be edited in place instead of forcing delete-and-recreate for keyword changes
+- Highlight tint now sits beneath the notification content layer instead of washing over the text, so highlighted cards stay readable while still showing the configured emphasis
 - Profile saves now flush the current debounced settings state first, and profile/settings export round-trips now include the explicit highlight border-width field plus compact settings-window mode reliably
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
@@ -149,7 +150,7 @@
   - Quiet hours — auto-suppress between configurable start/end times (handles midnight wrapping)
   - Burst rate limiting — auto-suppress when too many notifications arrive in a short time window
   - Focus mode — timed pause from tray (15/30/60 min) with live countdown and auto-resume
-  - Filtering tab now includes per-app muting, scoped keyword management, narration-rule overrides, redesigned repeated rule cards, and a local `Send Highlight Preview Notification` action for testing highlight styling
+  - Filtering tab now includes per-app muting, scoped keyword management, narration-rule overrides, compact-friendly repeated rule cards, and a local `Send Highlight Preview` action for testing highlight styling
   - Apps tab now includes per-app sound, icon, and card-background overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
@@ -381,7 +382,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Adding a highlight keyword causes matching notifications to use the highlight accent color
 - [ ] Filtering > Highlight Animation / Highlight Overlay Opacity / Highlight Border Mode / Highlight Border Width visibly change highlighted cards, and `Full Border` still frames the card when the accent stripe is disabled
 - [ ] Filtering > Highlight rules allow per-rule animation/border-mode/opacity/border-width overrides and in-place keyword editing
-- [ ] Filtering > Send Highlight Preview Notification injects a local highlighted test card, and changing the highlight animation while that card is visible updates the current card immediately
+- [ ] Filtering > Send Highlight Preview injects a local highlighted test card, and changing the highlight animation while that card is visible updates the current card immediately
 - [ ] Adding a mute keyword suppresses notifications containing that word
 - [ ] Quiet hours toggle suppresses all notifications between configured times
 - [ ] Behavior tab burst-protection toggle suppresses when too many notifications arrive quickly

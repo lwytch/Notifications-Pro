@@ -40,15 +40,6 @@
                 </Border.RenderTransform>
 
                 <Grid>
-                    <!-- Highlight tint overlay — sits outside AccentBorder so it covers the full card (no padding offset).
-                         Background binds to the per-notification HighlightColor so each keyword can have a unique shade. -->
-                    <Border x:Name="HighlightOverlay"
-                            CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
-                            Opacity="0"
-                            IsHitTestVisible="False"
-                            Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
-                            Panel.ZIndex="1"/>
-
                 <Border x:Name="AccentBorder"
                         CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
                         ClipToBounds="True"
@@ -109,56 +100,64 @@
                         </Image.Source>
                     </Image>
 
-                    <Grid Margin="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}" ClipToBounds="True">
+                    <Image Opacity="{Binding BackgroundImageOpacity}"
+                           IsHitTestVisible="False"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Stretch" Value="UniformToFill"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding BackgroundImageMode}" Value="Image"/>
+                                            <Condition Binding="{Binding BackgroundImagePlacement}" Value="Inside Padding"/>
+                                            <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Fit Inside Card">
+                                        <Setter Property="Stretch" Value="Uniform"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Original Size">
+                                        <Setter Property="Stretch" Value="None"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Top">
+                                        <Setter Property="VerticalAlignment" Value="Top"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Bottom">
+                                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
+                                <Binding Path="BackgroundImagePath"/>
+                                <Binding Path="BackgroundImageHueDegrees"/>
+                                <Binding Path="BackgroundImageBrightness"/>
+                                <Binding Path="BackgroundImageSaturation"/>
+                                <Binding Path="BackgroundImageContrast"/>
+                                <Binding Path="BackgroundImageBlackAndWhite"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+
+                    <!-- Highlight tint sits between background treatments and the content layer so text stays readable. -->
+                    <Border x:Name="HighlightOverlay"
+                            CornerRadius="{Binding DataContext.CornerRadius, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Opacity="0"
+                            IsHitTestVisible="False"
+                            Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"/>
+
+                    <Grid Margin="{Binding DataContext.Padding, RelativeSource={RelativeSource AncestorType=Window}}"
+                          ClipToBounds="True">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-
-                        <Image Opacity="{Binding BackgroundImageOpacity}"
-                               IsHitTestVisible="False"
-                               Grid.ColumnSpan="2"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center">
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Setter Property="Stretch" Value="UniformToFill"/>
-                                        <Style.Triggers>
-                                            <MultiDataTrigger>
-                                                <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding BackgroundImageMode}" Value="Image"/>
-                                                    <Condition Binding="{Binding BackgroundImagePlacement}" Value="Inside Padding"/>
-                                                    <Condition Binding="{Binding DataContext.SingleLineMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="False"/>
-                                                </MultiDataTrigger.Conditions>
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </MultiDataTrigger>
-                                        <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Fit Inside Card">
-                                            <Setter Property="Stretch" Value="Uniform"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding BackgroundImageFitMode}" Value="Original Size">
-                                            <Setter Property="Stretch" Value="None"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Top">
-                                            <Setter Property="VerticalAlignment" Value="Top"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding BackgroundImageVerticalFocus}" Value="Bottom">
-                                            <Setter Property="VerticalAlignment" Value="Bottom"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Image.Style>
-                            <Image.Source>
-                                <MultiBinding Converter="{StaticResource NotificationBackgroundImageSource}">
-                                    <Binding Path="BackgroundImagePath"/>
-                                    <Binding Path="BackgroundImageHueDegrees"/>
-                                    <Binding Path="BackgroundImageBrightness"/>
-                                    <Binding Path="BackgroundImageSaturation"/>
-                                    <Binding Path="BackgroundImageContrast"/>
-                                    <Binding Path="BackgroundImageBlackAndWhite"/>
-                                </MultiBinding>
-                            </Image.Source>
-                        </Image>
 
                         <!-- Icon column -->
                         <Image Grid.Column="0" VerticalAlignment="Top"

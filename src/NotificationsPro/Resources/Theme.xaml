@@ -345,8 +345,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Slider">
                     <Grid VerticalAlignment="Center">
-                        <Border x:Name="TrackBackground" Height="4" CornerRadius="2"
-                                Background="{DynamicResource SurfaceLightBrush}" Margin="6,0"/>
+                        <Border x:Name="TrackBackground" Height="6" CornerRadius="3"
+                                Background="{DynamicResource BorderBrush}"
+                                BorderBrush="{DynamicResource BorderLightBrush}"
+                                BorderThickness="1"
+                                Margin="6,0"/>
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
                                 <Thumb x:Name="Thumb" Width="18" Height="18" Cursor="Hand">

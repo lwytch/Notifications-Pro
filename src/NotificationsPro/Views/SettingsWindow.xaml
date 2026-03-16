@@ -128,20 +128,28 @@
             <Setter Property="Margin" Value="0,0,0,4"/>
         </Style>
 
-        <Style x:Key="RuleNote" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource UIFont}"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Margin" Value="0"/>
+        <Style x:Key="RuleFieldStack" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,14"/>
+        </Style>
+
+        <Style x:Key="RuleColorSwatch" TargetType="Border">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <Style x:Key="RuleActionButton" TargetType="Button" BasedOn="{StaticResource InlineSecondaryButton}">
-            <Setter Property="MinWidth" Value="74"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
         </Style>
 
         <Style x:Key="RulePreviewButton" TargetType="Button" BasedOn="{StaticResource InlinePrimaryButton}">
-            <Setter Property="MinWidth" Value="88"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
         </Style>
 
         <Style x:Key="RuleRegexToggle" TargetType="ToggleButton">
@@ -154,6 +162,7 @@
             <Setter Property="Padding" Value="12,7"/>
             <Setter Property="MinHeight" Value="34"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
@@ -1652,43 +1661,63 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="HIGHLIGHT DEFAULTS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="These defaults apply to highlighted notifications unless a highlight rule overrides them."/>
+                                       ToolTip="These defaults apply to highlighted notifications unless a highlight rule overrides them. Use Send Highlight Preview to verify tint, border, and animation changes immediately."/>
                         </Border>
 
                         <Border Style="{StaticResource RuleCard}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Default highlight color" Style="{StaticResource RuleFieldLabel}"
+                                           ToolTip="Default tint used for highlighted notifications and new highlight rules."/>
+                                <Grid Margin="0,0,0,14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                                    <TextBlock Text="Default highlight color" Style="{StaticResource RuleFieldLabel}"
-                                               ToolTip="Default tint used for highlighted notifications and new highlight rules."/>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0"
+                                            Style="{StaticResource RuleColorSwatch}"
+                                            Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
+                                            ToolTip="Preview of the current default highlight tint."/>
 
-                                        <Border Grid.Column="0" Width="30" Height="30" CornerRadius="6"
-                                                Background="{Binding HighlightColor, Converter={StaticResource ColorToBrush}}"
-                                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                                Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="1"
+                                             Style="{StaticResource SettingsValueTextBox}"
+                                             Text="{Binding HighlightColor, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Hex color used as the default highlight tint."
+                                             MaxLength="7"
+                                             Margin="0,0,8,0"/>
 
-                                        <TextBox Grid.Column="1" Style="{StaticResource SettingsValueTextBox}"
-                                                 Text="{Binding HighlightColor, UpdateSourceTrigger=PropertyChanged}"
-                                                 ToolTip="Hex color used as the default highlight tint."
-                                                 MaxLength="7" Margin="0,0,8,0"/>
+                                    <Button Grid.Column="2"
+                                            Content="Pick"
+                                            Style="{StaticResource ColorPickButton}"
+                                            MinHeight="36"
+                                            Tag="HighlightColor"
+                                            Click="OnPickColorClick"
+                                            ToolTip="Open the color picker for the default highlight tint."/>
+                                </Grid>
 
-                                        <Button Grid.Column="2" Content="Pick"
-                                                Style="{StaticResource ColorPickButton}" MinHeight="36"
-                                                Tag="HighlightColor" Click="OnPickColorClick"
-                                                ToolTip="Open the color picker for the default highlight tint."/>
-                                    </Grid>
+                                <StackPanel Style="{StaticResource RuleFieldStack}">
+                                    <TextBlock Text="Highlight animation" Style="{StaticResource RuleFieldLabel}"
+                                               ToolTip="Default animation played when a highlighted notification appears."/>
+                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                              ItemsSource="{Binding AvailableHighlightAnimations}"
+                                              SelectedItem="{Binding HighlightAnimation}"
+                                              ToolTip="Flash blinks the tint, Pulse gently breathes it, and Shake nudges the card for emphasis."/>
+                                </StackPanel>
 
-                                    <TextBlock Text="Overlay opacity" Style="{StaticResource RuleFieldLabel}" Margin="0,14,0,4"
+                                <StackPanel Style="{StaticResource RuleFieldStack}">
+                                    <TextBlock Text="Highlight border mode" Style="{StaticResource RuleFieldLabel}"
+                                               ToolTip="Choose whether highlighted cards use a full outline, only rely on the accent side, or show no extra border."/>
+                                    <ComboBox Style="{StaticResource SettingsComboBox}"
+                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                              ItemsSource="{Binding AvailableHighlightBorderModes}"
+                                              SelectedItem="{Binding HighlightBorderMode}"
+                                              ToolTip="Full Border is the safest default when the accent stripe is hidden."/>
+                                </StackPanel>
+
+                                <StackPanel Style="{StaticResource RuleFieldStack}">
+                                    <TextBlock Text="Overlay opacity" Style="{StaticResource RuleFieldLabel}"
                                                ToolTip="Controls how strong the highlight tint appears behind the card content."/>
                                     <DockPanel>
                                         <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
@@ -1699,8 +1728,10 @@
                                                 TickFrequency="0.05" IsSnapToTickEnabled="True"
                                                 ToolTip="Higher values make highlighted cards more obvious; lower values keep the tint more subtle."/>
                                     </DockPanel>
+                                </StackPanel>
 
-                                    <TextBlock Text="Highlight border width" Style="{StaticResource RuleFieldLabel}" Margin="0,14,0,4"
+                                <StackPanel Style="{StaticResource RuleFieldStack}">
+                                    <TextBlock Text="Highlight border width" Style="{StaticResource RuleFieldLabel}"
                                                ToolTip="Dedicated border width for highlighted notifications."/>
                                     <DockPanel>
                                         <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
@@ -1713,197 +1744,158 @@
                                     </DockPanel>
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="Highlight animation" Style="{StaticResource RuleFieldLabel}"
-                                               ToolTip="Default animation played when a highlighted notification appears."/>
-                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                              ItemsSource="{Binding AvailableHighlightAnimations}"
-                                              SelectedItem="{Binding HighlightAnimation}"
-                                              ToolTip="Flash blinks the tint, Pulse gently breathes it, and Shake nudges the card for emphasis."/>
-
-                                    <TextBlock Text="Highlight border mode" Style="{StaticResource RuleFieldLabel}" Margin="0,14,0,4"
-                                               ToolTip="Choose whether highlighted cards use a full outline, only rely on the accent side, or show no extra border."/>
-                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                              ItemsSource="{Binding AvailableHighlightBorderModes}"
-                                              SelectedItem="{Binding HighlightBorderMode}"
-                                              ToolTip="Full Border is the safest default when the accent stripe is hidden."/>
-
-                                    <TextBlock Text="Verification" Style="{StaticResource RuleFieldLabel}" Margin="0,14,0,4"/>
-                                    <TextBlock Text="Send a local preview card to verify tint, border, and animation changes immediately."
-                                               Style="{StaticResource RuleNote}"/>
-                                    <Button Content="Send Highlight Preview Notification"
-                                            Style="{StaticResource InlinePrimaryButton}"
-                                            HorizontalAlignment="Left"
-                                            Command="{Binding PreviewHighlightNotificationCommand}"
-                                            Margin="0,10,0,0"
-                                            ToolTip="Inject a local highlighted preview so you can verify the active highlight defaults immediately."/>
-                                </StackPanel>
-                            </Grid>
+                                <Button Content="Send Highlight Preview"
+                                        Style="{StaticResource RulePreviewButton}"
+                                        HorizontalAlignment="Left"
+                                        Command="{Binding PreviewHighlightNotificationCommand}"
+                                        ToolTip="Inject a local highlighted preview notification so you can verify the active highlight defaults immediately."/>
+                            </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="HIGHLIGHT RULES" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Rule-specific highlight matches with optional styling overrides."/>
+                                       ToolTip="Rule-specific highlight matches with optional styling overrides. Each highlight rule can override the global animation, border mode, overlay opacity, and border width when needed."/>
                         </Border>
 
-                        <TextBlock Text="Each highlight rule can override the global animation, border mode, overlay opacity, and border width when needed."
-                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,10"/>
-
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
-                                     Text="{Binding NewHighlightKeyword, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Type a keyword, phrase, or pattern and press Add Highlight Rule."
-                                     Margin="0,0,8,0"/>
-
-                            <Button Grid.Column="1" Content="Add Highlight Rule" Style="{StaticResource SecondaryButton}"
-                                    MinWidth="150" Command="{Binding AddHighlightKeywordCommand}"
-                                    ToolTip="Add a new highlight rule using the entered keyword."/>
-                        </Grid>
+                        <TextBlock Text="New highlight rule" Style="{StaticResource RuleFieldLabel}"
+                                   ToolTip="Type a keyword, phrase, or pattern, then add a highlight rule you can edit in place."/>
+                        <TextBox Style="{StaticResource SettingsTextBox}"
+                                 Text="{Binding NewHighlightKeyword, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Type a keyword, phrase, or pattern and press Add Highlight Rule."
+                                 Margin="0,0,0,10"/>
+                        <Button Content="Add Highlight Rule" Style="{StaticResource SecondaryButton}"
+                                HorizontalAlignment="Left"
+                                Command="{Binding AddHighlightKeywordCommand}"
+                                ToolTip="Add a new highlight rule using the entered keyword."/>
                         
                         <ItemsControl ItemsSource="{Binding HighlightKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource RuleCard}">
                                         <StackPanel>
-                                            <Grid Margin="0,0,0,12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Match text" Style="{StaticResource RuleFieldLabel}"
+                                                       ToolTip="Edit the text or pattern used by this highlight rule."/>
+                                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                                     Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
+                                                     ToolTip="Edit the text or pattern used by this highlight rule."
+                                                     Margin="0,0,0,10"/>
 
-                                                <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
-                                                         Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
-                                                         ToolTip="Edit the text or pattern used by this highlight rule."
-                                                         Margin="0,0,8,0"/>
-
-                                                <Border Grid.Column="1" Width="26" Height="26" CornerRadius="5"
+                                            <WrapPanel Margin="0,0,0,6">
+                                                <Border Style="{StaticResource RuleColorSwatch}"
                                                         Background="{Binding Color, Converter={StaticResource ColorToBrush}}"
-                                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                                        Margin="0,0,8,0" VerticalAlignment="Center"/>
-
-                                                <Button Grid.Column="2" Content="Pick" Style="{StaticResource RuleActionButton}"
+                                                        ToolTip="Preview of the custom highlight color for this rule."/>
+                                                <Button Content="Pick"
+                                                        Style="{StaticResource RuleActionButton}"
                                                         Click="OnPickKeywordColorClick"
                                                         ToolTip="Pick a custom highlight color for this rule."/>
-
-                                                <ToggleButton Grid.Column="3" Content="Regex (.*)" Style="{StaticResource RuleRegexToggle}"
-                                                              IsChecked="{Binding IsRegex}" Margin="8,0,0,0"
+                                                <ToggleButton Content="Regex (.*)"
+                                                              Style="{StaticResource RuleRegexToggle}"
+                                                              IsChecked="{Binding IsRegex}"
                                                               ToolTip="When enabled, the keyword is treated as a regular expression pattern."/>
+                                                <Button Content="Preview"
+                                                        Style="{StaticResource RulePreviewButton}"
+                                                        Command="{Binding DataContext.PreviewHighlightNotificationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Send a local preview notification using this rule's current styling."/>
+                                                <Button Content="Remove"
+                                                        Style="{StaticResource RuleActionButton}"
+                                                        Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Remove this highlight rule."/>
+                                            </WrapPanel>
 
-                                                <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="8,0,0,0">
-                                                    <Button Content="Preview" Style="{StaticResource RulePreviewButton}"
-                                                            Command="{Binding DataContext.PreviewHighlightNotificationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                            CommandParameter="{Binding}"
-                                                            ToolTip="Send a local preview notification using this rule's current styling."/>
-                                                    <Button Content="Remove" Style="{StaticResource RuleActionButton}" Margin="8,0,0,0"
-                                                            Command="{Binding DataContext.RemoveHighlightKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                            CommandParameter="{Binding}"
-                                                            ToolTip="Remove this highlight rule."/>
-                                                </StackPanel>
-                                            </Grid>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="Match scope" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Choose whether this rule searches the title, body, or both fields."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding Scope}"/>
+                                            </StackPanel>
 
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="App filter (optional)" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Limit this rule to apps whose name contains this text, for example X, Outlook, Slack, or Antigravity."/>
+                                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                                         Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
+                                                         ToolTip="Limit this rule to apps whose name contains this text, for example X, Outlook, Slack, or Antigravity."/>
+                                            </StackPanel>
 
-                                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                                    <TextBlock Text="Match scope" Style="{StaticResource RuleFieldLabel}"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding Scope}"/>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="Animation" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Override the default highlight animation for this rule, or keep Use global."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableHighlightAnimationOverrides, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding Animation}"/>
+                                            </StackPanel>
 
-                                                    <TextBlock Text="Animation" Style="{StaticResource RuleFieldLabel}" Margin="0,12,0,4"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableHighlightAnimationOverrides, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding Animation}"/>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="Border mode" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Override the default highlight border treatment for this rule, or keep Use global."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableHighlightBorderModeOverrides, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding BorderMode}"/>
+                                            </StackPanel>
 
-                                                    <CheckBox Content="Custom overlay opacity"
-                                                              IsChecked="{Binding UseCustomOverlayOpacity}"
-                                                              FontFamily="{StaticResource UIFont}"
-                                                              FontSize="12"
-                                                              Foreground="{DynamicResource TextPrimaryBrush}"
-                                                              Margin="0,12,0,0"
-                                                              ToolTip="Enable this to give the rule its own highlight tint strength instead of using the global default."/>
-                                                    <DockPanel Margin="0,4,0,0">
-                                                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                                            <Run Text="{Binding OverlayOpacity, StringFormat='{}{0:P0}'}"/>
-                                                        </TextBlock>
-                                                        <Slider Minimum="0.05" Maximum="0.80" Value="{Binding OverlayOpacity}"
-                                                                TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                                                ToolTip="Controls the tint strength when Custom overlay opacity is enabled.">
-                                                            <Slider.Style>
-                                                                <Style TargetType="Slider" BasedOn="{StaticResource SettingsSlider}">
-                                                                    <Setter Property="Opacity" Value="1"/>
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding UseCustomOverlayOpacity}" Value="False">
-                                                                            <Setter Property="IsEnabled" Value="False"/>
-                                                                            <Setter Property="Opacity" Value="0.45"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Slider.Style>
-                                                        </Slider>
-                                                    </DockPanel>
-                                                    <TextBlock Text="Unchecked rules inherit the section defaults above."
-                                                               Style="{StaticResource RuleNote}" Margin="0,4,0,0"/>
-                                                </StackPanel>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <CheckBox Content="Custom overlay opacity"
+                                                          IsChecked="{Binding UseCustomOverlayOpacity}"
+                                                          FontFamily="{StaticResource UIFont}"
+                                                          FontSize="12"
+                                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                                          ToolTip="Enable this to give the rule its own highlight tint strength instead of using the global default."/>
+                                                <DockPanel Margin="0,4,0,0">
+                                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                                        <Run Text="{Binding OverlayOpacity, StringFormat='{}{0:P0}'}"/>
+                                                    </TextBlock>
+                                                    <Slider Minimum="0.05" Maximum="0.80" Value="{Binding OverlayOpacity}"
+                                                            TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                                            ToolTip="Controls the tint strength when Custom overlay opacity is enabled.">
+                                                        <Slider.Style>
+                                                            <Style TargetType="Slider" BasedOn="{StaticResource SettingsSlider}">
+                                                                <Setter Property="Opacity" Value="1"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding UseCustomOverlayOpacity}" Value="False">
+                                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                                        <Setter Property="Opacity" Value="0.68"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Slider.Style>
+                                                    </Slider>
+                                                </DockPanel>
+                                            </StackPanel>
 
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="App filter (optional)" Style="{StaticResource RuleFieldLabel}"/>
-                                                    <TextBox Style="{StaticResource SettingsTextBox}"
-                                                             Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
-                                                             ToolTip="Limit this rule to apps whose name contains this text, for example X, Outlook, Slack, or Antigravity."/>
-
-                                                    <TextBlock Text="Border mode" Style="{StaticResource RuleFieldLabel}" Margin="0,12,0,4"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableHighlightBorderModeOverrides, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding BorderMode}"/>
-
-                                                    <CheckBox Content="Custom border width"
-                                                              IsChecked="{Binding UseCustomBorderThickness}"
-                                                              FontFamily="{StaticResource UIFont}"
-                                                              FontSize="12"
-                                                              Foreground="{DynamicResource TextPrimaryBrush}"
-                                                              Margin="0,12,0,0"
-                                                              ToolTip="Enable this to give the rule its own highlight border width instead of using the global default."/>
-                                                    <DockPanel Margin="0,4,0,0">
-                                                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
-                                                            <Run Text="{Binding BorderThickness, StringFormat='{}{0:0.0}px'}"/>
-                                                        </TextBlock>
-                                                        <Slider Minimum="0.5" Maximum="8.0" Value="{Binding BorderThickness}"
-                                                                TickFrequency="0.5" IsSnapToTickEnabled="True"
-                                                                ToolTip="Controls the highlight border width when Custom border width is enabled.">
-                                                            <Slider.Style>
-                                                                <Style TargetType="Slider" BasedOn="{StaticResource SettingsSlider}">
-                                                                    <Setter Property="Opacity" Value="1"/>
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding UseCustomBorderThickness}" Value="False">
-                                                                            <Setter Property="IsEnabled" Value="False"/>
-                                                                            <Setter Property="Opacity" Value="0.45"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Slider.Style>
-                                                        </Slider>
-                                                    </DockPanel>
-                                                    <TextBlock Text="Custom width only matters when the effective border mode draws a visible highlight border."
-                                                               Style="{StaticResource RuleNote}" Margin="0,4,0,0"/>
-                                                </StackPanel>
-                                            </Grid>
+                                            <StackPanel>
+                                                <CheckBox Content="Custom border width"
+                                                          IsChecked="{Binding UseCustomBorderThickness}"
+                                                          FontFamily="{StaticResource UIFont}"
+                                                          FontSize="12"
+                                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                                          ToolTip="Enable this to give the rule its own highlight border width instead of using the global default."/>
+                                                <DockPanel Margin="0,4,0,0">
+                                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource SliderValue}">
+                                                        <Run Text="{Binding BorderThickness, StringFormat='{}{0:0.0}px'}"/>
+                                                    </TextBlock>
+                                                    <Slider Minimum="0.5" Maximum="8.0" Value="{Binding BorderThickness}"
+                                                            TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                                            ToolTip="Controls the highlight border width when Custom border width is enabled.">
+                                                        <Slider.Style>
+                                                            <Style TargetType="Slider" BasedOn="{StaticResource SettingsSlider}">
+                                                                <Setter Property="Opacity" Value="1"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding UseCustomBorderThickness}" Value="False">
+                                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                                        <Setter Property="Opacity" Value="0.68"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Slider.Style>
+                                                    </Slider>
+                                                </DockPanel>
+                                            </StackPanel>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -1912,76 +1904,60 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="KEYWORD MUTING" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Notifications containing these keywords will be silently suppressed."/>
+                                       ToolTip="Notifications containing these keywords will be silently suppressed before they reach the overlay."/>
                         </Border>
 
-                        <TextBlock Text="Mute rules suppress matching notifications before they reach the overlay."
-                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,10"/>
-
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
-                                     Text="{Binding NewMuteKeyword, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Type a keyword or pattern and press Add Mute Rule."
-                                     Margin="0,0,8,0"/>
-
-                            <Button Grid.Column="1" Content="Add Mute Rule" Style="{StaticResource SecondaryButton}"
-                                    MinWidth="132" Command="{Binding AddMuteKeywordCommand}"
-                                    ToolTip="Add the entered mute rule."/>
-                        </Grid>
+                        <TextBlock Text="New mute rule" Style="{StaticResource RuleFieldLabel}"
+                                   ToolTip="Type a keyword or pattern, then add a mute rule you can edit in place."/>
+                        <TextBox Style="{StaticResource SettingsTextBox}"
+                                 Text="{Binding NewMuteKeyword, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Type a keyword or pattern and press Add Mute Rule."
+                                 Margin="0,0,0,10"/>
+                        <Button Content="Add Mute Rule" Style="{StaticResource SecondaryButton}"
+                                HorizontalAlignment="Left"
+                                Command="{Binding AddMuteKeywordCommand}"
+                                ToolTip="Add the entered mute rule."/>
 
                         <ItemsControl ItemsSource="{Binding MuteKeywordEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource RuleCard}">
                                         <StackPanel>
-                                            <Grid Margin="0,0,0,12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Match text" Style="{StaticResource RuleFieldLabel}"
+                                                       ToolTip="Edit the text or pattern used by this mute rule."/>
+                                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                                     Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
+                                                     ToolTip="Edit the text or pattern used by this mute rule."
+                                                     Margin="0,0,0,10"/>
 
-                                                <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
-                                                         Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
-                                                         ToolTip="Edit the text or pattern used by this mute rule."
-                                                         Margin="0,0,8,0"/>
-
-                                                <ToggleButton Grid.Column="1" Content="Regex (.*)" Style="{StaticResource RuleRegexToggle}"
+                                            <WrapPanel Margin="0,0,0,6">
+                                                <ToggleButton Content="Regex (.*)"
+                                                              Style="{StaticResource RuleRegexToggle}"
                                                               IsChecked="{Binding IsRegex}"
                                                               ToolTip="When enabled, the keyword is treated as a regular expression pattern."/>
-
-                                                <Button Grid.Column="2" Content="Remove" Style="{StaticResource RuleActionButton}" Margin="8,0,0,0"
+                                                <Button Content="Remove"
+                                                        Style="{StaticResource RuleActionButton}"
                                                         Command="{Binding DataContext.RemoveMuteKeywordCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                         CommandParameter="{Binding}"
                                                         ToolTip="Remove this mute rule."/>
-                                            </Grid>
+                                            </WrapPanel>
 
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="Match scope" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Choose whether this mute rule searches the title, body, or both fields."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding Scope}"/>
+                                            </StackPanel>
 
-                                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                                    <TextBlock Text="Match scope" Style="{StaticResource RuleFieldLabel}"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding Scope}"/>
-                                                </StackPanel>
-
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="App filter (optional)" Style="{StaticResource RuleFieldLabel}"/>
-                                                    <TextBox Style="{StaticResource SettingsTextBox}"
-                                                             Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
-                                                             ToolTip="Limit this mute rule to a specific app or group of app names."/>
-                                                </StackPanel>
-                                            </Grid>
+                                            <StackPanel>
+                                                <TextBlock Text="App filter (optional)" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Limit this mute rule to a specific app or group of app names."/>
+                                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                                         Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
+                                                         ToolTip="Limit this mute rule to a specific app or group of app names."/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -1994,95 +1970,84 @@
                         </Border>
 
                         <Border Style="{StaticResource RuleCard}">
-                            <StackPanel>
-                                <DockPanel Margin="0,0,0,6">
-                                    <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
-                                                  IsChecked="{Binding NarrationRulesOnlyEnabled}"
-                                                  ToolTip="When enabled, built-in narration stays silent unless a Narration Rule matches with the Read Aloud action. This mirrors Accessibility > Narration Trigger."/>
-                                    <TextBlock Text="Only Speak Matching Rules" Style="{StaticResource SettingLabel}" Margin="0"
-                                               ToolTip="Use this when read aloud should happen only for narration-rule hits instead of every allowed notification. Matching rules can still force Read Aloud or Skip Read Aloud per app, title, or body text."/>
-                                </DockPanel>
-                                <TextBlock Text="When this is off, narration rules only override matching notifications and other allowed apps still speak normally."
-                                           Style="{StaticResource RuleNote}"/>
-                            </StackPanel>
+                            <DockPanel>
+                                <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
+                                              IsChecked="{Binding NarrationRulesOnlyEnabled}"
+                                              ToolTip="When enabled, built-in narration stays silent unless a Narration Rule with the Read Aloud action matches. When disabled, narration rules only override matching notifications while other allowed apps still speak normally."/>
+                                <TextBlock Text="Only speak matching rules" Style="{StaticResource SettingLabel}" Margin="0"
+                                           ToolTip="When enabled, built-in narration stays silent unless a Narration Rule with the Read Aloud action matches. When disabled, narration rules only override matching notifications while other allowed apps still speak normally."/>
+                            </DockPanel>
                         </Border>
 
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
-                                     Text="{Binding NewNarrationKeyword, UpdateSourceTrigger=PropertyChanged}"
-                                     ToolTip="Type a keyword or handle and press Add Rule. Use regex if you need advanced matching."
-                                     Margin="0,0,8,0"/>
-
-                            <Button Grid.Column="1" Content="Add Narration Rule" Style="{StaticResource SecondaryButton}"
-                                    MinWidth="148" Command="{Binding AddNarrationRuleCommand}"
-                                    ToolTip="Add a narration rule that can force read-aloud or skip read-aloud for matching notifications."/>
-                        </Grid>
+                        <TextBlock Text="New narration rule" Style="{StaticResource RuleFieldLabel}"
+                                   ToolTip="Type a keyword or handle, then add a narration rule you can edit in place."/>
+                        <TextBox Style="{StaticResource SettingsTextBox}"
+                                 Text="{Binding NewNarrationKeyword, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Type a keyword or handle and press Add Rule. Use regex if you need advanced matching."
+                                 Margin="0,0,0,10"/>
+                        <Button Content="Add Narration Rule" Style="{StaticResource SecondaryButton}"
+                                HorizontalAlignment="Left"
+                                Command="{Binding AddNarrationRuleCommand}"
+                                ToolTip="Add a narration rule that can force read-aloud or skip read-aloud for matching notifications."/>
 
                         <ItemsControl ItemsSource="{Binding NarrationRuleEntries}" Margin="0,4,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource RuleCard}">
                                         <StackPanel>
-                                            <Grid Margin="0,0,0,12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Match text" Style="{StaticResource RuleFieldLabel}"
+                                                       ToolTip="Edit the text or pattern used by this narration rule."/>
+                                            <TextBox Style="{StaticResource SettingsTextBox}"
+                                                     Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
+                                                     ToolTip="Edit the text or pattern used by this narration rule."
+                                                     Margin="0,0,0,10"/>
 
-                                                <TextBox Grid.Column="0" Style="{StaticResource SettingsTextBox}"
-                                                         Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
-                                                         ToolTip="Edit the text or pattern used by this narration rule."
-                                                         Margin="0,0,8,0"/>
-
-                                                <ToggleButton Grid.Column="1" Content="Regex (.*)" Style="{StaticResource RuleRegexToggle}"
+                                            <WrapPanel Margin="0,0,0,6">
+                                                <ToggleButton Content="Regex (.*)"
+                                                              Style="{StaticResource RuleRegexToggle}"
                                                               IsChecked="{Binding IsRegex}"
                                                               ToolTip="When enabled, the keyword is treated as a regular expression pattern."/>
-
-                                                <Button Grid.Column="2" Content="Remove" Style="{StaticResource RuleActionButton}" Margin="8,0,0,0"
+                                                <Button Content="Remove"
+                                                        Style="{StaticResource RuleActionButton}"
                                                         Command="{Binding DataContext.RemoveNarrationRuleCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                         CommandParameter="{Binding}"
                                                         ToolTip="Remove this narration rule."/>
-                                            </Grid>
+                                            </WrapPanel>
 
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="Match scope" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Choose whether this narration rule searches the title, body, or both fields."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding Scope}"/>
+                                            </StackPanel>
 
-                                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                                    <TextBlock Text="Match scope" Style="{StaticResource RuleFieldLabel}"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableNotificationMatchScopes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding Scope}"/>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="App filter (optional)" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Limit this narration rule to apps whose name contains this text."/>
+                                                <TextBox Style="{StaticResource SettingsTextBox}"
+                                                         Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
+                                                         ToolTip="Limit this narration rule to apps whose name contains this text."/>
+                                            </StackPanel>
 
-                                                    <TextBlock Text="Action" Style="{StaticResource RuleFieldLabel}" Margin="0,12,0,4"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableNarrationRuleActions, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding Action}"/>
-                                                </StackPanel>
+                                            <StackPanel Style="{StaticResource RuleFieldStack}">
+                                                <TextBlock Text="Action" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Choose whether this rule forces Read Aloud or Skip Read Aloud for matching notifications."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableNarrationRuleActions, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding Action}"/>
+                                            </StackPanel>
 
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="App filter (optional)" Style="{StaticResource RuleFieldLabel}"/>
-                                                    <TextBox Style="{StaticResource SettingsTextBox}"
-                                                             Text="{Binding AppFilter, UpdateSourceTrigger=PropertyChanged}"
-                                                             ToolTip="Limit this narration rule to apps whose name contains this text."/>
-
-                                                    <TextBlock Text="Read mode" Style="{StaticResource RuleFieldLabel}" Margin="0,12,0,4"/>
-                                                    <ComboBox Style="{StaticResource SettingsComboBox}"
-                                                              ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
-                                                              ItemsSource="{Binding DataContext.AvailableNarrationRuleReadModes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                              SelectedItem="{Binding ReadMode}"/>
-                                                </StackPanel>
-                                            </Grid>
+                                            <StackPanel>
+                                                <TextBlock Text="Read mode" Style="{StaticResource RuleFieldLabel}"
+                                                           ToolTip="Choose the spoken-content mode for this rule, or keep the global narration mode."/>
+                                                <ComboBox Style="{StaticResource SettingsComboBox}"
+                                                          ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
+                                                          ItemsSource="{Binding DataContext.AvailableNarrationRuleReadModes, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                          SelectedItem="{Binding ReadMode}"/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -2108,11 +2073,8 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="PER-APP OVERRIDES" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Assign app-specific sound, icon, narration, and card background overrides. Global styling still lives in Appearance."/>
+                                       ToolTip="Assign app-specific sound, icon, narration, and card background overrides. These overrides are optional: leave a control at Default to keep using the global settings from Appearance, Sounds, and Accessibility."/>
                         </Border>
-
-                        <TextBlock Text="Per-app overrides are optional. Leave controls at Default to keep using the global overlay settings from Appearance, Sounds, and Accessibility."
-                                   Style="{StaticResource SettingDesc}" Margin="0,0,0,10"/>
 
                         <Grid Margin="0,4,0,10">
                             <Grid.ColumnDefinitions>
@@ -2820,7 +2782,7 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SPOKEN NOTIFICATIONS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Built-in narration reads visible notifications aloud using a Windows-installed voice. Audio plays through your normal Windows output, so nearby people may hear it. Notifications Pro only speaks from the live in-memory queue, never writes spoken text to disk, and never retains overflow content for later playback."/>
+                                       ToolTip="Built-in narration reads visible notifications aloud using a Windows-installed voice. Audio plays through your normal Windows output, so nearby people may hear it. Notifications Pro only speaks from the live in-memory queue, never writes spoken text to disk, and never retains overflow content for later playback. Per-app Read aloud overrides live in the Apps tab so all app-specific controls stay together."/>
                         </Border>
 
                         <DockPanel Margin="0,0,0,8">
@@ -2897,8 +2859,6 @@
                                         ToolTip="Re-scan the Windows voice lists without reopening Notifications Pro."/>
                             </WrapPanel>
 
-                            <TextBlock Text="Per-app narration overrides now live in Apps so all app-specific controls stay in one place."
-                                       Style="{StaticResource SettingDesc}" Margin="0,10,0,0"/>
                         </StackPanel>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
@@ -2917,7 +2877,7 @@
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="GLOBAL HOTKEYS" Style="{StaticResource SectionHeader}"
-                                       ToolTip="Keyboard shortcuts provide an accessible way to control the overlay without the mouse."/>
+                                       ToolTip="Keyboard shortcuts provide an accessible way to control the overlay without the mouse. Use modifier-plus-key combinations such as Ctrl+Alt+N or Shift+F12. If a shortcut is invalid or already taken, Notifications Pro shows the current registration error inline below."/>
                         </Border>
 
                         <DockPanel Margin="0,0,0,8">
@@ -2950,13 +2910,6 @@
                                        Visibility="{Binding HasGlobalHotkeyRegistrationError, Converter={StaticResource BoolToVis}}"
                                        Text="{Binding GlobalHotkeyRegistrationError}"/>
 
-                            <TextBlock Text="Hotkeys save automatically. Use modifier+key combos like Ctrl+Alt+N or Shift+F12."
-                                       Style="{StaticResource SettingDesc}" Foreground="{DynamicResource TextMutedBrush}"
-                                       Margin="0,8,0,0" TextWrapping="Wrap"/>
-
-                            <TextBlock Text="If a combo is invalid or already used by Windows or another app, the current registration issue appears here after settings are applied."
-                                       Style="{StaticResource SettingDesc}" Foreground="{DynamicResource TextMutedBrush}"
-                                       Margin="0,6,0,0" TextWrapping="Wrap"/>
                         </StackPanel>
 
                     </StackPanel>
@@ -3249,12 +3202,6 @@
                                   SelectedItem="{Binding NotificationCaptureMode}"
                                   Margin="0,4,0,0"
                                   ToolTip="Use Force Accessibility if live notifications stop appearing even though test notifications still work."/>
-
-                        <TextBlock TextWrapping="Wrap"
-                                   Margin="0,6,0,8"
-                                   Style="{StaticResource SettingDesc}"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   Text="Direct WinRT access depends on Windows notification permission. Auto is the safest default. Prefer WinRT still falls back automatically, and Force Accessibility is the quickest recovery option if live toasts stop appearing."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="SYSTEM NOTIFICATIONS" Style="{StaticResource SectionHeader}"/>

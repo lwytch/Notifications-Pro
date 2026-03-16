@@ -76,8 +76,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 ### Appearance & Theming
 - **Built-in theme presets** — select from a dropdown and apply in one click.
 - **Custom themes** — save your current overlay look by name; re-apply or delete any time.
-- **Import / export** — share a complete settings profile as a JSON file. Position and session state are preserved on the receiving machine.
-- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu.
+- **Import / export** — share a complete settings profile as a JSON file. Filtering rules, settings-window theme state, and compact-window mode round-trip cleanly, while position and session state stay preserved on the receiving machine.
+- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu, including filtering rules and settings-window styling.
 - **Typography** — independently configure font family, size, and weight for app name, title, and body text. Line spacing control.
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
@@ -87,7 +87,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Grouping appearance** — grouped notifications can render as a `Framed Group`, `Header Chip`, or `Minimal Label`, with optional per-group counts, while reusing the normal accent/border/text styling controls.
 - **Accent stripe** — 3 px coloured bar on the left edge of each card.
 - **Optional border** — thin border around each card, configurable colour and thickness.
-- **Highlight styling** — matched highlight rules can add configurable tint opacity, explicit highlight border width, choose a full border / accent-side-only / no-border frame, optionally play `Flash`, `Pulse`, or `Shake`, and individual highlight rules can override those treatments directly from `Settings > Filtering`.
+- **Highlight styling** — matched highlight rules can add configurable tint opacity, explicit highlight border width, choose a full border / accent-side-only / no-border frame, optionally play `Flash`, `Pulse`, or `Shake`, and individual highlight rules can override those treatments directly from `Settings > Filtering`. `Send Highlight Preview` lets you verify the current highlight styling locally without waiting for a real toast.
 - **Per-app tint** — subtle colour tint on each card based on the source app name.
 - **Icons** — optional per-app icons using 10 built-in vector presets (Bell, Megaphone, Star, Warning, Info, Heart, Lightning, Fire, Chat, Checkmark) or your own image files. Icon size configurable 16–48 px.
 - **Dyslexia-friendly font** — bundled OpenDyslexic typeface with one-click preset buttons in `Appearance > Typography`.
@@ -111,7 +111,9 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Per-app mute** — silence notifications from specific apps. Muted apps are remembered per session; the settings UI shows every app seen this session.
 - **Field-scoped keyword rules** — highlight or mute rules can target `Title Only`, `Body Only`, or `Title + Body`, with optional regex matching.
 - **App-filtered rules** — highlight, mute, and narration rules can be limited to a specific app name such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`.
+- **Editable rule cards** — highlight, mute, and narration rules can all be edited in place after creation, and the Filtering tab now keeps those editors in a compact-friendly single-column layout instead of squeezed multi-column rows.
 - **Narration rules** — optional read-aloud overrides can force `Read Aloud` or `Skip Read Aloud` for matching notifications, with an optional spoken-content override and a mirrored `Only speak matching rules` toggle in `Settings > Filtering`.
+- **Local highlight preview** — `Settings > Filtering > Send Highlight Preview` injects a local highlighted test card so you can verify tint, border, and animation changes immediately.
 - **Focus mode** — a timed DND period (configurable minutes) accessible from the tray menu.
 - **Presentation mode** — auto-DND when a configured app (PowerPoint, Zoom, Teams, etc.) goes fullscreen.
 
@@ -210,13 +212,14 @@ Avoid distraction without missing urgent messages:
 - Start with `Settings > System > Notification Access` and keep `Capture Mode` on `Auto` unless live notifications stop appearing. If preview notifications work but real ones do not, switch to `Force Accessibility`.
 - Use `Settings > Filtering` for targeting logic, `Settings > Apps` for per-app presentation overrides, `Settings > Accessibility` for voice/rate/output choices, and `Settings > Appearance` for how stacked cards look.
 - If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Then use either `Settings > Accessibility > Narration Trigger` or `Settings > Filtering > Only speak matching rules` when speech should happen only for rule matches instead of for every allowed app.
+- Use `Settings > Filtering > Send Highlight Preview` whenever you adjust highlight tint, border mode, animation, or per-rule overrides and want to verify the look immediately.
 - Background images are local-only assets copied into Notifications Pro's backgrounds folder. Stacked cards can use fit and coverage controls, single-line banner mode stays solid-colour for readability, and app-specific overrides live in `Settings > Apps`.
 - If browser-hosted services all look like one browser app, install those sites as browser apps/PWAs first so Windows can surface a cleaner app identity when the browser supports it.
 
 ### Getting the Most Out of X
 - Browser-hosted X notifications usually surface as plain Windows notification text: `AppName`, `Title`, and `Body`. Notifications Pro does not receive structured account IDs or post metadata from X itself.
 - If X is arriving as a generic browser host, install it as a browser app/PWA first. Chrome’s desktop app flow is here: [Install or manage apps in Chrome](https://support.google.com/chrome/answer/9658361?co=GENIE.Platform%3DDesktop&hl=en). Edge also supports installable apps here: [Install as app from Microsoft Edge](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps-chromium/how-to/install). In practice, if X notifications are inconsistent in Edge on your machine, Chrome remains the safer workflow.
-- Use `Settings > Filtering > Keyword Highlighting` with `Match Scope` set to `Title Only` or `Body Only` depending on where the account name or watchword usually appears in your Windows notifications.
+- Use `Settings > Filtering > Highlight Rules` with `Match Scope` set to `Title Only` or `Body Only` depending on where the account name or watchword usually appears in your Windows notifications.
 - Use literal keywords like `@openai`, `@nvidia`, or a campaign hashtag when the text is stable. Turn on `.*` only when you really need regex patterns.
 - Add `App Filter = X` if you want X-specific rules without affecting Outlook, Reddit, Slack, or other notification sources using similar words.
 - Use `Settings > Filtering > Narration Rules` if only certain handles, phrases, or alerts should be spoken aloud while the rest of X stays visual-only. If speech should happen only for those matches, turn on `Only speak matching rules`.
@@ -325,7 +328,7 @@ Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-t
 | Drag left/right edge | Resize width (when manual resize is enabled) |
 
 ### Settings
-Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview your styling without waiting for a real notification.
+Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview general styling without waiting for a real notification, and use **Settings > Filtering > Send Highlight Preview** when you want a local highlighted card for filter-specific styling checks.
 
 ### Windows notification setup
 Notifications Pro mirrors the notifications Windows is already surfacing. If Windows notifications are off for an app, there is nothing for the overlay to capture.
@@ -413,6 +416,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.21
+- **Filtering Layout Polish**: `Settings > Filtering` now uses stacked single-column rule cards that hold up properly in compact popup mode, with wrapped action rows instead of squeezed/truncated controls.
+- **Highlight Readability Fix**: highlight tint now sits beneath the notification content layer, so highlighted cards keep their emphasis without washing over the text or card imagery.
+- **Tooltip Cleanup & Control Consistency**: non-critical helper copy moved out of the Filtering layout and several other dense settings sections into tooltips, the highlight preview CTA is shorter and clearer, and slider tracks are more visible against dark cards.
 
 ### Release v1.1.10.20
 - **Filtering Tab Redesign**: `Settings > Filtering` now separates global highlight defaults from per-rule editing and uses a cleaner repeated-card layout for highlight, mute, and narration rules.

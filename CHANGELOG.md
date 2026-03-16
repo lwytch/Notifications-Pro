@@ -14,6 +14,10 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Filtering now uses stacked single-column rule editors in compact popup mode, so highlight/mute/narration rules no longer rely on cramped multi-column rows or truncated action buttons
+- Highlight tint now composes beneath the notification content/background layers instead of washing over the text, improving readability on highlighted cards
+- Settings slider tracks now use a stronger visible rail, making highlight and other dense-card sliders readable again on darker surfaces
+- Non-critical helper copy was moved out of the Filtering layout and related dense settings sections into tooltips, keeping the cards cleaner without dropping the guidance
 - Filtering highlight styling no longer reuses the normal card-border width implicitly; highlighted notifications now have an explicit highlight border-width control and resolved per-notification highlight styling in the overlay
 - Saving a profile now flushes the current debounced settings state first, so newly edited filtering rules, settings-window state, and other in-flight changes are not lost in saved profiles
 - Existing highlighted cards now update live when you change highlight rules, tint opacity, or highlight animation settings instead of waiting for a brand-new notification

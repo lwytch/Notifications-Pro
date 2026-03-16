@@ -483,7 +483,9 @@ Information architecture cleanup from the 2026-03-12 settings audit:
 - [x] Apps card layout cleanup: rework the per-app override cards into a cleaner aligned form layout, keep long background-image paths out of the main visual flow, and make the card-background override actions read as one coherent control group instead of a cramped mixed row.
 - [x] Scrollbar polish: add a card-to-scrollbar gap control, hide the themed scrollbar while the idle waiting placeholder is shown, and clarify in the UI/docs that scrollbars only apply to currently visible cards rather than discarded overflow.
 - [ ] Scope signposting and discoverability: Add lightweight “configured in …” cross-links or helper rows between split concepts such as timestamp visibility vs timestamp styling, app grouping behavior vs grouping appearance, and default icon vs per-app icon overrides without duplicating the controls themselves.
-- [ ] Tooltip and inline-copy audit: Reduce non-critical inline guidance in dense tabs, keep privacy/access/live-status text inline where required, and move general usage hints into tooltips so sections stay readable.
+- [x] Tooltip and inline-copy audit: Reduce non-critical inline guidance in dense tabs, keep privacy/access/live-status text inline where required, and move general usage hints into tooltips so sections stay readable.
+- [x] Filtering readability and compact-mode follow-up: restore a single-column rule-editor rhythm for the Filtering tab, prevent highlight tint from washing out notification text, reduce button truncation, and keep the layout deliberate at compact settings-window widths.
+- [x] Slider-visibility follow-up: strengthen slider track visibility in dense cards and section surfaces so the control line stays readable against dark backgrounds.
 - [x] Accessibility disclosure cleanup: moved the built-in narration and Voice Access transparency/privacy copy out of the main Accessibility layout and into the relevant tooltips, while keeping the fuller disclosures in Help/README.
 
 Control-system and visual-rhythm cleanup from the 2026-03-12 layout audit:
@@ -496,6 +498,7 @@ Control-system and visual-rhythm cleanup from the 2026-03-12 layout audit:
 - [x] Filtering redesign and rule-editor cleanup: Split global highlight defaults from per-rule editing, shrink and promote the preview CTA into a deliberate accent action, standardize the repeated rule-card layout across highlight/mute/narration rules, and make added keywords/rules editable instead of forcing delete-and-recreate.
 - [x] Highlight styling override expansion: Add explicit highlight-border thickness control plus per-rule highlight animation, border-mode, opacity, and border-width overrides so filtered notifications can be styled intentionally rather than inheriting only one global treatment.
 - [x] Profile/export completeness hardening: Audit every `AppSettings` field against `SettingsViewModel`, flush pending debounced edits before saving profiles, ensure keyword/rule collections and compact settings-window state round-trip through profiles and JSON export/import, and cover the regressions with tests plus an analysis report.
+- [x] Filtering polish follow-up: after the first redesign, tighten the action hierarchy, reduce non-critical helper text to tooltips, and normalize per-rule button sizing and stacking so highlight, mute, and narration cards still look intentional at popup/compact widths.
 
 Background image and advanced visual-control gaps:
 - [x] Card background image treatment expansion: Add missing image-processing controls for notification cards, including at minimum `Black & White`, `Saturation`, and `Contrast`, while keeping existing `Fit`, `Placement`, `Opacity`, `Hue`, and `Brightness` controls coherent and export/import safe.
@@ -507,15 +510,15 @@ Background image and advanced visual-control gaps:
 
 Operational gaps:
 - [x] Real listener diagnostics: Add a `Run Capture Diagnostic` or equivalent action under `System > Notification Access` so users can distinguish overlay rendering issues from live WinRT/accessibility capture failures.
-- [ ] Regression hardening for settings moves: Extend tests to cover moved settings, settings defaults, export/import, reset defaults, and tab-navigation links so another IA pass does not quietly break persistence or discoverability.
+- [ ] Regression hardening for settings moves: Extend tests to cover moved settings, settings defaults, export/import, reset defaults, tab-navigation links, and filtering/profile regressions so another IA pass does not quietly break persistence or discoverability.
 
 Post-redesign process guardrails:
 - [ ] Create a local `settings-ia-review` skill after the new layout is finalized: document the canonical tab ownership, approved tab order, and “do not duplicate controls across tabs” rules so future feature work follows the agreed information architecture.
 - [ ] Create a local `ui-form-rhythm-review` skill after the new layout is finalized: document the shared control tiers, spacing tokens, typography rules, inline action patterns, and compact-mode responsiveness checks so future UI changes preserve alignment and visual consistency.
-- [ ] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, and export/import coverage whenever a settings feature is added or reorganized.
+- [x] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, profile save/load coverage, and export/import coverage whenever a settings feature is added or reorganized.
 
 ## Current Focus
-Next planned pass: execute the settings IA cleanup from the 2026-03-12 audit while still completing the remaining release-readiness work (MSIX settings-persistence audit and public-repo sanitisation).
+Next planned pass: continue the broader settings IA cleanup by tackling the remaining tab-ownership, shared-control, and regression-hardening items after the filtering follow-up and settings-regression skill pass.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.
