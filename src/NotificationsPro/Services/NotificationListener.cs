@@ -286,6 +286,8 @@ public class NotificationListener
 
             var appName = NormalizeText(notification.AppInfo?.DisplayInfo?.DisplayName ?? string.Empty);
             var fields = BuildNotificationFields(texts, appName, assumeLeadingAppNameWhenUnknown: false);
+            if (ShouldIgnoreCapturedNotification(fields.AppName, fields.Title, fields.Body))
+                return;
 
             // Suppress the Windows toast popup before forwarding to the overlay so the system
             // toast has less chance to flash first. The notification payload has already been
@@ -513,6 +515,9 @@ public class NotificationListener
         {
             foreach (var fields in fieldsToDispatch)
             {
+                if (ShouldIgnoreCapturedNotification(fields.AppName, fields.Title, fields.Body))
+                    continue;
+
                 _queueManager.AddNotification(fields.AppName, fields.Title, fields.Body);
                 _capturedCount++;
             }
@@ -584,6 +589,16 @@ public class NotificationListener
     private static bool IsKnownBrowserHostName(string value)
     {
         return KnownBrowserHostNames.Contains(value, StringComparer.OrdinalIgnoreCase);
+    }
+
+    internal static bool ShouldIgnoreCapturedNotification(string appName, string title, string body)
+    {
+        var normalizedAppName = NormalizeText(appName);
+        if (string.IsNullOrWhiteSpace(normalizedAppName))
+            return false;
+
+        return string.Equals(normalizedAppName, "Notifications Pro", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(normalizedAppName, "NotificationsPro", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

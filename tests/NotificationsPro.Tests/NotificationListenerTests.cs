@@ -62,4 +62,18 @@ public class NotificationListenerTests
 
         Assert.Empty(split);
     }
+
+    [Theory]
+    [InlineData("Notifications Pro")]
+    [InlineData("NotificationsPro")]
+    public void ShouldIgnoreCapturedNotification_ReturnsTrue_ForSelfNotifications(string appName)
+    {
+        Assert.True(NotificationListener.ShouldIgnoreCapturedNotification(appName, "Startup", "Tray balloon"));
+    }
+
+    [Fact]
+    public void ShouldIgnoreCapturedNotification_ReturnsFalse_ForExternalNotifications()
+    {
+        Assert.False(NotificationListener.ShouldIgnoreCapturedNotification("Slack", "Mention", "Hello"));
+    }
 }

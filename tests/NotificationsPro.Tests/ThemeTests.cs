@@ -349,6 +349,14 @@ public class ThemeTests : IDisposable
     [Fact]
     public void ExportAndImport_RoundTrips()
     {
+        var backgroundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.BackgroundsFolderName);
+        var iconsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.IconsFolderName);
+        var soundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.SoundsFolderName);
+        var cardBackgroundPath = Path.Combine(backgroundsDir, "social.png");
+        var perAppBackgroundPath = Path.Combine(backgroundsDir, "x.png");
+        var fullscreenBackgroundPath = Path.Combine(backgroundsDir, "wallpaper.png");
+        var defaultIconPath = Path.Combine(iconsDir, "social.png");
+        var defaultSoundPath = Path.Combine(soundsDir, "notify.wav");
         var original = new AppSettings
         {
             FontSize = 22,
@@ -368,18 +376,20 @@ public class ThemeTests : IDisposable
             ReadNotificationsAloudMode = SpokenNotificationTextFormatter.ModeTitleTimestamp,
             SpokenMutedApps = new() { "Teams", "Outlook" },
             NotificationCaptureMode = NotificationCaptureModeHelper.ModeAccessibility,
-            CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png",
+            CardBackgroundImagePath = cardBackgroundPath,
             CardBackgroundImageOpacity = 0.55,
             CardBackgroundImageHueDegrees = 12,
             CardBackgroundImageBrightness = 0.9,
             CardBackgroundImageFitMode = CardBackgroundImageFitModeHelper.FitInsideCard,
             CardBackgroundImagePlacement = CardBackgroundImagePlacementHelper.FullCard,
-            FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png",
+            FullscreenOverlayImagePath = fullscreenBackgroundPath,
             FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize,
+            DefaultIconPreset = defaultIconPath,
+            DefaultSound = defaultSoundPath,
             CompactSettingsWindow = false,
             ShowQuickTips = false,
         };
-        original.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
+        original.PerAppBackgroundImages["X"] = perAppBackgroundPath;
         original.HighlightRules.Add(new HighlightRuleDefinition
         {
             Keyword = "headline",
@@ -395,6 +405,14 @@ public class ThemeTests : IDisposable
 
         var filePath = Path.Combine(_tempDir, "export.json");
         ThemeManager.ExportSettings(original, filePath);
+        var exportedJson = File.ReadAllText(filePath);
+        Assert.Contains("\"CardBackgroundImagePath\": \"backgrounds/social.png\"", exportedJson);
+        Assert.Contains("\"FullscreenOverlayImagePath\": \"backgrounds/wallpaper.png\"", exportedJson);
+        Assert.Contains("\"DefaultIconPreset\": \"icons/social.png\"", exportedJson);
+        Assert.Contains("\"DefaultSound\": \"sounds/notify.wav\"", exportedJson);
+        Assert.DoesNotContain(backgroundsDir.Replace("\\", "\\\\"), exportedJson);
+        Assert.DoesNotContain(iconsDir.Replace("\\", "\\\\"), exportedJson);
+        Assert.DoesNotContain(soundsDir.Replace("\\", "\\\\"), exportedJson);
         var imported = ThemeManager.ImportSettings(filePath);
 
         Assert.NotNull(imported);
@@ -415,15 +433,17 @@ public class ThemeTests : IDisposable
         Assert.Equal(SpokenNotificationTextFormatter.ModeTitleTimestamp, imported.ReadNotificationsAloudMode);
         Assert.Equal(new[] { "Teams", "Outlook" }, imported.SpokenMutedApps);
         Assert.Equal(NotificationCaptureModeHelper.ModeAccessibility, imported.NotificationCaptureMode);
-        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png", imported.CardBackgroundImagePath);
+        Assert.Equal(cardBackgroundPath, imported.CardBackgroundImagePath);
         Assert.Equal(0.55, imported.CardBackgroundImageOpacity);
         Assert.Equal(12, imported.CardBackgroundImageHueDegrees);
         Assert.Equal(0.9, imported.CardBackgroundImageBrightness);
         Assert.Equal(CardBackgroundImageFitModeHelper.FitInsideCard, imported.CardBackgroundImageFitMode);
         Assert.Equal(CardBackgroundImagePlacementHelper.FullCard, imported.CardBackgroundImagePlacement);
-        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", imported.FullscreenOverlayImagePath);
+        Assert.Equal(fullscreenBackgroundPath, imported.FullscreenOverlayImagePath);
         Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, imported.FullscreenOverlayImageFitMode);
-        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", imported.PerAppBackgroundImages["X"]);
+        Assert.Equal(defaultIconPath, imported.DefaultIconPreset);
+        Assert.Equal(defaultSoundPath, imported.DefaultSound);
+        Assert.Equal(perAppBackgroundPath, imported.PerAppBackgroundImages["X"]);
         Assert.False(imported.CompactSettingsWindow);
         Assert.False(imported.ShowQuickTips);
         Assert.Single(imported.HighlightRules);

@@ -60,6 +60,15 @@ public class SettingsManagerTests : IDisposable
     public void SaveAndLoad_RoundTrips()
     {
         var sm = CreateManager();
+        var backgroundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.BackgroundsFolderName);
+        var iconsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.IconsFolderName);
+        var soundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.SoundsFolderName);
+        var cardBackgroundPath = Path.Combine(backgroundsDir, "social.png");
+        var perAppBackgroundPath = Path.Combine(backgroundsDir, "x.png");
+        var fullscreenBackgroundPath = Path.Combine(backgroundsDir, "wallpaper.png");
+        var defaultIconPath = Path.Combine(iconsDir, "chat.png");
+        var defaultSoundPath = Path.Combine(soundsDir, "alert.wav");
+        var perAppSoundPath = Path.Combine(soundsDir, "x.wav");
         sm.Settings.FontSize = 22;
         sm.Settings.FontFamily = "Consolas";
         sm.Settings.TextAlignment = "Right";
@@ -73,7 +82,7 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.AppGroupingStyle = "Header Chip";
         sm.Settings.ShowAppGroupCounts = false;
         sm.Settings.CardBackgroundMode = CardBackgroundModeHelper.Image;
-        sm.Settings.CardBackgroundImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png";
+        sm.Settings.CardBackgroundImagePath = cardBackgroundPath;
         sm.Settings.CardBackgroundImageOpacity = 0.6;
         sm.Settings.CardBackgroundImageHueDegrees = 30;
         sm.Settings.CardBackgroundImageBrightness = 0.8;
@@ -89,14 +98,17 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.HighlightOverlayOpacity = 0.42;
         sm.Settings.HighlightAnimation = HighlightAnimationHelper.Shake;
         sm.Settings.HighlightBorderMode = HighlightBorderModeHelper.NoBorder;
+        sm.Settings.DefaultIconPreset = defaultIconPath;
+        sm.Settings.DefaultSound = defaultSoundPath;
+        sm.Settings.PerAppSounds["X"] = perAppSoundPath;
         sm.Settings.OverlayScrollbarTrackColor = "#101010";
         sm.Settings.OverlayScrollbarThumbColor = "#6A6A6A";
         sm.Settings.OverlayScrollbarThumbHoverColor = "#44AAFF";
         sm.Settings.OverlayScrollbarPadding = 2.5;
         sm.Settings.OverlayScrollbarContentGap = 12;
         sm.Settings.OverlayScrollbarCornerRadius = 7;
-        sm.Settings.PerAppBackgroundImages["X"] = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png";
-        sm.Settings.FullscreenOverlayImagePath = @"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png";
+        sm.Settings.PerAppBackgroundImages["X"] = perAppBackgroundPath;
+        sm.Settings.FullscreenOverlayImagePath = fullscreenBackgroundPath;
         sm.Settings.FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize;
         sm.Settings.FullscreenOverlayImageHueDegrees = -45;
         sm.Settings.FullscreenOverlayImageBrightness = 0.9;
@@ -126,6 +138,15 @@ public class SettingsManagerTests : IDisposable
         });
         sm.Save();
 
+        var rawJson = File.ReadAllText(Path.Combine(_tempDir, "settings.json"));
+        Assert.Contains("\"CardBackgroundImagePath\": \"backgrounds/social.png\"", rawJson);
+        Assert.Contains("\"FullscreenOverlayImagePath\": \"backgrounds/wallpaper.png\"", rawJson);
+        Assert.Contains("\"DefaultIconPreset\": \"icons/chat.png\"", rawJson);
+        Assert.Contains("\"DefaultSound\": \"sounds/alert.wav\"", rawJson);
+        Assert.DoesNotContain(backgroundsDir.Replace("\\", "\\\\"), rawJson);
+        Assert.DoesNotContain(iconsDir.Replace("\\", "\\\\"), rawJson);
+        Assert.DoesNotContain(soundsDir.Replace("\\", "\\\\"), rawJson);
+
         var sm2 = CreateManager();
         sm2.Load();
 
@@ -144,7 +165,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Header Chip", sm2.Settings.AppGroupingStyle);
         Assert.False(sm2.Settings.ShowAppGroupCounts);
         Assert.Equal(CardBackgroundModeHelper.Image, sm2.Settings.CardBackgroundMode);
-        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\social.png", sm2.Settings.CardBackgroundImagePath);
+        Assert.Equal(cardBackgroundPath, sm2.Settings.CardBackgroundImagePath);
         Assert.Equal(0.6, sm2.Settings.CardBackgroundImageOpacity);
         Assert.Equal(30, sm2.Settings.CardBackgroundImageHueDegrees);
         Assert.Equal(0.8, sm2.Settings.CardBackgroundImageBrightness);
@@ -160,14 +181,17 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(0.42, sm2.Settings.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.Shake, sm2.Settings.HighlightAnimation);
         Assert.Equal(HighlightBorderModeHelper.NoBorder, sm2.Settings.HighlightBorderMode);
+        Assert.Equal(defaultIconPath, sm2.Settings.DefaultIconPreset);
+        Assert.Equal(defaultSoundPath, sm2.Settings.DefaultSound);
+        Assert.Equal(perAppSoundPath, sm2.Settings.PerAppSounds["X"]);
         Assert.Equal("#101010", sm2.Settings.OverlayScrollbarTrackColor);
         Assert.Equal("#6A6A6A", sm2.Settings.OverlayScrollbarThumbColor);
         Assert.Equal("#44AAFF", sm2.Settings.OverlayScrollbarThumbHoverColor);
         Assert.Equal(2.5, sm2.Settings.OverlayScrollbarPadding);
         Assert.Equal(12, sm2.Settings.OverlayScrollbarContentGap);
         Assert.Equal(7, sm2.Settings.OverlayScrollbarCornerRadius);
-        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\x.png", sm2.Settings.PerAppBackgroundImages["X"]);
-        Assert.Equal(@"C:\Users\demo\AppData\Roaming\NotificationsPro\backgrounds\wallpaper.png", sm2.Settings.FullscreenOverlayImagePath);
+        Assert.Equal(perAppBackgroundPath, sm2.Settings.PerAppBackgroundImages["X"]);
+        Assert.Equal(fullscreenBackgroundPath, sm2.Settings.FullscreenOverlayImagePath);
         Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, sm2.Settings.FullscreenOverlayImageFitMode);
         Assert.Equal(-45, sm2.Settings.FullscreenOverlayImageHueDegrees);
         Assert.Equal(0.9, sm2.Settings.FullscreenOverlayImageBrightness);
@@ -314,6 +338,7 @@ public class SettingsManagerTests : IDisposable
     public void Load_NormalizesLegacyAndOutOfRangeBackgroundSettings()
     {
         var settingsPath = Path.Combine(_tempDir, "settings.json");
+        var relativeBackgroundPath = $"{ManagedAssetPathHelper.BackgroundsFolderName}/legacy.png";
         File.WriteAllText(settingsPath,
             """
             {
@@ -323,7 +348,7 @@ public class SettingsManagerTests : IDisposable
               "HighlightOverlayOpacity": 4.0,
               "HighlightAnimation": "Sparkle",
               "HighlightBorderMode": "Halo",
-              "CardBackgroundImagePath": "C:\\Users\\demo\\AppData\\Roaming\\NotificationsPro\\backgrounds\\legacy.png",
+              "CardBackgroundImagePath": "backgrounds/legacy.png",
               "CardBackgroundImageSaturation": 5.0,
               "CardBackgroundImageContrast": -2.0,
               "CardBackgroundImageVerticalFocus": "Somewhere",
@@ -344,6 +369,7 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(HighlightAnimationHelper.None, sm.Settings.HighlightAnimation);
         Assert.Equal(HighlightBorderModeHelper.FullBorder, sm.Settings.HighlightBorderMode);
         Assert.Equal(CardBackgroundModeHelper.Image, sm.Settings.CardBackgroundMode);
+        Assert.Equal(Path.Combine(ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.BackgroundsFolderName), "legacy.png"), sm.Settings.CardBackgroundImagePath);
         Assert.Equal(2.0, sm.Settings.CardBackgroundImageSaturation);
         Assert.Equal(0.2, sm.Settings.CardBackgroundImageContrast);
         Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.CardBackgroundImageVerticalFocus);
@@ -351,6 +377,31 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(2.0, sm.Settings.FullscreenOverlayImageContrast);
         Assert.Equal(ImageVerticalFocusHelper.Center, sm.Settings.FullscreenOverlayImageVerticalFocus);
         Assert.Equal(24.0, sm.Settings.OverlayScrollbarContentGap);
+    }
+
+    [Fact]
+    public void Load_RejectsOutOfRootSoundPaths_AndResolvesManagedRelativeSoundPaths()
+    {
+        var settingsPath = Path.Combine(_tempDir, "settings.json");
+        File.WriteAllText(settingsPath,
+            """
+            {
+              "DefaultSound": "\\\\server\\share\\alert.wav",
+              "PerAppSounds": {
+                "Slack": "C:\\Temp\\slack.wav",
+                "Teams": "sounds/teams.wav"
+              }
+            }
+            """);
+
+        var sm = CreateManager();
+        sm.Load();
+
+        Assert.Equal("None", sm.Settings.DefaultSound);
+        Assert.False(sm.Settings.PerAppSounds.ContainsKey("Slack"));
+        Assert.Equal(
+            Path.Combine(ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.SoundsFolderName), "teams.wav"),
+            sm.Settings.PerAppSounds["Teams"]);
     }
 
     [Fact]

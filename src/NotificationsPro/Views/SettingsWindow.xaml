@@ -866,7 +866,7 @@
                                         ToolTip="Choose a local image file to use as the notification card background."/>
                                 <TextBox Style="{StaticResource SettingsTextBox}"
                                          Text="{Binding CardBackgroundImagePath, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip="Path to the local card background image copied into Notifications Pro's backgrounds folder."/>
+                                         ToolTip="Path to the local card background image copied into Notifications Pro's backgrounds folder. Shared exports and saved profiles keep managed asset references relative instead of storing your full machine path."/>
                             </DockPanel>
 
                             <TextBlock Text="Image Coverage" Style="{StaticResource SettingLabel}"
@@ -3214,7 +3214,7 @@
                         <DockPanel Margin="0,0,0,8">
                             <ToggleButton DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}"
                                           IsChecked="{Binding SuppressToastPopups}"
-                                          ToolTip="Suppression is only active while Notifications Pro is running. Closing the app immediately restores normal toast behavior."/>
+                                       ToolTip="Suppression is only active while Notifications Pro is running. Closing the app immediately restores normal toast behavior, and Notifications Pro ignores its own startup/self toasts so the app does not mirror its tray balloon back into the overlay."/>
                             <TextBlock Text="Suppress Toast Popups" Style="{StaticResource SettingLabel}"
                                        ToolTip="Removes Windows toast popups after capture to prevent duplicates on screen. Also removes notifications from Windows notification center. Only works with WinRT capture mode (not accessibility fallback). Suppression stops immediately when the app closes."/>
                         </DockPanel>
@@ -3516,7 +3516,7 @@
                                    Text="Use Settings → Apps if only certain apps should get a different card background, and use Settings → Layout → Fullscreen Backdrop if you want a local image behind the fullscreen monitoring mode."/>
                         <TextBlock TextWrapping="Wrap" Margin="0,0,0,12"
                                    Foreground="{DynamicResource TextMutedBrush}" FontSize="11"
-                                   Text="Images are copied into Notifications Pro's local backgrounds folder and referenced by path in settings export/import. Single-line banner mode stays solid-colour for readability. Images affect appearance only and never include or persist notification text."/>
+                                   Text="Images are copied into Notifications Pro's local backgrounds folder and stored as managed relative references in settings export/import and profiles. Single-line banner mode stays solid-colour for readability. Images affect appearance only and never include or persist notification text."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="WHY CAN'T I CLICK NOTIFICATIONS TO OPEN APPS?" Style="{StaticResource SectionHeader}"/>

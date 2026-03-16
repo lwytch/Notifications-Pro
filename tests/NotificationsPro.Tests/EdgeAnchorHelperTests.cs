@@ -47,4 +47,59 @@ public class EdgeAnchorHelperTests
 
         Assert.True(anchored);
     }
+
+    [Fact]
+    public void ShouldPreserveFarEdgeDuringResize_ReturnsFalse_WhenOnlyStartEdgeIsNear()
+    {
+        var anchored = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            currentlyAnchoredToFarEdge: false,
+            nearStartEdgeBeforeResize: true,
+            nearFarEdgeBeforeResize: false);
+
+        Assert.False(anchored);
+    }
+
+    [Fact]
+    public void ShouldPreserveFarEdgeDuringResize_ReturnsTrue_WhenOnlyFarEdgeIsNear()
+    {
+        var anchored = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            currentlyAnchoredToFarEdge: false,
+            nearStartEdgeBeforeResize: false,
+            nearFarEdgeBeforeResize: true);
+
+        Assert.True(anchored);
+    }
+
+    [Fact]
+    public void ShouldPreserveFarEdgeDuringResize_ReturnsFalse_WhenBothEdgesAreNearButWindowWasTopAnchored()
+    {
+        var anchored = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            currentlyAnchoredToFarEdge: false,
+            nearStartEdgeBeforeResize: true,
+            nearFarEdgeBeforeResize: true);
+
+        Assert.False(anchored);
+    }
+
+    [Fact]
+    public void ShouldPreserveFarEdgeDuringResize_ReturnsTrue_WhenWindowWasAlreadyBottomAnchored()
+    {
+        var anchored = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            currentlyAnchoredToFarEdge: true,
+            nearStartEdgeBeforeResize: true,
+            nearFarEdgeBeforeResize: true);
+
+        Assert.True(anchored);
+    }
+
+    [Fact]
+    public void ShouldPreserveFarEdgeDuringResize_KeepsExistingFarEdgeAnchor_WhenWindowIsOffsetFromEdges()
+    {
+        var anchored = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            currentlyAnchoredToFarEdge: true,
+            nearStartEdgeBeforeResize: false,
+            nearFarEdgeBeforeResize: false);
+
+        Assert.True(anchored);
+    }
 }

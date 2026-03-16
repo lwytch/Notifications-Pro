@@ -55,6 +55,7 @@ public class SettingsManager
                 if (loaded != null)
                 {
                     NormalizeLoadedSettings(loaded, hasCardBackgroundMode, hasNotificationAnimationStyle);
+                    AppSettingsAssetPathHelper.NormalizeForRuntime(loaded);
                     Settings = loaded;
                 }
             }
@@ -78,7 +79,8 @@ public class SettingsManager
             Directory.CreateDirectory(_settingsDir);
             if (!Settings.SettingsSchemaVersion.HasValue || Settings.SettingsSchemaVersion.Value < CurrentSettingsSchemaVersion)
                 Settings.SettingsSchemaVersion = CurrentSettingsSchemaVersion;
-            var json = JsonSerializer.Serialize(Settings, JsonOptions);
+            var snapshot = AppSettingsAssetPathHelper.CreatePortableSnapshot(Settings);
+            var json = JsonSerializer.Serialize(snapshot, JsonOptions);
             File.WriteAllText(_settingsPath, json);
         }
         catch
@@ -90,6 +92,7 @@ public class SettingsManager
     public void Apply(AppSettings updated)
     {
         NormalizeLoadedSettings(updated, hasCardBackgroundMode: true, hasNotificationAnimationStyle: true);
+        AppSettingsAssetPathHelper.NormalizeForRuntime(updated);
         Settings = updated;
         Save();
         SettingsChanged?.Invoke();

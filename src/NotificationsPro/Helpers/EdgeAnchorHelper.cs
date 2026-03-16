@@ -12,4 +12,15 @@ public static class EdgeAnchorHelper
 
         return nearFarEdge;
     }
+
+    public static bool ShouldPreserveFarEdgeDuringResize(
+        bool currentlyAnchoredToFarEdge,
+        bool nearStartEdgeBeforeResize,
+        bool nearFarEdgeBeforeResize)
+    {
+        if (currentlyAnchoredToFarEdge)
+            return true;
+
+        return nearFarEdgeBeforeResize && !nearStartEdgeBeforeResize;
+    }
 }

@@ -14,9 +14,11 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
-- Top-right and other non-bottom overlay placements now keep their original vertical anchor when the card stack grows and later shrinks, so expiry removals no longer snap the overlay down to the bottom edge
+- Top-right and other non-bottom overlay placements now keep their original vertical anchor even when the card stack temporarily hits the monitor-height limit, so expiry removals no longer snap the overlay down to the bottom edge or reverse the stack direction
 - `Suppress Toast Popups` now removes WinRT toasts before forwarding the captured notification to the overlay queue, reducing the visible system-toast flash when suppression is enabled
+- Notifications Pro now ignores its own startup/self notifications during capture, preventing the app’s tray balloon from being mirrored back into the overlay as a non-actionable first-launch card
 - Standard animation settings now round-trip through defaults, JSON import/export, and profile save/load, and legacy `FadeOnlyAnimation` installs migrate cleanly into the new animation-style model
+- Managed custom sound/icon/background references now serialize as relative Notifications Pro asset paths in settings export/profile JSON, while runtime load resolves them back to local AppData paths and rejects out-of-root custom sound references
 - Filtering now uses stacked single-column rule editors in compact popup mode, so highlight/mute/narration rules no longer rely on cramped multi-column rows or truncated action buttons
 - Highlight tint now composes beneath the notification content/background layers instead of washing over the text, improving readability on highlighted cards
 - Settings slider tracks now use a stronger visible rail, making highlight and other dense-card sliders readable again on darker surfaces

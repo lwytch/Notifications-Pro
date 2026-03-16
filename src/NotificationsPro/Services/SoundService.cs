@@ -1,6 +1,7 @@
 using System.IO;
 using System.Media;
 using Microsoft.Win32;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 
 namespace NotificationsPro.Services;
@@ -12,9 +13,7 @@ namespace NotificationsPro.Services;
 /// </summary>
 public static class SoundService
 {
-    private static readonly string CustomSoundsDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "NotificationsPro", "sounds");
+    private static readonly string CustomSoundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.SoundsFolderName);
 
     /// <summary>
     /// Represents a Windows sound event with its display name and resolved WAV path.

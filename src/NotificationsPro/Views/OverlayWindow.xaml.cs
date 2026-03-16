@@ -549,10 +549,22 @@ public partial class OverlayWindow : Window
         var threshold = Math.Max(8, _settingsManager.Settings.SnapDistance + 4);
         var previousWidth = ResolveDimension(e.PreviousSize.Width, ActualWidth, MinWidth, 380);
         var previousHeight = ResolveDimension(e.PreviousSize.Height, ActualHeight, MinHeight, 120);
+        var leftGapBefore = Left - workArea.Left;
         var rightGapBefore = workArea.Right - (Left + previousWidth);
+        var topGapBefore = Top - workArea.Top;
         var bottomGapBefore = workArea.Bottom - (Top + previousHeight);
-        var shouldAnchorRight = _anchorToRightEdge || Math.Abs(rightGapBefore) <= threshold;
-        var shouldAnchorBottom = _anchorToBottomEdge || Math.Abs(bottomGapBefore) <= threshold;
+        var nearLeftBefore = leftGapBefore <= threshold;
+        var nearRightBefore = rightGapBefore <= threshold;
+        var nearTopBefore = topGapBefore <= threshold;
+        var nearBottomBefore = bottomGapBefore <= threshold;
+        var shouldAnchorRight = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            _anchorToRightEdge,
+            nearLeftBefore,
+            nearRightBefore);
+        var shouldAnchorBottom = EdgeAnchorHelper.ShouldPreserveFarEdgeDuringResize(
+            _anchorToBottomEdge,
+            nearTopBefore,
+            nearBottomBefore);
 
         if (shouldAnchorRight)
         {

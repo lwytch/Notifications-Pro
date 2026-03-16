@@ -82,7 +82,8 @@ public class ThemeManager
         if (!settings.SettingsSchemaVersion.HasValue || settings.SettingsSchemaVersion.Value < SettingsManager.CurrentSettingsSchemaVersion)
             settings.SettingsSchemaVersion = SettingsManager.CurrentSettingsSchemaVersion;
 
-        var json = JsonSerializer.Serialize(settings, JsonOptions);
+        var snapshot = AppSettingsAssetPathHelper.CreatePortableSnapshot(settings);
+        var json = JsonSerializer.Serialize(snapshot, JsonOptions);
         File.WriteAllText(filePath, json);
     }
 
@@ -102,7 +103,10 @@ public class ThemeManager
         var imported = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
 
         if (imported != null)
+        {
             SanitizeImportedSettings(imported, hasCardBackgroundMode, hasNotificationAnimationStyle);
+            AppSettingsAssetPathHelper.NormalizeForRuntime(imported);
+        }
 
         return imported;
     }

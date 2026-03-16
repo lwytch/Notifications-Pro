@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 
 namespace NotificationsPro.Services;
@@ -52,6 +53,7 @@ public class ProfileManager
         var snapshot = settings.Clone();
         if (!snapshot.SettingsSchemaVersion.HasValue || snapshot.SettingsSchemaVersion.Value < SettingsManager.CurrentSettingsSchemaVersion)
             snapshot.SettingsSchemaVersion = SettingsManager.CurrentSettingsSchemaVersion;
+        snapshot = AppSettingsAssetPathHelper.CreatePortableSnapshot(snapshot);
         var json = JsonSerializer.Serialize(snapshot, JsonOptions);
         File.WriteAllText(path, json);
     }
@@ -73,7 +75,11 @@ public class ProfileManager
                 return null;
 
             var json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
+            var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
+            if (loaded != null)
+                AppSettingsAssetPathHelper.NormalizeForRuntime(loaded);
+
+            return loaded;
         }
         catch
         {

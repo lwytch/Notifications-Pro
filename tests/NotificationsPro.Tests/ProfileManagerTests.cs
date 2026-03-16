@@ -24,6 +24,12 @@ public class ProfileManagerTests : IDisposable
     public void SaveAndLoadProfile_RoundTripsFilteringAndSettingsWindowState()
     {
         var manager = new ProfileManager(_tempDir);
+        var backgroundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.BackgroundsFolderName);
+        var iconsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.IconsFolderName);
+        var soundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.SoundsFolderName);
+        var profileBackgroundPath = Path.Combine(backgroundsDir, "profile.png");
+        var profileIconPath = Path.Combine(iconsDir, "profile.png");
+        var profileSoundPath = Path.Combine(soundsDir, "profile.wav");
         var settings = new AppSettings
         {
             HighlightBorderThickness = 2.5,
@@ -32,7 +38,10 @@ public class ProfileManagerTests : IDisposable
             NotificationAnimationStyle = NotificationAnimationStyleHelper.ZoomFade,
             SlideInDirection = "Right",
             CompactSettingsWindow = false,
-            SettingsThemeMode = "Custom"
+            SettingsThemeMode = "Custom",
+            CardBackgroundImagePath = profileBackgroundPath,
+            DefaultIconPreset = profileIconPath,
+            DefaultSound = profileSoundPath
         };
         settings.HighlightRules.Add(new HighlightRuleDefinition
         {
@@ -47,6 +56,10 @@ public class ProfileManagerTests : IDisposable
         settings.NarrationRules.Add(new NarrationRuleDefinition { Keyword = "@openai", ReadMode = SpokenNotificationTextFormatter.ModeTitleOnly });
 
         manager.SaveProfile("Streamer", settings);
+        var rawJson = File.ReadAllText(Path.Combine(_tempDir, "Streamer.json"));
+        Assert.Contains("\"CardBackgroundImagePath\": \"backgrounds/profile.png\"", rawJson);
+        Assert.Contains("\"DefaultIconPreset\": \"icons/profile.png\"", rawJson);
+        Assert.Contains("\"DefaultSound\": \"sounds/profile.wav\"", rawJson);
         var loaded = manager.LoadProfile("Streamer");
 
         Assert.NotNull(loaded);
@@ -55,6 +68,9 @@ public class ProfileManagerTests : IDisposable
         Assert.Equal(NotificationAnimationStyleHelper.ZoomFade, loaded.NotificationAnimationStyle);
         Assert.Equal("Right", loaded.SlideInDirection);
         Assert.False(loaded.CompactSettingsWindow);
+        Assert.Equal(profileBackgroundPath, loaded.CardBackgroundImagePath);
+        Assert.Equal(profileIconPath, loaded.DefaultIconPreset);
+        Assert.Equal(profileSoundPath, loaded.DefaultSound);
         Assert.Single(loaded.HighlightRules);
         Assert.Equal(HighlightAnimationHelper.Flash, loaded.HighlightRules[0].Animation);
         Assert.Equal(HighlightBorderModeHelper.AccentSideOnly, loaded.HighlightRules[0].BorderMode);

@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MediaColor = System.Windows.Media.Color;
 using MediaColorConverter = System.Windows.Media.ColorConverter;
+using NotificationsPro.Helpers;
 using NotificationsPro.Models;
 
 namespace NotificationsPro.Services;
@@ -16,9 +17,7 @@ namespace NotificationsPro.Services;
 /// </summary>
 public class IconService
 {
-    private static readonly string CustomIconsDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "NotificationsPro", "icons");
+    private static readonly string CustomIconsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.IconsFolderName);
 
     private readonly ConcurrentDictionary<string, ImageSource?> _iconCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, DrawingImage?> _geometryCache = new(StringComparer.OrdinalIgnoreCase);

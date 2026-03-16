@@ -50,7 +50,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Accessibility fallback** — uses `SetWinEventHook` + UI Automation to read toast text when the WinRT path is unavailable (e.g. unpackaged app restrictions). Simultaneous notifications are split into individual entries rather than merged.
 - **Capture mode selector** — `Settings > System > Notification Access` now offers `Auto`, `Prefer WinRT`, and `Force Accessibility` so you can recover quickly if live notifications stop flowing through the direct path.
 - **Polling guard** — a 2-second polling loop supplements the event-driven path for reliability; a flag prevents overlapping polls.
-- **Toast suppression** (optional) — after capturing a notification, the app can remove the native Windows toast popup so only the overlay shows. The WinRT path now attempts removal before the overlay card is queued to reduce visible flashing. Requires the WinRT path. Off by default.
+- **Toast suppression** (optional) — after capturing a notification, the app can remove the native Windows toast popup so only the overlay shows. The WinRT path now attempts removal before the overlay card is queued to reduce visible flashing, and Notifications Pro ignores its own startup/self toasts so suppression does not bounce the app’s tray balloon back into the overlay. Requires the WinRT path. Off by default.
 
 ### Overlay Window
 - Always-on-top, transparent, borderless — sits over any application.
@@ -76,8 +76,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 ### Appearance & Theming
 - **Built-in theme presets** — select from a dropdown and apply in one click.
 - **Custom themes** — save your current overlay look by name; re-apply or delete any time.
-- **Import / export** — share a complete settings profile as a JSON file. Filtering rules, settings-window theme state, and compact-window mode round-trip cleanly, while position and session state stay preserved on the receiving machine.
-- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu, including filtering rules and settings-window styling.
+- **Import / export** — share a complete settings profile as a JSON file. Filtering rules, settings-window theme state, and compact-window mode round-trip cleanly, while managed custom assets are stored as relative Notifications Pro references instead of machine-specific absolute paths.
+- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu, including filtering rules, settings-window styling, and the same portable managed-asset references used by settings export/import.
 - **Typography** — independently configure font family, size, and weight for app name, title, and body text. Line spacing control.
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
@@ -119,10 +119,10 @@ Notifications Pro is built for people who need more control than Windows offers 
 
 ### Sounds
 - **Master toggle** for notification sounds.
-- **System sound presets** — Asterisk, Beep, Exclamation, Hand, Question.
-  > Note: Windows 11 unified many system sound events, so some system sound choices may produce the same audio. For distinct sounds use a custom WAV file.
+- **Windows sound list** — Notifications Pro enumerates the Windows sound events currently exposed in the registry, deduplicated by WAV path, so you can pick from the sounds your machine actually exposes instead of a hardcoded short list.
+  > Note: Windows 11 unified many system sound events, so some choices may still produce the same audio. For distinct sounds use a custom WAV file.
 - **Custom WAV files** — browse for any `.wav` file; stored under `%AppData%\NotificationsPro\sounds\`.
-- **Per-app overrides** — assign a different sound to each app.
+- **Per-app overrides** — assign a different sound to each app. Imported settings and saved profiles now trust only Windows system sounds or files inside Notifications Pro’s managed sounds folder.
 - **Test button** — play the current default sound immediately.
 
 ### System Integration
@@ -213,7 +213,7 @@ Avoid distraction without missing urgent messages:
 - Use `Settings > Filtering` for targeting logic, `Settings > Apps` for per-app presentation overrides, `Settings > Accessibility` for voice/rate/output choices, and `Settings > Appearance` for how stacked cards look.
 - If you want the app itself to speak, turn on `Settings > Accessibility > Read Notifications Aloud`. Then use either `Settings > Accessibility > Narration Trigger` or `Settings > Filtering > Only speak matching rules` when speech should happen only for rule matches instead of for every allowed app.
 - Use `Settings > Filtering > Send Highlight Preview` whenever you adjust highlight tint, border mode, animation, or per-rule overrides and want to verify the look immediately.
-- Background images are local-only assets copied into Notifications Pro's backgrounds folder. Stacked cards can use fit and coverage controls, single-line banner mode stays solid-colour for readability, and app-specific overrides live in `Settings > Apps`.
+- Background images are local-only assets copied into Notifications Pro's backgrounds folder. Stacked cards can use fit and coverage controls, single-line banner mode stays solid-colour for readability, app-specific overrides live in `Settings > Apps`, and shared exports/profiles keep those managed assets as relative Notifications Pro references instead of leaking machine-specific absolute paths.
 - If browser-hosted services all look like one browser app, install those sites as browser apps/PWAs first so Windows can surface a cleaner app identity when the browser supports it.
 
 ### Getting the Most Out of X
@@ -285,7 +285,7 @@ Under `%AppData%\NotificationsPro\`:
 dotnet restore
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 202 unit tests
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 211 unit tests
 ```
 
 ## Publish (self-contained)

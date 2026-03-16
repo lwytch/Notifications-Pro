@@ -22,7 +22,7 @@
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
-- Top-right and other non-bottom overlay placements now keep their original vertical anchor when tall stacks later shrink after expiry, instead of snapping down to the bottom edge
+- Top-right and other non-bottom overlay placements now keep their original vertical anchor when tall stacks temporarily hit the monitor-height limit and later shrink after expiry, instead of snapping down to the bottom edge
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
 - Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, Settings Window, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
@@ -62,6 +62,7 @@
 - Highlight rules now support per-rule animation, border-mode, tint-opacity, and border-width overrides, and existing rules can be edited in place instead of forcing delete-and-recreate for keyword changes
 - Highlight tint now sits beneath the notification content layer instead of washing over the text, so highlighted cards stay readable while still showing the configured emphasis
 - Profile saves now flush the current debounced settings state first, and profile/settings export round-trips now include the explicit highlight border-width field plus compact settings-window mode reliably
+- Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
@@ -129,7 +130,7 @@
 - Tray menu includes a click-through toggle so drag can be restored quickly without opening settings
 - No DropShadowEffect on notification cards (causes severe WPF perf issues with AllowsTransparency)
 - Standard entrance animations now support six styles (`Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, `Pop`) plus direction where relevant, configurable duration, and easing (`EaseOut`, `Bounce`, `Elastic`, `Linear`)
-- `Suppress Toast Popups` now removes WinRT toasts before forwarding them to the overlay queue, reducing the visible system-toast flash when suppression is enabled
+- `Suppress Toast Popups` now removes WinRT toasts before forwarding them to the overlay queue, reducing the visible system-toast flash when suppression is enabled, and Notifications Pro ignores its own startup/self toasts so the first post-launch interaction is not replaced by a mirrored app notification
 - Card load animations now ensure mutable transforms to avoid frozen-transform startup crashes
 - **Card interaction (Milestone 4)**:
   - Click to dismiss — click a notification card to immediately remove it
@@ -162,10 +163,10 @@
   - Settings Window theme preset dropdown now uses the same named theme presets as overlay themes (plus System and Custom)
   - Save current settings as a named custom theme (stored as JSON in %AppData%\NotificationsPro\themes\)
   - Load, switch between, and delete custom themes from Settings > Appearance > Overlay Themes
-  - Export full settings to a shareable JSON file
+  - Export full settings to a shareable JSON file, using relative Notifications Pro asset references for managed custom sounds/icons/backgrounds
   - Import settings from a JSON file
   - Theme quick-switch submenu in tray menu (built-in + custom themes)
-  - Profiles tab in Settings now focuses on import/export of full settings profiles
+  - Profiles tab in Settings now focuses on import/export of full settings profiles, with the same portable managed-asset references used by settings export/import
   - Profile loads now preserve custom settings-window palette/opacity values instead of snapping non-Custom UI themes back to preset defaults
 - **Accessibility & Inclusivity (Milestone 7)**:
   - Persistent notifications — stay visible until manually dismissed (no auto-expiry)
@@ -336,6 +337,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Overlay snaps to screen edges on primary and secondary monitors
 - [ ] Click-through mode allows clicking through the overlay to underlying apps
 - [ ] Position preset buttons move overlay to expected top/side anchors
+- [ ] Top-edge overlays that temporarily fill the work area stay top-anchored as cards expire, instead of jumping to the bottom edge and reversing stack direction
 - [ ] "Reset to Defaults" restores all settings
 - [ ] Settings Window tab shows full settings-window color controls (including Surface Light/Hover and Secondary/Muted text)
 - [ ] Settings Window corner radius slider adjusts window rounding (0 = sharp, 20 = very round)

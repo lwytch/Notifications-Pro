@@ -1,15 +1,13 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Windows.Media.Imaging;
+using NotificationsPro.Helpers;
 
 namespace NotificationsPro.Services;
 
 public sealed class BackgroundImageService
 {
-    private static readonly string CustomBackgroundsDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "NotificationsPro",
-        "backgrounds");
+    private static readonly string CustomBackgroundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.BackgroundsFolderName);
 
     private readonly ConcurrentDictionary<string, BitmapSource?> _imageCache = new(StringComparer.OrdinalIgnoreCase);
 
