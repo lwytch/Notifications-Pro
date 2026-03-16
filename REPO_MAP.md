@@ -1,44 +1,147 @@
 # Repository Map
 
-This file acts as a structural guide to help AI coding agents immediately orient themselves.
+This file is the quick orientation guide for AI agents and maintainers working in this repository.
 
-## Core Application (C# .NET 8 WPF)
+## Root Guides & Configuration
 
-`src/NotificationsPro/`
-  `App.xaml(.cs)`               — Entry point, tray icon, and window management.
-  `Models/`                     — Data structures (AppSettings, NotificationItem).
-  `Services/`                   — Core logic (SettingsManager, QueueManager, NotificationListener, ThemeManager).
-  `ViewModels/`                 — UI binding logic (OverlayViewModel, SettingsViewModel).
-  `Views/`                      — View templates (OverlayWindow, SettingsWindow).
-  `Helpers/`                    — Utility classes (SnapHelper, IconHelper, etc).
-  `Converters/`                 — XAML value converters.
-  `Resources/Theme.xaml`        — Core visual dictionary and styling.
+`AGENTS.md`
+  Local AI-agent operating rules, repo workflow, privacy constraints, and available skills.
 
-`tests/NotificationsPro.Tests/`
-  Contains xUnit tests for core logic (QueueManager, SettingsManager, SnapHelper, ThemeTests).
+`REPO_MAP.md`
+  Structural overview of the repository; update this when major folders, workflows, or responsibilities change.
 
-## Packaging & Distribution (MSIX)
+`README.md`
+  User-facing product overview, setup instructions, workflow guidance, troubleshooting, and release notes.
 
-`src/NotificationsPro.Package/`
-  `NotificationsPro.Package.wapproj` — Windows application packaging project.
-  `Package.appxmanifest`        — The core MSIX config (Identity, Capabilities).
-  `Images/`                     — Package icons and splash screens.
+`CHANGELOG.md`
+  Rolling engineering changelog for user-visible additions, fixes, and behavior changes.
 
-`scripts/app-packaging/`
-  Contains the native PowerShell build/sign tools to avoid Visual Studio dependencies.
-  `release.ps1`                 — Master orchestrator (bumps versions and runs build/sign).
-  `build_msix.ps1`              — Compiles the raw payload and wraps it using MakeAppx.
-  `sign_msix.ps1`               — Signs the generated MSIX using the local Code Signing Certificate.
+`LICENSE`
+  GPL v3 license for the project.
 
-## Operations & AI Tooling
+`SECURITY.md`
+  Security and privacy posture for the public repository.
+
+`CONTRIBUTING.md`
+  Contributor workflow and repository expectations.
+
+`NotificationsPro.slnx`
+  Solution entry point for the WPF app and test project.
+
+`settings.example.json`
+  Example serialized settings payload; keep this aligned with `AppSettings`.
 
 `docs/`
-  `PLAN.md`                     — Living roadmap and milestones.
-  `STATUS.md`                   — Current capabilities and testing states.
-  `ARCHITECTURE.md`             — System design documentation.
+  Living project documentation.
+  `PLAN.md`                     — Roadmap, active implementation backlog, and completed milestones.
+  `STATUS.md`                   — Current shipped behavior, manual verification checklist, and known limitations.
+  `ARCHITECTURE.md`             — Higher-level system design and component relationships.
 
-`runbooks/`
-  (Gitignored) Documentation for the repository owner on how to manually perform operations if automation fails.
+## Core Application (`src/NotificationsPro/`)
+
+`App.xaml(.cs)`
+  Application entry point, tray menu wiring, profile/theme switching, and window lifecycle management.
+
+`Models/`
+  In-memory and persisted configuration/state models such as `AppSettings`, `NotificationItem`, and rule definitions.
+
+`Services/`
+  Operational services and persistence boundaries.
+  `NotificationListener.cs`     — WinRT + accessibility notification capture pipeline.
+  `QueueManager.cs`             — RAM-only visible queue, overflow counting, filtering, highlighting, and expiry behavior.
+  `SettingsManager.cs`          — Load/save/apply settings and normalize persisted values.
+  `ThemeManager.cs`             — Custom theme storage plus settings import/export.
+  `ProfileManager.cs`           — Named full-settings profile save/load/delete.
+  `SettingsThemeService.cs`     — Runtime theming for the settings window.
+  `SpokenNotificationService.cs` — Built-in narration pipeline and voice management.
+  `IconService.cs` / `SoundService.cs` — Local asset handling for per-app icons and sounds.
+  `HotkeyManager.cs`            — Global hotkey registration and diagnostics.
+  `BackgroundImageService.cs`   — Notification-card/background image processing helpers.
+
+`ViewModels/`
+  MVVM state and command surfaces for the UI.
+  `OverlayViewModel.cs`         — Overlay-facing computed settings, grouping, and rendering state.
+  `SettingsViewModel.cs`        — Main settings, save pipeline, commands, import/export, and profile operations.
+  `SettingsViewModel.SinglePanelEnhancements.cs`
+                                — Filtering/rule-editor and related single-panel behavior helpers.
+  `SettingsViewModel.SettingsAuditPolish.cs`
+                                — Settings IA cleanup helpers such as app filtering/search views.
+
+`Views/`
+  WPF windows and templates.
+  `OverlayWindow.xaml(.cs)`     — Notification rendering surface, card animations, hit-testing, and overlay interaction.
+  `SettingsWindow.xaml(.cs)`    — Multi-tab settings UI, tooltips, and window/popup behavior.
+
+`Helpers/`
+  Focused normalization and formatting helpers used across settings, rendering, and tests.
+  Includes animation helpers (`AnimationEasingHelper`, `NotificationAnimationStyleHelper`, `HighlightAnimationHelper`), rule helpers (`NotificationRuleMatcher`, `NotificationMatchScopeHelper`), and system helpers (`StartupHelper`, `SnapHelper`, `FullscreenHelper`).
+
+`Converters/`
+  WPF value converters for colors, icons, timestamps, one-line content, Voice Access labels, and card background image sources.
+
+`Resources/Theme.xaml`
+  Shared visual resource dictionary for the app and settings window.
+
+`Fonts/`
+  Bundled type assets such as `OpenDyslexic-Regular.otf`.
+
+`Assets/`
+  Application-owned visual assets used by the desktop app.
+
+## Packaging & Distribution
+
+`src/NotificationsPro.Package/`
+  MSIX packaging project and package metadata.
+  `NotificationsPro.Package.wapproj` — Windows application packaging project.
+  `Package.appxmanifest`        — Package identity, startup task, capabilities, and visual metadata.
+  `Images/`                     — MSIX tile, splash, and store imagery.
+
+`scripts/app-packaging/`
+  Native PowerShell packaging pipeline used instead of IDE-only publishing.
+  `release.ps1`                 — Version bump + build + sign orchestration.
+  `build_msix.ps1`              — Self-contained publish plus `MakeAppx` packaging step.
+  `sign_msix.ps1`               — Certificate-store / PFX signing flow for the MSIX artifact.
+
+`AppPackages/`
+  Generated MSIX output directory for local release artifacts.
+
+## Tests (`tests/NotificationsPro.Tests/`)
+
+`NotificationsPro.Tests.csproj`
+  xUnit test project for app logic.
+
+`QueueManagerTests.cs`
+  Queue, filtering, highlight, overflow, preview, and expiry coverage.
+
+`SettingsManagerTests.cs`
+  Settings defaults, migration, normalization, clone, and persistence coverage.
+
+`ThemeTests.cs`
+  Theme preset behavior and JSON import/export coverage.
+
+`ProfileManagerTests.cs`
+  Full-profile round-trip coverage.
+
+`OverlayViewModelTests.cs`
+  Overlay-facing state and computed-behavior checks.
+
+`NotificationListenerTests.cs`
+  Capture-path parsing and browser-toast split behavior coverage.
+
+`SpokenNotification*.cs`, `VoiceAccessTextFormatterTests.cs`, `AccessibilityTests.cs`
+  Narration, Voice Access, and accessibility behavior checks.
+
+`StreamingPresentationTests.cs`, `SystemIntegrationTests.cs`, `StartupSettingsMigrationHelperTests.cs`, `UxPolishTests.cs`, `M95Tests.cs`
+  Feature-area regression coverage for streaming, system integration, startup migration, and UX/persistence work.
+
+## Local Ops & AI Tooling
 
 `.agents/skills/`
-  AI Agent instructions for performing specialized repository actions (e.g., `repack-msix`, `update-repo-map`, `sanitise-for-publish`).
+  Local AI-agent skills used in this workspace. This directory is intentionally gitignored for the public repo.
+  Notable local skills include `update-repo-map`, `maintain-plan`, `maintain-settings-sync`, `repack-msix`, `install-msix`, and `settings-regression-checklist`.
+
+`runbooks/`
+  Gitignored owner-facing operational notes and manual recovery procedures.
+
+`analysis/`
+  Gitignored local audit notes, implementation reports, and one-off investigations.

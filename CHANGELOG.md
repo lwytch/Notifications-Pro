@@ -14,6 +14,7 @@
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
 
 ### Fixed
+- Top-right and other non-bottom overlay placements now keep their original vertical anchor when the card stack grows and later shrinks, so expiry removals no longer snap the overlay down to the bottom edge
 - `Suppress Toast Popups` now removes WinRT toasts before forwarding the captured notification to the overlay queue, reducing the visible system-toast flash when suppression is enabled
 - Standard animation settings now round-trip through defaults, JSON import/export, and profile save/load, and legacy `FadeOnlyAnimation` installs migrate cleanly into the new animation-style model
 - Filtering now uses stacked single-column rule editors in compact popup mode, so highlight/mute/narration rules no longer rely on cramped multi-column rows or truncated action buttons

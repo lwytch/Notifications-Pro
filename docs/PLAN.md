@@ -512,6 +512,9 @@ Background image and advanced visual-control gaps:
 Operational gaps:
 - [x] Real listener diagnostics: Add a `Run Capture Diagnostic` or equivalent action under `System > Notification Access` so users can distinguish overlay rendering issues from live WinRT/accessibility capture failures.
 - [x] Toast suppression flash fix: tighten the WinRT suppression path so `Suppress Toast Popups` removes the system toast before overlay presentation when possible, avoid regressions in live capture, and document any remaining platform limits honestly.
+- [ ] Security audit refresh: run a current packaged-app security sweep across the working tree, dependencies, packaging/signing scripts, and privacy-sensitive runtime surfaces; record the findings in `analysis/security-audit-2026-03-16.md`, and convert confirmed issues into tracked remediation items.
+- [ ] Dependency currency review: audit the shipped NuGet packages, packaging/tooling assumptions, and bundled local assets for outdated or risky components, then prioritise safe updates for the next maintenance pass.
+- [ ] Privacy-surface regression review: inspect capture, suppression, session archive, clipboard, profile/export, and local asset-loading paths for edge cases that could violate the repo privacy rules or weaken public-release readiness.
 - [ ] Regression hardening for settings moves: Extend tests to cover moved settings, settings defaults, export/import, reset defaults, tab-navigation links, and filtering/profile regressions so another IA pass does not quietly break persistence or discoverability.
 - [x] Animation persistence hardening: add regression coverage for any new standard-animation settings so default values, JSON export/import, profile save/load, reset defaults, and legacy `FadeOnlyAnimation` migration all stay in sync.
 

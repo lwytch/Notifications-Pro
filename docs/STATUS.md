@@ -22,6 +22,7 @@
 - Overlay drag reliability improved with deterministic HWND hook attach (+ WPF drag fallback if hook is unavailable)
 - Snap-to-edges now uses the active monitor work area (secondary monitor snapping works)
 - Resizing while near the right edge now keeps the right edge anchored/snapped more reliably
+- Top-right and other non-bottom overlay placements now keep their original vertical anchor when tall stacks later shrink after expiry, instead of snapping down to the bottom edge
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
 - Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, Settings Window, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode

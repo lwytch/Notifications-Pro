@@ -27,8 +27,6 @@ public partial class OverlayWindow : Window
     private bool _isInternalMove;
     private bool _anchorToRightEdge;
     private bool _anchorToBottomEdge;
-    private double _rightEdgeOffset = 16;
-    private double _bottomEdgeOffset = 16;
     private bool _ncMouseDownTracked;
     private bool _dragOccurredSinceMouseDown;
     private bool _isHoveringOverlay;
@@ -599,17 +597,18 @@ public partial class OverlayWindow : Window
         var workArea = GetCurrentWorkArea();
         var threshold = Math.Max(8, _settingsManager.Settings.SnapDistance + 4);
 
+        var leftGap = Left - workArea.Left;
         var rightGap = workArea.Right - (Left + ActualWidth);
+        var topGap = Top - workArea.Top;
         var bottomGap = workArea.Bottom - (Top + ActualHeight);
 
-        _anchorToRightEdge = rightGap <= threshold;
-        _anchorToBottomEdge = bottomGap <= threshold;
+        var nearLeft = leftGap <= threshold;
+        var nearRight = rightGap <= threshold;
+        var nearTop = topGap <= threshold;
+        var nearBottom = bottomGap <= threshold;
 
-        if (_anchorToRightEdge)
-            _rightEdgeOffset = Math.Max(0, rightGap);
-
-        if (_anchorToBottomEdge)
-            _bottomEdgeOffset = Math.Max(0, bottomGap);
+        _anchorToRightEdge = EdgeAnchorHelper.ResolveFarEdgeAnchor(_anchorToRightEdge, nearLeft, nearRight);
+        _anchorToBottomEdge = EdgeAnchorHelper.ResolveFarEdgeAnchor(_anchorToBottomEdge, nearTop, nearBottom);
     }
 
     private async void OnCardLoaded(object sender, RoutedEventArgs e)

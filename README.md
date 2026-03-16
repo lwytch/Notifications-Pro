@@ -417,6 +417,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.23
+- **Overlay Anchor Retention Fix**: top-right and other non-bottom placements now keep their original vertical anchor when tall stacks shrink after expiry, so the overlay no longer drops to the bottom edge as cards disappear.
+- **Layout Stability Follow-Up**: the anchor logic now preserves the intended edge when a tall overlay happens to touch both the top and bottom work-area bounds at once, avoiding position drift during live resize/expiry changes.
+
 ### Release v1.1.10.22
 - **Standard Animation Expansion**: `Behavior > Animations` now offers `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, and `Pop`, while directional styles still respect the explicit motion-direction selector.
 - **Suppression Timing Fix**: `Suppress Toast Popups` now removes WinRT toasts before the overlay queues the captured notification, reducing the split-second native-toast flash when suppression is enabled.
