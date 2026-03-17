@@ -15,6 +15,7 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate, pinned the active local workflow/package metadata to the replacement thumbprint, and retired the old current-user signing cert/PFX from the normal signing path
 
 ### Fixed
+- Test hardening now exercises the animation-style/easing normalization helpers and the managed-asset path sanitizer directly, reducing the chance that future animation, export/import, or profile changes silently drift out of sync
 - Top-right and other non-bottom overlay placements now keep their original vertical anchor even when the card stack temporarily hits the monitor-height limit, so expiry removals no longer snap the overlay down to the bottom edge or reverse the stack direction
 - `Suppress Toast Popups` now removes WinRT toasts before forwarding the captured notification to the overlay queue, reducing the visible system-toast flash when suppression is enabled
 - Notifications Pro now ignores its own startup/self notifications during capture, preventing the app’s tray balloon from being mirrored back into the overlay as a non-actionable first-launch card
@@ -73,6 +74,7 @@
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
 
 ### Added
+- Added direct regression coverage for animation helper normalization and managed asset portability/security paths, bringing the automated suite to 256 passing tests
 - Standard entrance animation styles in `Behavior > Animations` — notifications can now use `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, or `Pop`, while directional styles still respect the explicit motion-direction selector
 - Filtering tab redesign — highlight defaults are now separated from the rule list, the preview CTA is a smaller accent action, and highlight/mute/narration rules share a cleaner repeated-card layout
 - Highlight rules now support per-rule animation, border mode, tint opacity, and border width overrides, plus per-rule preview buttons and in-place keyword editing

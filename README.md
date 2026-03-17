@@ -417,6 +417,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.25
+- Maintenance release focused on regression hardening: animation-style/easing normalization and managed custom asset portability/sanitization now have direct automated coverage, bringing the suite to `256` passing tests.
+- Packaging/release safety was tightened around the public-repo workflow so the signed MSIX path is checked against the safer cert-store-first process before release builds.
+- No user-facing feature changes in this build; the goal is to catch settings/profile/export regressions earlier and keep the public release path safer.
+
 ### Release v1.1.10.24
 - **Managed Asset Path Hardening**: exported settings and saved profiles now serialize custom sound, icon, and background assets as portable Notifications Pro asset references instead of machine-specific absolute paths.
 - **Custom Sound Safety Tightening**: custom sounds now resolve only from trusted Windows sound identifiers or Notifications Pro's managed local sounds folder, preventing imported settings from pointing at arbitrary local or network paths.

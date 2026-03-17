@@ -64,6 +64,7 @@
 - Profile saves now flush the current debounced settings state first, and profile/settings export round-trips now include the explicit highlight border-width field plus compact settings-window mode reliably
 - Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
 - Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
+- Automated regression coverage now also exercises the animation-style/easing normalization helpers plus the managed-asset path sanitizer directly, bringing the test suite to 256 passing tests for the current release branch
 - Local MSIX packaging now uses the replacement signing certificate thumbprint in the active workflow and package metadata, with the old current-user signing cert/PFX retired from the normal signing path
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
@@ -471,3 +472,4 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - Signed MSIX packaging is the supported install path; unpackaged source runs may have limited WinRT notification access
 - MSIX signing now prefers a matching local certificate-store identity and only uses a local `.pfx` as an explicit fallback; if no password is supplied for the fallback path, the script fails fast instead of waiting on a hidden prompt
 - Unpackaged desktop apps may have limited UserNotificationListener support
+- Native window mechanics and MSIX packaging still need manual validation on Windows because unit tests cover helper and persistence logic well, but they do not replace live shell, certificate-store, or packaged-app behavior checks

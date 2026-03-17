@@ -502,7 +502,10 @@ Post-redesign process guardrails:
 - [x] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, profile save/load coverage, and export/import coverage whenever a settings feature is added or reorganized.
 
 ## Current Focus
-No active unchecked items remain in the trimmed plan. Add future work here only when it is intentionally promoted above general backlog polish.
+- [x] Test pipeline audit and hardening: reviewed the Notifications Pro test surface, added targeted regression coverage for high-risk helper/settings path behavior, and recorded the remaining manual-only release/runtime risk areas in `analysis/test-pipeline-audit-2026-03-17.md`.
+- [x] Public repo guard skill: added a dedicated local AI skill that treats Notifications Pro as a public repository by default, with explicit checks for secrets, local certificates, hardcoded user paths, private assets, and privacy-rule regressions before edits or release work.
+- [x] Skill review and maintenance pass: tightened the local sanitisation, repackaging, and settings-regression skills so future agents keep release safety, settings persistence, and documentation hygiene in view.
+- [x] Release v1.1.10.25: updated README release notes, reran the verification/build pipeline, and generated a fresh signed MSIX package after the audit work landed.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.
