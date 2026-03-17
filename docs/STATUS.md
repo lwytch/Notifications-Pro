@@ -63,6 +63,8 @@
 - Highlight tint now sits beneath the notification content layer instead of washing over the text, so highlighted cards stay readable while still showing the configured emphasis
 - Profile saves now flush the current debounced settings state first, and profile/settings export round-trips now include the explicit highlight border-width field plus compact settings-window mode reliably
 - Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
+- Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
+- Local MSIX packaging now uses the replacement signing certificate thumbprint in the active workflow and package metadata, with the old current-user signing cert/PFX retired from the normal signing path
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech

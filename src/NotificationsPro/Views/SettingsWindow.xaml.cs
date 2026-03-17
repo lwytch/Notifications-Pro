@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Navigation;
+using NotificationsPro.Helpers;
 using NotificationsPro.Services;
 using WpfInput = System.Windows.Input;
 using NotificationsPro.ViewModels;
@@ -275,41 +276,11 @@ public partial class SettingsWindow : Window
 
     public void NavigateToTab(string tabHeader)
     {
-        for (var i = 0; i < MainTabControl.Items.Count; i++)
+        var index = SettingsTabNavigationHelper.FindTabIndexByHeader(MainTabControl.Items, tabHeader);
+        if (index >= 0)
         {
-            if (MainTabControl.Items[i] is System.Windows.Controls.TabItem tab
-                && string.Equals(GetTabHeaderText(tab.Header), tabHeader, StringComparison.OrdinalIgnoreCase))
-            {
-                MainTabControl.SelectedIndex = i;
-                return;
-            }
+            MainTabControl.SelectedIndex = index;
         }
-    }
-
-    private static string? GetTabHeaderText(object? header)
-    {
-        switch (header)
-        {
-            case string text:
-                return text;
-
-            case System.Windows.Controls.TextBlock textBlock:
-                return textBlock.Text;
-
-            case System.Windows.Controls.ContentControl contentControl:
-                return GetTabHeaderText(contentControl.Content);
-
-            case System.Windows.Controls.Panel panel:
-                foreach (var child in panel.Children)
-                {
-                    var text = GetTabHeaderText(child);
-                    if (!string.IsNullOrWhiteSpace(text))
-                        return text;
-                }
-                break;
-        }
-
-        return header?.ToString();
     }
 
     private bool IsPopupDisplayMode()

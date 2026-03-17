@@ -37,6 +37,15 @@ public class ProfileManagerTests : IDisposable
             HighlightBorderMode = HighlightBorderModeHelper.FullBorder,
             NotificationAnimationStyle = NotificationAnimationStyleHelper.ZoomFade,
             SlideInDirection = "Right",
+            PersistentNotifications = true,
+            AutoDurationEnabled = true,
+            AutoDurationBaseSeconds = 9.5,
+            AutoDurationSecondsPerLine = 3.5,
+            AlwaysOnTop = false,
+            ClickThrough = true,
+            PresentationModeEnabled = true,
+            PerAppTintEnabled = true,
+            PerAppTintOpacity = 0.41,
             CompactSettingsWindow = false,
             SettingsThemeMode = "Custom",
             CardBackgroundImagePath = profileBackgroundPath,
@@ -67,6 +76,15 @@ public class ProfileManagerTests : IDisposable
         Assert.Equal(2.5, loaded.HighlightBorderThickness);
         Assert.Equal(NotificationAnimationStyleHelper.ZoomFade, loaded.NotificationAnimationStyle);
         Assert.Equal("Right", loaded.SlideInDirection);
+        Assert.True(loaded.PersistentNotifications);
+        Assert.True(loaded.AutoDurationEnabled);
+        Assert.Equal(9.5, loaded.AutoDurationBaseSeconds);
+        Assert.Equal(3.5, loaded.AutoDurationSecondsPerLine);
+        Assert.False(loaded.AlwaysOnTop);
+        Assert.True(loaded.ClickThrough);
+        Assert.True(loaded.PresentationModeEnabled);
+        Assert.True(loaded.PerAppTintEnabled);
+        Assert.Equal(0.41, loaded.PerAppTintOpacity);
         Assert.False(loaded.CompactSettingsWindow);
         Assert.Equal(profileBackgroundPath, loaded.CardBackgroundImagePath);
         Assert.Equal(profileIconPath, loaded.DefaultIconPreset);

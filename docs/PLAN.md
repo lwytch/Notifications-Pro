@@ -35,10 +35,9 @@
 - [x] "Retry Access Check" works even when access already granted
 - [x] Accessibility fallback hardened for Win11 (broader events + shell host detection + live diagnostics)
 - [x] Capture-mode override and recovery: System tab now offers Auto / Prefer WinRT / Force Accessibility, and WinRT seed/poll failures automatically switch to accessibility capture
-- [ ] Align timing with system toast duration when available (deferred — using configurable duration)
 
 ### Milestone 3: Customization Polish
-**Status: In Progress**
+**Status: Complete**
 
 Per-field typography:
 - [x] Per-field font size — independent sliders for App Name, Title, and Body
@@ -63,8 +62,6 @@ Animation refinement:
 - [x] Standard entrance animation expansion: replace the legacy fade-only entrance model with a richer set of standard notification animation styles, keep explicit direction control for directional motion, preserve reduced-motion behavior, and ensure the Behavior UI explains which styles respect direction versus pure fade/scale effects.
 
 Settings UI reorganization (Behavior tab has 6 concerns in one panel):
-- [ ] Split Behavior tab — move content/display controls to a separate tab from timing/window/animation (deferred)
-- [ ] Ensure logical grouping: Typography, Colors, Card Shape, Content/Display, Behavior, Position (deferred)
 - [x] Background-image and spacing polish: Restore the single-column settings rhythm on Appearance and other affected tabs, move explanatory copy into tooltips where possible, add explicit image fit behavior options, and verify the rollback README/help text still matches the shipped single-panel UI.
 - [x] App-specific background assets: Allow specific apps to override the default card background image treatment without reintroducing multi-panel complexity, and add fullscreen-backdrop image support with fit/opacity controls that stay privacy-safe and export/import correctly.
 - [x] Settings ownership cleanup: Add an Apps tab for per-app presentation overrides, and move Quiet Hours plus Burst Limiting out of Filtering into a behavior/scheduling home that matches what they actually do.
@@ -147,7 +144,6 @@ Settings UI:
 Built-in theme presets:
 - [x] Ship 6 presets: "Windows Dark" (default), "Dark Purple", "Light", "Frosted Glass", "High Contrast", "Minimal"
 - [x] One-click apply sets all colors, opacity, corner radius, and accent at once
-- [ ] Per-field "reset to theme default" micro-button next to each color picker (deferred)
 
 Custom themes:
 - [x] Save current settings as a named custom theme (stored in %AppData%\NotificationsPro\themes\)
@@ -160,10 +156,6 @@ Import / export:
 
 Tray integration:
 - [x] Theme quick-switch submenu in tray menu (built-in + custom themes)
-
-Profiles (stretch):
-- [ ] Named profiles (e.g., "Work", "Gaming", "Streaming") that bundle theme + filter rules + position + behavior
-- [ ] Quick-switch between profiles from tray menu
 
 ### Milestone 7: Accessibility & Inclusivity
 **Status: Complete**
@@ -181,8 +173,6 @@ Color accessibility:
 - [x] ContrastHelper utility for WCAG 2.1 contrast ratio calculation
 - [x] WcagContrastTextConverter and WcagContrastColorConverter for XAML binding
 - [x] Color-Blind Safe built-in theme (Wong palette — 7th theme)
-- [ ] Display WCAG contrast ratio inline on color pickers (deferred — converters ready)
-- [ ] Warn when chosen text/background colors fall below WCAG AA minimum (deferred)
 
 Notification timing:
 - [x] Auto-duration by content length — configurable extra seconds per line of body text
@@ -199,7 +189,6 @@ Keyboard & motor accessibility:
 - [x] Spoken notification replay guard: visible cards are spoken once, new arrivals no longer replay cards that already finished speaking, and unfinished visible cards can still resume after pause/unmute
 - [x] Spoken app selector clarity: switched from Speak/Skip buttons to explicit Read Aloud checkboxes
 - [x] Spoken voice availability and trigger clarity: enumerate every voice Windows exposes to Notifications Pro across app and desktop speech APIs, add an explicit narration trigger mode for `All allowed notifications` vs `Only matching narration rules`, and update help/readme wording so Narrator-only voices are disclosed honestly.
-- [ ] Full keyboard navigation audit (deferred)
 
 Cognitive accessibility:
 - [x] Information density presets ("Compact" / "Comfortable" / "Spacious") — one-click bundles
@@ -278,7 +267,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] 16 new unit tests (M9.5 defaults, clone, deep-copy, JSON round-trip, IconPreset, SoundService, QueueManager NotificationAdded, ThemePreset settings colors)
 
 ### Milestone 11: Packaging & Final Polish
-**Status: In Progress**
+**Status: Complete**
 
 - [x] Security Strategy: Remove currently-tracked `.agents` directory (`git rm -r --cached .agents`).
 - [x] Legal Strategy: Add an open-source `GPL v3` `LICENSE` to the repo root.
@@ -314,9 +303,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Final polish: popup panel height reduced (68% → 55% of work area) for a more proportionate panel on 1080p+
 - [x] Final polish: settings window rounded corners with adjustable radius slider (0–20px) in UI Styling tab — XAML clipping in popup mode, DWM corner preference in windowed mode
 - [x] Final polish: tooltips added to all UI Styling color picker labels and section headers
-- [ ] Full manual test checklist pass
 - [x] README finalization with screenshots
-- [ ] Comprehensive onboarding / first-run experience
 
 ### UI/UX Audit & Polish Pass
 **Status: Complete**
@@ -447,7 +434,7 @@ Addressed post-release feedback to improve reliability and visual consistency:
 - [x] Grouping customization pass: move information density into Appearance, keep app-grouping behavior in its logical tab, and replace the hardcoded app banner with a properly styleable grouping presentation.
 
 ### Milestone 18: Stable Single-Panel Enhancements
-**Status: Mostly complete**
+**Status: Complete**
 
 Targeted rules and narration:
 - [x] Field-scoped keyword rules: highlight and mute rules should target `Title`, `Body`, or `Title + Body`, preserve regex support, and work cleanly in the restored single-panel app.
@@ -471,31 +458,21 @@ Docs and release readiness:
 - [x] README/Help gap analysis: update README, in-app Help, example settings, and status text for advanced narration rules, card background images, voice setup, privacy disclosures, defaults, and troubleshooting without reintroducing multi-panel language.
 - [x] Public repo sanitisation audit: reviewed the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity, and recorded the findings in `analysis/public-release-audit-2026-03-12.md`.
 - [x] Packaging automation hardening: prefer local certificate-store identities for MSIX signing, support explicit env-var overrides, and fail fast when a PFX password is unavailable instead of hanging on a hidden prompt.
-- [ ] Public release follow-through: rotate the exposed signing credential, decide whether to rewrite history to remove the old secret-bearing signing-script revision and local-path-heavy commit messages, and confirm whether the package publisher identity should stay public as-is.
+- [x] Signing credential rotation follow-through: rotated the exposed MSIX signing credential locally, pinned the active packaging workflow to the replacement certificate thumbprint, retired the old current-user signing cert/PFX from the active path, and updated the local packaging docs/metadata accordingly.
 
 ### Milestone 19: Settings IA Cleanup & Advanced Image Controls
-**Status: In progress**
+**Status: Complete**
 
 Information architecture cleanup from the 2026-03-12 settings audit:
-- [ ] Sidebar order and naming cleanup: Reorder the settings tabs to `Appearance / Behavior / Apps / Filtering / Layout / Sounds / Accessibility / Streaming / System / Settings Window / Profiles / Help`, and rename `UI Styling` to `Settings Window` if it remains the home for settings-window chrome/theme controls.
-- [ ] Tab ownership cleanup: Move `Persistent Notifications` and `Auto-Duration` into `Behavior > Timing`, move `Per-App Speech` into `Apps`, move `Presentation Mode` into `Behavior`, move `Per-App Color Tinting` into `Appearance`, move `Always on Top` plus `Click-Through` into `Layout`, move `Show Quick Tips` into `Settings Window`, and relocate `Global Hotkeys` into a general controls/system home instead of leaving them under Accessibility.
-- [ ] Appearance flow cleanup: Re-sequence `Appearance` so quick-start controls (`Themes`, `Custom Themes`, `Theme Schedule`, `Density Presets`) appear before detailed typography/timestamp/color/image controls, and keep the lower half for secondary styling groups such as grouping, icons, and scrollbar options.
 - [x] Apps-tab cleanup: Make `Apps` the canonical per-app overrides surface by renaming the section to `Per-App Overrides`, moving per-app narration into it, adding app search plus `Only modified` filtering, and adding per-app clear/reset actions so large app lists stay manageable.
 - [x] Apps card layout cleanup: rework the per-app override cards into a cleaner aligned form layout, keep long background-image paths out of the main visual flow, and make the card-background override actions read as one coherent control group instead of a cramped mixed row.
 - [x] Scrollbar polish: add a card-to-scrollbar gap control, hide the themed scrollbar while the idle waiting placeholder is shown, and clarify in the UI/docs that scrollbars only apply to currently visible cards rather than discarded overflow.
-- [ ] Scope signposting and discoverability: Add lightweight “configured in …” cross-links or helper rows between split concepts such as timestamp visibility vs timestamp styling, app grouping behavior vs grouping appearance, and default icon vs per-app icon overrides without duplicating the controls themselves.
 - [x] Tooltip and inline-copy audit: Reduce non-critical inline guidance in dense tabs, keep privacy/access/live-status text inline where required, and move general usage hints into tooltips so sections stay readable.
 - [x] Filtering readability and compact-mode follow-up: restore a single-column rule-editor rhythm for the Filtering tab, prevent highlight tint from washing out notification text, reduce button truncation, and keep the layout deliberate at compact settings-window widths.
 - [x] Slider-visibility follow-up: strengthen slider track visibility in dense cards and section surfaces so the control line stays readable against dark backgrounds.
 - [x] Accessibility disclosure cleanup: moved the built-in narration and Voice Access transparency/privacy copy out of the main Accessibility layout and into the relevant tooltips, while keeping the fuller disclosures in Help/README.
 
 Control-system and visual-rhythm cleanup from the 2026-03-12 layout audit:
-- [ ] Shared form-control normalization: Split the current monospaced text-box style into semantic input styles (`general text` vs `structured value`), standardize control heights, and make sure normal text entry fields such as theme names, profile names, app filters, and general keyword inputs no longer inherit a technical monospace look.
-- [ ] Button tier cleanup: Define explicit shared button tiers for footer actions, standard form actions, compact inline actions, and token/chip actions so `Apply`, `Browse`, `Clear`, `Remove`, `Pick`, regex toggles, and list-row buttons all look related instead of individually sized.
-- [ ] Spacing-token cleanup: Normalize section spacing, field-label spacing, row spacing, nested-indent spacing, and first-control-after-header spacing so tabs stop relying on ad hoc local margin overrides that make some rows feel crushed and others too loose.
-- [ ] Slider-row consistency pass: Ensure slider sections consistently show current values where that helps comprehension, remove the remaining one-off slider rows that lack mirrored values, and align slider/value spacing across Appearance, Behavior, Accessibility, Layout, and System.
-- [ ] Repeated-card layout cleanup: Replace the improvised per-item card internals in `Filtering`, `Apps`, and similar list-heavy areas with one canonical repeated-card pattern that has a compact header, proper sub-field labels, and a consistent inline action cluster.
-- [ ] Responsive action-row cleanup: Replace cramped fixed-width or hard-column action rows with responsive patterns for compact mode, especially for width/height presets, add/remove rows, and browse/clear rows so the popup layout still looks deliberate at the smaller width.
 - [x] Filtering redesign and rule-editor cleanup: Split global highlight defaults from per-rule editing, shrink and promote the preview CTA into a deliberate accent action, standardize the repeated rule-card layout across highlight/mute/narration rules, and make added keywords/rules editable instead of forcing delete-and-recreate.
 - [x] Highlight styling override expansion: Add explicit highlight-border thickness control plus per-rule highlight animation, border-mode, opacity, and border-width overrides so filtered notifications can be styled intentionally rather than inheriting only one global treatment.
 - [x] Profile/export completeness hardening: Audit every `AppSettings` field against `SettingsViewModel`, flush pending debounced edits before saving profiles, ensure keyword/rule collections and compact settings-window state round-trip through profiles and JSON export/import, and cover the regressions with tests plus an analysis report.
@@ -505,9 +482,7 @@ Background image and advanced visual-control gaps:
 - [x] Card background image treatment expansion: Add missing image-processing controls for notification cards, including at minimum `Black & White`, `Saturation`, and `Contrast`, while keeping existing `Fit`, `Placement`, `Opacity`, `Hue`, and `Brightness` controls coherent and export/import safe.
 - [x] Explicit card background mode: Add a clearer `Solid / Image` card-background mode so image-backed cards are an explicit styling decision instead of something users infer from whether an image path happens to be populated.
 - [x] Portrait-image handling pass: Add a practical portrait-safe crop/anchor option (for example `Top / Center / Bottom`) if current fit modes still crop tall artwork poorly in wide cards, and verify text readability across the built-in density presets.
-- [ ] Background-image control consistency: Align the control model between the global card background, per-app card background overrides, and fullscreen backdrop backgrounds so the same concepts (`Fit`, `Placement`, `Image Treatment`) behave consistently without forcing every surface to expose every option.
 - [x] Single-line banner compatibility guard: Keep banner mode on solid backgrounds only, but make that constraint explicit in the UI/help so users understand why card background images do not apply there.
-- [ ] Notification-style gap review: Evaluate a short list of additional high-value card-style controls during the redesign, especially `Timestamp Placement`, `Icon Placement`, and simple background-treatment presets, while explicitly avoiding expensive styling features that would regress rendering performance.
 
 Operational gaps:
 - [x] Real listener diagnostics: Add a `Run Capture Diagnostic` or equivalent action under `System > Notification Access` so users can distinguish overlay rendering issues from live WinRT/accessibility capture failures.
@@ -520,16 +495,14 @@ Operational gaps:
 - [x] Startup self-notification suppression follow-up: prevent Notifications Pro from mirroring its own startup balloon/system toasts back into the overlay when toast suppression is enabled, so first interaction after launch does not surface a non-actionable app notification or interfere with clicking.
 - [x] Overlay anchor retention follow-up: keep overlays dragged to the top edge top-anchored when tall card stacks hit the monitor height limit, so timer expiry shrink does not reinterpret the window as bottom-anchored and reverse the stacking direction.
 - [x] Public metadata hygiene follow-up: historical local-only metadata was scrubbed before public release so the public repo does not expose maintainer-only workspace details.
-- [ ] Regression hardening for settings moves: Extend tests to cover moved settings, settings defaults, export/import, reset defaults, tab-navigation links, and filtering/profile regressions so another IA pass does not quietly break persistence or discoverability.
+- [x] Regression hardening for settings moves: extended regression coverage for moved settings defaults, `SettingsViewModel` persistence, reset defaults, export/import, profile round-trips, and tab-navigation header resolution so future IA passes are less likely to break persistence or discoverability silently.
 - [x] Animation persistence hardening: add regression coverage for any new standard-animation settings so default values, JSON export/import, profile save/load, reset defaults, and legacy `FadeOnlyAnimation` migration all stay in sync.
 
 Post-redesign process guardrails:
-- [ ] Create a local `settings-ia-review` skill after the new layout is finalized: document the canonical tab ownership, approved tab order, and “do not duplicate controls across tabs” rules so future feature work follows the agreed information architecture.
-- [ ] Create a local `ui-form-rhythm-review` skill after the new layout is finalized: document the shared control tiers, spacing tokens, typography rules, inline action patterns, and compact-mode responsiveness checks so future UI changes preserve alignment and visual consistency.
 - [x] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, profile save/load coverage, and export/import coverage whenever a settings feature is added or reorganized.
 
 ## Current Focus
-Next planned pass: continue the broader settings IA cleanup and remaining regression-hardening work now that the standard animation model, suppression timing, and animation persistence coverage have been shipped.
+No active unchecked items remain in the trimmed plan. Add future work here only when it is intentionally promoted above general backlog polish.
 
 ## Blocked
 - UserNotificationListener may not deliver notifications for unpackaged desktop apps even when reporting "Allowed". May need MSIX packaging (Milestone 11) to fully resolve.

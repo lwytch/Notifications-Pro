@@ -12,6 +12,7 @@
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
 - Release packaging script now takes the MSIX signing password from `NOTIFICATIONSPRO_PFX_PASSWORD` or a secure prompt instead of shipping a hardcoded secret in the tracked script
 - Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
+- Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate, pinned the active local workflow/package metadata to the replacement thumbprint, and retired the old current-user signing cert/PFX from the normal signing path
 
 ### Fixed
 - Top-right and other non-bottom overlay placements now keep their original vertical anchor even when the card stack temporarily hits the monitor-height limit, so expiry removals no longer snap the overlay down to the bottom edge or reverse the stack direction
@@ -28,6 +29,7 @@
 - Existing highlighted cards now update live when you change highlight rules, tint opacity, or highlight animation settings instead of waiting for a brand-new notification
 - Highlighted cards no longer lose their left-edge frame when the accent stripe is disabled, and the tray About dialog now reports the current `GPL v3` license text
 - Loading a named profile or tray-applied theme now preserves the full settings-window palette/opacity state and refreshes the settings UI immediately instead of reverting to a preset snapshot
+- Settings regression hardening now covers moved settings through the `SettingsViewModel` save path, reset defaults, settings export/import, profile round-trips, and shared settings-tab navigation header matching so future IA cleanup is less likely to drift silently
 - Fresh installs now enable the styled overlay scrollbar by default again, while still only surfacing it when the retained cards actually overflow the overlay height
 - Startup defaults repair now follows settings schema version `5`, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on their next launch
 - Overlay hit-testing now treats the real scrollbar and search controls as client input regions, so the scrollbar can be clicked and dragged normally without sacrificing drag-anywhere behavior on the rest of the overlay

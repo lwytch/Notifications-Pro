@@ -52,6 +52,17 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal(0.25, sm.Settings.HighlightOverlayOpacity);
         Assert.Equal(HighlightAnimationHelper.None, sm.Settings.HighlightAnimation);
         Assert.Equal(HighlightBorderModeHelper.FullBorder, sm.Settings.HighlightBorderMode);
+        Assert.False(sm.Settings.PersistentNotifications);
+        Assert.False(sm.Settings.AutoDurationEnabled);
+        Assert.Equal(5.0, sm.Settings.AutoDurationBaseSeconds);
+        Assert.Equal(2.0, sm.Settings.AutoDurationSecondsPerLine);
+        Assert.True(sm.Settings.AlwaysOnTop);
+        Assert.False(sm.Settings.ClickThrough);
+        Assert.False(sm.Settings.PresentationModeEnabled);
+        Assert.False(sm.Settings.PerAppTintEnabled);
+        Assert.Equal(0.15, sm.Settings.PerAppTintOpacity);
+        Assert.True(sm.Settings.CompactSettingsWindow);
+        Assert.True(sm.Settings.ShowQuickTips);
         Assert.True(sm.Settings.OverlayScrollbarVisible);
         Assert.Equal(10, sm.Settings.OverlayScrollbarContentGap);
     }
@@ -117,6 +128,16 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.FullscreenOverlayImageBlackAndWhite = true;
         sm.Settings.FullscreenOverlayImageVerticalFocus = ImageVerticalFocusHelper.Bottom;
         sm.Settings.ShowQuickTips = false;
+        sm.Settings.PersistentNotifications = true;
+        sm.Settings.AutoDurationEnabled = true;
+        sm.Settings.AutoDurationBaseSeconds = 9.5;
+        sm.Settings.AutoDurationSecondsPerLine = 3.5;
+        sm.Settings.AlwaysOnTop = false;
+        sm.Settings.ClickThrough = true;
+        sm.Settings.PresentationModeEnabled = true;
+        sm.Settings.PerAppTintEnabled = true;
+        sm.Settings.PerAppTintOpacity = 0.41;
+        sm.Settings.CompactSettingsWindow = false;
         sm.Settings.HighlightRules.Add(new HighlightRuleDefinition
         {
             Keyword = "urgent",
@@ -200,6 +221,16 @@ public class SettingsManagerTests : IDisposable
         Assert.True(sm2.Settings.FullscreenOverlayImageBlackAndWhite);
         Assert.Equal(ImageVerticalFocusHelper.Bottom, sm2.Settings.FullscreenOverlayImageVerticalFocus);
         Assert.False(sm2.Settings.ShowQuickTips);
+        Assert.True(sm2.Settings.PersistentNotifications);
+        Assert.True(sm2.Settings.AutoDurationEnabled);
+        Assert.Equal(9.5, sm2.Settings.AutoDurationBaseSeconds);
+        Assert.Equal(3.5, sm2.Settings.AutoDurationSecondsPerLine);
+        Assert.False(sm2.Settings.AlwaysOnTop);
+        Assert.True(sm2.Settings.ClickThrough);
+        Assert.True(sm2.Settings.PresentationModeEnabled);
+        Assert.True(sm2.Settings.PerAppTintEnabled);
+        Assert.Equal(0.41, sm2.Settings.PerAppTintOpacity);
+        Assert.False(sm2.Settings.CompactSettingsWindow);
         Assert.Single(sm2.Settings.HighlightRules);
         Assert.Equal(NotificationMatchScopeHelper.TitleOnly, sm2.Settings.HighlightRules[0].Scope);
         Assert.Equal("X", sm2.Settings.HighlightRules[0].AppFilter);
@@ -531,6 +562,17 @@ public class SettingsManagerTests : IDisposable
         sm.Settings.FontSize = 99;
         sm.Settings.FontFamily = "Impact";
         sm.Settings.BackgroundOpacity = 0.1;
+        sm.Settings.PersistentNotifications = true;
+        sm.Settings.AutoDurationEnabled = true;
+        sm.Settings.AutoDurationBaseSeconds = 11;
+        sm.Settings.AutoDurationSecondsPerLine = 4;
+        sm.Settings.AlwaysOnTop = false;
+        sm.Settings.ClickThrough = true;
+        sm.Settings.PresentationModeEnabled = true;
+        sm.Settings.PerAppTintEnabled = true;
+        sm.Settings.PerAppTintOpacity = 0.41;
+        sm.Settings.CompactSettingsWindow = false;
+        sm.Settings.ShowQuickTips = false;
 
         sm.ResetToDefaults();
 
@@ -538,6 +580,17 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Segoe UI", sm.Settings.FontFamily);
         Assert.Equal(0.94, sm.Settings.BackgroundOpacity);
         Assert.Equal(AppSettings.DefaultMaxVisibleNotifications, sm.Settings.MaxVisibleNotifications);
+        Assert.False(sm.Settings.PersistentNotifications);
+        Assert.False(sm.Settings.AutoDurationEnabled);
+        Assert.Equal(5.0, sm.Settings.AutoDurationBaseSeconds);
+        Assert.Equal(2.0, sm.Settings.AutoDurationSecondsPerLine);
+        Assert.True(sm.Settings.AlwaysOnTop);
+        Assert.False(sm.Settings.ClickThrough);
+        Assert.False(sm.Settings.PresentationModeEnabled);
+        Assert.False(sm.Settings.PerAppTintEnabled);
+        Assert.Equal(0.15, sm.Settings.PerAppTintOpacity);
+        Assert.True(sm.Settings.CompactSettingsWindow);
+        Assert.True(sm.Settings.ShowQuickTips);
     }
 
     [Fact]

@@ -386,6 +386,15 @@ public class ThemeTests : IDisposable
             FullscreenOverlayImageFitMode = CardBackgroundImageFitModeHelper.OriginalSize,
             DefaultIconPreset = defaultIconPath,
             DefaultSound = defaultSoundPath,
+            PersistentNotifications = true,
+            AutoDurationEnabled = true,
+            AutoDurationBaseSeconds = 9.5,
+            AutoDurationSecondsPerLine = 3.5,
+            AlwaysOnTop = false,
+            ClickThrough = true,
+            PresentationModeEnabled = true,
+            PerAppTintEnabled = true,
+            PerAppTintOpacity = 0.41,
             CompactSettingsWindow = false,
             ShowQuickTips = false,
         };
@@ -443,6 +452,15 @@ public class ThemeTests : IDisposable
         Assert.Equal(CardBackgroundImageFitModeHelper.OriginalSize, imported.FullscreenOverlayImageFitMode);
         Assert.Equal(defaultIconPath, imported.DefaultIconPreset);
         Assert.Equal(defaultSoundPath, imported.DefaultSound);
+        Assert.True(imported.PersistentNotifications);
+        Assert.True(imported.AutoDurationEnabled);
+        Assert.Equal(9.5, imported.AutoDurationBaseSeconds);
+        Assert.Equal(3.5, imported.AutoDurationSecondsPerLine);
+        Assert.False(imported.AlwaysOnTop);
+        Assert.True(imported.ClickThrough);
+        Assert.True(imported.PresentationModeEnabled);
+        Assert.True(imported.PerAppTintEnabled);
+        Assert.Equal(0.41, imported.PerAppTintOpacity);
         Assert.Equal(perAppBackgroundPath, imported.PerAppBackgroundImages["X"]);
         Assert.False(imported.CompactSettingsWindow);
         Assert.False(imported.ShowQuickTips);
