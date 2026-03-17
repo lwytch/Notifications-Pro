@@ -59,6 +59,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Click-to-dismiss** — left-click a card to remove it.
 - **Hover-to-pause** — hovering over the overlay pauses all expiry timers so you can finish reading before cards disappear.
 - **Multi-monitor support** — place the overlay on any connected display; it remembers which monitor.
+- **Quick position + monitor move** — `Settings > Layout` can move the overlay directly to a selected monitor and snap it to common corners/edges without manual dragging.
 - **Edge snapping** — configurable snap distance; overlay aligns to screen edges when dragged nearby.
 - **Manual resize** — drag the left or right edge of the overlay to change its width. Resize anchors to the edge it is near so right-aligned overlays do not jump.
 - **Fullscreen overlay mode** — expands the overlay to cover an entire monitor with a configurable semi-transparent backdrop (solid colour or local image, with opacity and fit controls). Useful as a dedicated notification monitor or for focus sessions.
@@ -68,6 +69,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Stacked cards** — each notification is a separate card, and the optional scrollbar applies when the currently visible cards need more vertical space.
 - **Single-line banner mode** — all text compressed to a single line per notification, with optional wrapping and a configurable max-line count. Timestamps are rendered inline when enabled.
 - **Replace mode** — globally available text-replacement rendering that works across all layout modes.
+- **Text alignment** — choose Left / Center / Right alignment for stacked cards, wrapped banner cards, and the live preview.
 - **Newest-on-top** toggle — controls whether new notifications appear at the top or bottom.
 - **Retained notifications** — configurable 1–1000 retained cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards. The themed scrollbar is enabled by default for fresh installs but only appears when the retained cards overflow the overlay height; it does not resurrect discarded overflow items.
 - **Max overlay height** — the overlay expands vertically up to this limit, then shows a scrollbar. Clamped to the active monitor work area.
@@ -130,11 +132,12 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Notification access recovery** — the System tab shows current capture status, includes buttons to open Windows notification access, retry the direct WinRT access check, and run a capture diagnostic, and exposes `Auto`, `Prefer WinRT`, and `Force Accessibility` capture modes.
 - **Session archive** — optional RAM-only archive for the current app session, with clipboard export and no disk persistence of notification text.
 - **About dialog** — tray menu About shows the installed version, package identity, listener mode/status, runtime version, and project link.
+- **Tray quick actions** — the tray menu can show/hide the overlay, pause notifications, toggle always-on-top / click-through, start focus mode, clear all, quick mute seen apps, and switch saved themes or profiles.
 - **Tray listener health** — tray tooltip surfaces the active listener mode plus current status details for faster troubleshooting.
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
 - **Settings undo/redo** — Ctrl+Z and Ctrl+Y with a 50-entry history stack, plus undo/redo buttons in the settings header.
-- **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border).
-- **Settings popup mode** — settings window can float as a popup above the taskbar with optional auto-close.
+- **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border), and you can link the overlay theme and settings-window theme when you want both to move together.
+- **Settings popup mode** — settings window can open as a normal resizable window or as a popup above the taskbar corner, with optional auto-close and a compact-width layout.
 - **Quick tips toggle** — `Settings > Settings Window` can turn the first-run guidance banner on or off without affecting notification capture.
 
 ### Accessibility
@@ -253,7 +256,7 @@ Per-app icons are user-configured (built-in vector presets or your own files) an
 
 Notifications Pro is designed to avoid persisting notification content:
 - **No notification title or body is ever written to disk** — no database, no cache, no logs of notification text.
-- Notification content exists only in RAM while displayed, and is released immediately after dismissal or expiry.
+- Notification content exists only in RAM. By default it is released immediately after dismissal or expiry. The only exception is the optional **Session Archive**, which keeps notification text in RAM for the current app session only and clears it when the app closes.
 - The app makes **no network calls** and includes **no telemetry**.
 - If **Spoken Notifications** is enabled, the text is spoken through your selected Windows audio output and may be audible to people nearby. Notifications Pro still keeps that text in RAM only and never saves spoken content to disk.
 - Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label only; it does not save or transmit the text.
@@ -304,7 +307,8 @@ To install it for the first time:
 1. Download both the **`.msix`** installer and the **`.cer`** certificate file from the [Releases page].
 2. Right-click the `.cer` file and select **Install Certificate**.
 3. Select **Local Machine**, and explicitly browse to place it in the **"Trusted Root Certification Authorities"** store.
-4. Double-click the `.msix` file to install the app natively.
+4. If Windows still reports that the package signature is not trusted, import the same `.cer` into **Local Machine > Trusted People** as well, then retry the install.
+5. Double-click the `.msix` file to install the app natively.
 
 > **Note on Windows Defender / SmartScreen:** 
 > Because this is a new, indie open-source app targeting low-level UI Automation, Microsoft Defender or "Attack Surface Reduction" tools may flag it initially. This is a false positive completely expected for newly compiled binaries. You can safely click "More info" and "Run Anyway". If Defender continually blocks it, do not whitelist the entire WindowsApps folder; instead, add a specific exclusion for the `NotificationsPro.exe` process.
@@ -316,7 +320,7 @@ To install it for the first time:
 ## How To Use
 
 ### Tray Icon
-Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-top, click-through, focus mode timer, quick mute, theme quick-switch, clear all, open notification-access settings, retry access check, settings, quit.
+Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-top, click-through, focus mode timer, quick mute, theme quick-switch, profile quick-switch, clear all, open notification-access settings, retry access check, settings, quit.
 
 ### Overlay Interaction
 | Action | Effect |
@@ -328,7 +332,7 @@ Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-t
 | Drag left/right edge | Resize width (when manual resize is enabled) |
 
 ### Settings
-Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview general styling without waiting for a real notification, and use **Settings > Filtering > Send Highlight Preview** when you want a local highlighted card for filter-specific styling checks.
+Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview general styling without waiting for a real notification, and use **Settings > Filtering > Send Highlight Preview** when you want a local highlighted card for filter-specific styling checks. The header also exposes undo/redo, and **Reset to Defaults** asks for confirmation before replacing your current settings.
 
 ### Windows notification setup
 Notifications Pro mirrors the notifications Windows is already surfacing. If Windows notifications are off for an app, there is nothing for the overlay to capture.
