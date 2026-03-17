@@ -26,7 +26,7 @@ This file is the quick orientation guide for AI agents and maintainers working i
   Contributor workflow and repository expectations.
 
 `NotificationsPro.slnx`
-  Solution entry point for the WPF app and test project.
+  Local solution metadata for the WPF app and test project. Public contributor docs should prefer the explicit project-level `dotnet build` / `dotnet test` commands.
 
 `settings.example.json`
   Example serialized settings payload; keep this aligned with `AppSettings`.
@@ -97,13 +97,13 @@ This file is the quick orientation guide for AI agents and maintainers working i
   `Images/`                     — MSIX tile, splash, and store imagery.
 
 `scripts/app-packaging/`
-  Native PowerShell packaging pipeline used instead of IDE-only publishing.
+  Maintainer-only local PowerShell packaging pipeline. This folder is gitignored and may be absent from the public checkout.
   `release.ps1`                 — Version bump + build + sign orchestration.
   `build_msix.ps1`              — Self-contained publish plus `MakeAppx` packaging step.
   `sign_msix.ps1`               — Certificate-store / PFX signing flow for the MSIX artifact.
 
 `AppPackages/`
-  Generated MSIX output directory for local release artifacts.
+  Local generated MSIX output directory for release artifacts. Gitignored.
 
 ## Tests (`tests/NotificationsPro.Tests/`)
 

@@ -9,11 +9,13 @@ Thank you for your interest in contributing!
 3. Build and test:
    ```bash
    dotnet restore
-   dotnet build
-   dotnet test
+   dotnet build src/NotificationsPro/NotificationsPro.csproj
+   dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
    ```
 4. Make your changes
 5. Submit a pull request with a clear description
+
+Release packaging and signing are maintainer-only local workflows and are not required for normal contributions.
 
 ## Guidelines
 
@@ -30,8 +32,8 @@ Thank you for your interest in contributing!
 - See `AGENTS.md` for the full privacy policy
 
 ### Before Submitting
-- [ ] `dotnet build` succeeds with no errors or warnings
-- [ ] `dotnet test` passes all tests
+- [ ] `dotnet build src/NotificationsPro/NotificationsPro.csproj` succeeds with no errors or warnings
+- [ ] `dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj` passes all tests
 - [ ] No notification content in any file I/O or serialization
 - [ ] No `settings.json` (real user settings) committed
 - [ ] Update `docs/PLAN.md` and `docs/STATUS.md` if scope changed

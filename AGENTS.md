@@ -10,16 +10,18 @@ Notifications Pro: a Windows tray app (C# .NET 8 + WPF) that mirrors Windows toa
 
 ```bash
 dotnet restore                                          # restore dependencies
-dotnet build                                            # build solution
+dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro               # run the app
-dotnet test                                             # run all tests
-# Build MSIX release package (Requires Windows SDK):
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
+# Maintainer-only local MSIX workflow (gitignored in the public repo; use only when present):
 powershell -ExecutionPolicy Bypass -File scripts\app-packaging\release.ps1 -Version "1.x.x"
 ```
 
 ## Repo Map
 
 Please read `REPO_MAP.md` in the repository root for a breakdown of the architectural structure, testing locations, packaging scripts, and AI tools.
+
+The maintainer may keep local packaging scripts under `scripts/app-packaging/`, but that folder is gitignored for the public repository. Treat it as an owner-only local workflow and only rely on it when it exists in the current workspace.
 
 ## Privacy Rules (HARD CONSTRAINTS — never violate)
 
@@ -50,7 +52,7 @@ Please read `REPO_MAP.md` in the repository root for a breakdown of the architec
 
 1. Read `docs/PLAN.md` to find the current focus and pick an unchecked item
 2. Implement the feature or fix
-3. Run `dotnet build` and `dotnet test` — all must pass
+3. Run `dotnet build src/NotificationsPro/NotificationsPro.csproj` and `dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj` — both must pass
 4. Update `docs/PLAN.md` (check off completed items, add new tasks, note blockers)
 5. Update `docs/STATUS.md` (what works, what doesn't)
 6. Update `CHANGELOG.md` if the change is user-visible
@@ -67,8 +69,8 @@ Please read `REPO_MAP.md` in the repository root for a breakdown of the architec
 
 ## Before You Commit Checklist
 
-- [ ] `dotnet build` succeeds with no errors
-- [ ] `dotnet test` passes all tests
+- [ ] `dotnet build src/NotificationsPro/NotificationsPro.csproj` succeeds with no errors
+- [ ] `dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj` passes all tests
 - [ ] Grep for notification content in any file I/O, logging, or serialization — must find none
 - [ ] No `settings.json` staged — only `settings.example.json`
 - [ ] `.gitignore` covers new build artifacts or local files
