@@ -678,7 +678,7 @@ public partial class SettingsViewModel : BaseViewModel
                 var namedTheme = FindThemeByName(normalized);
                 if (namedTheme != null)
                 {
-                    ApplySettingsThemeColors(GetSettingsThemeColors(namedTheme), queueSave: false);
+                    ApplySettingsThemePreset(namedTheme, queueSave: false);
                 }
                 else if (Services.SettingsThemeService.TryGetPresetColors(normalized, out var presetColors))
                 {
@@ -728,7 +728,7 @@ public partial class SettingsViewModel : BaseViewModel
     public string SettingsWindowBorder { get => _settingsWindowBorder; set => SetSettingsWindowColor(ref _settingsWindowBorder, value); }
 
     private double _settingsWindowCornerRadius = 12;
-    public double SettingsWindowCornerRadius { get => _settingsWindowCornerRadius; set { if (SetProperty(ref _settingsWindowCornerRadius, value)) QueueSave(); } }
+    public double SettingsWindowCornerRadius { get => _settingsWindowCornerRadius; set => SetSettingsThemeCornerRadius(value); }
 
     private bool _compactSettingsWindow = true;
     public bool CompactSettingsWindow { get => _compactSettingsWindow; set { if (SetProperty(ref _compactSettingsWindow, value)) QueueSave(); } }
@@ -743,12 +743,7 @@ public partial class SettingsViewModel : BaseViewModel
         if (!SetProperty(ref backingField, value))
             return;
 
-        if (!_suppressSettingsThemeAutoCustom
-            && !string.Equals(_settingsThemeMode, "Custom", StringComparison.OrdinalIgnoreCase))
-        {
-            _settingsThemeMode = "Custom";
-            OnPropertyChanged(nameof(SettingsThemeMode));
-        }
+        MarkSettingsThemeCustomIfNeeded();
 
         QueueSave();
         ApplySettingsTheme();
@@ -759,8 +754,18 @@ public partial class SettingsViewModel : BaseViewModel
         if (!SetProperty(ref backingField, value))
             return;
 
+        MarkSettingsThemeCustomIfNeeded();
         QueueSave();
         ApplySettingsTheme();
+    }
+
+    private void SetSettingsThemeCornerRadius(double value)
+    {
+        if (!SetProperty(ref _settingsWindowCornerRadius, value))
+            return;
+
+        MarkSettingsThemeCustomIfNeeded();
+        QueueSave();
     }
 
     private void ApplySettingsThemeColors(IReadOnlyList<string> colors, bool queueSave)
@@ -798,6 +803,60 @@ public partial class SettingsViewModel : BaseViewModel
 
         if (queueSave)
             QueueSave();
+    }
+
+    private void ApplySettingsThemePreset(ThemePreset theme, bool queueSave)
+    {
+        _suppressSettingsThemeAutoCustom = true;
+        try
+        {
+            _settingsWindowBg = theme.SettingsWindowBg;
+            _settingsWindowSurface = theme.SettingsWindowSurface;
+            _settingsWindowSurfaceLight = theme.SettingsWindowSurfaceLight;
+            _settingsWindowSurfaceHover = theme.SettingsWindowSurfaceHover;
+            _settingsWindowText = theme.SettingsWindowText;
+            _settingsWindowTextSecondary = theme.SettingsWindowTextSecondary;
+            _settingsWindowTextMuted = theme.SettingsWindowTextMuted;
+            _settingsWindowAccent = theme.SettingsWindowAccent;
+            _settingsWindowBorder = theme.SettingsWindowBorder;
+            _settingsWindowOpacity = theme.SettingsWindowOpacity;
+            _settingsSurfaceOpacity = theme.SettingsSurfaceOpacity;
+            _settingsElementOpacity = theme.SettingsElementOpacity;
+            _settingsWindowCornerRadius = theme.SettingsWindowCornerRadius;
+        }
+        finally
+        {
+            _suppressSettingsThemeAutoCustom = false;
+        }
+
+        OnPropertyChanged(nameof(SettingsWindowBg));
+        OnPropertyChanged(nameof(SettingsWindowSurface));
+        OnPropertyChanged(nameof(SettingsWindowSurfaceLight));
+        OnPropertyChanged(nameof(SettingsWindowSurfaceHover));
+        OnPropertyChanged(nameof(SettingsWindowText));
+        OnPropertyChanged(nameof(SettingsWindowTextSecondary));
+        OnPropertyChanged(nameof(SettingsWindowTextMuted));
+        OnPropertyChanged(nameof(SettingsWindowAccent));
+        OnPropertyChanged(nameof(SettingsWindowBorder));
+        OnPropertyChanged(nameof(SettingsWindowOpacity));
+        OnPropertyChanged(nameof(SettingsSurfaceOpacity));
+        OnPropertyChanged(nameof(SettingsElementOpacity));
+        OnPropertyChanged(nameof(SettingsWindowCornerRadius));
+
+        if (queueSave)
+            QueueSave();
+    }
+
+    private void MarkSettingsThemeCustomIfNeeded()
+    {
+        if (_suppressSettingsThemeAutoCustom
+            || string.Equals(_settingsThemeMode, "Custom", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        _settingsThemeMode = "Custom";
+        OnPropertyChanged(nameof(SettingsThemeMode));
     }
 
     private ThemePreset? FindThemeByName(string name)
@@ -851,6 +910,7 @@ public partial class SettingsViewModel : BaseViewModel
         target.SettingsWindowOpacity = source.SettingsWindowOpacity;
         target.SettingsSurfaceOpacity = source.SettingsSurfaceOpacity;
         target.SettingsElementOpacity = source.SettingsElementOpacity;
+        target.SettingsWindowCornerRadius = source.SettingsWindowCornerRadius;
     }
 
     private void RefreshSettingsThemeModeOptions()
@@ -887,10 +947,10 @@ public partial class SettingsViewModel : BaseViewModel
     private void ApplySettingsTheme()
     {
         if (System.Windows.Application.Current == null) return;
-        Services.SettingsThemeService.ApplySettingsTheme(BuildCurrentSettings());
+        Services.SettingsThemeService.ApplySettingsTheme(BuildSettingsThemePreviewSnapshot());
     }
 
-    private AppSettings BuildCurrentSettings()
+    private AppSettings BuildSettingsThemePreviewSnapshot()
     {
         return new AppSettings
         {
@@ -906,8 +966,261 @@ public partial class SettingsViewModel : BaseViewModel
             SettingsWindowOpacity = SettingsWindowOpacity,
             SettingsSurfaceOpacity = SettingsSurfaceOpacity,
             SettingsElementOpacity = SettingsElementOpacity,
+            SettingsWindowCornerRadius = SettingsWindowCornerRadius,
             CompactSettingsWindow = CompactSettingsWindow,
             LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
+        };
+    }
+
+    private AppSettings BuildCurrentSettingsSnapshot(AppSettings previousSettings)
+    {
+        var showAppName = ShowAppName;
+        var showTitle = ShowNotificationTitle;
+        var showBody = ShowNotificationBody;
+        var isLeavingSingleLineMode = previousSettings.SingleLineMode && !SingleLineMode;
+        var resolvedLimitTextLines = LimitTextLines;
+
+        // Keep stacked cards dense when returning from single-line mode to avoid
+        // carrying over wrapped banner readability settings into stacked layout.
+        if (isLeavingSingleLineMode && !resolvedLimitTextLines)
+            resolvedLimitTextLines = true;
+
+        // Keep cards meaningful if all display fields are toggled off.
+        if (!showAppName && !showTitle && !showBody)
+            showBody = true;
+
+        // Preserve a live manually-resized width unless the width control was explicitly adjusted.
+        var previousAutoFullWidth = previousSettings.SingleLineMode && previousSettings.SingleLineAutoFullWidth;
+        var nextAutoFullWidth = SingleLineMode && SingleLineAutoFullWidth;
+        var savedManualWidth = Math.Clamp(
+            previousSettings.LastManualOverlayWidth > 0
+                ? previousSettings.LastManualOverlayWidth
+                : previousSettings.OverlayWidth,
+            OverlayWidthMin,
+            OverlayWidthMax);
+
+        var resolvedOverlayWidth = _overlayWidthDirty
+            ? OverlayWidth
+            : previousSettings.OverlayWidth;
+
+        if (previousAutoFullWidth && !nextAutoFullWidth)
+            resolvedOverlayWidth = savedManualWidth;
+
+        resolvedOverlayWidth = Math.Clamp(resolvedOverlayWidth, OverlayWidthMin, OverlayWidthMax);
+        var nextLastManualWidth = nextAutoFullWidth
+            ? savedManualWidth
+            : resolvedOverlayWidth;
+
+        if (Math.Abs(resolvedOverlayWidth - _overlayWidth) > 0.5)
+        {
+            _overlayWidth = resolvedOverlayWidth;
+            OnPropertyChanged(nameof(OverlayWidth));
+        }
+
+        if (resolvedLimitTextLines != _limitTextLines)
+        {
+            _limitTextLines = resolvedLimitTextLines;
+            OnPropertyChanged(nameof(LimitTextLines));
+        }
+
+        return new AppSettings
+        {
+            FontFamily = FontFamily,
+            FontSize = FontSize,
+            FontWeight = FontWeight,
+            AppNameFontSize = AppNameFontSize,
+            AppNameFontWeight = AppNameFontWeight,
+            TitleFontSize = TitleFontSize,
+            TitleFontWeight = TitleFontWeight,
+            LineSpacing = LineSpacing,
+            TextAlignment = TextAlignment,
+            TextColor = TextColor,
+            TitleColor = TitleColor,
+            AppNameColor = AppNameColor,
+            BackgroundColor = BackgroundColor,
+            BackgroundOpacity = BackgroundOpacity,
+            CardBackgroundMode = CardBackgroundMode,
+            CardBackgroundImagePath = CardBackgroundImagePath,
+            CardBackgroundImageOpacity = CardBackgroundImageOpacity,
+            CardBackgroundImageHueDegrees = CardBackgroundImageHueDegrees,
+            CardBackgroundImageBrightness = CardBackgroundImageBrightness,
+            CardBackgroundImageSaturation = CardBackgroundImageSaturation,
+            CardBackgroundImageContrast = CardBackgroundImageContrast,
+            CardBackgroundImageBlackAndWhite = CardBackgroundImageBlackAndWhite,
+            CardBackgroundImageFitMode = CardBackgroundImageFitMode,
+            CardBackgroundImagePlacement = CardBackgroundImagePlacement,
+            CardBackgroundImageVerticalFocus = CardBackgroundImageVerticalFocus,
+            CornerRadius = CornerRadius,
+            Padding = Padding,
+            CardGap = CardGap,
+            OuterMargin = OuterMargin,
+            ShowAccent = ShowAccent,
+            AccentThickness = AccentThickness,
+            ShowBorder = ShowBorder,
+            BorderColor = BorderColor,
+            BorderThickness = BorderThickness,
+            AccentColor = AccentColor,
+            NotificationDuration = NotificationDuration,
+            MaxVisibleNotifications = Math.Clamp(MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound),
+            ShowAppName = showAppName,
+            ShowNotificationTitle = showTitle,
+            ShowNotificationBody = showBody,
+            LimitTextLines = resolvedLimitTextLines,
+            MaxAppNameLines = Math.Max(1, MaxAppNameLines),
+            MaxTitleLines = Math.Max(1, MaxTitleLines),
+            MaxBodyLines = Math.Max(1, MaxBodyLines),
+            SingleLineMode = SingleLineMode,
+            SingleLineWrapText = SingleLineWrapText,
+            SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
+            SingleLineAutoFullWidth = SingleLineAutoFullWidth,
+            ReplaceMode = ReplaceMode,
+            ShowTimestamp = ShowTimestamp,
+            TimestampFontSize = Math.Clamp(TimestampFontSize, 8, 32),
+            TimestampDisplayMode = NormalizeTimestampDisplayMode(TimestampDisplayMode),
+            TimestampFontWeight = TimestampFontWeight,
+            TimestampColor = TimestampColor,
+            NewestOnTop = NewestOnTop,
+            AlwaysOnTop = AlwaysOnTop,
+            ClickThrough = ClickThrough,
+            AnimationsEnabled = AnimationsEnabled,
+            FadeOnlyAnimation = NotificationAnimationStyleHelper.IsLegacyFadeOnly(NotificationAnimationStyle),
+            NotificationAnimationStyle = NotificationAnimationStyleHelper.Normalize(NotificationAnimationStyle),
+            SlideInDirection = SlideInDirection,
+            AnimationDurationMs = Math.Max(0, AnimationDurationMs),
+            AnimationEasing = AnimationEasingHelper.Normalize(AnimationEasing),
+            DeduplicationEnabled = DeduplicationEnabled,
+            DeduplicationWindowSeconds = DeduplicationWindowSeconds,
+            HighlightColor = HighlightColor,
+            HighlightOverlayOpacity = Math.Clamp(HighlightOverlayOpacity, 0.05, 0.80),
+            HighlightAnimation = HighlightAnimationHelper.Normalize(HighlightAnimation),
+            HighlightBorderMode = HighlightBorderModeHelper.Normalize(HighlightBorderMode),
+            HighlightBorderThickness = Math.Clamp(HighlightBorderThickness, 0.5, 8.0),
+            HighlightRules = BuildHighlightRules(),
+            HighlightKeywords = HighlightKeywordEntries.Select(e => e.Keyword).ToList(),
+            PerKeywordColors = HighlightKeywordEntries
+                .Where(e => !string.Equals(e.Color, HighlightColor, StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(e => e.Keyword, e => e.Color),
+            HighlightKeywordRegexFlags = HighlightKeywordEntries
+                .Where(e => e.IsRegex)
+                .ToDictionary(e => e.Keyword, _ => true),
+            MuteRules = BuildMuteRules(),
+            MuteKeywords = MuteKeywordEntries.Select(e => e.Keyword).ToList(),
+            MuteKeywordRegexFlags = MuteKeywordEntries
+                .Where(e => e.IsRegex)
+                .ToDictionary(e => e.Keyword, _ => true),
+            NarrationRules = BuildNarrationRules(),
+            MutedApps = _settingsManager.Settings.MutedApps,
+            SpokenMutedApps = new List<string>(_settingsManager.Settings.SpokenMutedApps),
+            ShowNotificationIcons = ShowNotificationIcons,
+            IconSize = IconSize,
+            DefaultIconPreset = DefaultIconPreset,
+            PerAppIcons = new Dictionary<string, string>(_settingsManager.Settings.PerAppIcons),
+            SoundEnabled = SoundEnabled,
+            DefaultSound = DefaultSound,
+            PerAppSounds = new Dictionary<string, string>(_settingsManager.Settings.PerAppSounds),
+            PerAppBackgroundImages = new Dictionary<string, string>(_settingsManager.Settings.PerAppBackgroundImages),
+            SuppressToastPopups = SuppressToastPopups,
+            SessionArchiveEnabled = SessionArchiveEnabled,
+            SessionArchiveMaxItems = SessionArchiveMaxItems,
+            ThemeScheduleEnabled = ThemeScheduleEnabled,
+            DayThemeName = DayThemeName,
+            NightThemeName = NightThemeName,
+            DayStartTime = DayStartTime,
+            NightStartTime = NightStartTime,
+            GroupByApp = GroupByApp,
+            AppGroupingStyle = NormalizeAppGroupingStyle(AppGroupingStyle),
+            ShowAppGroupCounts = ShowAppGroupCounts,
+            QuietHoursEnabled = QuietHoursEnabled,
+            QuietHoursStart = QuietHoursStart,
+            QuietHoursEnd = QuietHoursEnd,
+            BurstLimitEnabled = BurstLimitEnabled,
+            BurstLimitCount = Math.Max(1, BurstLimitCount),
+            BurstLimitWindowSeconds = BurstLimitWindowSeconds,
+            AccessibilityModeEnabled = AccessibilityModeEnabled,
+            PersistentNotifications = PersistentNotifications,
+            AutoDurationEnabled = AutoDurationEnabled,
+            AutoDurationSecondsPerLine = AutoDurationSecondsPerLine,
+            AutoDurationBaseSeconds = AutoDurationBaseSeconds,
+            RespectReduceMotion = RespectReduceMotion,
+            RespectHighContrast = RespectHighContrast,
+            RespectTextScaling = RespectTextScaling,
+            GlobalHotkeysEnabled = GlobalHotkeysEnabled,
+            HotkeyToggleOverlay = HotkeyToggleOverlay,
+            HotkeyDismissAll = HotkeyDismissAll,
+            HotkeyToggleDnd = HotkeyToggleDnd,
+            ReadNotificationsAloudEnabled = ReadNotificationsAloudEnabled,
+            ReadNotificationsAloudTriggerMode = NormalizeReadNotificationsAloudTriggerMode(ReadNotificationsAloudTriggerMode),
+            ReadNotificationsAloudMode = NormalizeReadNotificationsAloudMode(ReadNotificationsAloudMode),
+            ReadNotificationsAloudVoiceId = NormalizeReadNotificationsAloudVoiceId(ReadNotificationsAloudVoiceId),
+            ReadNotificationsAloudRate = ReadNotificationsAloudRate,
+            ReadNotificationsAloudVolume = ReadNotificationsAloudVolume,
+            VoiceAccessReadMode = NormalizeVoiceAccessReadMode(VoiceAccessReadMode),
+            NotificationCaptureMode = NormalizeNotificationCaptureMode(NotificationCaptureMode),
+            DensityPreset = DensityPreset,
+            OverlayWidth = resolvedOverlayWidth,
+            LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
+            OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),
+            AllowManualResize = AllowManualResize,
+            SnapToEdges = SnapToEdges,
+            SnapDistance = SnapDistance,
+            OverlayScrollbarVisible = OverlayScrollbarVisible,
+            OverlayScrollbarWidth = OverlayScrollbarWidth,
+            OverlayScrollbarOpacity = OverlayScrollbarOpacity,
+            OverlayScrollbarTrackColor = OverlayScrollbarTrackColor,
+            OverlayScrollbarThumbColor = OverlayScrollbarThumbColor,
+            OverlayScrollbarThumbHoverColor = OverlayScrollbarThumbHoverColor,
+            OverlayScrollbarPadding = OverlayScrollbarPadding,
+            OverlayScrollbarContentGap = OverlayScrollbarContentGap,
+            OverlayScrollbarCornerRadius = OverlayScrollbarCornerRadius,
+            OverlayLeft = previousSettings.OverlayLeft,
+            OverlayTop = previousSettings.OverlayTop,
+            MonitorIndex = previousSettings.MonitorIndex,
+            OverlayVisible = previousSettings.OverlayVisible,
+            NotificationsPaused = previousSettings.NotificationsPaused,
+            ChromaKeyEnabled = ChromaKeyEnabled,
+            ChromaKeyColor = ChromaKeyColor,
+            ObsFixedWindowMode = ObsFixedWindowMode,
+            ObsFixedWidth = ObsFixedWidth,
+            ObsFixedHeight = ObsFixedHeight,
+            PresentationModeEnabled = PresentationModeEnabled,
+            PresentationApps = PresentationApps.ToList(),
+            PerAppTintEnabled = PerAppTintEnabled,
+            PerAppTintOpacity = PerAppTintOpacity,
+            FullscreenOverlayMode = FullscreenOverlayMode,
+            FullscreenOverlayOpacity = FullscreenOverlayOpacity,
+            FullscreenOverlayColor = FullscreenOverlayColor,
+            FullscreenOverlayImagePath = FullscreenOverlayImagePath,
+            FullscreenOverlayImageFitMode = FullscreenOverlayImageFitMode,
+            FullscreenOverlayImageHueDegrees = FullscreenOverlayImageHueDegrees,
+            FullscreenOverlayImageBrightness = FullscreenOverlayImageBrightness,
+            FullscreenOverlayImageSaturation = FullscreenOverlayImageSaturation,
+            FullscreenOverlayImageContrast = FullscreenOverlayImageContrast,
+            FullscreenOverlayImageBlackAndWhite = FullscreenOverlayImageBlackAndWhite,
+            FullscreenOverlayImageVerticalFocus = FullscreenOverlayImageVerticalFocus,
+            SettingsDisplayMode = SettingsDisplayMode,
+            PopupAutoClose = PopupAutoClose,
+            SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
+            SettingsWindowBg = SettingsWindowBg,
+            SettingsWindowOpacity = SettingsWindowOpacity,
+            SettingsSurfaceOpacity = SettingsSurfaceOpacity,
+            SettingsElementOpacity = SettingsElementOpacity,
+            SettingsWindowSurface = SettingsWindowSurface,
+            SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
+            SettingsWindowSurfaceHover = SettingsWindowSurfaceHover,
+            SettingsWindowText = SettingsWindowText,
+            SettingsWindowTextSecondary = SettingsWindowTextSecondary,
+            SettingsWindowTextMuted = SettingsWindowTextMuted,
+            SettingsWindowAccent = SettingsWindowAccent,
+            SettingsWindowBorder = SettingsWindowBorder,
+            SettingsWindowCornerRadius = SettingsWindowCornerRadius,
+            CompactSettingsWindow = CompactSettingsWindow,
+            LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
+            StartWithWindows = StartWithWindows,
+            SelectedMonitorIndex = SelectedMonitorIndex,
+            HasShownWelcome = previousSettings.HasShownWelcome,
+            ShowQuickTips = ShowQuickTips,
+            SettingsWindowLeft = previousSettings.SettingsWindowLeft,
+            SettingsWindowTop = previousSettings.SettingsWindowTop,
         };
     }
 
@@ -1583,6 +1896,7 @@ public partial class SettingsViewModel : BaseViewModel
     public void ReloadFromCurrentSettings()
     {
         LoadFromSettings();
+        ApplySettingsTheme();
         NotifyAllPropertiesChanged();
     }
 
@@ -1636,256 +1950,7 @@ public partial class SettingsViewModel : BaseViewModel
             UpdateUndoRedoState();
         }
         var previousSettings = _settingsManager.Settings;
-        var showAppName = ShowAppName;
-        var showTitle = ShowNotificationTitle;
-        var showBody = ShowNotificationBody;
-        var isLeavingSingleLineMode = previousSettings.SingleLineMode && !SingleLineMode;
-        var resolvedLimitTextLines = LimitTextLines;
-
-        // Keep stacked cards dense when returning from single-line mode to avoid
-        // carrying over wrapped banner readability settings into stacked layout.
-        if (isLeavingSingleLineMode && !resolvedLimitTextLines)
-            resolvedLimitTextLines = true;
-
-        // Keep cards meaningful if all display fields are toggled off.
-        if (!showAppName && !showTitle && !showBody)
-            showBody = true;
-
-        // Preserve a live manually-resized width unless the width control was explicitly adjusted.
-        var previousAutoFullWidth = previousSettings.SingleLineMode && previousSettings.SingleLineAutoFullWidth;
-        var nextAutoFullWidth = SingleLineMode && SingleLineAutoFullWidth;
-        var savedManualWidth = Math.Clamp(
-            previousSettings.LastManualOverlayWidth > 0
-                ? previousSettings.LastManualOverlayWidth
-                : previousSettings.OverlayWidth,
-            OverlayWidthMin,
-            OverlayWidthMax);
-
-        var resolvedOverlayWidth = _overlayWidthDirty
-            ? OverlayWidth
-            : previousSettings.OverlayWidth;
-
-        if (previousAutoFullWidth && !nextAutoFullWidth)
-            resolvedOverlayWidth = savedManualWidth;
-
-        resolvedOverlayWidth = Math.Clamp(resolvedOverlayWidth, OverlayWidthMin, OverlayWidthMax);
-        var nextLastManualWidth = nextAutoFullWidth
-            ? savedManualWidth
-            : resolvedOverlayWidth;
-
-        if (Math.Abs(resolvedOverlayWidth - _overlayWidth) > 0.5)
-        {
-            _overlayWidth = resolvedOverlayWidth;
-            OnPropertyChanged(nameof(OverlayWidth));
-        }
-
-        if (resolvedLimitTextLines != _limitTextLines)
-        {
-            _limitTextLines = resolvedLimitTextLines;
-            OnPropertyChanged(nameof(LimitTextLines));
-        }
-
-        var s = new AppSettings
-        {
-            FontFamily = FontFamily,
-            FontSize = FontSize,
-            FontWeight = FontWeight,
-            AppNameFontSize = AppNameFontSize,
-            AppNameFontWeight = AppNameFontWeight,
-            TitleFontSize = TitleFontSize,
-            TitleFontWeight = TitleFontWeight,
-            LineSpacing = LineSpacing,
-            TextAlignment = TextAlignment,
-            TextColor = TextColor,
-            TitleColor = TitleColor,
-            AppNameColor = AppNameColor,
-            BackgroundColor = BackgroundColor,
-            BackgroundOpacity = BackgroundOpacity,
-            CardBackgroundMode = CardBackgroundMode,
-            CardBackgroundImagePath = CardBackgroundImagePath,
-            CardBackgroundImageOpacity = CardBackgroundImageOpacity,
-            CardBackgroundImageHueDegrees = CardBackgroundImageHueDegrees,
-            CardBackgroundImageBrightness = CardBackgroundImageBrightness,
-            CardBackgroundImageSaturation = CardBackgroundImageSaturation,
-            CardBackgroundImageContrast = CardBackgroundImageContrast,
-            CardBackgroundImageBlackAndWhite = CardBackgroundImageBlackAndWhite,
-            CardBackgroundImageFitMode = CardBackgroundImageFitMode,
-            CardBackgroundImagePlacement = CardBackgroundImagePlacement,
-            CardBackgroundImageVerticalFocus = CardBackgroundImageVerticalFocus,
-            CornerRadius = CornerRadius,
-            Padding = Padding,
-            CardGap = CardGap,
-            OuterMargin = OuterMargin,
-            ShowAccent = ShowAccent,
-            AccentThickness = AccentThickness,
-            ShowBorder = ShowBorder,
-            BorderColor = BorderColor,
-            BorderThickness = BorderThickness,
-            AccentColor = AccentColor,
-            NotificationDuration = NotificationDuration,
-            MaxVisibleNotifications = Math.Clamp(MaxVisibleNotifications, 1, AppSettings.MaxVisibleNotificationsUpperBound),
-            ShowAppName = showAppName,
-            ShowNotificationTitle = showTitle,
-            ShowNotificationBody = showBody,
-            LimitTextLines = resolvedLimitTextLines,
-            MaxAppNameLines = Math.Max(1, MaxAppNameLines),
-            MaxTitleLines = Math.Max(1, MaxTitleLines),
-            MaxBodyLines = Math.Max(1, MaxBodyLines),
-            SingleLineMode = SingleLineMode,
-            SingleLineWrapText = SingleLineWrapText,
-            SingleLineMaxLines = Math.Max(1, SingleLineMaxLines),
-            SingleLineAutoFullWidth = SingleLineAutoFullWidth,
-            ReplaceMode = ReplaceMode,
-            ShowTimestamp = ShowTimestamp,
-            TimestampFontSize = Math.Clamp(TimestampFontSize, 8, 32),
-            TimestampDisplayMode = NormalizeTimestampDisplayMode(TimestampDisplayMode),
-            TimestampFontWeight = TimestampFontWeight,
-            TimestampColor = TimestampColor,
-            NewestOnTop = NewestOnTop,
-            AlwaysOnTop = AlwaysOnTop,
-            ClickThrough = ClickThrough,
-            AnimationsEnabled = AnimationsEnabled,
-            FadeOnlyAnimation = NotificationAnimationStyleHelper.IsLegacyFadeOnly(NotificationAnimationStyle),
-            NotificationAnimationStyle = NotificationAnimationStyleHelper.Normalize(NotificationAnimationStyle),
-            SlideInDirection = SlideInDirection,
-            AnimationDurationMs = Math.Max(0, AnimationDurationMs),
-            AnimationEasing = AnimationEasingHelper.Normalize(AnimationEasing),
-            DeduplicationEnabled = DeduplicationEnabled,
-            DeduplicationWindowSeconds = DeduplicationWindowSeconds,
-            HighlightColor = HighlightColor,
-            HighlightOverlayOpacity = Math.Clamp(HighlightOverlayOpacity, 0.05, 0.80),
-            HighlightAnimation = HighlightAnimationHelper.Normalize(HighlightAnimation),
-            HighlightBorderMode = HighlightBorderModeHelper.Normalize(HighlightBorderMode),
-            HighlightBorderThickness = Math.Clamp(HighlightBorderThickness, 0.5, 8.0),
-            HighlightRules = BuildHighlightRules(),
-            HighlightKeywords = HighlightKeywordEntries.Select(e => e.Keyword).ToList(),
-            PerKeywordColors = HighlightKeywordEntries
-                .Where(e => !string.Equals(e.Color, HighlightColor, StringComparison.OrdinalIgnoreCase))
-                .ToDictionary(e => e.Keyword, e => e.Color),
-            HighlightKeywordRegexFlags = HighlightKeywordEntries
-                .Where(e => e.IsRegex)
-                .ToDictionary(e => e.Keyword, _ => true),
-            MuteRules = BuildMuteRules(),
-            MuteKeywords = MuteKeywordEntries.Select(e => e.Keyword).ToList(),
-            MuteKeywordRegexFlags = MuteKeywordEntries
-                .Where(e => e.IsRegex)
-                .ToDictionary(e => e.Keyword, _ => true),
-            NarrationRules = BuildNarrationRules(),
-            MutedApps = _settingsManager.Settings.MutedApps,
-            SpokenMutedApps = new List<string>(_settingsManager.Settings.SpokenMutedApps),
-            ShowNotificationIcons = ShowNotificationIcons,
-            IconSize = IconSize,
-            DefaultIconPreset = DefaultIconPreset,
-            PerAppIcons = new Dictionary<string, string>(_settingsManager.Settings.PerAppIcons),
-            SoundEnabled = SoundEnabled,
-            DefaultSound = DefaultSound,
-            PerAppSounds = new Dictionary<string, string>(_settingsManager.Settings.PerAppSounds),
-            PerAppBackgroundImages = new Dictionary<string, string>(_settingsManager.Settings.PerAppBackgroundImages),
-            SuppressToastPopups = SuppressToastPopups,
-            SessionArchiveEnabled = SessionArchiveEnabled,
-            SessionArchiveMaxItems = SessionArchiveMaxItems,
-            ThemeScheduleEnabled = ThemeScheduleEnabled,
-            DayThemeName = DayThemeName,
-            NightThemeName = NightThemeName,
-            DayStartTime = DayStartTime,
-            NightStartTime = NightStartTime,
-            GroupByApp = GroupByApp,
-            AppGroupingStyle = NormalizeAppGroupingStyle(AppGroupingStyle),
-            ShowAppGroupCounts = ShowAppGroupCounts,
-            QuietHoursEnabled = QuietHoursEnabled,
-            QuietHoursStart = QuietHoursStart,
-            QuietHoursEnd = QuietHoursEnd,
-            BurstLimitEnabled = BurstLimitEnabled,
-            BurstLimitCount = Math.Max(1, BurstLimitCount),
-            BurstLimitWindowSeconds = BurstLimitWindowSeconds,
-            AccessibilityModeEnabled = AccessibilityModeEnabled,
-            PersistentNotifications = PersistentNotifications,
-            AutoDurationEnabled = AutoDurationEnabled,
-            AutoDurationSecondsPerLine = AutoDurationSecondsPerLine,
-            AutoDurationBaseSeconds = AutoDurationBaseSeconds,
-            RespectReduceMotion = RespectReduceMotion,
-            RespectHighContrast = RespectHighContrast,
-            RespectTextScaling = RespectTextScaling,
-            GlobalHotkeysEnabled = GlobalHotkeysEnabled,
-            HotkeyToggleOverlay = HotkeyToggleOverlay,
-            HotkeyDismissAll = HotkeyDismissAll,
-            HotkeyToggleDnd = HotkeyToggleDnd,
-            ReadNotificationsAloudEnabled = ReadNotificationsAloudEnabled,
-            ReadNotificationsAloudTriggerMode = NormalizeReadNotificationsAloudTriggerMode(ReadNotificationsAloudTriggerMode),
-            ReadNotificationsAloudMode = NormalizeReadNotificationsAloudMode(ReadNotificationsAloudMode),
-            ReadNotificationsAloudVoiceId = NormalizeReadNotificationsAloudVoiceId(ReadNotificationsAloudVoiceId),
-            ReadNotificationsAloudRate = ReadNotificationsAloudRate,
-            ReadNotificationsAloudVolume = ReadNotificationsAloudVolume,
-            VoiceAccessReadMode = NormalizeVoiceAccessReadMode(VoiceAccessReadMode),
-            NotificationCaptureMode = NormalizeNotificationCaptureMode(NotificationCaptureMode),
-            DensityPreset = DensityPreset,
-            OverlayWidth = resolvedOverlayWidth,
-            LastManualOverlayWidth = Math.Clamp(nextLastManualWidth, OverlayWidthMin, OverlayWidthMax),
-            OverlayMaxHeight = Math.Clamp(OverlayMaxHeight, OverlayMaxHeightMin, OverlayMaxHeightMax),
-            AllowManualResize = AllowManualResize,
-            SnapToEdges = SnapToEdges,
-            SnapDistance = SnapDistance,
-            OverlayScrollbarVisible = OverlayScrollbarVisible,
-            OverlayScrollbarWidth = OverlayScrollbarWidth,
-            OverlayScrollbarOpacity = OverlayScrollbarOpacity,
-            OverlayScrollbarTrackColor = OverlayScrollbarTrackColor,
-            OverlayScrollbarThumbColor = OverlayScrollbarThumbColor,
-            OverlayScrollbarThumbHoverColor = OverlayScrollbarThumbHoverColor,
-            OverlayScrollbarPadding = OverlayScrollbarPadding,
-            OverlayScrollbarContentGap = OverlayScrollbarContentGap,
-            OverlayScrollbarCornerRadius = OverlayScrollbarCornerRadius,
-            // Preserve position from current settings
-            OverlayLeft = previousSettings.OverlayLeft,
-            OverlayTop = previousSettings.OverlayTop,
-            MonitorIndex = previousSettings.MonitorIndex,
-            OverlayVisible = previousSettings.OverlayVisible,
-            NotificationsPaused = previousSettings.NotificationsPaused,
-            ChromaKeyEnabled = ChromaKeyEnabled,
-            ChromaKeyColor = ChromaKeyColor,
-            ObsFixedWindowMode = ObsFixedWindowMode,
-            ObsFixedWidth = ObsFixedWidth,
-            ObsFixedHeight = ObsFixedHeight,
-            PresentationModeEnabled = PresentationModeEnabled,
-            PresentationApps = PresentationApps.ToList(),
-            PerAppTintEnabled = PerAppTintEnabled,
-            PerAppTintOpacity = PerAppTintOpacity,
-            FullscreenOverlayMode = FullscreenOverlayMode,
-            FullscreenOverlayOpacity = FullscreenOverlayOpacity,
-            FullscreenOverlayColor = FullscreenOverlayColor,
-            FullscreenOverlayImagePath = FullscreenOverlayImagePath,
-            FullscreenOverlayImageFitMode = FullscreenOverlayImageFitMode,
-            FullscreenOverlayImageHueDegrees = FullscreenOverlayImageHueDegrees,
-            FullscreenOverlayImageBrightness = FullscreenOverlayImageBrightness,
-            FullscreenOverlayImageSaturation = FullscreenOverlayImageSaturation,
-            FullscreenOverlayImageContrast = FullscreenOverlayImageContrast,
-            FullscreenOverlayImageBlackAndWhite = FullscreenOverlayImageBlackAndWhite,
-            FullscreenOverlayImageVerticalFocus = FullscreenOverlayImageVerticalFocus,
-            SettingsDisplayMode = SettingsDisplayMode,
-            PopupAutoClose = PopupAutoClose,
-            SettingsThemeMode = Services.SettingsThemeService.NormalizeThemeMode(SettingsThemeMode),
-            SettingsWindowBg = SettingsWindowBg,
-            SettingsWindowOpacity = SettingsWindowOpacity,
-            SettingsSurfaceOpacity = SettingsSurfaceOpacity,
-            SettingsElementOpacity = SettingsElementOpacity,
-            SettingsWindowSurface = SettingsWindowSurface,
-            SettingsWindowSurfaceLight = SettingsWindowSurfaceLight,
-            SettingsWindowSurfaceHover = SettingsWindowSurfaceHover,
-            SettingsWindowText = SettingsWindowText,
-            SettingsWindowTextSecondary = SettingsWindowTextSecondary,
-            SettingsWindowTextMuted = SettingsWindowTextMuted,
-            SettingsWindowAccent = SettingsWindowAccent,
-            SettingsWindowBorder = SettingsWindowBorder,
-            SettingsWindowCornerRadius = SettingsWindowCornerRadius,
-            CompactSettingsWindow = CompactSettingsWindow,
-            LinkOverlayThemeAndUiTheme = LinkOverlayThemeAndUiTheme,
-            StartWithWindows = StartWithWindows,
-            SelectedMonitorIndex = SelectedMonitorIndex,
-            HasShownWelcome = previousSettings.HasShownWelcome,
-            ShowQuickTips = ShowQuickTips,
-            SettingsWindowLeft = previousSettings.SettingsWindowLeft,
-            SettingsWindowTop = previousSettings.SettingsWindowTop,
-        };
-
+        var s = BuildCurrentSettingsSnapshot(previousSettings);
         _settingsManager.Apply(s);
         _overlayWidthDirty = false;
         ShowSavedFeedback();

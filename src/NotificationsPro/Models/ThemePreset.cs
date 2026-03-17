@@ -34,6 +34,7 @@ public class ThemePreset
     public double SettingsWindowOpacity { get; set; } = 0.95;
     public double SettingsSurfaceOpacity { get; set; } = 1.0;
     public double SettingsElementOpacity { get; set; } = 1.0;
+    public double SettingsWindowCornerRadius { get; set; } = 20;
 
     // Shape
     public double CornerRadius { get; set; } = 12;
@@ -94,6 +95,7 @@ public class ThemePreset
         settings.SettingsWindowOpacity = SettingsWindowOpacity;
         settings.SettingsSurfaceOpacity = SettingsSurfaceOpacity;
         settings.SettingsElementOpacity = SettingsElementOpacity;
+        settings.SettingsWindowCornerRadius = SettingsWindowCornerRadius;
     }
 
     /// <summary>
@@ -147,6 +149,7 @@ public class ThemePreset
             SettingsWindowOpacity = settings.SettingsWindowOpacity,
             SettingsSurfaceOpacity = settings.SettingsSurfaceOpacity,
             SettingsElementOpacity = settings.SettingsElementOpacity,
+            SettingsWindowCornerRadius = settings.SettingsWindowCornerRadius,
         };
     }
 

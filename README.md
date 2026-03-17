@@ -417,6 +417,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.26
+- Fixed settings-window theme retention when switching profiles: the selected UI theme now carries its full background palette, opacity, and corner-radius state instead of partially falling back toward defaults.
+- Tightened the settings/profile/export audit path so the shared settings snapshot is more consistent and the unlinked UI-theme copy path preserves the full settings-window theme state.
+- Expanded automated persistence coverage for settings-window theme preset application plus profile/export round-trips, bringing the suite to `259` passing tests.
+
 ### Release v1.1.10.25
 - Maintenance release focused on regression hardening: animation-style/easing normalization and managed custom asset portability/sanitization now have direct automated coverage, bringing the suite to `256` passing tests.
 - Packaging/release safety was tightened around the public-repo workflow so the signed MSIX path is checked against the safer cert-store-first process before release builds.

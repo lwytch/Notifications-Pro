@@ -146,21 +146,27 @@ public class ThemeTests : IDisposable
     }
 
     [Fact]
-    public void ApplySettingsWindowTo_CopiesOpacityFields()
+    public void ApplySettingsWindowTo_CopiesSettingsWindowThemeFields()
     {
         var theme = new ThemePreset
         {
+            SettingsWindowBg = "#11151A",
+            SettingsWindowAccent = "#44AAFF",
             SettingsWindowOpacity = 0.81,
             SettingsSurfaceOpacity = 0.42,
-            SettingsElementOpacity = 0.66
+            SettingsElementOpacity = 0.66,
+            SettingsWindowCornerRadius = 27
         };
 
         var settings = new AppSettings();
         theme.ApplySettingsWindowTo(settings);
 
+        Assert.Equal("#11151A", settings.SettingsWindowBg);
+        Assert.Equal("#44AAFF", settings.SettingsWindowAccent);
         Assert.Equal(0.81, settings.SettingsWindowOpacity);
         Assert.Equal(0.42, settings.SettingsSurfaceOpacity);
         Assert.Equal(0.66, settings.SettingsElementOpacity);
+        Assert.Equal(27, settings.SettingsWindowCornerRadius);
     }
 
     [Fact]
@@ -397,6 +403,20 @@ public class ThemeTests : IDisposable
             PerAppTintOpacity = 0.41,
             CompactSettingsWindow = false,
             ShowQuickTips = false,
+            SettingsThemeMode = "Custom",
+            SettingsWindowBg = "#10141B",
+            SettingsWindowSurface = "#1A202A",
+            SettingsWindowSurfaceLight = "#252D3A",
+            SettingsWindowSurfaceHover = "#2E3748",
+            SettingsWindowText = "#F4F6FA",
+            SettingsWindowTextSecondary = "#C8CFDC",
+            SettingsWindowTextMuted = "#8590A5",
+            SettingsWindowAccent = "#3DAEFF",
+            SettingsWindowBorder = "#3A445A",
+            SettingsWindowOpacity = 0.78,
+            SettingsSurfaceOpacity = 0.38,
+            SettingsElementOpacity = 0.64,
+            SettingsWindowCornerRadius = 26,
         };
         original.PerAppBackgroundImages["X"] = perAppBackgroundPath;
         original.HighlightRules.Add(new HighlightRuleDefinition
@@ -464,6 +484,20 @@ public class ThemeTests : IDisposable
         Assert.Equal(perAppBackgroundPath, imported.PerAppBackgroundImages["X"]);
         Assert.False(imported.CompactSettingsWindow);
         Assert.False(imported.ShowQuickTips);
+        Assert.Equal("Custom", imported.SettingsThemeMode);
+        Assert.Equal("#10141B", imported.SettingsWindowBg);
+        Assert.Equal("#1A202A", imported.SettingsWindowSurface);
+        Assert.Equal("#252D3A", imported.SettingsWindowSurfaceLight);
+        Assert.Equal("#2E3748", imported.SettingsWindowSurfaceHover);
+        Assert.Equal("#F4F6FA", imported.SettingsWindowText);
+        Assert.Equal("#C8CFDC", imported.SettingsWindowTextSecondary);
+        Assert.Equal("#8590A5", imported.SettingsWindowTextMuted);
+        Assert.Equal("#3DAEFF", imported.SettingsWindowAccent);
+        Assert.Equal("#3A445A", imported.SettingsWindowBorder);
+        Assert.Equal(0.78, imported.SettingsWindowOpacity);
+        Assert.Equal(0.38, imported.SettingsSurfaceOpacity);
+        Assert.Equal(0.64, imported.SettingsElementOpacity);
+        Assert.Equal(26, imported.SettingsWindowCornerRadius);
         Assert.Single(imported.HighlightRules);
         Assert.Single(imported.MuteRules);
         Assert.Single(imported.NarrationRules);

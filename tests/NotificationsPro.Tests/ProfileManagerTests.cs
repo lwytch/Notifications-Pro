@@ -48,6 +48,19 @@ public class ProfileManagerTests : IDisposable
             PerAppTintOpacity = 0.41,
             CompactSettingsWindow = false,
             SettingsThemeMode = "Custom",
+            SettingsWindowBg = "#0F1014",
+            SettingsWindowSurface = "#181B21",
+            SettingsWindowSurfaceLight = "#232834",
+            SettingsWindowSurfaceHover = "#2C3140",
+            SettingsWindowText = "#F2F4F8",
+            SettingsWindowTextSecondary = "#C7CDDA",
+            SettingsWindowTextMuted = "#8B93A7",
+            SettingsWindowAccent = "#33AAFF",
+            SettingsWindowBorder = "#394257",
+            SettingsWindowOpacity = 0.79,
+            SettingsSurfaceOpacity = 0.36,
+            SettingsElementOpacity = 0.62,
+            SettingsWindowCornerRadius = 29,
             CardBackgroundImagePath = profileBackgroundPath,
             DefaultIconPreset = profileIconPath,
             DefaultSound = profileSoundPath
@@ -86,6 +99,20 @@ public class ProfileManagerTests : IDisposable
         Assert.True(loaded.PerAppTintEnabled);
         Assert.Equal(0.41, loaded.PerAppTintOpacity);
         Assert.False(loaded.CompactSettingsWindow);
+        Assert.Equal("Custom", loaded.SettingsThemeMode);
+        Assert.Equal("#0F1014", loaded.SettingsWindowBg);
+        Assert.Equal("#181B21", loaded.SettingsWindowSurface);
+        Assert.Equal("#232834", loaded.SettingsWindowSurfaceLight);
+        Assert.Equal("#2C3140", loaded.SettingsWindowSurfaceHover);
+        Assert.Equal("#F2F4F8", loaded.SettingsWindowText);
+        Assert.Equal("#C7CDDA", loaded.SettingsWindowTextSecondary);
+        Assert.Equal("#8B93A7", loaded.SettingsWindowTextMuted);
+        Assert.Equal("#33AAFF", loaded.SettingsWindowAccent);
+        Assert.Equal("#394257", loaded.SettingsWindowBorder);
+        Assert.Equal(0.79, loaded.SettingsWindowOpacity);
+        Assert.Equal(0.36, loaded.SettingsSurfaceOpacity);
+        Assert.Equal(0.62, loaded.SettingsElementOpacity);
+        Assert.Equal(29, loaded.SettingsWindowCornerRadius);
         Assert.Equal(profileBackgroundPath, loaded.CardBackgroundImagePath);
         Assert.Equal(profileIconPath, loaded.DefaultIconPreset);
         Assert.Equal(profileSoundPath, loaded.DefaultSound);

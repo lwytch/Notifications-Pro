@@ -72,10 +72,122 @@ public class SettingsViewModelRegressionTests : IDisposable
         });
     }
 
+    [Fact]
+    public void SaveSettings_AppliesAndPersistsFullSettingsWindowThemePresetState()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager);
+            var frostedGlass = viewModel.BuiltInThemes.First(t => t.Name == "Frosted Glass");
+
+            viewModel.SettingsThemeMode = frostedGlass.Name;
+            InvokeSaveSettings(viewModel);
+
+            Assert.Equal(frostedGlass.Name, settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal(frostedGlass.SettingsWindowBg, settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal(frostedGlass.SettingsWindowSurface, settingsManager.Settings.SettingsWindowSurface);
+            Assert.Equal(frostedGlass.SettingsWindowAccent, settingsManager.Settings.SettingsWindowAccent);
+            Assert.Equal(frostedGlass.SettingsWindowOpacity, settingsManager.Settings.SettingsWindowOpacity);
+            Assert.Equal(frostedGlass.SettingsSurfaceOpacity, settingsManager.Settings.SettingsSurfaceOpacity);
+            Assert.Equal(frostedGlass.SettingsElementOpacity, settingsManager.Settings.SettingsElementOpacity);
+            Assert.Equal(frostedGlass.SettingsWindowCornerRadius, settingsManager.Settings.SettingsWindowCornerRadius);
+
+            var reloaded = new SettingsViewModel(settingsManager, new QueueManager(settingsManager));
+            Assert.Equal(frostedGlass.Name, reloaded.SettingsThemeMode);
+            Assert.Equal(frostedGlass.SettingsWindowBg, reloaded.SettingsWindowBg);
+            Assert.Equal(frostedGlass.SettingsWindowOpacity, reloaded.SettingsWindowOpacity);
+            Assert.Equal(frostedGlass.SettingsSurfaceOpacity, reloaded.SettingsSurfaceOpacity);
+            Assert.Equal(frostedGlass.SettingsElementOpacity, reloaded.SettingsElementOpacity);
+            Assert.Equal(frostedGlass.SettingsWindowCornerRadius, reloaded.SettingsWindowCornerRadius);
+        });
+    }
+
+    [Fact]
+    public void SettingsWindowThemeTweaks_SwitchModeToCustom_AndPersist()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager)
+            {
+                SettingsThemeMode = "Windows Dark"
+            };
+
+            viewModel.SettingsWindowOpacity = 0.73;
+            viewModel.SettingsSurfaceOpacity = 0.44;
+            viewModel.SettingsElementOpacity = 0.61;
+            viewModel.SettingsWindowCornerRadius = 28;
+
+            Assert.Equal("Custom", viewModel.SettingsThemeMode);
+
+            InvokeSaveSettings(viewModel);
+
+            Assert.Equal("Custom", settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal(0.73, settingsManager.Settings.SettingsWindowOpacity);
+            Assert.Equal(0.44, settingsManager.Settings.SettingsSurfaceOpacity);
+            Assert.Equal(0.61, settingsManager.Settings.SettingsElementOpacity);
+            Assert.Equal(28, settingsManager.Settings.SettingsWindowCornerRadius);
+
+            var reloaded = new SettingsViewModel(settingsManager, new QueueManager(settingsManager));
+            Assert.Equal("Custom", reloaded.SettingsThemeMode);
+            Assert.Equal(0.73, reloaded.SettingsWindowOpacity);
+            Assert.Equal(0.44, reloaded.SettingsSurfaceOpacity);
+            Assert.Equal(0.61, reloaded.SettingsElementOpacity);
+            Assert.Equal(28, reloaded.SettingsWindowCornerRadius);
+        });
+    }
+
+    [Fact]
+    public void ApplyTheme_WithUnlinkedUiTheme_PreservesSettingsWindowThemeState()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager)
+            {
+                LinkOverlayThemeAndUiTheme = false,
+                SettingsThemeMode = "Custom",
+                SettingsWindowBg = "#121212",
+                SettingsWindowAccent = "#33AAFF",
+                SettingsWindowOpacity = 0.74,
+                SettingsSurfaceOpacity = 0.49,
+                SettingsElementOpacity = 0.63,
+                SettingsWindowCornerRadius = 31
+            };
+
+            InvokeSaveSettings(viewModel);
+            var theme = viewModel.BuiltInThemes.First(t => t.Name == "Light");
+
+            InvokeApplyTheme(viewModel, theme);
+
+            Assert.Equal("Custom", settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal("#121212", settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal("#33AAFF", settingsManager.Settings.SettingsWindowAccent);
+            Assert.Equal(0.74, settingsManager.Settings.SettingsWindowOpacity);
+            Assert.Equal(0.49, settingsManager.Settings.SettingsSurfaceOpacity);
+            Assert.Equal(0.63, settingsManager.Settings.SettingsElementOpacity);
+            Assert.Equal(31, settingsManager.Settings.SettingsWindowCornerRadius);
+        });
+    }
+
     private static void InvokeSaveSettings(SettingsViewModel viewModel)
     {
         var method = typeof(SettingsViewModel).GetMethod("SaveSettings", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(method);
         method!.Invoke(viewModel, null);
+    }
+
+    private static void InvokeApplyTheme(SettingsViewModel viewModel, ThemePreset theme)
+    {
+        var method = typeof(SettingsViewModel).GetMethod("ApplyTheme", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(method);
+        method!.Invoke(viewModel, new object?[] { theme });
     }
 }

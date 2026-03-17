@@ -872,6 +872,7 @@ public partial class App : Application
         target.SettingsWindowOpacity = source.SettingsWindowOpacity;
         target.SettingsSurfaceOpacity = source.SettingsSurfaceOpacity;
         target.SettingsElementOpacity = source.SettingsElementOpacity;
+        target.SettingsWindowCornerRadius = source.SettingsWindowCornerRadius;
     }
 
     public void ShowSettingsForApp(string appName)
