@@ -16,6 +16,7 @@
 
 ### Fixed
 - Settings-window theme selection now applies the full UI theme state instead of only the color palette, so profile switching and settings export/import keep the expected settings-window background theme, opacity, and corner-radius treatment instead of drifting back toward defaults
+- Live profile switching and imported settings now also reapply the already-open Settings window shell correctly, so saved popup/window mode, popup auto-close behavior, and custom settings-window accent/theme state no longer stay stuck on stale UI chrome after switching
 - Settings/profile/export pipeline audit tightened the shared snapshot path, and settings-window theme copy helpers now carry the full retained UI theme state when overlay themes are applied without linking
 - Test hardening now exercises the animation-style/easing normalization helpers and the managed-asset path sanitizer directly, reducing the chance that future animation, export/import, or profile changes silently drift out of sync
 - Top-right and other non-bottom overlay placements now keep their original vertical anchor even when the card stack temporarily hits the monitor-height limit, so expiry removals no longer snap the overlay down to the bottom edge or reverse the stack direction
@@ -76,7 +77,7 @@
 - Memory leak: timestamp DispatcherTimer in OverlayViewModel now stored as field and stopped on cleanup
 
 ### Added
-- Added regression coverage for settings-window theme preset application plus profile/export round-trips of settings-window palette, opacity, and corner-radius fields, bringing the suite to 259 passing tests
+- Added regression coverage for settings-window theme preset application plus live profile/import application of settings-window palette, accent, opacity, corner-radius, and display-mode fields, bringing the suite to 262 passing tests
 - Added direct regression coverage for animation helper normalization and managed asset portability/security paths, bringing the automated suite to 256 passing tests
 - Standard entrance animation styles in `Behavior > Animations` — notifications can now use `Slide + Fade`, `Slide`, `Fade`, `Drift + Fade`, `Zoom + Fade`, or `Pop`, while directional styles still respect the explicit motion-direction selector
 - Filtering tab redesign — highlight defaults are now separated from the rule list, the preview CTA is a smaller accent action, and highlight/mute/narration rules share a cleaner repeated-card layout

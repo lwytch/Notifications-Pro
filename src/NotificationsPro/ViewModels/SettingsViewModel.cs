@@ -962,6 +962,7 @@ public partial class SettingsViewModel : BaseViewModel
             SettingsWindowText = SettingsWindowText,
             SettingsWindowTextSecondary = SettingsWindowTextSecondary,
             SettingsWindowTextMuted = SettingsWindowTextMuted,
+            SettingsWindowAccent = SettingsWindowAccent,
             SettingsWindowBorder = SettingsWindowBorder,
             SettingsWindowOpacity = SettingsWindowOpacity,
             SettingsSurfaceOpacity = SettingsSurfaceOpacity,
@@ -1484,7 +1485,7 @@ public partial class SettingsViewModel : BaseViewModel
     public bool CanRedo { get => _canRedo; private set => SetProperty(ref _canRedo, value); }
 
     // Profiles
-    private readonly ProfileManager _profileManager = new();
+    private readonly ProfileManager _profileManager;
     public ObservableCollection<string> SavedProfiles { get; } = new();
 
     private string _newProfileName = "";
@@ -1493,7 +1494,7 @@ public partial class SettingsViewModel : BaseViewModel
     public ImageSource TrayIconImage { get; }
 
     // Themes
-    private readonly ThemeManager _themeManager = new();
+    private readonly ThemeManager _themeManager;
 
     private string _newThemeName = string.Empty;
     public string NewThemeName { get => _newThemeName; set => SetProperty(ref _newThemeName, value); }
@@ -1510,10 +1511,16 @@ public partial class SettingsViewModel : BaseViewModel
 
     public ICommand ApplySelectedBuiltInThemeCommand { get; private set; } = null!;
 
-    public SettingsViewModel(SettingsManager settingsManager, QueueManager queueManager)
+    public SettingsViewModel(
+        SettingsManager settingsManager,
+        QueueManager queueManager,
+        ProfileManager? profileManager = null,
+        ThemeManager? themeManager = null)
     {
         _settingsManager = settingsManager;
         _queueManager = queueManager;
+        _profileManager = profileManager ?? new ProfileManager();
+        _themeManager = themeManager ?? new ThemeManager();
 
         InitializeSettingsAuditPolishCommands();
 
@@ -1812,7 +1819,7 @@ public partial class SettingsViewModel : BaseViewModel
 
         RefreshSettingsThemeModeOptions();
 
-        if (!string.Equals(_settingsThemeMode, "Custom", StringComparison.OrdinalIgnoreCase)
+        if (string.Equals(_settingsThemeMode, "System", StringComparison.OrdinalIgnoreCase)
             && Services.SettingsThemeService.TryGetPresetColors(_settingsThemeMode, out var presetColors))
         {
             ApplySettingsThemeColors(presetColors, queueSave: false);
@@ -1920,6 +1927,7 @@ public partial class SettingsViewModel : BaseViewModel
     private void LoadProfile(string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) return;
+        _saveDebounce.Stop();
         var profile = _profileManager.LoadProfile(name);
         if (profile == null) return;
         profile.SettingsThemeMode = Services.SettingsThemeService.ResolveThemeModeForLoadedSettings(profile);
@@ -2575,6 +2583,13 @@ public partial class SettingsViewModel : BaseViewModel
         var imported = ThemeManager.ImportSettings(dialog.FileName);
         if (imported == null) return;
 
+        ApplyImportedSettings(imported);
+    }
+
+    private void ApplyImportedSettings(AppSettings imported)
+    {
+        _saveDebounce.Stop();
+
         // Preserve device-specific fields so importing doesn't reposition the
         // overlay or reset session state on the current machine.
         var current = _settingsManager.Settings;
@@ -2589,11 +2604,7 @@ public partial class SettingsViewModel : BaseViewModel
         imported.NotificationsPaused = current.NotificationsPaused;
 
         _settingsManager.Apply(imported);
-        LoadFromSettings();
-
-        var props = GetType().GetProperties();
-        foreach (var prop in props)
-            OnPropertyChanged(prop.Name);
+        ReloadFromCurrentSettings();
     }
 
     private void ApplyDensityPreset(object? parameter)

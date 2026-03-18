@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Navigation;
 using NotificationsPro.Helpers;
 using NotificationsPro.Services;
@@ -272,6 +273,21 @@ public partial class SettingsWindow : Window
         {
             // Non-critical visual enhancement.
         }
+    }
+
+    public bool IsPopupShellMode => WindowStyle == WindowStyle.None;
+
+    public string? GetSelectedTabHeader()
+    {
+        return (MainTabControl.SelectedItem as TabItem)?.Header?.ToString();
+    }
+
+    public void RefreshChromeFromCurrentSettings()
+    {
+        if (!IsLoaded || IsPopupShellMode)
+            return;
+
+        ApplyWindowedTitleBarTheme();
     }
 
     public void NavigateToTab(string tabHeader)

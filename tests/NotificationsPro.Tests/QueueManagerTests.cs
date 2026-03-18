@@ -650,7 +650,7 @@ public class QueueManagerTests
         settings.Settings.QuietHoursEnabled = true;
         // Set quiet hours to cover all day so the test always triggers
         settings.Settings.QuietHoursStart = "00:00";
-        settings.Settings.QuietHoursEnd = "23:59";
+        settings.Settings.QuietHoursEnd = "23:59:59";
         var queue = new QueueManager(settings);
 
         queue.AddNotification("App", "Title", "Body");

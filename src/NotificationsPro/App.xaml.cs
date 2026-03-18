@@ -155,6 +155,7 @@ public partial class App : Application
         Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
         _settingsManager.SettingsChanged += () =>
             Services.SettingsThemeService.ApplySettingsTheme(_settingsManager.Settings);
+        _settingsManager.SettingsChanged += RefreshOpenSettingsWindowFromCurrentSettings;
 
         // Apply High Contrast theme if active and respected
         ApplyHighContrastIfNeeded();
@@ -544,43 +545,117 @@ public partial class App : Application
 
     private void ShowSettings()
     {
-        if (_settingsWindow == null || !_settingsWindow.IsLoaded)
+        EnsureSettingsWindow();
+
+        _settingsWindow!.Show();
+        _settingsWindow.Activate();
+    }
+
+    private void EnsureSettingsWindow()
+    {
+        if (_settingsWindow != null && _settingsWindow.IsLoaded)
+            return;
+
+        _settingsViewModel ??= new SettingsViewModel(_settingsManager!, _queueManager!);
+        _settingsViewModel.ConfigureRetryNotificationAccess(() =>
+            _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
+        UpdateSettingsDiagnostics();
+        _settingsWindow = new SettingsWindow(_settingsViewModel, _settingsManager);
+        _settingsWindow.Closed += OnSettingsWindowClosed;
+        ApplySettingsWindowShell(_settingsWindow, _settingsManager!.Settings, repositionPopup: true);
+    }
+
+    private void OnSettingsWindowClosed(object? sender, EventArgs e)
+    {
+        if (sender is SettingsWindow window)
+            window.Deactivated -= OnSettingsWindowDeactivated;
+
+        if (ReferenceEquals(sender, _settingsWindow))
+            _settingsWindow = null;
+    }
+
+    private void ApplySettingsWindowShell(SettingsWindow window, AppSettings settings, bool repositionPopup)
+    {
+        var popupMode = string.Equals(settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase);
+        if (popupMode)
         {
-            _settingsViewModel = new SettingsViewModel(_settingsManager!, _queueManager!);
-            _settingsViewModel.ConfigureRetryNotificationAccess(() =>
-                _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
-            UpdateSettingsDiagnostics();
-            _settingsWindow = new SettingsWindow(_settingsViewModel, _settingsManager);
-            _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+            window.WindowStyle = WindowStyle.None;
+            window.ResizeMode = ResizeMode.NoResize;
+            window.ShowInTaskbar = false;
+            window.AllowsTransparency = true;
+            window.Background = System.Windows.Media.Brushes.Transparent;
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
 
-            var settings = _settingsManager!.Settings;
-            if (settings.SettingsDisplayMode == "Popup")
+            if (repositionPopup)
             {
-                _settingsWindow.WindowStyle = WindowStyle.None;
-                _settingsWindow.ResizeMode = ResizeMode.NoResize;
-                _settingsWindow.ShowInTaskbar = false;
-                _settingsWindow.AllowsTransparency = true;
-                _settingsWindow.Background = System.Windows.Media.Brushes.Transparent;
-                _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-
-                var expectedWidth = double.IsNaN(_settingsWindow.Width) 
-                    ? (settings.CompactSettingsWindow ? 560.0 : 780.0) 
-                    : _settingsWindow.Width;
-                var expectedHeight = double.IsNaN(_settingsWindow.Height) ? 560.0 : _settingsWindow.Height;
-
+                var expectedWidth = double.IsNaN(window.Width)
+                    ? (settings.CompactSettingsWindow ? 560.0 : 780.0)
+                    : window.Width;
+                var expectedHeight = double.IsNaN(window.Height) ? 560.0 : window.Height;
                 var popupBounds = CalculateSettingsPopupBounds(expectedWidth, expectedHeight);
-                _settingsWindow.Left = popupBounds.Left;
-                _settingsWindow.Top = popupBounds.Top;
+                window.Left = popupBounds.Left;
+                window.Top = popupBounds.Top;
+            }
+        }
+        else
+        {
+            window.WindowStyle = WindowStyle.SingleBorderWindow;
+            window.ResizeMode = ResizeMode.CanResize;
+            window.ShowInTaskbar = true;
+            window.SetResourceReference(Window.BackgroundProperty, "WindowBgBrush");
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        }
 
-                if (settings.PopupAutoClose)
-                {
-                    _settingsWindow.Deactivated += OnSettingsWindowDeactivated;
-                }
+        window.Deactivated -= OnSettingsWindowDeactivated;
+        if (popupMode && settings.PopupAutoClose)
+            window.Deactivated += OnSettingsWindowDeactivated;
+
+        window.RefreshChromeFromCurrentSettings();
+    }
+
+    private void RefreshOpenSettingsWindowFromCurrentSettings()
+    {
+        if (_settingsWindow == null || _settingsManager == null)
+            return;
+
+        var settings = _settingsManager.Settings;
+        if (_settingsWindow.IsLoaded)
+        {
+            var desiredPopup = string.Equals(settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase);
+            if (_settingsWindow.IsPopupShellMode != desiredPopup)
+            {
+                RecreateSettingsWindow();
+                return;
             }
         }
 
-        _settingsWindow.Show();
-        _settingsWindow.Activate();
+        ApplySettingsWindowShell(_settingsWindow, settings, repositionPopup: _settingsWindow.IsPopupShellMode);
+    }
+
+    private void RecreateSettingsWindow()
+    {
+        if (_settingsWindow == null || _settingsManager == null || _settingsViewModel == null)
+            return;
+
+        var previousWindow = _settingsWindow;
+        var selectedTabHeader = previousWindow.GetSelectedTabHeader();
+        var wasVisible = previousWindow.IsVisible;
+
+        previousWindow.Deactivated -= OnSettingsWindowDeactivated;
+        previousWindow.Closed -= OnSettingsWindowClosed;
+        _settingsWindow = null;
+        previousWindow.Close();
+
+        EnsureSettingsWindow();
+
+        if (!string.IsNullOrWhiteSpace(selectedTabHeader))
+            _settingsWindow?.NavigateToTab(selectedTabHeader);
+
+        if (wasVisible)
+        {
+            _settingsWindow?.Show();
+            _settingsWindow?.Activate();
+        }
     }
 
     public static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight)

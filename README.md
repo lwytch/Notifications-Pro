@@ -78,8 +78,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 ### Appearance & Theming
 - **Built-in theme presets** — select from a dropdown and apply in one click.
 - **Custom themes** — save your current overlay look by name; re-apply or delete any time.
-- **Import / export** — share a complete settings profile as a JSON file. Filtering rules, settings-window theme state, and compact-window mode round-trip cleanly, while managed custom assets are stored as relative Notifications Pro references instead of machine-specific absolute paths.
-- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu, including filtering rules, settings-window styling, and the same portable managed-asset references used by settings export/import.
+- **Import / export** — share a complete settings profile as a JSON file. Filtering rules, settings-window theme state, settings-window display mode, and compact-window mode round-trip cleanly, while managed custom assets are stored as relative Notifications Pro references instead of machine-specific absolute paths.
+- **Named profiles** — save, load, and delete full profile snapshots from the Profiles tab or tray menu, including filtering rules, settings-window styling, popup/window behavior, and the same portable managed-asset references used by settings export/import.
 - **Typography** — independently configure font family, size, and weight for app name, title, and body text. Line spacing control.
 - **Timestamps** — optional per-card timestamps in Relative (`2m ago`), Time (`14:35`), or DateTime format, with independent size, weight, and colour.
 - **Colours** — independent hex colours for title, app name, body text, background, and accent stripe.
@@ -288,7 +288,7 @@ Under `%AppData%\NotificationsPro\`:
 dotnet restore
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 259 unit tests
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 262 unit tests
 ```
 
 ## Publish (self-contained)
@@ -421,10 +421,16 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.27
+- Fixed live profile switching for the already-open Settings window, so saved `Settings Window` theme colours, accent, opacity, corner radius, and popup/window mode now reapply instead of leaving stale UI state behind.
+- Settings import now goes through the same hardened live-apply path, preserving device-local placement/session fields while correctly loading the imported Settings Window theme and display-mode state.
+- Expanded regression coverage around profile load and settings import through the real `SettingsViewModel` path, bringing the suite to `262` passing tests.
+
 ### Release v1.1.10.26
 - Fixed settings-window theme retention when switching profiles: the selected UI theme now carries its full background palette, opacity, and corner-radius state instead of partially falling back toward defaults.
 - Tightened the settings/profile/export audit path so the shared settings snapshot is more consistent and the unlinked UI-theme copy path preserves the full settings-window theme state.
-- Expanded automated persistence coverage for settings-window theme preset application plus profile/export round-trips, bringing the suite to `259` passing tests.
+- Fixed live profile/import application for the already-open Settings window, including settings-window accent preview state and popup/window shell refresh when the loaded profile changes the Settings Window mode.
+- Expanded automated persistence coverage for settings-window theme preset application plus live profile/import application, bringing the suite to `262` passing tests.
 
 ### Release v1.1.10.25
 - Maintenance release focused on regression hardening: animation-style/easing normalization and managed custom asset portability/sanitization now have direct automated coverage, bringing the suite to `256` passing tests.

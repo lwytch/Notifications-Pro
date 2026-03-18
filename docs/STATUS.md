@@ -65,7 +65,7 @@
 - Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
 - Settings-window theme selection now applies the full UI theme state, including background palette, opacity sliders, and settings-window corner radius, so switching profiles or exporting/importing settings no longer falls back toward the default UI theme look after a theme change
 - Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
-- Automated regression coverage now also exercises settings-window theme preset application plus profile/export round-trips of settings-window theme fields, alongside the animation-style/easing normalization helpers and managed-asset path sanitizer, bringing the test suite to 259 passing tests for the current release branch
+- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers and managed-asset path sanitizer, bringing the test suite to 262 passing tests for the current release branch
 - Local MSIX packaging now uses the replacement signing certificate thumbprint in the active workflow and package metadata, with the old current-user signing cert/PFX retired from the normal signing path
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
@@ -355,10 +355,10 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] OpenDyslexic: clicking font preset button changes overlay text to OpenDyslexic font
 - [ ] Undo: Ctrl+Z reverts last settings change; Ctrl+Y re-applies
 - [ ] Undo/Redo buttons in header are disabled when stack is empty
-- [ ] Profiles: saving a profile creates a JSON file in %AppData%\NotificationsPro\profiles\
-- [ ] Profiles: loading a profile restores all settings
-- [ ] Profiles: tray menu "Switch Profile" lists saved profiles
-- [ ] Profiles: loading from both Settings and tray preserves custom settings-window palette/opacity values instead of reverting to a preset
+- [x] Profiles: saving a profile creates a JSON file in %AppData%\NotificationsPro\profiles\
+- [x] Profiles: loading a profile restores all settings
+- [x] Profiles: tray menu "Switch Profile" lists saved profiles
+- [x] Profiles: loading from both Settings and tray preserves custom settings-window palette/opacity values instead of reverting to a preset
 - [ ] Group by App: toggle in Behavior groups notifications under app name headers
 - [ ] Keyboard: Alt+key mnemonics navigate to correct tabs
 - [ ] Keyboard: Escape closes settings window
@@ -402,8 +402,8 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Clicking a built-in theme applies its colors/shape to the overlay immediately
 - [ ] Saving a custom theme creates a file and it appears in the custom themes list
 - [ ] Deleting a custom theme removes it from the list and from disk
-- [ ] Profiles tab provides Import/Export for full settings snapshots
-- [ ] Export Settings writes a JSON file; Import Settings loads it and applies
+- [x] Profiles tab provides Import/Export for full settings snapshots
+- [x] Export Settings writes a JSON file; Import Settings loads it and applies
 - [ ] Theme quick-switch submenu in tray menu lists built-in and custom themes
 - [ ] Accessibility tab appears in Settings with timing, system integration, spoken notifications, Microsoft Voice Access, and hotkey sections
 - [ ] Persistent Notifications toggle keeps cards visible until manually dismissed
