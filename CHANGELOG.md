@@ -15,8 +15,15 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate, pinned the active local workflow/package metadata to the replacement thumbprint, and retired the old current-user signing cert/PFX from the normal signing path
 
 ### Fixed
+- The open Settings-window `UI Theme Preset` combo no longer writes `Windows Dark` back into the viewmodel while its option list is being refreshed during profile loads or settings imports, so named UI theme presets now survive real profile switching with the Settings window open
+- Added bound-combobox regression coverage for Settings-window theme preset profile load and import paths, bringing the suite to 267 passing tests
+- Popup-mode profile switching now suppresses the eager live Settings-window refresh while profiles/imports are being applied, then performs a single rebuild after the final resolved theme state is synced, so the popup shell no longer stays visually stuck on the previous profile
+- Named Settings Window themes now restore correctly when loading saved profiles or importing settings in popup mode, so switching back to an earlier profile no longer leaves the popup UI stuck on the previous theme or a stale serialized palette
+- Added named-theme regression coverage for popup-mode profile switching and settings import, bringing the suite to 265 passing tests
 - Settings-window theme selection now applies the full UI theme state instead of only the color palette, so profile switching and settings export/import keep the expected settings-window background theme, opacity, and corner-radius treatment instead of drifting back toward defaults
 - Live profile switching and imported settings now also reapply the already-open Settings window shell correctly, so saved popup/window mode, popup auto-close behavior, and custom settings-window accent/theme state no longer stay stuck on stale UI chrome after switching
+- Changing the Settings Window UI theme while the window is already open in popup mode no longer crashes the app; popup-shell properties are now only applied during initial shell creation or explicit popup/window-mode switches
+- Switching back to an earlier saved profile in popup mode now forces the Settings Window popup shell to rebuild after the profile/import apply path, so the popup UI theme no longer stays stuck on the previous profile's visuals
 - Settings/profile/export pipeline audit tightened the shared snapshot path, and settings-window theme copy helpers now carry the full retained UI theme state when overlay themes are applied without linking
 - Test hardening now exercises the animation-style/easing normalization helpers and the managed-asset path sanitizer directly, reducing the chance that future animation, export/import, or profile changes silently drift out of sync
 - Top-right and other non-bottom overlay placements now keep their original vertical anchor even when the card stack temporarily hits the monitor-height limit, so expiry removals no longer snap the overlay down to the bottom edge or reverse the stack direction

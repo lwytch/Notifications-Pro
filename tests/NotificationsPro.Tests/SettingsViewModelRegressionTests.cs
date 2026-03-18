@@ -1,4 +1,8 @@
 using System.Reflection;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Threading;
 using NotificationsPro.Models;
 using NotificationsPro.Services;
 using NotificationsPro.ViewModels;
@@ -199,6 +203,48 @@ public class SettingsViewModelRegressionTests : IDisposable
     }
 
     [Fact]
+    public void BuildSettingsThemePreviewSnapshot_UsesResolvedNamedThemeDefinition()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            settingsManager.Apply(new AppSettings
+            {
+                SettingsThemeMode = "Light",
+                SettingsWindowBg = "#111111",
+                SettingsWindowSurface = "#161616",
+                SettingsWindowSurfaceLight = "#202020",
+                SettingsWindowSurfaceHover = "#2A2A2A",
+                SettingsWindowText = "#F3F3F3",
+                SettingsWindowTextSecondary = "#D0D0D0",
+                SettingsWindowTextMuted = "#A0A0A0",
+                SettingsWindowAccent = "#0078D4",
+                SettingsWindowBorder = "#353535",
+                SettingsWindowOpacity = 0.1,
+                SettingsSurfaceOpacity = 0.2,
+                SettingsElementOpacity = 0.3,
+                SettingsWindowCornerRadius = 4
+            });
+
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager);
+
+            var snapshot = InvokeBuildSettingsThemePreviewSnapshot(viewModel);
+            var lightTheme = viewModel.BuiltInThemes.First(t => t.Name == "Light");
+
+            Assert.Equal("Light", snapshot.SettingsThemeMode);
+            Assert.Equal(lightTheme.SettingsWindowBg, snapshot.SettingsWindowBg);
+            Assert.Equal(lightTheme.SettingsWindowSurface, snapshot.SettingsWindowSurface);
+            Assert.Equal(lightTheme.SettingsWindowAccent, snapshot.SettingsWindowAccent);
+            Assert.Equal(lightTheme.SettingsWindowOpacity, snapshot.SettingsWindowOpacity);
+            Assert.Equal(lightTheme.SettingsSurfaceOpacity, snapshot.SettingsSurfaceOpacity);
+            Assert.Equal(lightTheme.SettingsElementOpacity, snapshot.SettingsElementOpacity);
+            Assert.Equal(lightTheme.SettingsWindowCornerRadius, snapshot.SettingsWindowCornerRadius);
+        });
+    }
+
+    [Fact]
     public void LoadProfile_AppliesSettingsWindowThemeAndDisplayModeThroughViewModel()
     {
         StaThreadTestHelper.Run(() =>
@@ -244,6 +290,10 @@ public class SettingsViewModelRegressionTests : IDisposable
 
             var queueManager = new QueueManager(settingsManager);
             var viewModel = new SettingsViewModel(settingsManager, queueManager, profileManager);
+            var refreshRequested = false;
+            var bulkApplyStates = new List<bool>();
+            viewModel.ConfigureRefreshSettingsWindow(() => refreshRequested = true);
+            viewModel.ConfigureSettingsWindowBulkApplyState(isBulkApplying => bulkApplyStates.Add(isBulkApplying));
 
             InvokeLoadProfile(viewModel, "Studio");
 
@@ -264,6 +314,169 @@ public class SettingsViewModelRegressionTests : IDisposable
             Assert.Equal("#0F1014", settingsManager.Settings.SettingsWindowBg);
             Assert.Equal("#33AAFF", settingsManager.Settings.SettingsWindowAccent);
             Assert.False(settingsManager.Settings.CompactSettingsWindow);
+            Assert.True(refreshRequested);
+            Assert.Equal(new[] { true, false }, bulkApplyStates);
+        });
+    }
+
+    [Fact]
+    public void LoadProfile_WithBoundThemePresetCombo_RestoresEachSavedNamedUiThemePreset()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsDir = Path.Combine(_tempDir, "bound-settings");
+            var profilesDir = Path.Combine(_tempDir, "bound-profiles");
+            var settingsManager = new SettingsManager(settingsDir);
+            settingsManager.Load();
+            var profileManager = new ProfileManager(profilesDir);
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager, profileManager);
+            var combo = CreateBoundSettingsThemePresetCombo(viewModel);
+
+            viewModel.SettingsThemeMode = "High Contrast";
+            viewModel.NewProfileName = "HighContrast";
+            InvokeSaveProfile(viewModel);
+            PumpDispatcher();
+
+            viewModel.SettingsThemeMode = "Frosted Glass";
+            viewModel.NewProfileName = "Frosted";
+            InvokeSaveProfile(viewModel);
+            PumpDispatcher();
+
+            InvokeLoadProfile(viewModel, "HighContrast");
+            PumpDispatcher();
+            var highContrast = viewModel.BuiltInThemes.First(t => t.Name == "High Contrast");
+
+            Assert.Equal("High Contrast", viewModel.SettingsThemeMode);
+            Assert.Equal("High Contrast", settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal("High Contrast", combo.SelectedItem);
+            Assert.Equal(highContrast.SettingsWindowBg, settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal(highContrast.SettingsWindowAccent, settingsManager.Settings.SettingsWindowAccent);
+
+            InvokeLoadProfile(viewModel, "Frosted");
+            PumpDispatcher();
+            var frosted = viewModel.BuiltInThemes.First(t => t.Name == "Frosted Glass");
+
+            Assert.Equal("Frosted Glass", viewModel.SettingsThemeMode);
+            Assert.Equal("Frosted Glass", settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal("Frosted Glass", combo.SelectedItem);
+            Assert.Equal(frosted.SettingsWindowBg, settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal(frosted.SettingsWindowAccent, settingsManager.Settings.SettingsWindowAccent);
+        });
+    }
+
+    [Fact]
+    public void ApplyImportedSettings_WithBoundThemePresetCombo_RestoresNamedUiThemePreset()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager);
+            var combo = CreateBoundSettingsThemePresetCombo(viewModel);
+            var importedTheme = viewModel.BuiltInThemes.First(t => t.Name == "High Contrast");
+            var imported = new AppSettings
+            {
+                SettingsDisplayMode = "Popup",
+                PopupAutoClose = false,
+                SettingsThemeMode = importedTheme.Name,
+                SettingsWindowBg = importedTheme.SettingsWindowBg,
+                SettingsWindowSurface = importedTheme.SettingsWindowSurface,
+                SettingsWindowSurfaceLight = importedTheme.SettingsWindowSurfaceLight,
+                SettingsWindowSurfaceHover = importedTheme.SettingsWindowSurfaceHover,
+                SettingsWindowText = importedTheme.SettingsWindowText,
+                SettingsWindowTextSecondary = importedTheme.SettingsWindowTextSecondary,
+                SettingsWindowTextMuted = importedTheme.SettingsWindowTextMuted,
+                SettingsWindowAccent = importedTheme.SettingsWindowAccent,
+                SettingsWindowBorder = importedTheme.SettingsWindowBorder,
+                SettingsWindowOpacity = importedTheme.SettingsWindowOpacity,
+                SettingsSurfaceOpacity = importedTheme.SettingsSurfaceOpacity,
+                SettingsElementOpacity = importedTheme.SettingsElementOpacity,
+                SettingsWindowCornerRadius = importedTheme.SettingsWindowCornerRadius
+            };
+
+            InvokeApplyImportedSettings(viewModel, imported);
+            PumpDispatcher();
+
+            Assert.Equal(importedTheme.Name, viewModel.SettingsThemeMode);
+            Assert.Equal(importedTheme.Name, settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal(importedTheme.Name, combo.SelectedItem);
+            Assert.Equal(importedTheme.SettingsWindowBg, settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal(importedTheme.SettingsWindowAccent, settingsManager.Settings.SettingsWindowAccent);
+        });
+    }
+
+    [Fact]
+    public void LoadProfile_WithNamedSettingsTheme_RehydratesResolvedPopupThemeState()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsDir = Path.Combine(_tempDir, "named-theme-settings");
+            var profilesDir = Path.Combine(_tempDir, "named-theme-profiles");
+            var settingsManager = new SettingsManager(settingsDir);
+            settingsManager.Load();
+            var profileManager = new ProfileManager(profilesDir);
+
+            profileManager.SaveProfile("LightPopup", new AppSettings
+            {
+                SettingsDisplayMode = "Popup",
+                PopupAutoClose = false,
+                SettingsThemeMode = "Light",
+                SettingsWindowBg = "#111111",
+                SettingsWindowSurface = "#181818",
+                SettingsWindowSurfaceLight = "#232323",
+                SettingsWindowSurfaceHover = "#2C2C2C",
+                SettingsWindowText = "#F2F4F8",
+                SettingsWindowTextSecondary = "#C7CDDA",
+                SettingsWindowTextMuted = "#8B93A7",
+                SettingsWindowAccent = "#33AAFF",
+                SettingsWindowBorder = "#394257",
+                SettingsWindowOpacity = 0.31,
+                SettingsSurfaceOpacity = 0.32,
+                SettingsElementOpacity = 0.33,
+                SettingsWindowCornerRadius = 7,
+                CompactSettingsWindow = true
+            });
+
+            settingsManager.Apply(new AppSettings
+            {
+                SettingsDisplayMode = "Popup",
+                SettingsThemeMode = "Windows Dark",
+                SettingsWindowBg = "#111111",
+                SettingsWindowAccent = "#0078D4"
+            });
+
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager, profileManager);
+            var refreshRequested = false;
+            var bulkApplyStates = new List<bool>();
+            viewModel.ConfigureRefreshSettingsWindow(() => refreshRequested = true);
+            viewModel.ConfigureSettingsWindowBulkApplyState(isBulkApplying => bulkApplyStates.Add(isBulkApplying));
+
+            InvokeLoadProfile(viewModel, "LightPopup");
+
+            var lightTheme = viewModel.BuiltInThemes.First(t => t.Name == "Light");
+
+            Assert.Equal("Light", viewModel.SettingsThemeMode);
+            Assert.Equal(lightTheme.SettingsWindowBg, viewModel.SettingsWindowBg);
+            Assert.Equal(lightTheme.SettingsWindowSurface, viewModel.SettingsWindowSurface);
+            Assert.Equal(lightTheme.SettingsWindowAccent, viewModel.SettingsWindowAccent);
+            Assert.Equal(lightTheme.SettingsWindowOpacity, viewModel.SettingsWindowOpacity);
+            Assert.Equal(lightTheme.SettingsSurfaceOpacity, viewModel.SettingsSurfaceOpacity);
+            Assert.Equal(lightTheme.SettingsElementOpacity, viewModel.SettingsElementOpacity);
+            Assert.Equal(lightTheme.SettingsWindowCornerRadius, viewModel.SettingsWindowCornerRadius);
+
+            Assert.Equal("Light", settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal(lightTheme.SettingsWindowBg, settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal(lightTheme.SettingsWindowSurface, settingsManager.Settings.SettingsWindowSurface);
+            Assert.Equal(lightTheme.SettingsWindowAccent, settingsManager.Settings.SettingsWindowAccent);
+            Assert.Equal(lightTheme.SettingsWindowOpacity, settingsManager.Settings.SettingsWindowOpacity);
+            Assert.Equal(lightTheme.SettingsSurfaceOpacity, settingsManager.Settings.SettingsSurfaceOpacity);
+            Assert.Equal(lightTheme.SettingsElementOpacity, settingsManager.Settings.SettingsElementOpacity);
+            Assert.Equal(lightTheme.SettingsWindowCornerRadius, settingsManager.Settings.SettingsWindowCornerRadius);
+            Assert.True(refreshRequested);
+            Assert.Equal(new[] { true, false }, bulkApplyStates);
         });
     }
 
@@ -294,6 +507,10 @@ public class SettingsViewModelRegressionTests : IDisposable
 
             var queueManager = new QueueManager(settingsManager);
             var viewModel = new SettingsViewModel(settingsManager, queueManager);
+            var refreshRequested = false;
+            var bulkApplyStates = new List<bool>();
+            viewModel.ConfigureRefreshSettingsWindow(() => refreshRequested = true);
+            viewModel.ConfigureSettingsWindowBulkApplyState(isBulkApplying => bulkApplyStates.Add(isBulkApplying));
             var imported = new AppSettings
             {
                 OverlayLeft = 999,
@@ -349,6 +566,76 @@ public class SettingsViewModelRegressionTests : IDisposable
             Assert.Equal(0.78, viewModel.SettingsWindowOpacity);
             Assert.Equal(26, viewModel.SettingsWindowCornerRadius);
             Assert.False(viewModel.CompactSettingsWindow);
+            Assert.True(refreshRequested);
+            Assert.Equal(new[] { true, false }, bulkApplyStates);
+        });
+    }
+
+    [Fact]
+    public void ApplyImportedSettings_WithNamedSettingsTheme_RehydratesResolvedThemeState()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            settingsManager.Apply(new AppSettings
+            {
+                SettingsDisplayMode = "Popup",
+                SettingsThemeMode = "Windows Dark",
+                SettingsWindowBg = "#111111",
+                SettingsWindowAccent = "#0078D4"
+            });
+
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager);
+            var refreshRequested = false;
+            var bulkApplyStates = new List<bool>();
+            viewModel.ConfigureRefreshSettingsWindow(() => refreshRequested = true);
+            viewModel.ConfigureSettingsWindowBulkApplyState(isBulkApplying => bulkApplyStates.Add(isBulkApplying));
+            var imported = new AppSettings
+            {
+                SettingsDisplayMode = "Popup",
+                PopupAutoClose = false,
+                SettingsThemeMode = "Frosted Glass",
+                SettingsWindowBg = "#111111",
+                SettingsWindowSurface = "#181818",
+                SettingsWindowSurfaceLight = "#232323",
+                SettingsWindowSurfaceHover = "#2C2C2C",
+                SettingsWindowText = "#F2F4F8",
+                SettingsWindowTextSecondary = "#C7CDDA",
+                SettingsWindowTextMuted = "#8B93A7",
+                SettingsWindowAccent = "#33AAFF",
+                SettingsWindowBorder = "#394257",
+                SettingsWindowOpacity = 0.31,
+                SettingsSurfaceOpacity = 0.32,
+                SettingsElementOpacity = 0.33,
+                SettingsWindowCornerRadius = 7,
+                CompactSettingsWindow = true
+            };
+
+            InvokeApplyImportedSettings(viewModel, imported);
+
+            var frostedTheme = viewModel.BuiltInThemes.First(t => t.Name == "Frosted Glass");
+
+            Assert.Equal("Frosted Glass", viewModel.SettingsThemeMode);
+            Assert.Equal(frostedTheme.SettingsWindowBg, viewModel.SettingsWindowBg);
+            Assert.Equal(frostedTheme.SettingsWindowSurface, viewModel.SettingsWindowSurface);
+            Assert.Equal(frostedTheme.SettingsWindowAccent, viewModel.SettingsWindowAccent);
+            Assert.Equal(frostedTheme.SettingsWindowOpacity, viewModel.SettingsWindowOpacity);
+            Assert.Equal(frostedTheme.SettingsSurfaceOpacity, viewModel.SettingsSurfaceOpacity);
+            Assert.Equal(frostedTheme.SettingsElementOpacity, viewModel.SettingsElementOpacity);
+            Assert.Equal(frostedTheme.SettingsWindowCornerRadius, viewModel.SettingsWindowCornerRadius);
+
+            Assert.Equal("Frosted Glass", settingsManager.Settings.SettingsThemeMode);
+            Assert.Equal(frostedTheme.SettingsWindowBg, settingsManager.Settings.SettingsWindowBg);
+            Assert.Equal(frostedTheme.SettingsWindowSurface, settingsManager.Settings.SettingsWindowSurface);
+            Assert.Equal(frostedTheme.SettingsWindowAccent, settingsManager.Settings.SettingsWindowAccent);
+            Assert.Equal(frostedTheme.SettingsWindowOpacity, settingsManager.Settings.SettingsWindowOpacity);
+            Assert.Equal(frostedTheme.SettingsSurfaceOpacity, settingsManager.Settings.SettingsSurfaceOpacity);
+            Assert.Equal(frostedTheme.SettingsElementOpacity, settingsManager.Settings.SettingsElementOpacity);
+            Assert.Equal(frostedTheme.SettingsWindowCornerRadius, settingsManager.Settings.SettingsWindowCornerRadius);
+            Assert.True(refreshRequested);
+            Assert.Equal(new[] { true, false }, bulkApplyStates);
         });
     }
 
@@ -373,6 +660,13 @@ public class SettingsViewModelRegressionTests : IDisposable
         method!.Invoke(viewModel, new object?[] { name });
     }
 
+    private static void InvokeSaveProfile(SettingsViewModel viewModel)
+    {
+        var method = typeof(SettingsViewModel).GetMethod("SaveProfile", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(method);
+        method!.Invoke(viewModel, null);
+    }
+
     private static void InvokeApplyImportedSettings(SettingsViewModel viewModel, AppSettings settings)
     {
         var method = typeof(SettingsViewModel).GetMethod("ApplyImportedSettings", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -385,5 +679,33 @@ public class SettingsViewModelRegressionTests : IDisposable
         var method = typeof(SettingsViewModel).GetMethod("ApplyTheme", BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(method);
         method!.Invoke(viewModel, new object?[] { theme });
+    }
+
+    private static ComboBox CreateBoundSettingsThemePresetCombo(SettingsViewModel viewModel)
+    {
+        var combo = new ComboBox();
+        BindingOperations.SetBinding(combo, ItemsControl.ItemsSourceProperty, new Binding(nameof(SettingsViewModel.AvailableSettingsThemeModes))
+        {
+            Source = viewModel
+        });
+        BindingOperations.SetBinding(combo, Selector.SelectedItemProperty, new Binding(nameof(SettingsViewModel.SettingsThemeMode))
+        {
+            Source = viewModel,
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+        });
+        PumpDispatcher();
+        return combo;
+    }
+
+    private static void PumpDispatcher()
+    {
+        var frame = new DispatcherFrame();
+        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(_ =>
+        {
+            frame.Continue = false;
+            return null;
+        }), null);
+        Dispatcher.PushFrame(frame);
     }
 }

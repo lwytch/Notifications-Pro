@@ -288,7 +288,7 @@ Under `%AppData%\NotificationsPro\`:
 dotnet restore
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 262 unit tests
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 267 unit tests
 ```
 
 ## Publish (self-contained)
@@ -420,6 +420,24 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.32
+- Fixed `Settings Window > UI Theme Preset` profile switching with the Settings window open. Named UI presets no longer get pushed back to `Windows Dark` when the preset combo refreshes during profile load or settings import.
+- Saving two profiles with different UI theme presets now restores the correct preset, palette, and popup styling when you switch between them on the Profiles tab.
+- Added bound-combobox regression coverage for profile load and settings import, bringing the suite to `267` passing tests.
+
+### Release v1.1.10.31
+- Fixed popup-mode profile switching for Settings Window themes by suppressing the early live-window refresh during profile/import bulk apply, then rebuilding the popup shell once the final resolved theme state is in place.
+- Switching back to an earlier saved profile now restores the expected popup UI theme instead of leaving the previous profile's popup visuals on screen.
+- Added bulk-apply regression coverage around profile load and settings import/export paths, bringing the suite to `265` passing tests.
+
+### Release v1.1.10.29
+- Fixed popup-mode profile switching for the Settings Window by forcing a full popup-shell refresh after saved profiles or imported settings are applied.
+- Returning to an earlier saved profile in popup mode now restores the expected Settings Window UI theme instead of leaving the previous popup theme visible.
+
+### Release v1.1.10.28
+- Fixed a Settings Window crash when changing the UI theme while the window was already open in popup mode.
+- The live Settings-window refresh path now recreates the shell only when switching between `Window` and `Popup`, instead of reapplying immutable popup-only properties on every theme save.
 
 ### Release v1.1.10.27
 - Fixed live profile switching for the already-open Settings window, so saved `Settings Window` theme colours, accent, opacity, corner radius, and popup/window mode now reapply instead of leaving stale UI state behind.

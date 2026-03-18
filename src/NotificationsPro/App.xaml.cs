@@ -48,6 +48,8 @@ public partial class App : Application
     private DispatcherTimer? _themeScheduleTimer;
     private string? _lastScheduledTheme;
     private System.ComponentModel.PropertyChangedEventHandler? _highContrastHandler;
+    private bool _suppressSettingsWindowAutoRefresh;
+    private bool _pendingSettingsWindowBulkRefresh;
 
     // Unpackaged desktop apps need an explicit AppUserModelID so the OS can
     // identify them in Privacy > Notifications and grant listener access.
@@ -139,6 +141,8 @@ public partial class App : Application
         _settingsViewModel = new SettingsViewModel(_settingsManager, _queueManager);
         _settingsViewModel.ConfigureRetryNotificationAccess(() =>
             _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
+        _settingsViewModel.ConfigureRefreshSettingsWindow(RefreshSettingsWindowAfterBulkApply);
+        _settingsViewModel.ConfigureSettingsWindowBulkApplyState(SetSettingsWindowBulkApplyState);
         UpdateSettingsDiagnostics();
 
         // Play notification sounds
@@ -559,10 +563,12 @@ public partial class App : Application
         _settingsViewModel ??= new SettingsViewModel(_settingsManager!, _queueManager!);
         _settingsViewModel.ConfigureRetryNotificationAccess(() =>
             _notificationListener?.RetryAccessAsync() ?? Task.CompletedTask);
+        _settingsViewModel.ConfigureRefreshSettingsWindow(RefreshSettingsWindowAfterBulkApply);
+        _settingsViewModel.ConfigureSettingsWindowBulkApplyState(SetSettingsWindowBulkApplyState);
         UpdateSettingsDiagnostics();
         _settingsWindow = new SettingsWindow(_settingsViewModel, _settingsManager);
         _settingsWindow.Closed += OnSettingsWindowClosed;
-        ApplySettingsWindowShell(_settingsWindow, _settingsManager!.Settings, repositionPopup: true);
+        InitializeSettingsWindowShell(_settingsWindow, _settingsManager!.Settings, repositionPopup: true);
     }
 
     private void OnSettingsWindowClosed(object? sender, EventArgs e)
@@ -574,7 +580,7 @@ public partial class App : Application
             _settingsWindow = null;
     }
 
-    private void ApplySettingsWindowShell(SettingsWindow window, AppSettings settings, bool repositionPopup)
+    private void InitializeSettingsWindowShell(SettingsWindow window, AppSettings settings, bool repositionPopup)
     {
         var popupMode = string.Equals(settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase);
         if (popupMode)
@@ -606,6 +612,24 @@ public partial class App : Application
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
+        ApplySettingsWindowRuntimeState(window, settings, repositionPopup && popupMode);
+    }
+
+    private void ApplySettingsWindowRuntimeState(SettingsWindow window, AppSettings settings, bool repositionPopup)
+    {
+        var popupMode = string.Equals(settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase);
+
+        if (popupMode && repositionPopup)
+        {
+            var expectedWidth = double.IsNaN(window.Width)
+                ? (settings.CompactSettingsWindow ? 560.0 : 780.0)
+                : window.Width;
+            var expectedHeight = double.IsNaN(window.Height) ? 560.0 : window.Height;
+            var popupBounds = CalculateSettingsPopupBounds(expectedWidth, expectedHeight);
+            window.Left = popupBounds.Left;
+            window.Top = popupBounds.Top;
+        }
+
         window.Deactivated -= OnSettingsWindowDeactivated;
         if (popupMode && settings.PopupAutoClose)
             window.Deactivated += OnSettingsWindowDeactivated;
@@ -615,7 +639,7 @@ public partial class App : Application
 
     private void RefreshOpenSettingsWindowFromCurrentSettings()
     {
-        if (_settingsWindow == null || _settingsManager == null)
+        if (_suppressSettingsWindowAutoRefresh || _settingsWindow == null || _settingsManager == null)
             return;
 
         var settings = _settingsManager.Settings;
@@ -629,7 +653,41 @@ public partial class App : Application
             }
         }
 
-        ApplySettingsWindowShell(_settingsWindow, settings, repositionPopup: _settingsWindow.IsPopupShellMode);
+        ApplySettingsWindowRuntimeState(_settingsWindow, settings, repositionPopup: _settingsWindow.IsPopupShellMode);
+    }
+
+    private void RefreshSettingsWindowAfterBulkApply()
+    {
+        if (_settingsWindow == null || _settingsManager == null)
+            return;
+
+        if (_pendingSettingsWindowBulkRefresh)
+            return;
+
+        var settings = _settingsManager.Settings;
+        if (string.Equals(settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase))
+        {
+            _pendingSettingsWindowBulkRefresh = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+            {
+                _pendingSettingsWindowBulkRefresh = false;
+                if (_settingsWindow == null || _settingsManager == null)
+                    return;
+
+                if (string.Equals(_settingsManager.Settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase))
+                    RecreateSettingsWindow();
+                else
+                    RefreshOpenSettingsWindowFromCurrentSettings();
+            }));
+            return;
+        }
+
+        RefreshOpenSettingsWindowFromCurrentSettings();
+    }
+
+    private void SetSettingsWindowBulkApplyState(bool isBulkApplying)
+    {
+        _suppressSettingsWindowAutoRefresh = isBulkApplying;
     }
 
     private void RecreateSettingsWindow()
@@ -906,9 +964,20 @@ public partial class App : Application
         var profile = _profileManager.LoadProfile(profileName);
         if (profile != null)
         {
-            profile.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(profile);
-            _settingsManager.Apply(profile);
-            _settingsViewModel?.ReloadFromCurrentSettings();
+            SetSettingsWindowBulkApplyState(true);
+            try
+            {
+                profile.SettingsThemeMode = SettingsThemeService.ResolveThemeModeForLoadedSettings(profile);
+                _settingsManager.Apply(profile);
+                _settingsViewModel?.ReloadFromCurrentSettings();
+                _settingsViewModel?.SyncResolvedSettingsThemeState();
+            }
+            finally
+            {
+                SetSettingsWindowBulkApplyState(false);
+            }
+
+            RefreshSettingsWindowAfterBulkApply();
         }
     }
 
