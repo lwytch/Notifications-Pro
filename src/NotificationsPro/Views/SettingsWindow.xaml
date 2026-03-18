@@ -3246,7 +3246,7 @@
                         <Button Content="View Archive (Copy to Clipboard)" Style="{StaticResource SecondaryButton}"
                                 Command="{Binding ViewSessionArchiveCommand}"
                                 Margin="0,8,0,0" HorizontalAlignment="Left"
-                                ToolTip="Copies all archived notifications to the clipboard. Data exists only in RAM."/>
+                                ToolTip="Copies all archived notifications to the Windows clipboard. Notifications Pro keeps the archive in RAM only, but clipboard history or other clipboard tools may retain copied text."/>
 
                         <Border Style="{StaticResource SectionHeaderPanel}">
                             <TextBlock Text="STARTUP" Style="{StaticResource SectionHeader}"/>
@@ -3835,7 +3835,17 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
                             <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
-                                       Text="Notification content exists only in RAM while displayed, and is released immediately after dismissal or expiry."/>
+                                       Text="Notification content exists only in RAM while visible. The optional Session Archive keeps it in RAM only for the current app session and clears it when the app closes."/>
+                        </Grid>
+
+                        <Grid Margin="12,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="• " Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                       Text="Copy Text, Copy All to Clipboard, and View Archive hand the selected notification text to the Windows clipboard. Notifications Pro does not persist copied text itself, but clipboard history or other clipboard tools may retain it outside the app."/>
                         </Grid>
 
                         <Grid Margin="12,0,0,12">

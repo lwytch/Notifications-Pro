@@ -28,7 +28,7 @@ If you discover a security vulnerability in Notifications Pro, please report it 
 
 - **No external dependencies** — the app uses only .NET 8 framework libraries (WPF, WinForms, WinRT). No third-party NuGet packages in the main application.
 - **No network access** — the app makes no outbound connections. No telemetry, analytics, or update checks.
-- **No elevated privileges** — runs as a standard user process. Registry access is limited to `HKCU` (current user only).
+- **No elevated privileges** — runs as a standard user process. Registry access is limited to read-only Windows metadata queries under current-user/local-machine hives for sound and speech discovery, and notification content is never written to the registry.
 - **Input validation** — imported settings files are size-limited (1 MB) and numeric values are clamped to valid ranges. Custom asset paths are validated to stay within the designated AppData directory.
 - **Regex safety** — keyword matching uses timeouts to prevent ReDoS.
 

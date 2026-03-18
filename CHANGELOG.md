@@ -10,11 +10,14 @@
 - Safe hex parsing in ContrastHelper using TryParse instead of Convert.ToByte (prevents crash on malformed input)
 - SetLastError=true added to HotkeyManager P/Invoke declarations for better error diagnostics
 - Exception messages in NotificationListener status sanitized (type name only, no sensitive message text)
-- Release packaging script now takes the MSIX signing password from `NOTIFICATIONSPRO_PFX_PASSWORD` or a secure prompt instead of shipping a hardcoded secret in the tracked script
-- Public-release cleanup removed tracked local build-error dumps and documented the remaining history/publisher-identity decisions in `analysis/public-release-audit-2026-03-12.md`
-- Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate, pinned the active local workflow/package metadata to the replacement thumbprint, and retired the old current-user signing cert/PFX from the normal signing path
+- Local release packaging workflow now takes the MSIX signing password from `NOTIFICATIONSPRO_PFX_PASSWORD` or a secure prompt instead of relying on a hardcoded secret
+- Public-release cleanup removed tracked local build-error dumps and cleaned the public contributor/build/privacy docs for the open-source repo
+- Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate used by the maintainer-only packaging workflow and retired the previous local cert/PFX from the normal signing path
 
 ### Fixed
+- Public contributor docs now use explicit project-level `dotnet restore` / `dotnet build` / `dotnet test` commands instead of a broken root solution workflow
+- Startup/privacy docs now match the packaged `StartupTask` behavior and the app's clipboard export disclosures
+- IconService now rejects sibling-directory prefix escapes when loading custom icons, with targeted regression coverage
 - The open Settings-window `UI Theme Preset` combo no longer writes `Windows Dark` back into the viewmodel while its option list is being refreshed during profile loads or settings imports, so named UI theme presets now survive real profile switching with the Settings window open
 - Added bound-combobox regression coverage for Settings-window theme preset profile load and import paths, bringing the suite to 267 passing tests
 - Popup-mode profile switching now suppresses the eager live Settings-window refresh while profiles/imports are being applied, then performs a single rebuild after the final resolved theme state is synced, so the popup shell no longer stays visually stuck on the previous profile

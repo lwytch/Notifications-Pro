@@ -130,7 +130,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 ### System Integration
 - **Start with Windows** — enables/disables the packaged Windows Startup Task for Notifications Pro.
 - **Notification access recovery** — the System tab shows current capture status, includes buttons to open Windows notification access, retry the direct WinRT access check, and run a capture diagnostic, and exposes `Auto`, `Prefer WinRT`, and `Force Accessibility` capture modes.
-- **Session archive** — optional RAM-only archive for the current app session, with clipboard export and no disk persistence of notification text.
+- **Session archive** — optional RAM-only archive for the current app session, with explicit clipboard export when you choose it and no disk persistence of notification text.
 - **About dialog** — tray menu About shows the installed version, package identity, listener mode/status, runtime version, and project link.
 - **Tray quick actions** — the tray menu can show/hide the overlay, pause notifications, toggle always-on-top / click-through, start focus mode, clear all, quick mute seen apps, and switch saved themes or profiles.
 - **Tray listener health** — tray tooltip surfaces the active listener mode plus current status details for faster troubleshooting.
@@ -257,6 +257,7 @@ Per-app icons are user-configured (built-in vector presets or your own files) an
 Notifications Pro is designed to avoid persisting notification content:
 - **No notification title or body is ever written to disk** — no database, no cache, no logs of notification text.
 - Notification content exists only in RAM. By default it is released immediately after dismissal or expiry. The only exception is the optional **Session Archive**, which keeps notification text in RAM for the current app session only and clears it when the app closes.
+- Using **Copy Text**, **Copy All to Clipboard**, or **View Session Archive** hands the selected notification text to the Windows clipboard. Notifications Pro does not persist that text itself, but Windows clipboard history or third-party clipboard tools may retain copied text outside the app.
 - The app makes **no network calls** and includes **no telemetry**.
 - If **Spoken Notifications** is enabled, the text is spoken through your selected Windows audio output and may be audible to people nearby. Notifications Pro still keeps that text in RAM only and never saves spoken content to disk.
 - Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label only; it does not save or transmit the text.
@@ -285,10 +286,11 @@ Under `%AppData%\NotificationsPro\`:
 ## Build / Run / Test
 
 ```bash
-dotnet restore
+dotnet restore src/NotificationsPro/NotificationsPro.csproj
+dotnet restore tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro
-dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj   # 267 unit tests
+dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 ```
 
 ## Publish (self-contained)

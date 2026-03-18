@@ -8,7 +8,8 @@ Thank you for your interest in contributing!
 2. Clone your fork and create a feature branch
 3. Build and test:
    ```bash
-   dotnet restore
+   dotnet restore src/NotificationsPro/NotificationsPro.csproj
+   dotnet restore tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
    dotnet build src/NotificationsPro/NotificationsPro.csproj
    dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
    ```

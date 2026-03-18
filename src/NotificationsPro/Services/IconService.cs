@@ -83,7 +83,10 @@ public class IconService
             // Validate the path is within the custom icons directory to prevent path traversal
             var fullPath = Path.GetFullPath(filePath);
             var customDir = Path.GetFullPath(CustomIconsDir);
-            if (!fullPath.StartsWith(customDir, StringComparison.OrdinalIgnoreCase))
+            var customDirWithSeparator = customDir.EndsWith(Path.DirectorySeparatorChar)
+                ? customDir
+                : customDir + Path.DirectorySeparatorChar;
+            if (!fullPath.StartsWith(customDirWithSeparator, StringComparison.OrdinalIgnoreCase))
             {
                 _iconCache[filePath] = null;
                 return null;

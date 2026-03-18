@@ -128,8 +128,8 @@ public partial class App : Application
         _themeManager = new ThemeManager();
         _profileManager = new ProfileManager();
 
-        // Sync startup registry with saved setting
-        SyncStartupRegistryState();
+        // Sync the packaged StartupTask with the saved setting
+        SyncStartupTaskState();
 
         _queueManager = new QueueManager(_settingsManager);
         _spokenNotificationService = new SpokenNotificationService(_queueManager, _settingsManager, Dispatcher);
@@ -273,7 +273,7 @@ public partial class App : Application
         ApplyThemeByName(targetTheme);
     }
 
-    private async void SyncStartupRegistryState()
+    private async void SyncStartupTaskState()
     {
         if (_settingsManager == null) return;
         var shouldStart = _settingsManager.Settings.StartWithWindows;
@@ -1055,7 +1055,7 @@ public partial class App : Application
         var text = string.Join("\n", lines);
         System.Windows.Clipboard.SetText(text);
         System.Windows.MessageBox.Show(
-            $"{archive.Count} archived notification(s) copied to clipboard.\n\nThis data exists only in RAM and will be cleared when the app closes.",
+            $"{archive.Count} archived notification(s) copied to clipboard.\n\nNotifications Pro keeps the archive in RAM only and clears it when the app closes. Copying it here also hands the text to the Windows clipboard, which clipboard history or other clipboard tools may retain.",
             "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 

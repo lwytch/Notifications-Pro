@@ -25,9 +25,6 @@ This file is the quick orientation guide for AI agents and maintainers working i
 `CONTRIBUTING.md`
   Contributor workflow and repository expectations.
 
-`NotificationsPro.slnx`
-  Local solution metadata for the WPF app and test project. Public contributor docs should prefer the explicit project-level `dotnet build` / `dotnet test` commands.
-
 `settings.example.json`
   Example serialized settings payload; keep this aligned with `AppSettings`.
 

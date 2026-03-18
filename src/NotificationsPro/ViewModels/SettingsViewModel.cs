@@ -2941,7 +2941,7 @@ public partial class SettingsViewModel : BaseViewModel
             });
         var text = string.Join("\n", lines);
         System.Windows.Clipboard.SetText(text);
-        System.Windows.MessageBox.Show($"{archive.Count} archived notification(s) copied to clipboard.\n\nThis data exists only in RAM and will be cleared when the app closes.",
+        System.Windows.MessageBox.Show($"{archive.Count} archived notification(s) copied to clipboard.\n\nNotifications Pro keeps the archive in RAM only and clears it when the app closes. Copying it here also hands the text to the Windows clipboard, which clipboard history or other clipboard tools may retain.",
             "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 

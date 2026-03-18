@@ -15,7 +15,7 @@ App.xaml.cs (Entry Point)
 │   └── IconService           Optional per-app icons (built-in presets or user-provided image files)
 ├── NotificationListener     WinRT listener + polling + accessibility fallback (optional toast suppression)
 ├── HotkeyManager            Global hotkeys via Win32 RegisterHotKey
-├── StartupHelper            Start-with-Windows registry helper (HKCU Run key)
+├── StartupHelper            Start-with-Windows packaged StartupTask helper
 ├── OverlayWindow            Transparent overlay window
 │   └── OverlayViewModel     Binds queue state + settings to overlay rendering
 └── SettingsWindow           Tabbed settings UI:

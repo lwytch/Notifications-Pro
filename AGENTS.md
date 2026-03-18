@@ -9,7 +9,8 @@ Notifications Pro: a Windows tray app (C# .NET 8 + WPF) that mirrors Windows toa
 ## Commands
 
 ```bash
-dotnet restore                                          # restore dependencies
+dotnet restore src/NotificationsPro/NotificationsPro.csproj               # restore app dependencies
+dotnet restore tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj # restore test dependencies
 dotnet build src/NotificationsPro/NotificationsPro.csproj
 dotnet run --project src/NotificationsPro               # run the app
 dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
@@ -22,6 +23,7 @@ powershell -ExecutionPolicy Bypass -File scripts\app-packaging\release.ps1 -Vers
 Please read `REPO_MAP.md` in the repository root for a breakdown of the architectural structure, testing locations, packaging scripts, and AI tools.
 
 The maintainer may keep local packaging scripts under `scripts/app-packaging/`, but that folder is gitignored for the public repository. Treat it as an owner-only local workflow and only rely on it when it exists in the current workspace.
+The maintainer may also keep local audit notes under `analysis/` and `runbooks/`. Treat them as optional, gitignored context when present, not as required inputs for the public contributor workflow.
 
 ## Privacy Rules (HARD CONSTRAINTS — never violate)
 

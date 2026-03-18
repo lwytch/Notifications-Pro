@@ -273,7 +273,7 @@ Quick wins, dynamic theming, sounds, icons, and settings UX enhancements.
 - [x] Legal Strategy: Add an open-source `GPL v3` `LICENSE` to the repo root.
 - [x] Legal Strategy: Add an explicit "Disclaimer of Liability" and "As-Is" warranty section to `README.md`.
 - [x] Packaging Strategy: Implement an MSIX packaging project (`.wapproj`) to bundle the WPF app and grant native WinRT permissions.
-- [x] Update Strategy: Configure an `.appinstaller` file with the MSIX to support automatic over-the-air client updates.
+- [x] Update Strategy: keep MSIX update/install metadata in the maintainer-local packaging workflow rather than requiring a tracked public `.appinstaller` file.
 - [x] Final polish: settings popup now anchors to the Windows toast corner on the taskbar monitor (multi-monitor aware)
 - [x] Final polish: settings popup position restore no longer overrides popup mode placement
 - [x] Final polish: fullscreen overlay mode now renders true fullscreen (monitor bounds) without taskbar/work-area clipping
@@ -456,7 +456,7 @@ Settings UX and persistence:
 Docs and release readiness:
 - [x] README workflow guides: add dedicated sections for `Getting the Most Out of Notifications Pro`, `Getting the Most Out of X`, `Other Social Platforms`, and `Common Notification-Heavy Tools`, covering setup, browser-hosted app limitations, per-app narration, privacy limits, and troubleshooting for services such as X, Reddit, Instagram, Codex, and Antigravity in the single-panel app.
 - [x] README/Help gap analysis: update README, in-app Help, example settings, and status text for advanced narration rules, card background images, voice setup, privacy disclosures, defaults, and troubleshooting without reintroducing multi-panel language.
-- [x] Public repo sanitisation audit: reviewed the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity, and recorded the findings in `analysis/public-release-audit-2026-03-12.md`.
+- [x] Public repo sanitisation audit: reviewed the tracked tree and git history for secrets, local certificates, hardcoded signing material, proprietary/internal tooling references, author metadata, and publisher identity; the public follow-up was contributor-doc cleanup plus explicit acceptance of the remaining non-sensitive metadata.
 - [x] Packaging automation hardening: prefer local certificate-store identities for MSIX signing, support explicit env-var overrides, and fail fast when a PFX password is unavailable instead of hanging on a hidden prompt.
 - [x] Signing credential rotation follow-through: rotated the exposed MSIX signing credential locally, pinned the active packaging workflow to the replacement certificate thumbprint, retired the old current-user signing cert/PFX from the active path, and updated the local packaging docs/metadata accordingly.
 
@@ -487,7 +487,7 @@ Background image and advanced visual-control gaps:
 Operational gaps:
 - [x] Real listener diagnostics: Add a `Run Capture Diagnostic` or equivalent action under `System > Notification Access` so users can distinguish overlay rendering issues from live WinRT/accessibility capture failures.
 - [x] Toast suppression flash fix: tighten the WinRT suppression path so `Suppress Toast Popups` removes the system toast before overlay presentation when possible, avoid regressions in live capture, and document any remaining platform limits honestly.
-- [x] Security audit refresh: ran a packaged-app security sweep across the working tree, dependencies, packaging/signing scripts, and privacy-sensitive runtime surfaces; recorded the findings in `analysis/security-audit-2026-03-16.md`, and converted the confirmed issues into tracked remediation items below.
+- [x] Security audit refresh: ran a packaged-app security sweep across the working tree, dependencies, packaging/signing workflows, and privacy-sensitive runtime surfaces, then converted the confirmed issues into tracked remediation items below.
 - [x] Dependency currency review: reviewed the shipped NuGet graph and packaging/tooling surfaces; no known vulnerable packages were reported from the configured feeds, so the immediate follow-up remains runtime/path hardening rather than package CVEs.
 - [x] Privacy-surface regression review: inspected capture, suppression, session archive, clipboard, profile/export, and local asset-loading paths; the remaining gaps are sound-path confinement and portable asset-path serialization rather than direct notification-content persistence.
 - [x] Sound-path confinement hardening: restrict `DefaultSound` and `PerAppSounds` to trusted Windows sound identifiers or files under `%AppData%\NotificationsPro\sounds`, reject UNC/out-of-root paths during settings load/import/profile apply, and cover the behavior with regression tests.
@@ -502,9 +502,10 @@ Post-redesign process guardrails:
 - [x] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, profile save/load coverage, and export/import coverage whenever a settings feature is added or reorganized.
 
 ## Current Focus
+- [x] Public contributor/release-readiness cleanup: removed the broken tracked `.slnx` contributor path, switched tracked docs and validation guidance to explicit project-level restore/build/test commands, aligned startup/clipboard/security wording with the shipped app, and tightened custom-icon path confinement with regression coverage.
 - [x] Settings/profile/export pipeline hardening: audited the full `AppSettings` snapshot path used by settings save, profile save/load, and JSON export/import; fixed settings-window theme retention bugs (including profile switching and theme-copy omissions); and expanded regression tests so future settings drift is caught automatically.
 - [x] Settings-window profile/import follow-up: fixed live profile switching for the already-open Settings window so saved settings-window accent, popup/window mode, popup auto-close behavior, and imported settings-window theme fields are reapplied instead of drifting toward stale shell/theme state.
-- [x] Test pipeline audit and hardening: reviewed the Notifications Pro test surface, added targeted regression coverage for high-risk helper/settings path behavior, and recorded the remaining manual-only release/runtime risk areas in `analysis/test-pipeline-audit-2026-03-17.md`.
+- [x] Test pipeline audit and hardening: reviewed the Notifications Pro test surface, added targeted regression coverage for high-risk helper/settings path behavior, and documented the remaining manual-only release/runtime risk areas in tracked docs.
 - [x] Public repo guard skill: added a dedicated local AI skill that treats Notifications Pro as a public repository by default, with explicit checks for secrets, local certificates, hardcoded user paths, private assets, and privacy-rule regressions before edits or release work.
 - [x] Skill review and maintenance pass: tightened the local sanitisation, repackaging, and settings-regression skills so future agents keep release safety, settings persistence, and documentation hygiene in view.
 - [x] Release v1.1.10.25: updated README release notes, reran the verification/build pipeline, and generated a fresh signed MSIX package after the audit work landed.

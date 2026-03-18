@@ -1098,7 +1098,11 @@ public partial class OverlayWindow : Window
             };
             menu.Items.Add(dismissMenuItem);
 
-            var copyMenuItem = new MenuItem { Header = "Copy Text" };
+            var copyMenuItem = new MenuItem
+            {
+                Header = "Copy Text",
+                ToolTip = "Copies this notification text to the Windows clipboard."
+            };
             copyMenuItem.Click += (_, _) =>
             {
                 var parts = new[] { item.AppName, item.Title, item.Body }
@@ -1135,7 +1139,11 @@ public partial class OverlayWindow : Window
             menu.Items.Add(new Separator());
         }
 
-        var copyAllMenuItem = new MenuItem { Header = "Copy All to Clipboard" };
+        var copyAllMenuItem = new MenuItem
+        {
+            Header = "Copy All to Clipboard",
+            ToolTip = "Copies all visible notification text to the Windows clipboard."
+        };
         copyAllMenuItem.Click += (_, _) =>
         {
             if (DataContext is OverlayViewModel copyAllVm)

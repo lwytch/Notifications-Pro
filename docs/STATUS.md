@@ -65,7 +65,7 @@
 - Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
 - Settings-window theme selection now applies the full UI theme state, including background palette, opacity sliders, and settings-window corner radius, so switching profiles or exporting/importing settings no longer falls back toward the default UI theme look after a theme change
 - Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
-- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers and managed-asset path sanitizer, bringing the test suite to 262 passing tests for the current release branch
+- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers and managed-asset path sanitizer, bringing the current verified suite to 269 passing tests
 - Local MSIX packaging now uses the replacement signing certificate thumbprint in the active workflow and package metadata, with the old current-user signing cert/PFX retired from the normal signing path
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
@@ -205,8 +205,8 @@
   - Tray icon dimmed/monochrome when notifications are paused
   - Notification count badge on tray icon (red badge with active card count)
 - **System Integration & Multi-Monitor (Milestone 9)**:
-  - Start with Windows toggle — adds/removes registry Run key automatically
-  - Startup registry state synced on app launch for consistency
+  - Start with Windows toggle — enables/disables the packaged Windows Startup Task
+  - Startup task state synced on app launch for consistency
   - Multi-monitor picker in Layout tab with detected monitor list (resolution + primary label)
   - Move overlay to selected monitor with one click
   - Refresh button to re-detect monitors without restarting
@@ -273,11 +273,10 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 203 unit tests covering QueueManager (including scoped highlight/mute/narration rules, live highlight re-evaluation, per-rule highlight styling, preview-notification injection, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, animation-style migration, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), ThemeManager/ProfileManager filtering-round-trip coverage, spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- 269 unit tests covering QueueManager (including scoped highlight/mute/narration rules, live highlight re-evaluation, per-rule highlight styling, preview-notification injection, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, animation-style migration, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), ThemeManager/ProfileManager filtering-round-trip coverage, spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
-- Solution-level `dotnet build` against `NotificationsPro.slnx` currently fails in this environment due a solution parser error; building the app and tests by project works
 
 ## Known Issues / Troubleshooting
 - **UserNotificationListener** may report "Allowed" but not deliver notifications reliably on some systems. Workaround: open Windows Settings > Privacy > Notifications, ensure the app has access, then use "Retry Access Check". If test notifications work but live ones do not, switch Settings > System > Notification Access > Capture Mode to `Force Accessibility`.
@@ -441,8 +440,8 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] "Refresh" button updates the monitor list after connecting/disconnecting a display
 - [ ] Position presets (top/middle/bottom left/center/right) target the selected monitor
 - [ ] Layout tab exposes overlay width/max-height sliders, numeric width entry, fullscreen backdrop controls, and 1080p/2K/4K/8K preset buttons
-- [ ] Start with Windows toggle adds a registry Run key for automatic startup
-- [ ] Disabling Start with Windows removes the registry Run key
+- [ ] Start with Windows toggle enables the packaged Windows Startup Task
+- [ ] Disabling Start with Windows disables the packaged Windows Startup Task
 - [ ] App launches at Windows startup when the toggle is on
 - [ ] Streaming tab appears in Settings between Sounds and Accessibility
 - [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
