@@ -404,15 +404,16 @@ If live notifications stop appearing while preview/test notifications still work
 
 | Symptom | Fix |
 |---------|-----|
-| No notifications captured | Verify permission, then use tray "Retry Access Check". If test notifications work but live ones do not, open **Settings > System > Notification Access**, run **Capture Diagnostic**, and switch **Capture Mode** to `Force Accessibility`. |
-| Can't drag the overlay | Click-through is on. Disable from the tray menu or Settings > Layout. |
-| Windows toasts stop appearing | Ensure "Suppress Toast Popups" is off in Settings > System. |
-| System sounds all sound the same | Windows 11 unified many system sound events. Use a custom WAV for distinct sounds. |
-| Overlay disappears off-screen | Use Settings > Layout > Quick Position presets to move it back. |
-| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If you still hear nothing, check your Windows output device, ensure notifications are not paused, confirm the app is still checked in **Settings > Apps > Read aloud**, and verify that **Settings > Filtering > Only speak matching rules** or `Narration Trigger = Only Matching Narration Rules` is not enabled unless you actually have a matching `Read Aloud` rule. |
+| MSIX won't install or Windows says the package is untrusted | Download the matching **`.msix`** and **`.cer`** from the same GitHub release. Install the **`.cer`** into **Trusted Root Certification Authorities**, and if Windows still says the signature is not trusted, add the same certificate to **Trusted People** and retry. |
+| No notifications captured | First confirm Windows is actually surfacing notifications for that app and that the tray menu is not showing `Resume Notifications` (meaning capture is paused). Then use tray **Retry Access Check**. If test notifications work but live ones do not, open **Settings > System > Notification Access**, use **Open Windows Notification Access** if needed, run **Run Capture Diagnostic**, and switch **Capture Mode** to `Force Accessibility`. |
+| Can't drag the overlay | Click-through is on. Turn off the tray **Click-Through** item or disable **Settings > Layout > Click-Through Mode**. |
+| Windows toasts stop appearing | If you want both native Windows toasts and the overlay, turn off **Settings > System > Suppress Toast Popups**. When enabled, Notifications Pro intentionally removes captured native toasts while it is running. |
+| Several Windows sound choices sound identical or very similar | Notifications Pro lists the distinct WAV files Windows currently exposes for its default sound events, but Windows can still map multiple event names to the same or very similar audio. Use **Settings > Sounds > Test** to preview the current choice, or **Browse Custom Sound...** if you want a clearly distinct alert. |
+| The app is running in the tray but I can't see the overlay | Use the tray **Show Overlay** item first. If the overlay appears off-screen, open **Settings > Layout** and use **Quick Position** presets to move it back. |
+| Notifications are not read aloud | Turn on **Settings > Accessibility > Read Notifications Aloud**, then use **Preview Voice**. If Preview Voice is silent, check your Windows output device and selected voice. If Preview Voice works but live notifications stay silent, ensure notifications are not paused, confirm the app is still checked in **Settings > Apps > Read aloud**, and verify that **Settings > Filtering > Only speak matching rules** or `Narration Trigger = Only Matching Narration Rules` is not enabled unless you already have a matching `Read Aloud` rule. |
 | A highlight, mute, or narration rule is affecting the wrong app | Open **Settings > Filtering** and add or tighten the optional **App Filter** so the rule only matches the intended source such as `X`, `Outlook`, `Slack`, `Codex`, or `Antigravity`. |
-| Everything shows up as `Google Chrome` or `Microsoft Edge` | Install the site as a browser app/PWA so Windows can surface a more specific app identity when the browser supports it, then wait for the next live notification. |
-| Voice Access only sees "Notification" | Change **Settings > Accessibility > Microsoft Voice Access** from `Off` to `Body Only` or `Title + Body + Timestamp`. |
+| Everything shows up as `Google Chrome` or `Microsoft Edge` | Install the site as a browser app/PWA so Windows can surface a more specific app identity when the browser supports it. If it still comes through as the browser host, keep the browser app name as the **App Filter** and narrow the match with title/body rule text. |
+| Voice Access only sees "Notification" | Change **Settings > Accessibility > Voice Access Card Labels** from `Off` to `Body Only` or `Title + Body + Timestamp`. `Off` intentionally keeps the generic card label. |
 
 ---
 
