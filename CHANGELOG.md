@@ -15,6 +15,8 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate used by the maintainer-only packaging workflow and retired the previous local cert/PFX from the normal signing path
 
 ### Fixed
+- Settings Window popup-mode theme sliders now raise the correct property-change notifications, so their live numeric readouts stay in sync while dragging opacity, surface, element, and corner-radius controls
+- README install/privacy/accessibility copy was tightened for first-time public users, and the in-file release notes were reset to a fresh current baseline
 - Public contributor docs now use explicit project-level `dotnet restore` / `dotnet build` / `dotnet test` commands instead of a broken root solution workflow
 - Startup/privacy docs now match the packaged `StartupTask` behavior and the app's clipboard export disclosures
 - IconService now rejects sibling-directory prefix escapes when loading custom icons, with targeted regression coverage

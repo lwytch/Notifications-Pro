@@ -508,6 +508,7 @@ Post-redesign process guardrails:
 - [x] Test pipeline audit and hardening: reviewed the Notifications Pro test surface, added targeted regression coverage for high-risk helper/settings path behavior, and documented the remaining manual-only release/runtime risk areas in tracked docs.
 - [x] Public repo guard skill: added a dedicated local AI skill that treats Notifications Pro as a public repository by default, with explicit checks for secrets, local certificates, hardcoded user paths, private assets, and privacy-rule regressions before edits or release work.
 - [x] Skill review and maintenance pass: tightened the local sanitisation, repackaging, and settings-regression skills so future agents keep release safety, settings persistence, and documentation hygiene in view.
+- [x] Release v1.1.10.33: fixed the popup Settings Window slider/value refresh regression, refreshed the public README/install/privacy wording, reset the in-file release-notes block to a fresh baseline, and generated plus installed a new packaged build for review.
 - [x] Release v1.1.10.25: updated README release notes, reran the verification/build pipeline, and generated a fresh signed MSIX package after the audit work landed.
 
 ## Blocked

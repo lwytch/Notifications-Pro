@@ -26,6 +26,7 @@
 - Click-through hit testing now returns transparent hit results so mouse input passes through consistently
 - Settings window: twelve sections (Appearance, Behavior, Filtering, Apps, Layout, Sounds, Streaming, Accessibility, Settings Window, System, Profiles, Help) with a Windows-style dark default theme
 - Settings navigation now uses a left sidebar layout for reliable section access in popup mode
+- Settings Window popup-mode theme sliders now keep their live value readouts in sync while dragging opacity, surface, element, and corner-radius controls
 - Apps tab now loads its per-app sound/icon/background controls through stable root-window bindings instead of popup-sensitive combo-box ancestor lookups
 - Apps tab background override display now reads from a one-way binding, so opening the tab and sending test notifications no longer tries to write back into the read-only display property
 - Apps tab per-app override cards now use a cleaner aligned form layout, with a compact header, a consistent label/control rhythm, and a shortened background-image status display instead of dumping full file paths into the main form flow

@@ -699,43 +699,43 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     private string _settingsWindowBg = "#111111";
-    public string SettingsWindowBg { get => _settingsWindowBg; set => SetSettingsWindowColor(ref _settingsWindowBg, value); }
+    public string SettingsWindowBg { get => _settingsWindowBg; set => SetSettingsWindowColor(ref _settingsWindowBg, value, nameof(SettingsWindowBg)); }
 
     private double _settingsWindowOpacity = 0.95;
-    public double SettingsWindowOpacity { get => _settingsWindowOpacity; set => SetSettingsThemeOpacity(ref _settingsWindowOpacity, value); }
+    public double SettingsWindowOpacity { get => _settingsWindowOpacity; set => SetSettingsThemeOpacity(ref _settingsWindowOpacity, value, nameof(SettingsWindowOpacity)); }
 
     private double _settingsSurfaceOpacity = 1.0;
-    public double SettingsSurfaceOpacity { get => _settingsSurfaceOpacity; set => SetSettingsThemeOpacity(ref _settingsSurfaceOpacity, value); }
+    public double SettingsSurfaceOpacity { get => _settingsSurfaceOpacity; set => SetSettingsThemeOpacity(ref _settingsSurfaceOpacity, value, nameof(SettingsSurfaceOpacity)); }
 
     private double _settingsElementOpacity = 1.0;
-    public double SettingsElementOpacity { get => _settingsElementOpacity; set => SetSettingsThemeOpacity(ref _settingsElementOpacity, value); }
+    public double SettingsElementOpacity { get => _settingsElementOpacity; set => SetSettingsThemeOpacity(ref _settingsElementOpacity, value, nameof(SettingsElementOpacity)); }
 
     private string _settingsWindowSurface = "#1C1C1C";
-    public string SettingsWindowSurface { get => _settingsWindowSurface; set => SetSettingsWindowColor(ref _settingsWindowSurface, value); }
+    public string SettingsWindowSurface { get => _settingsWindowSurface; set => SetSettingsWindowColor(ref _settingsWindowSurface, value, nameof(SettingsWindowSurface)); }
 
     private string _settingsWindowSurfaceLight = "#262626";
-    public string SettingsWindowSurfaceLight { get => _settingsWindowSurfaceLight; set => SetSettingsWindowColor(ref _settingsWindowSurfaceLight, value); }
+    public string SettingsWindowSurfaceLight { get => _settingsWindowSurfaceLight; set => SetSettingsWindowColor(ref _settingsWindowSurfaceLight, value, nameof(SettingsWindowSurfaceLight)); }
 
     private string _settingsWindowSurfaceHover = "#303030";
-    public string SettingsWindowSurfaceHover { get => _settingsWindowSurfaceHover; set => SetSettingsWindowColor(ref _settingsWindowSurfaceHover, value); }
+    public string SettingsWindowSurfaceHover { get => _settingsWindowSurfaceHover; set => SetSettingsWindowColor(ref _settingsWindowSurfaceHover, value, nameof(SettingsWindowSurfaceHover)); }
 
     private string _settingsWindowText = "#F3F3F3";
-    public string SettingsWindowText { get => _settingsWindowText; set => SetSettingsWindowColor(ref _settingsWindowText, value); }
+    public string SettingsWindowText { get => _settingsWindowText; set => SetSettingsWindowColor(ref _settingsWindowText, value, nameof(SettingsWindowText)); }
 
     private string _settingsWindowTextSecondary = "#C7C7C7";
-    public string SettingsWindowTextSecondary { get => _settingsWindowTextSecondary; set => SetSettingsWindowColor(ref _settingsWindowTextSecondary, value); }
+    public string SettingsWindowTextSecondary { get => _settingsWindowTextSecondary; set => SetSettingsWindowColor(ref _settingsWindowTextSecondary, value, nameof(SettingsWindowTextSecondary)); }
 
     private string _settingsWindowTextMuted = "#8A8A8A";
-    public string SettingsWindowTextMuted { get => _settingsWindowTextMuted; set => SetSettingsWindowColor(ref _settingsWindowTextMuted, value); }
+    public string SettingsWindowTextMuted { get => _settingsWindowTextMuted; set => SetSettingsWindowColor(ref _settingsWindowTextMuted, value, nameof(SettingsWindowTextMuted)); }
 
     private string _settingsWindowAccent = "#0078D4";
-    public string SettingsWindowAccent { get => _settingsWindowAccent; set => SetSettingsWindowColor(ref _settingsWindowAccent, value); }
+    public string SettingsWindowAccent { get => _settingsWindowAccent; set => SetSettingsWindowColor(ref _settingsWindowAccent, value, nameof(SettingsWindowAccent)); }
 
     private string _settingsWindowBorder = "#353535";
-    public string SettingsWindowBorder { get => _settingsWindowBorder; set => SetSettingsWindowColor(ref _settingsWindowBorder, value); }
+    public string SettingsWindowBorder { get => _settingsWindowBorder; set => SetSettingsWindowColor(ref _settingsWindowBorder, value, nameof(SettingsWindowBorder)); }
 
     private double _settingsWindowCornerRadius = 12;
-    public double SettingsWindowCornerRadius { get => _settingsWindowCornerRadius; set => SetSettingsThemeCornerRadius(value); }
+    public double SettingsWindowCornerRadius { get => _settingsWindowCornerRadius; set => SetSettingsThemeCornerRadius(value, nameof(SettingsWindowCornerRadius)); }
 
     private bool _compactSettingsWindow = true;
     public bool CompactSettingsWindow { get => _compactSettingsWindow; set { if (SetProperty(ref _compactSettingsWindow, value)) QueueSave(); } }
@@ -745,9 +745,9 @@ public partial class SettingsViewModel : BaseViewModel
 
     public ObservableCollection<string> AvailableSettingsThemeModes { get; } = new();
 
-    private void SetSettingsWindowColor(ref string backingField, string value)
+    private void SetSettingsWindowColor(ref string backingField, string value, string propertyName)
     {
-        if (!SetProperty(ref backingField, value))
+        if (!SetProperty(ref backingField, value, propertyName))
             return;
 
         MarkSettingsThemeCustomIfNeeded();
@@ -756,9 +756,9 @@ public partial class SettingsViewModel : BaseViewModel
         ApplySettingsTheme();
     }
 
-    private void SetSettingsThemeOpacity(ref double backingField, double value)
+    private void SetSettingsThemeOpacity(ref double backingField, double value, string propertyName)
     {
-        if (!SetProperty(ref backingField, value))
+        if (!SetProperty(ref backingField, value, propertyName))
             return;
 
         MarkSettingsThemeCustomIfNeeded();
@@ -766,9 +766,9 @@ public partial class SettingsViewModel : BaseViewModel
         ApplySettingsTheme();
     }
 
-    private void SetSettingsThemeCornerRadius(double value)
+    private void SetSettingsThemeCornerRadius(double value, string propertyName)
     {
-        if (!SetProperty(ref _settingsWindowCornerRadius, value))
+        if (!SetProperty(ref _settingsWindowCornerRadius, value, propertyName))
             return;
 
         MarkSettingsThemeCustomIfNeeded();

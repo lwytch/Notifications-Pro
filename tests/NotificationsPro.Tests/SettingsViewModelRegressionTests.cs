@@ -147,6 +147,41 @@ public class SettingsViewModelRegressionTests : IDisposable
     }
 
     [Fact]
+    public void SettingsWindowThemeTweaks_RaiseConcretePropertyChangedNames()
+    {
+        StaThreadTestHelper.Run(() =>
+        {
+            var settingsManager = new SettingsManager(_tempDir);
+            settingsManager.Load();
+            var queueManager = new QueueManager(settingsManager);
+            var viewModel = new SettingsViewModel(settingsManager, queueManager);
+            var propertyNames = new List<string>();
+
+            viewModel.PropertyChanged += (_, args) =>
+            {
+                if (!string.IsNullOrWhiteSpace(args.PropertyName))
+                    propertyNames.Add(args.PropertyName!);
+            };
+
+            viewModel.SettingsWindowOpacity = 0.73;
+            viewModel.SettingsSurfaceOpacity = 0.44;
+            viewModel.SettingsElementOpacity = 0.61;
+            viewModel.SettingsWindowCornerRadius = 28;
+            viewModel.SettingsWindowBg = "#101820";
+
+            Assert.Contains(nameof(SettingsViewModel.SettingsWindowOpacity), propertyNames);
+            Assert.Contains(nameof(SettingsViewModel.SettingsSurfaceOpacity), propertyNames);
+            Assert.Contains(nameof(SettingsViewModel.SettingsElementOpacity), propertyNames);
+            Assert.Contains(nameof(SettingsViewModel.SettingsWindowCornerRadius), propertyNames);
+            Assert.Contains(nameof(SettingsViewModel.SettingsWindowBg), propertyNames);
+
+            Assert.DoesNotContain("SetSettingsThemeOpacity", propertyNames);
+            Assert.DoesNotContain("SetSettingsThemeCornerRadius", propertyNames);
+            Assert.DoesNotContain("SetSettingsWindowColor", propertyNames);
+        });
+    }
+
+    [Fact]
     public void ApplyTheme_WithUnlinkedUiTheme_PreservesSettingsWindowThemeState()
     {
         StaThreadTestHelper.Run(() =>
