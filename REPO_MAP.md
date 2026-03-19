@@ -138,7 +138,7 @@ This file is the quick orientation guide for AI agents and maintainers working i
 
 `.agents/skills/`
   Local AI-agent skills used in this workspace. This directory is intentionally gitignored for the public repo.
-  Notable local skills include `update-repo-map`, `maintain-plan`, `maintain-settings-sync`, `repack-msix`, `install-msix`, and `settings-regression-checklist`.
+  Notable local skills include `update-repo-map`, `maintain-plan`, `maintain-architecture-docs`, `maintain-status-docs`, `maintain-settings-sync`, `repack-msix`, `install-msix`, and `settings-regression-checklist`.
 
 `runbooks/`
   Gitignored owner-facing operational notes and manual recovery procedures.

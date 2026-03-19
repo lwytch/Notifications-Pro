@@ -1,7 +1,7 @@
 # Status
 
 ## What Works
-- Solution builds successfully (.NET 8 WPF, targets Windows 10 SDK 19041)
+- App project builds successfully via `dotnet build src/NotificationsPro/NotificationsPro.csproj` (.NET 8 WPF, targets Windows 10 SDK 19041)
 - System tray icon with dark-themed context menu (Show/Hide, Pause/Resume, Settings, Quit)
 - Overlay window: transparent, always-on-top (configurable), draggable, slide-in animations
 - Overlay size now fits visible cards (no persistent faint backdrop below cards)
@@ -66,8 +66,8 @@
 - Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
 - Settings-window theme selection now applies the full UI theme state, including background palette, opacity sliders, and settings-window corner radius, so switching profiles or exporting/importing settings no longer falls back toward the default UI theme look after a theme change
 - Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
-- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers and managed-asset path sanitizer, bringing the current verified suite to 269 passing tests
-- Local MSIX packaging now uses a dedicated non-exportable current-user signing certificate for the Notifications Pro publisher identity, with the package metadata pinned to the active replacement thumbprint and the old exportable cert retired from the normal signing path
+- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers, managed-asset path sanitizers, background-image cache/path hardening, and oversized settings/theme-file guards. The current project-level xUnit suite passes end to end.
+- Maintainer-local MSIX packaging signs successfully with the active local certificate-store identity, and the current review build installs successfully when its matching public `.cer` is trusted on the machine
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
@@ -81,7 +81,7 @@
 - Comprehensive UI/UX audit applied: standardized margins, color pickers, button sizes, visual hierarchy indentation, Help tab expansion
 - Per-keyword highlight colors — each keyword can have its own color with inline color picker
 - Overlay default size reduced for better fit on smaller displays (width 340px, max height 480px)
-- Settings window default height reduced to 680px
+- Settings window default height now uses a 740px baseline for the current sidebar layout
 - Behavior tab includes:
   - configurable retained card count (1-1000)
   - content field toggles (show app name, title, body)
@@ -276,7 +276,7 @@
   - Notification grouping by app: toggle in Behavior tab groups overlay notifications under themed app headers, and Appearance now lets you switch between Framed Group, Header Chip, and Minimal Label styles with optional counts
   - Keyboard navigation audit: tab mnemonics (Alt+key), Escape closes settings, TabControl cycle navigation
   - Screen reader audit: AutomationProperties.Name on settings window, tab control, all tabs, notification cards
-- 269 unit tests covering QueueManager (including scoped highlight/mute/narration rules, live highlight re-evaluation, per-rule highlight styling, preview-notification injection, app-specific card backgrounds, background-image card settings, regex keywords, session archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (with round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, animation-style migration, scrollbar-gap persistence, highlight/easing normalization, and rule/background-image persistence), ThemeManager/ProfileManager filtering-round-trip coverage, spoken-notification trigger logic, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish (icon variants, M8 settings round-trip), system integration (M9 settings, StartupHelper, MonitorInfo), streaming & presentation (M10 defaults, clone, deep-copy PresentationApps, JSON round-trip, AppTintHelper determinism/distribution/edge cases, FullscreenHelper), and browser-toast split extraction
+- Current xUnit coverage includes QueueManager (scoped highlight/mute/narration rules, live highlight re-evaluation, per-rule highlight styling, preview-notification injection, app-specific card backgrounds, regex keywords, Session Archive, persistent/auto-duration, overflow summary semantics, and per-notification narration overrides), SettingsManager (round-trip, corruption, deep-copy, legacy normalization, startup schema tracking, animation-style migration, scrollbar-gap persistence, highlight/easing normalization, rule/background-image persistence, and oversized startup-file rejection), ThemeManager/ProfileManager import-load behavior (including oversized local-file guardrails), spoken-notification trigger logic, background-image path/cache hardening, startup default migration, SnapHelper, one-line text shaping, ThemePreset, ContrastHelper, HotkeyManager parsing, accessibility defaults, VoiceAccessTextFormatter, UX polish, system integration, streaming/presentation helpers, and browser-toast split extraction
 
 ## What Doesn't Work Yet
 - Toast duration alignment (using configurable duration instead)
