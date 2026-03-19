@@ -67,7 +67,7 @@
 - Settings-window theme selection now applies the full UI theme state, including background palette, opacity sliders, and settings-window corner radius, so switching profiles or exporting/importing settings no longer falls back toward the default UI theme look after a theme change
 - Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
 - Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers, managed-asset path sanitizers, background-image cache/path hardening, and oversized settings/theme-file guards. The current project-level xUnit suite passes end to end.
-- Maintainer-local MSIX packaging signs successfully with the active local certificate-store identity, and the current review build installs successfully when its matching public `.cer` is trusted on the machine
+- The MSIX packaging and install flow has been re-verified on Windows for the current review build
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
@@ -161,7 +161,7 @@
   - Apps tab now includes per-app sound, icon, and card-background overrides
   - SeenAppNames tracking (RAM only, never persisted)
 - **Themes & Profiles (Milestone 6)**:
-  - 6 built-in core presets: Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal
+- Built-in core presets now include Windows Dark (default), Dark Purple, Light, Frosted Glass, High Contrast, Minimal, and Color-Blind Safe
   - One-click theme apply sets overlay visual properties (colors, opacity, corner radius, accent, border)
   - Optional "Link Overlay Theme to UI Theme" toggle in Settings Window controls whether theme apply also updates settings-window colors
   - Overlay theme apply now explicitly preserves current settings-window theme/palette when link toggle is off
@@ -196,11 +196,11 @@
   - Empty overlay ghost card — low-opacity "Waiting for notifications..." placeholder when no cards are visible
   - First-run tray balloon tip — tray/settings quick-start guidance with theme/focus hints
   - First-run tip bar in settings — dismissable info bar on first open with sidebar/theme/Ctrl+T guidance
-  - System tab now includes a `Show Quick Tips` toggle so the settings guidance banner can be turned off explicitly without changing notification behavior
+- Settings Window tab now includes a `Show Quick Tips` toggle so the settings guidance banner can be turned off explicitly without changing notification behavior
   - HasShownWelcome tracking in AppSettings (UI state, not notification content)
   - Confirm before "Reset to Defaults" — MessageBox confirmation prevents accidental resets
   - "Saved" micro-feedback — brief "Saved" label appears next to auto-save text after each save
-  - Remember settings window position between opens
+- Window mode reopens centered, while Popup mode recalculates its shell bounds when opened or resized
   - Ctrl+T keyboard shortcut to send test notification from settings
   - Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through)
   - Tray icon dimmed/monochrome when notifications are paused
@@ -230,7 +230,7 @@
   - Custom settings window color pickers (background, surface, surface light, surface hover, text, text secondary, text muted, accent, border)
 - Overlay scrollbar controls (show/hide, width, opacity, track/thumb colors, padding, corner radius) now apply to a fully themed custom scrollbar instead of the stock WPF look
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
-  - Settings popup display mode — Window or Popup (toast-corner anchored on the taskbar monitor, auto-close option, reduced popup height at 55% of work area)
+- Settings popup display mode — Window or Popup (popup shell uses auto-close when enabled and recalculates centered bounds from the current work area, with a 55% work-area minimum-height floor)
   - Settings window rounded corners with adjustable radius slider (0–20px) in Settings Window — XAML clipping in popup mode, DWM corner preference in windowed mode
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
@@ -422,7 +422,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Spoken notification controls allow on/off narration, multiple title/body/timestamp speech combinations, installed voice selection, rate/volume tuning, and Preview Voice playback
 - [ ] Microsoft Voice Access selector offers Off, Body Only, and Title + Body + Timestamp options
 - [ ] Notification cards expose a generic UI Automation name when Voice Access is Off and content-based names when a Voice Access label mode is enabled
-- [ ] System tab shows notification access status plus Open Windows Notification Access and Retry Access Check controls
+- [ ] System tab shows notification access status plus Open Windows Notification Access, Retry Access Check, Run Capture Diagnostic, and Capture Mode controls
 - [ ] Compact/Comfortable/Spacious density presets adjust font sizes, padding, spacing, and line limits from the Appearance tab
 - [ ] Color-Blind Safe theme appears in built-in theme list and passes WCAG AA
 - [ ] Focus indicators visible when tabbing through settings controls
@@ -433,7 +433,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] First-run tip bar appears in settings on first open and can be dismissed
 - [ ] "Reset to Defaults" shows a confirmation dialog before resetting
 - [ ] "Saved" label briefly appears next to "Changes are saved automatically" after each save
-- [ ] Settings window position is remembered between opens
+- [ ] Window mode reopens centered and Popup mode recalculates its shell bounds when the settings window opens
 - [ ] Ctrl+T sends a test notification from the settings window
 - [ ] Tray menu toggle items (Pause, Always on Top, Click-Through) show checkmarks
 - [ ] Tray icon dims when notifications are paused
@@ -473,6 +473,6 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 
 ## Known Limitations
 - Signed MSIX packaging is the supported install path; unpackaged source runs may have limited WinRT notification access
-- MSIX signing now prefers a matching local certificate-store identity and only uses a local `.pfx` as an explicit fallback; if no password is supplied for the fallback path, the script fails fast instead of waiting on a hidden prompt
+- MSIX packaging and install trust still need manual Windows validation, especially certificate import, trust-store state, and SmartScreen / AV reputation behavior
 - Unpackaged desktop apps may have limited UserNotificationListener support
 - Native window mechanics and MSIX packaging still need manual validation on Windows because unit tests cover helper and persistence logic well, but they do not replace live shell, certificate-store, or packaged-app behavior checks
