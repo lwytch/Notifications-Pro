@@ -19,14 +19,19 @@ public static class ManagedAssetPathHelper
 
     public static string ResolveManagedPathOrEmpty(string? value, string folderName)
     {
-        return TryResolveManagedPath(value, folderName, out var resolvedPath)
+        return ResolveManagedPathOrEmpty(value, folderName, rootOverridePath: null);
+    }
+
+    public static string ResolveManagedPathOrEmpty(string? value, string folderName, string? rootOverridePath)
+    {
+        return TryResolveManagedPath(value, folderName, rootOverridePath, out var resolvedPath)
             ? resolvedPath
             : string.Empty;
     }
 
     public static string ToPortableManagedPathOrEmpty(string? value, string folderName)
     {
-        if (!TryResolveManagedPath(value, folderName, out var resolvedPath))
+        if (!TryResolveManagedPath(value, folderName, rootOverridePath: null, out var resolvedPath))
             return string.Empty;
 
         var root = Path.GetFullPath(GetRoot(folderName));
@@ -39,7 +44,7 @@ public static class ManagedAssetPathHelper
             : $"{folderName}/{relative}";
     }
 
-    private static bool TryResolveManagedPath(string? value, string folderName, out string resolvedPath)
+    private static bool TryResolveManagedPath(string? value, string folderName, string? rootOverridePath, out string resolvedPath)
     {
         resolvedPath = string.Empty;
 
@@ -47,7 +52,9 @@ public static class ManagedAssetPathHelper
         if (string.IsNullOrWhiteSpace(trimmed))
             return false;
 
-        var root = Path.GetFullPath(GetRoot(folderName));
+        var root = Path.GetFullPath(string.IsNullOrWhiteSpace(rootOverridePath)
+            ? GetRoot(folderName)
+            : rootOverridePath);
         string candidatePath;
 
         if (Path.IsPathRooted(trimmed))

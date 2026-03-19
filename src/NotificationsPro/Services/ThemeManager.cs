@@ -12,6 +12,7 @@ namespace NotificationsPro.Services;
 /// </summary>
 public class ThemeManager
 {
+    internal const long MaxThemeFileBytes = 1_048_576;
     private readonly string _themesDir;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -40,6 +41,10 @@ public class ThemeManager
         {
             try
             {
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.Length > MaxThemeFileBytes)
+                    continue;
+
                 var json = File.ReadAllText(file);
                 var theme = JsonSerializer.Deserialize<ThemePreset>(json, JsonOptions);
                 if (theme != null && !string.IsNullOrWhiteSpace(theme.Name))
@@ -94,7 +99,7 @@ public class ThemeManager
 
         // Limit import file size to 1 MB to prevent DoS
         var fileInfo = new FileInfo(filePath);
-        if (fileInfo.Length > 1_048_576)
+        if (fileInfo.Length > MaxThemeFileBytes)
             return null;
 
         var json = File.ReadAllText(filePath);

@@ -7,9 +7,13 @@ namespace NotificationsPro.Services;
 
 public sealed class BackgroundImageService
 {
+    internal const int MaxCachedImages = 24;
     private static readonly string CustomBackgroundsDir = ManagedAssetPathHelper.GetRoot(ManagedAssetPathHelper.BackgroundsFolderName);
 
     private readonly ConcurrentDictionary<string, BitmapSource?> _imageCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentQueue<string> _cacheOrder = new();
+
+    internal int CachedImageCount => _imageCache.Count;
 
     public BitmapSource? ResolveBackgroundImage(
         string filePath,
@@ -22,12 +26,23 @@ public sealed class BackgroundImageService
         if (string.IsNullOrWhiteSpace(filePath))
             return null;
 
-        var cacheKey = $"{filePath}|{hueDegrees:F0}|{brightness:F2}|{saturationAmount:F2}|{contrastAmount:F2}|{blackAndWhite}";
+        var normalizedPath = ManagedAssetPathHelper.ResolveManagedPathOrEmpty(
+            filePath,
+            ManagedAssetPathHelper.BackgroundsFolderName);
+        if (string.IsNullOrWhiteSpace(normalizedPath))
+            return null;
+
+        var cacheKey = $"{normalizedPath}|{hueDegrees:F0}|{brightness:F2}|{saturationAmount:F2}|{contrastAmount:F2}|{blackAndWhite}";
         if (_imageCache.TryGetValue(cacheKey, out var cached))
             return cached;
 
-        var image = LoadAndTransform(filePath, hueDegrees, brightness, saturationAmount, contrastAmount, blackAndWhite);
-        _imageCache[cacheKey] = image;
+        var image = LoadAndTransform(normalizedPath, hueDegrees, brightness, saturationAmount, contrastAmount, blackAndWhite);
+        if (image != null && _imageCache.TryAdd(cacheKey, image))
+        {
+            _cacheOrder.Enqueue(cacheKey);
+            TrimCache();
+        }
+
         return image;
     }
 
@@ -37,6 +52,14 @@ public sealed class BackgroundImageService
     }
 
     public static string GetCustomBackgroundsDir() => CustomBackgroundsDir;
+
+    public void ClearCache()
+    {
+        _imageCache.Clear();
+        while (_cacheOrder.TryDequeue(out _))
+        {
+        }
+    }
 
     private static BitmapSource? LoadAndTransform(
         string filePath,
@@ -49,10 +72,6 @@ public sealed class BackgroundImageService
         try
         {
             var fullPath = Path.GetFullPath(filePath);
-            var customDir = Path.GetFullPath(CustomBackgroundsDir);
-            if (!fullPath.StartsWith(customDir, StringComparison.OrdinalIgnoreCase))
-                return null;
-
             if (!File.Exists(fullPath))
                 return null;
 
@@ -129,6 +148,12 @@ public sealed class BackgroundImageService
         {
             return null;
         }
+    }
+
+    private void TrimCache()
+    {
+        while (_imageCache.Count > MaxCachedImages && _cacheOrder.TryDequeue(out var oldestKey))
+            _imageCache.TryRemove(oldestKey, out _);
     }
 
     private static byte ApplyContrast(byte channel, double contrast)

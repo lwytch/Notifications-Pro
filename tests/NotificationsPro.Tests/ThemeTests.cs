@@ -336,6 +336,24 @@ public class ThemeTests : IDisposable
     }
 
     [Fact]
+    public void LoadCustomThemes_SkipsOversizedFiles()
+    {
+        var mgr = new ThemeManager(_tempDir);
+        mgr.SaveCustomTheme(new ThemePreset { Name = "Good" });
+        var oversizedValue = new string('a', (int)ThemeManager.MaxThemeFileBytes);
+        File.WriteAllText(Path.Combine(_tempDir, "huge.json"), $$"""
+            {
+              "Name": "{{oversizedValue}}"
+            }
+            """);
+
+        var themes = mgr.LoadCustomThemes();
+
+        Assert.Single(themes);
+        Assert.Equal("Good", themes[0].Name);
+    }
+
+    [Fact]
     public void LoadCustomThemes_SortsByName()
     {
         var mgr = new ThemeManager(_tempDir);

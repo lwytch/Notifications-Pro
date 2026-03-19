@@ -46,14 +46,14 @@ This file is the quick orientation guide for AI agents and maintainers working i
   Operational services and persistence boundaries.
   `NotificationListener.cs`     — WinRT + accessibility notification capture pipeline.
   `QueueManager.cs`             — RAM-only visible queue, overflow counting, filtering, highlighting, and expiry behavior.
-  `SettingsManager.cs`          — Load/save/apply settings and normalize persisted values.
-  `ThemeManager.cs`             — Custom theme storage plus settings import/export.
-  `ProfileManager.cs`           — Named full-settings profile save/load/delete.
+  `SettingsManager.cs`          — Load/save/apply settings, normalize persisted values, and reject oversized startup settings payloads.
+  `ThemeManager.cs`             — Custom theme storage plus settings import/export, including oversized-theme guardrails.
+  `ProfileManager.cs`           — Named full-settings profile save/load/delete with size-limited JSON loads.
   `SettingsThemeService.cs`     — Runtime theming for the settings window.
   `SpokenNotificationService.cs` — Built-in narration pipeline and voice management.
   `IconService.cs` / `SoundService.cs` — Local asset handling for per-app icons and sounds.
   `HotkeyManager.cs`            — Global hotkey registration and diagnostics.
-  `BackgroundImageService.cs`   — Notification-card/background image processing helpers.
+  `BackgroundImageService.cs`   — Managed local background-image validation plus bounded transformed-image caching for card/fullscreen artwork.
 
 `ViewModels/`
   MVVM state and command surfaces for the UI.
@@ -113,8 +113,11 @@ This file is the quick orientation guide for AI agents and maintainers working i
 `SettingsManagerTests.cs`
   Settings defaults, migration, normalization, clone, and persistence coverage.
 
+`BackgroundImageServiceTests.cs`
+  Managed background-image path validation and transformed-image cache-boundary coverage.
+
 `ThemeTests.cs`
-  Theme preset behavior and JSON import/export coverage.
+  Theme preset behavior, JSON import/export coverage, and oversized custom-theme load guardrails.
 
 `ProfileManagerTests.cs`
   Full-profile round-trip coverage.

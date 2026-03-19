@@ -248,6 +248,8 @@
   - StaticPropertyChanged handler properly unsubscribed on quit
   - HwndSource disposed in HotkeyManager to prevent handle leaks
   - Path traversal validation in IconService (custom icons confined to AppData directory)
+  - BackgroundImageService now normalizes local background-image paths through the managed asset helper and keeps its transformed bitmap cache bounded during long styling sessions
+  - Startup `settings.json` loads and custom theme discovery now apply the same 1 MB defensive size limit already used by import/profile flows
   - Import size limit (1MB) + numeric clamping in ThemeManager
   - Regex timeout (100ms) in QueueManager keyword matching to prevent ReDoS
   - Safe hex parsing in ContrastHelper
@@ -263,7 +265,7 @@
 - **Functionality & UX (Milestone 13 High Value)**:
   - Regex keyword matching — per-keyword ".*" toggle treats keywords as regex patterns (both highlight and mute, with timeout + invalid-regex safety)
   - Overlay search/filter reverted — ICollectionView binding caused display breakage over time. Search bar UI remains but filtering disabled pending safer implementation.
-  - Session-only notification archive — opt-in RAM-only archive (Settings > System) keeps up to 1000 notifications for the current session, "View Archive" in tray menu and settings
+- Session-only notification archive — opt-in RAM-only archive (Settings > System) keeps up to 1000 notifications for the current session, with explicit archive-copy actions in the tray menu and settings
   - Copy All to Clipboard, "Settings for [app]..." card action, Layout tab consolidation (completed in previous session)
 - **Functionality & UX (Milestone 13 Nice-to-Have)**:
   - CLI arguments: --pause, --resume, --theme <name>, --send-test, --hide, --show (processed after initialization)

@@ -631,6 +631,24 @@ public class SettingsManagerTests : IDisposable
     }
 
     [Fact]
+    public void Load_RejectsOversizedSettingsFile()
+    {
+        var settingsPath = Path.Combine(_tempDir, "settings.json");
+        var oversizedValue = new string('a', (int)SettingsManager.MaxSettingsFileBytes);
+        File.WriteAllText(settingsPath, $$"""
+            {
+              "FontFamily": "{{oversizedValue}}"
+            }
+            """);
+
+        var sm = CreateManager();
+        sm.Load();
+
+        Assert.True(sm.HadExistingSettingsFile);
+        Assert.Equal("Segoe UI", sm.Settings.FontFamily);
+    }
+
+    [Fact]
     public void Settings_NeverContainNotificationContent()
     {
         var props = typeof(AppSettings).GetProperties();

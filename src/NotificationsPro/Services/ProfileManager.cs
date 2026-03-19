@@ -71,7 +71,7 @@ public class ProfileManager
         try
         {
             var fileInfo = new FileInfo(path);
-            if (fileInfo.Length > 1_048_576)
+            if (fileInfo.Length > SettingsManager.MaxSettingsFileBytes)
                 return null;
 
             var json = File.ReadAllText(path);

@@ -10,6 +10,7 @@ namespace NotificationsPro.Services;
 public class SettingsManager
 {
     public const int CurrentSettingsSchemaVersion = 5;
+    internal const long MaxSettingsFileBytes = 1_048_576;
 
     private static readonly string DefaultSettingsDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -48,15 +49,23 @@ public class SettingsManager
         {
             if (HadExistingSettingsFile)
             {
-                var json = File.ReadAllText(_settingsPath);
-                var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
-                var hasNotificationAnimationStyle = JsonPropertyExists(json, nameof(AppSettings.NotificationAnimationStyle));
-                var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
-                if (loaded != null)
+                var fileInfo = new FileInfo(_settingsPath);
+                if (fileInfo.Length > MaxSettingsFileBytes)
                 {
-                    NormalizeLoadedSettings(loaded, hasCardBackgroundMode, hasNotificationAnimationStyle);
-                    AppSettingsAssetPathHelper.NormalizeForRuntime(loaded);
-                    Settings = loaded;
+                    Settings = new AppSettings();
+                }
+                else
+                {
+                    var json = File.ReadAllText(_settingsPath);
+                    var hasCardBackgroundMode = JsonPropertyExists(json, nameof(AppSettings.CardBackgroundMode));
+                    var hasNotificationAnimationStyle = JsonPropertyExists(json, nameof(AppSettings.NotificationAnimationStyle));
+                    var loaded = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
+                    if (loaded != null)
+                    {
+                        NormalizeLoadedSettings(loaded, hasCardBackgroundMode, hasNotificationAnimationStyle);
+                        AppSettingsAssetPathHelper.NormalizeForRuntime(loaded);
+                        Settings = loaded;
+                    }
                 }
             }
         }

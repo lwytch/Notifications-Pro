@@ -139,7 +139,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 ### System Integration
 - **Start with Windows** — enables/disables the packaged Windows Startup Task for Notifications Pro.
 - **Notification access recovery** — the System tab shows current capture status, includes buttons to open Windows notification access, retry the direct WinRT access check, and run a capture diagnostic, and exposes `Auto`, `Prefer WinRT`, and `Force Accessibility` capture modes.
-- **Session archive** — optional, off by default, and still RAM-only. When enabled, Notifications Pro keeps a temporary in-memory list of captured notifications for the current app session so you can review them or copy them to the clipboard. Notifications Pro does not save that archive to files or databases, and clears it when the app closes.
+- **Session archive** — optional, off by default, and still RAM-only. When enabled, Notifications Pro keeps a temporary in-memory list of captured notifications for the current app session so you can review them in Settings or use the explicit copy actions in Settings and the tray menu to send them to the Windows clipboard. Notifications Pro does not save that archive to files or databases, and clears it when the app closes.
 - **About dialog** — tray menu About shows the installed version, package identity, listener mode/status, runtime version, and project link.
 - **Tray quick actions** — the tray menu can show/hide the overlay, pause notifications, toggle always-on-top / click-through, start focus mode, clear all, quick mute seen apps, and switch saved themes or profiles.
 - **Tray listener health** — tray tooltip surfaces the active listener mode plus current status details for faster troubleshooting.
@@ -267,7 +267,7 @@ Per-app icons are user-configured (built-in vector presets or your own files) an
 Notifications Pro is designed to avoid persisting notification content:
 - **No notification title or body is ever written to disk** — no database, no cache, no logs of notification text.
 - Notification content exists only in RAM. By default, Notifications Pro keeps only the currently visible notifications on screen, releases each one after dismissal or expiry, and stores overflow as a count only. If you explicitly enable **Session Archive**, the app also keeps a temporary in-memory session list of captured notifications so you can review them or copy them while the app is running. Session Archive is off by default, is not saved by Notifications Pro to files or databases, and is cleared when the app closes.
-- Using **Copy Text**, **Copy All to Clipboard**, or **View Session Archive** hands the selected notification text to the Windows clipboard. Notifications Pro does not persist that text itself, but Windows clipboard history or third-party clipboard tools may retain copied text outside the app.
+- Using **Copy Text**, **Copy All to Clipboard**, or either Session Archive copy action hands the selected notification text to the Windows clipboard. Notifications Pro does not persist that text itself, but Windows clipboard history or third-party clipboard tools may retain copied text outside the app.
 - The app makes **no network calls** and includes **no telemetry**.
 - If **Spoken Notifications** is enabled, the text is spoken through your selected Windows audio output and may be audible to people nearby. Notifications Pro still keeps that text in RAM only and never saves spoken content to disk.
 - Visible notification text is available to Windows accessibility tools while on screen. The Voice Access setting controls the card-level UI Automation label only; it does not save or transmit the text.
@@ -433,6 +433,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.34
+- Hardened local background image handling so custom card/fullscreen artwork now uses stricter managed-path validation and a bounded transformed-image cache during long styling sessions.
+- Made Session Archive copy actions more explicit in the tray and settings flows, and tightened the public privacy/security wording around clipboard behavior plus what app-level metadata can still be saved in settings or profiles.
+- Added 1 MB guardrails to normal startup settings and custom-theme JSON loads, with expanded regression coverage for the new hardening paths.
 
 ### Release v1.1.10.33
 - Fixed `Settings Window` slider and live-binding refresh issues in popup mode by correcting the Settings Window theme property notifications. Opacity, surface, element, and corner-radius values now update their on-screen readouts reliably while you drag.

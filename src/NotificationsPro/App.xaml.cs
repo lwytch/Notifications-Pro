@@ -404,7 +404,7 @@ public partial class App : Application
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
         contextMenu.Items.Add("Clear All Notifications", null, (_, _) => _queueManager?.ClearAll());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
-        contextMenu.Items.Add("View Session Archive", null, (_, _) => ViewSessionArchive());
+        contextMenu.Items.Add("Copy Session Archive to Clipboard", null, (_, _) => ViewSessionArchive());
         contextMenu.Items.Add("Settings...", null, (_, _) => ShowSettings());
         contextMenu.Items.Add("About Notifications Pro", null, (_, _) => ShowAboutDialog());
         contextMenu.Items.Add(new WinForms.ToolStripSeparator());
@@ -1035,7 +1035,7 @@ public partial class App : Application
         if (archive.Count == 0)
         {
             System.Windows.MessageBox.Show(
-                "No archived notifications yet.\n\nEnable Session Archive in Settings > System to start recording notifications in memory.",
+                "No archived notifications yet.\n\nEnable Session Archive in Settings > System to keep captured notifications in memory for the current app session.",
                 "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }

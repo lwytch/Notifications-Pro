@@ -2922,7 +2922,7 @@ public partial class SettingsViewModel : BaseViewModel
         var archive = _queueManager.SessionArchive;
         if (archive.Count == 0)
         {
-            System.Windows.MessageBox.Show("No archived notifications yet.\n\nNotifications are archived while the app is running when Session Archive is enabled.",
+            System.Windows.MessageBox.Show("No archived notifications yet.\n\nEnable Session Archive to keep captured notifications in memory for the current app session while Notifications Pro is running.",
                 "Session Archive", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }

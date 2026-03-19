@@ -4,6 +4,9 @@
 
 ### Security
 - **Milestone 12: Security Hardening & Code Quality**
+- BackgroundImageService now resolves custom background files through the managed asset-path helper and keeps its transformed bitmap cache bounded during long styling sessions
+- Startup `settings.json` loads and custom theme discovery now reject oversized (>1 MB) local JSON payloads just like the explicit import/profile paths
+- SECURITY.md now distinguishes RAM-only notification title/body handling from the user-configured app-name metadata that can be saved in settings/profiles
 - Local MSIX signing now uses a dedicated non-exportable current-user certificate for the Notifications Pro publisher identity, reducing the chance of the active signing key being exported again from the normal workflow
 - Path traversal validation in IconService — custom icon file paths validated to stay within AppData icons directory
 - Settings import hardened with 1MB file size limit and numeric range clamping to prevent DoS/corrupt values
@@ -16,6 +19,7 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate used by the maintainer-only packaging workflow and retired the previous local cert/PFX from the normal signing path
 
 ### Fixed
+- The tray Session Archive action now explicitly says it copies the archive to the Windows clipboard, aligning the menu wording with the actual behavior
 - README install guidance now explains why the exported `.cer` currently shows `CN=LiamWytcherley` and makes it explicit that the release certificate is public-only and does not contain the private signing key
 - Settings Window popup-mode theme sliders now raise the correct property-change notifications, so their live numeric readouts stay in sync while dragging opacity, surface, element, and corner-radius controls
 - README install/privacy/accessibility copy was tightened for first-time public users, and the in-file release notes were reset to a fresh current baseline
@@ -141,7 +145,7 @@
 - Position + Size tabs consolidated into single "Layout" tab (Monitor, Quick Position, Size, Fullscreen Overlay, Snapping)
 - **Regex keyword matching** — per-keyword ".*" toggle treats the keyword as a regex pattern (supports highlight and mute keywords, with timeout protection and invalid-regex safety)
 - **Overlay search/filter** — right-click "Search..." on overlay toggles a search bar that filters visible notifications by text content (app name, title, body)
-- **Session-only notification archive** — opt-in RAM-only archive (Settings > System) keeps up to 1000 notifications in memory for the current session. Never persisted to disk. "View Session Archive" available in tray menu and settings, copies to clipboard.
+- **Session-only notification archive** — opt-in RAM-only archive (Settings > System) keeps up to 1000 notifications in memory for the current session. Never persisted to disk. Explicit archive-copy actions are available in the tray menu and settings when you want to hand that text to the Windows clipboard.
 - 8 new unit tests: regex mute/highlight matching, invalid regex safety, session archive enable/disable/max items/RAM-only
 - Version info added to project (v1.0.0)
 - SECURITY.md — privacy guarantee, security design, threat model, vulnerability reporting instructions

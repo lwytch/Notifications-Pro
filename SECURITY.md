@@ -2,12 +2,13 @@
 
 ## Privacy Guarantee
 
-Notifications Pro is designed with a strict **zero-persistence privacy model**:
+Notifications Pro is designed with a strict **zero-persistence notification-content model**:
 
-- **Notification content (title, body, app name) is never written to disk** — not to files, databases, registry, cache, logs, or telemetry.
+- **Notification title/body content is never written to disk** — not to files, databases, registry, cache, logs, or telemetry.
 - Notification text exists **only in RAM** for the duration it is displayed on screen.
 - Overflow notifications store **only a count**, never content.
-- The only persistent data is user settings (`%AppData%\NotificationsPro\settings.json`), custom themes, and optional user-provided icon/sound assets.
+- User-configured app-name metadata such as muted apps, spoken-app preferences, and per-app icon/sound/background overrides can be saved in settings or profiles.
+- The only persistent data is user settings (`%AppData%\NotificationsPro\settings.json`), saved profiles, custom themes, and optional user-provided icon/sound/background assets.
 
 ## Supported Versions
 
@@ -29,7 +30,7 @@ If you discover a security vulnerability in Notifications Pro, please report it 
 - **No external dependencies** — the app uses only .NET 8 framework libraries (WPF, WinForms, WinRT). No third-party NuGet packages in the main application.
 - **No network access** — the app makes no outbound connections. No telemetry, analytics, or update checks.
 - **No elevated privileges** — runs as a standard user process. Registry access is limited to read-only Windows metadata queries under current-user/local-machine hives for sound and speech discovery, and notification content is never written to the registry.
-- **Input validation** — imported settings files are size-limited (1 MB) and numeric values are clamped to valid ranges. Custom asset paths are validated to stay within the designated AppData directory.
+- **Input validation** — startup settings, profile/import payloads, and custom theme JSON are size-limited to 1 MB where Notifications Pro loads them, numeric values are clamped to valid ranges, and custom asset paths are validated to stay within the designated AppData directory.
 - **Regex safety** — keyword matching uses timeouts to prevent ReDoS.
 
 ## Threat Model
