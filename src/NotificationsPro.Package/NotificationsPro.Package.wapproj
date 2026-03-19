@@ -29,7 +29,7 @@
     <AppInstallerUri>https://github.com/lwytch/Notifications-Pro/releases/latest/download/</AppInstallerUri>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>792A8ACF5DA7527CFC8ABDB295AF302FB148B1CA</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>463C376ED03BC9797D6A036D0DFEE9DFA2004E4C</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>

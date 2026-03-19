@@ -4,6 +4,7 @@
 
 ### Security
 - **Milestone 12: Security Hardening & Code Quality**
+- Local MSIX signing now uses a dedicated non-exportable current-user certificate for the Notifications Pro publisher identity, reducing the chance of the active signing key being exported again from the normal workflow
 - Path traversal validation in IconService — custom icon file paths validated to stay within AppData icons directory
 - Settings import hardened with 1MB file size limit and numeric range clamping to prevent DoS/corrupt values
 - Regex timeout (100ms) added to keyword matching in QueueManager to prevent potential UI hangs
@@ -15,6 +16,7 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate used by the maintainer-only packaging workflow and retired the previous local cert/PFX from the normal signing path
 
 ### Fixed
+- README install guidance now explains why the exported `.cer` currently shows `CN=LiamWytcherley` and makes it explicit that the release certificate is public-only and does not contain the private signing key
 - Settings Window popup-mode theme sliders now raise the correct property-change notifications, so their live numeric readouts stay in sync while dragging opacity, surface, element, and corner-radius controls
 - README install/privacy/accessibility copy was tightened for first-time public users, and the in-file release notes were reset to a fresh current baseline
 - Public contributor docs now use explicit project-level `dotnet restore` / `dotnet build` / `dotnet test` commands instead of a broken root solution workflow

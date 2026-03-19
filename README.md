@@ -313,11 +313,12 @@ dotnet publish src/NotificationsPro -c Release -r win-x64 --self-contained
 
 ## Installation (MSIX)
 
-Notifications Pro is distributed as a native Windows App package (`.msix`). Because it relies on Windows package identity for the best notification-access behavior, the installer must be digitally signed. Current releases use a self-signed developer certificate.
+Notifications Pro is distributed as a native Windows App package (`.msix`). Because it relies on Windows package identity for the best notification-access behavior, the installer must be digitally signed. Current releases use a dedicated self-signed signing certificate for Notifications Pro.
 
 To install it for the first time:
 1. Download the matching **`.msix`** installer and **`.cer`** certificate from [GitHub Releases](https://github.com/lwytch/Notifications-Pro/releases).
 2. Review the release source and certificate details. Install the certificate only if you trust this release and want Windows to trust that package signature.
+   The public `.cer` may show subject `CN=LiamWytcherley`. That is the current package publisher / maintainer signing identity for Notifications Pro, and it is expected. The `.cer` contains only the public certificate used to verify the MSIX, not the private signing key.
 3. Right-click the `.cer` file, choose **Install Certificate**, and place it in **Trusted Root Certification Authorities**.
 4. If Windows still reports that the package signature is not trusted on your machine, import the same `.cer` into **Trusted People** as well, then retry the install.
 5. Double-click the `.msix` file to install Notifications Pro.
