@@ -569,7 +569,10 @@ public partial class SettingsViewModel
         catch (Exception ex)
         {
             System.Windows.MessageBox.Show(
-                $"Could not copy the selected background image.\n\n{ex.Message}",
+                SafeErrorDialogHelper.BuildErrorMessage(
+                    "Could not copy the selected background image",
+                    ex,
+                    "Check that the source image is still available and try again"),
                 "Background Image",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error);

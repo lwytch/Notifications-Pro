@@ -66,10 +66,11 @@
 - Settings/profile persistence now stores managed custom sound/icon/background references as relative Notifications Pro asset paths at rest, then resolves them back to local AppData paths on load so shared JSON stays more portable and avoids leaking machine-specific asset locations
 - Settings-window theme selection now applies the full UI theme state, including background palette, opacity sliders, and settings-window corner radius, so switching profiles or exporting/importing settings no longer falls back toward the default UI theme look after a theme change
 - Settings regression coverage now explicitly exercises moved settings through the `SettingsViewModel` save path, reset-to-defaults behavior, settings export/import, profile round-trips, and the shared settings tab-navigation header helper
-- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers, managed-asset path sanitizers, background-image cache/path hardening, and oversized settings/theme-file guards. The current project-level xUnit suite passes end to end.
+- Automated regression coverage now also exercises settings-window theme preset application plus live profile/import application of settings-window theme and display-mode fields, alongside the animation-style/easing normalization helpers, managed-asset path sanitizers, background-image cache/path hardening, oversized settings/theme-file guards, and safe exception-dialog formatting. The current project-level xUnit suite passes end to end.
 - The MSIX packaging and install flow has been re-verified on Windows for the current review build
 - Apps tab now includes per-app `Read aloud` checkboxes, app search, `Only modified` filtering, and one-click override reset actions
 - Spoken notifications now track each visible card as already-read once narration finishes, so new arrivals no longer replay earlier cards that have already been spoken
+- User-facing recovery/error dialogs now show safe exception types instead of raw exception text for unexpected failures, narration preview errors, notification-access recovery issues, and background-image copy failures
 - Accessibility Help now links to official Microsoft voice-setup pages and explains that Notifications Pro shows every voice Windows exposes to the app, while some Narrator-only voices may still not be available to third-party app text-to-speech
 - Accessibility tab privacy/transparency copy is now pushed into tooltips for spoken notifications and Voice Access, keeping the main control layout cleaner without removing the disclosures from Help/README
 - Accessibility spoken-voice availability now stays in tooltips rather than as a long inline paragraph in the middle of the control flow
@@ -475,4 +476,5 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - Signed MSIX packaging is the supported install path; unpackaged source runs may have limited WinRT notification access
 - MSIX packaging and install trust still need manual Windows validation, especially certificate import, trust-store state, and SmartScreen / AV reputation behavior
 - Unpackaged desktop apps may have limited UserNotificationListener support
+- RAM-only by default reduces notification-content persistence, but sufficiently privileged local software or debuggers could still inspect visible notification text in process memory while the app is running
 - Native window mechanics and MSIX packaging still need manual validation on Windows because unit tests cover helper and persistence logic well, but they do not replace live shell, certificate-store, or packaged-app behavior checks

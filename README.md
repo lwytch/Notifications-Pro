@@ -267,6 +267,7 @@ Per-app icons are user-configured (built-in vector presets or your own files) an
 Notifications Pro is designed to avoid persisting notification content:
 - **No notification title or body is ever written to disk** — no database, no cache, no logs of notification text.
 - Notification content exists only in RAM. By default, Notifications Pro keeps only the currently visible notifications on screen, releases each one after dismissal or expiry, and stores overflow as a count only. If you explicitly enable **Session Archive**, the app also keeps a temporary in-memory session list of captured notifications so you can review them or copy them while the app is running. Session Archive is off by default, is not saved by Notifications Pro to files or databases, and is cleared when the app closes.
+- Windows processes do not automatically share Notifications Pro's address space. However, sufficiently privileged local software, debuggers, or malware that can inspect this process while it is running could still read visible notification text from memory. RAM-only by default reduces persistence; it is not a claim against local machine compromise.
 - Using **Copy Text**, **Copy All to Clipboard**, or either Session Archive copy action hands the selected notification text to the Windows clipboard. Notifications Pro does not persist that text itself, but Windows clipboard history or third-party clipboard tools may retain copied text outside the app.
 - The app makes **no network calls** and includes **no telemetry**.
 - If **Spoken Notifications** is enabled, the text is spoken through your selected Windows audio output and may be audible to people nearby. Notifications Pro still keeps that text in RAM only and never saves spoken content to disk.
@@ -434,6 +435,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.35
+- Hardened user-facing error handling so unexpected crash prompts, narration preview failures, notification-access recovery failures, and background-image copy failures no longer show raw exception text.
+- Clarified the public privacy and security docs that `RAM-only by default` reduces notification-content persistence, but does not claim hardened protection against sufficiently privileged local process inspection.
+- Added regression coverage for the safe exception-dialog formatting helper and reran the project-level build/test verification pass.
 
 ### Release v1.1.10.34
 - Hardened local background image handling so custom card/fullscreen artwork now uses stricter managed-path validation and a bounded transformed-image cache during long styling sessions.

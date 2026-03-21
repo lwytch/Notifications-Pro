@@ -2836,7 +2836,10 @@ public partial class SettingsViewModel : BaseViewModel
         catch (Exception ex)
         {
             System.Windows.MessageBox.Show(
-                $"Could not play the narration preview.\n\n{ex.Message}",
+                SafeErrorDialogHelper.BuildErrorMessage(
+                    "Could not play the narration preview",
+                    ex,
+                    "Try a different voice or output device, then try again"),
                 "Spoken Notifications",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -2954,7 +2957,10 @@ public partial class SettingsViewModel : BaseViewModel
         catch (Exception ex)
         {
             System.Windows.MessageBox.Show(
-                $"Could not open Windows notification access settings.\n\n{ex.Message}",
+                SafeErrorDialogHelper.BuildErrorMessage(
+                    "Could not open Windows notification access settings",
+                    ex,
+                    "Open Windows Settings manually and search for notification access"),
                 "Notification Access",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -2973,7 +2979,10 @@ public partial class SettingsViewModel : BaseViewModel
         catch (Exception ex)
         {
             System.Windows.MessageBox.Show(
-                $"Could not retry the notification access check.\n\n{ex.Message}",
+                SafeErrorDialogHelper.BuildErrorMessage(
+                    "Could not retry the notification access check",
+                    ex,
+                    "Close and reopen Notifications Pro, then try again"),
                 "Notification Access",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

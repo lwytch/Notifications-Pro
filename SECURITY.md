@@ -38,5 +38,7 @@ If you discover a security vulnerability in Notifications Pro, please report it 
 Notifications Pro reads all Windows toast notifications via the WinRT `UserNotificationListener` API (or UI Automation fallback). This means:
 
 - The app processes notification text from all applications on the system.
+- Windows does not automatically give other applications this process's memory, but sufficiently privileged local software, debuggers, or malware that can inspect the running process could still read notification text currently held in RAM.
+- Notifications Pro does not claim special process-memory isolation beyond the normal Windows process boundary; its main guardrails are minimizing retention and avoiding persistence, transmission, and logging of notification content.
 - An attacker who compromises this process could read notification text currently displayed in the overlay.
 - The app does **not** store, transmit, or log notification content, limiting the window of exposure to what is currently visible on screen.

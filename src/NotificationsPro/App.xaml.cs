@@ -99,8 +99,11 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             System.Windows.MessageBox.Show(
-                $"Unhandled UI exception:\n\n{args.Exception}",
-                "Notifications Pro — Error",
+                SafeErrorDialogHelper.BuildErrorMessage(
+                    "Notifications Pro hit an unexpected UI error",
+                    args.Exception,
+                    "If the app becomes unstable, restart it"),
+                "Notifications Pro Error",
                 MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
@@ -108,8 +111,11 @@ public partial class App : Application
         {
             if (args.ExceptionObject is Exception ex)
                 System.Windows.MessageBox.Show(
-                    $"Unhandled exception:\n\n{ex}",
-                    "Notifications Pro — Fatal Error",
+                    SafeErrorDialogHelper.BuildErrorMessage(
+                        "Notifications Pro hit an unexpected error",
+                        ex,
+                        "Restart the app before using it again"),
+                    "Notifications Pro Fatal Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
         };
         TaskScheduler.UnobservedTaskException += (_, args) =>

@@ -7,6 +7,7 @@
 - BackgroundImageService now resolves custom background files through the managed asset-path helper and keeps its transformed bitmap cache bounded during long styling sessions
 - Startup `settings.json` loads and custom theme discovery now reject oversized (>1 MB) local JSON payloads just like the explicit import/profile paths
 - SECURITY.md now distinguishes RAM-only notification title/body handling from the user-configured app-name metadata that can be saved in settings/profiles
+- Public privacy docs now clarify that "RAM-only by default" reduces persistence, not exposure to sufficiently privileged local process-memory inspection
 - Local MSIX signing now uses a dedicated non-exportable current-user certificate for the Notifications Pro publisher identity, reducing the chance of the active signing key being exported again from the normal workflow
 - Path traversal validation in IconService — custom icon file paths validated to stay within AppData icons directory
 - Settings import hardened with 1MB file size limit and numeric range clamping to prevent DoS/corrupt values
@@ -19,6 +20,7 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate used by the maintainer-only packaging workflow and retired the previous local cert/PFX from the normal signing path
 
 ### Fixed
+- User-facing error dialogs no longer show raw exception messages for unexpected failures, narration preview errors, notification-access recovery failures, or background-image copy failures; they now show sanitized summaries with safe exception types only
 - The tray Session Archive action now explicitly says it copies the archive to the Windows clipboard, aligning the menu wording with the actual behavior
 - README install guidance now explains why the exported `.cer` currently shows `CN=LiamWytcherley` and makes it explicit that the release certificate is public-only and does not contain the private signing key
 - Settings Window popup-mode theme sliders now raise the correct property-change notifications, so their live numeric readouts stay in sync while dragging opacity, surface, element, and corner-radius controls

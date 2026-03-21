@@ -139,6 +139,7 @@ The privacy contract is narrower and more precise than "nothing is ever stored":
 
 - Notification title/body content is never written to settings, themes, profiles, registry, logs, telemetry, or local caches
 - Visible notification content exists in RAM while the card is on screen
+- RAM-only by default is a persistence boundary, not a claim that visible notification text is unreadable to sufficiently privileged local software that can inspect the running process
 - Overflow stores count only, not content
 - Session Archive is the only built-in history-like feature, and it remains opt-in, RAM-only, bounded, and cleared on app close
 - Clipboard copy actions and narration can hand notification text to Windows clipboard/audio surfaces, but Notifications Pro does not create its own disk-backed content history
