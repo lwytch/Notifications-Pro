@@ -20,6 +20,9 @@
 - Local signing credential rotation follow-through — replaced the current-user MSIX signing certificate used by the maintainer-only packaging workflow and retired the previous local cert/PFX from the normal signing path
 
 ### Fixed
+- The Settings window no longer snaps back to the centre of the primary monitor when popup mode is open and a live setting auto-save runs; regular setting changes now leave the open shell where you placed it
+- Settings-window placement is remembered again across popup/window reopen flows and popup-shell rebuilds, and popup resizes now stay on the current display instead of being re-centered
+- Added targeted settings-window placement regression coverage, bringing the verified suite to 281 passing tests
 - User-facing error dialogs no longer show raw exception messages for unexpected failures, narration preview errors, notification-access recovery failures, or background-image copy failures; they now show sanitized summaries with safe exception types only
 - The tray Session Archive action now explicitly says it copies the archive to the Windows clipboard, aligning the menu wording with the actual behavior
 - README install guidance now explains why the exported `.cer` currently shows `CN=LiamWytcherley` and makes it explicit that the release certificate is public-only and does not contain the private signing key

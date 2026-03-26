@@ -37,6 +37,7 @@ public partial class SettingsWindow : Window
         Closing += OnClosing;
         KeyDown += OnKeyDown;
         SizeChanged += OnSizeChanged;
+        LocationChanged += OnLocationChanged;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -49,17 +50,27 @@ public partial class SettingsWindow : Window
 
     private void OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
-        // Settings position is intentionally not saved, so it always defaults to CenterScreen on launch.
+        RememberCurrentPosition();
+        _settingsManager?.Save();
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (IsPopupDisplayMode() && IsLoaded)
         {
-            var bounds = App.CalculateSettingsPopupBounds(e.NewSize.Width, e.NewSize.Height);
-            Left = bounds.Left;
-            Top = bounds.Top;
+            var bounds = App.CalculateSettingsPopupBounds(e.NewSize.Width, e.NewSize.Height, Left, Top);
+            if (Math.Abs(bounds.Left - Left) > 0.5)
+                Left = bounds.Left;
+            if (Math.Abs(bounds.Top - Top) > 0.5)
+                Top = bounds.Top;
         }
+
+        RememberCurrentPosition();
+    }
+
+    private void OnLocationChanged(object? sender, EventArgs e)
+    {
+        RememberCurrentPosition();
     }
 
     private double _preCompactWidth = double.NaN;
@@ -306,6 +317,18 @@ public partial class SettingsWindow : Window
 
         return string.Equals(_settingsManager.Settings.SettingsDisplayMode, "Popup", StringComparison.OrdinalIgnoreCase)
                || WindowStyle == WindowStyle.None;
+    }
+
+    private void RememberCurrentPosition()
+    {
+        if (_settingsManager == null)
+            return;
+
+        if (!double.IsFinite(Left) || !double.IsFinite(Top))
+            return;
+
+        _settingsManager.Settings.SettingsWindowLeft = Left;
+        _settingsManager.Settings.SettingsWindowTop = Top;
     }
 
     private void OnMinimizeClick(object sender, RoutedEventArgs e)

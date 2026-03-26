@@ -600,11 +600,13 @@ public partial class App : Application
 
             if (repositionPopup)
             {
-                var expectedWidth = double.IsNaN(window.Width)
-                    ? (settings.CompactSettingsWindow ? 560.0 : 780.0)
-                    : window.Width;
-                var expectedHeight = double.IsNaN(window.Height) ? 560.0 : window.Height;
-                var popupBounds = CalculateSettingsPopupBounds(expectedWidth, expectedHeight);
+                var expectedWidth = GetExpectedPopupSettingsWindowWidth(window, settings);
+                var expectedHeight = GetExpectedSettingsWindowHeight(window, 560.0);
+                var popupBounds = CalculateSettingsPopupBounds(
+                    expectedWidth,
+                    expectedHeight,
+                    settings.SettingsWindowLeft,
+                    settings.SettingsWindowTop);
                 window.Left = popupBounds.Left;
                 window.Top = popupBounds.Top;
             }
@@ -615,7 +617,14 @@ public partial class App : Application
             window.ResizeMode = ResizeMode.CanResize;
             window.ShowInTaskbar = true;
             window.SetResourceReference(Window.BackgroundProperty, "WindowBgBrush");
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (TryApplyStoredSettingsWindowPosition(window, settings))
+            {
+                window.WindowStartupLocation = WindowStartupLocation.Manual;
+            }
+            else
+            {
+                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
         }
 
         ApplySettingsWindowRuntimeState(window, settings, repositionPopup && popupMode);
@@ -627,11 +636,13 @@ public partial class App : Application
 
         if (popupMode && repositionPopup)
         {
-            var expectedWidth = double.IsNaN(window.Width)
-                ? (settings.CompactSettingsWindow ? 560.0 : 780.0)
-                : window.Width;
-            var expectedHeight = double.IsNaN(window.Height) ? 560.0 : window.Height;
-            var popupBounds = CalculateSettingsPopupBounds(expectedWidth, expectedHeight);
+            var expectedWidth = GetExpectedPopupSettingsWindowWidth(window, settings);
+            var expectedHeight = GetExpectedSettingsWindowHeight(window, 560.0);
+            var popupBounds = CalculateSettingsPopupBounds(
+                expectedWidth,
+                expectedHeight,
+                settings.SettingsWindowLeft,
+                settings.SettingsWindowTop);
             window.Left = popupBounds.Left;
             window.Top = popupBounds.Top;
         }
@@ -659,7 +670,7 @@ public partial class App : Application
             }
         }
 
-        ApplySettingsWindowRuntimeState(_settingsWindow, settings, repositionPopup: _settingsWindow.IsPopupShellMode);
+        ApplySettingsWindowRuntimeState(_settingsWindow, settings, repositionPopup: false);
     }
 
     private void RefreshSettingsWindowAfterBulkApply()
@@ -722,30 +733,74 @@ public partial class App : Application
         }
     }
 
-    public static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight)
+    public static Rect CalculateSettingsPopupBounds(double requestedWidth, double requestedHeight, double? preferredLeft = null, double? preferredTop = null)
+    {
+        var workArea = GetSettingsWindowWorkArea(preferredLeft, preferredTop);
+        return SettingsWindowPlacementHelper.CreatePopupBounds(
+            requestedWidth,
+            requestedHeight,
+            workArea,
+            preferredLeft,
+            preferredTop);
+    }
+
+    private static bool TryApplyStoredSettingsWindowPosition(SettingsWindow window, AppSettings settings)
+    {
+        if (!SettingsWindowPlacementHelper.HasStoredPosition(settings.SettingsWindowLeft, settings.SettingsWindowTop))
+            return false;
+
+        var expectedWidth = GetExpectedWindowedSettingsWindowWidth(window, settings);
+        var expectedHeight = GetExpectedSettingsWindowHeight(window, 740.0);
+        var workArea = GetSettingsWindowWorkArea(settings.SettingsWindowLeft, settings.SettingsWindowTop);
+        var bounds = SettingsWindowPlacementHelper.ClampBoundsToWorkArea(
+            new Rect(settings.SettingsWindowLeft!.Value, settings.SettingsWindowTop!.Value, expectedWidth, expectedHeight),
+            workArea);
+
+        window.Left = bounds.Left;
+        window.Top = bounds.Top;
+        return true;
+    }
+
+    private static double GetExpectedPopupSettingsWindowWidth(SettingsWindow window, AppSettings settings)
+    {
+        return double.IsNaN(window.Width)
+            ? (settings.CompactSettingsWindow ? 560.0 : 780.0)
+            : window.Width;
+    }
+
+    private static double GetExpectedWindowedSettingsWindowWidth(SettingsWindow window, AppSettings settings)
+    {
+        return double.IsNaN(window.Width)
+            ? (settings.CompactSettingsWindow ? 620.0 : 780.0)
+            : window.Width;
+    }
+
+    private static double GetExpectedSettingsWindowHeight(SettingsWindow window, double fallback)
+    {
+        return double.IsNaN(window.Height) ? fallback : window.Height;
+    }
+
+    private static Rect GetSettingsWindowWorkArea(double? preferredLeft = null, double? preferredTop = null)
     {
         var screens = WinForms.Screen.AllScreens;
-        var screen = WinForms.Screen.PrimaryScreen ?? (screens.Length > 0 ? screens[0] : null);
-        
-        if (screen == null)
-            return new Rect(0, 0, Math.Max(320, requestedWidth), Math.Max(280, requestedHeight));
-            
+        if (screens.Length == 0)
+            return SystemParameters.WorkArea;
+
+        WinForms.Screen screen;
+        if (SettingsWindowPlacementHelper.HasStoredPosition(preferredLeft, preferredTop))
+        {
+            var point = new Drawing.Point(
+                (int)Math.Round(preferredLeft!.Value),
+                (int)Math.Round(preferredTop!.Value));
+            screen = WinForms.Screen.FromPoint(point);
+        }
+        else
+        {
+            screen = WinForms.Screen.PrimaryScreen ?? screens[0];
+        }
+
         var workArea = screen.WorkingArea;
-
-        var preferredWidth = requestedWidth > 0 ? requestedWidth : 640;
-        var maxWidth = Math.Max(320, workArea.Width - 24);
-        var minWidth = Math.Min(400, maxWidth);
-        var width = Math.Clamp(preferredWidth, minWidth, maxWidth);
-
-        var preferredHeight = Math.Max(requestedHeight, workArea.Height * 0.55);
-        var maxHeight = Math.Max(280, workArea.Height - 24);
-        var minHeight = Math.Min(380, maxHeight);
-        var height = Math.Clamp(preferredHeight, minHeight, maxHeight);
-
-        var left = workArea.Left + (workArea.Width - width) / 2.0;
-        var top = workArea.Top + (workArea.Height - height) / 2.0;
-
-        return new Rect(left, top, width, height);
+        return new Rect(workArea.Left, workArea.Top, workArea.Width, workArea.Height);
     }
 
     private void OnSettingsWindowDeactivated(object? sender, EventArgs e)

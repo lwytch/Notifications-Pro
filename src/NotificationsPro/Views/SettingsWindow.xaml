@@ -2938,13 +2938,13 @@
                         </Border>
 
                         <TextBlock Text="Display Mode" Style="{StaticResource SettingLabel}"
-                                   ToolTip="Window: standard resizable settings window. Popup (default): borderless panel anchored to the Windows toast corner on the taskbar monitor."/>
+                                   ToolTip="Window: standard resizable settings window. Popup (default): borderless panel that remembers its last position and stays on the current display while live settings update."/>
                         <ComboBox Style="{StaticResource SettingsComboBox}"
                                   ItemContainerStyle="{StaticResource SettingsComboBoxItem}"
                                   ItemsSource="{Binding AvailableSettingsDisplayModes}"
                                   SelectedItem="{Binding SettingsDisplayMode}"
                                   Margin="0,4,0,0"
-                                  ToolTip="Window mode opens a normal resizable window. Popup mode anchors to the same corner where Windows toasts appear."
+                                  ToolTip="Window mode opens a normal resizable window. Popup mode reopens where you last left it instead of recentring on each live save."
                                   />
 
                         <Border Style="{StaticResource SectionHeaderPanel}">

@@ -146,7 +146,7 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Global hotkeys** — register system-wide keyboard shortcuts for: toggle overlay visibility, dismiss all notifications, toggle Do Not Disturb.
 - **Settings undo/redo** — Ctrl+Z and Ctrl+Y with a 50-entry history stack, plus undo/redo buttons in the settings header.
 - **Settings window theming** — Dark / Light / System / any named overlay theme. Colours are fully customisable (background, surface, text, accent, border), and you can link the overlay theme and settings-window theme when you want both to move together.
-- **Settings popup mode** — settings window can open as a normal resizable window or as a popup above the taskbar corner, with optional auto-close and a compact-width layout.
+- **Settings popup mode** — settings window can open as a normal resizable window or as a popup shell, with optional auto-close, a compact-width layout, and remembered placement so live setting changes do not yank it back to the primary display.
 - **Quick tips toggle** — `Settings > Settings Window` can turn the first-run guidance banner on or off without affecting notification capture.
 
 ### Accessibility
@@ -435,6 +435,11 @@ While extensively tested, this software hooks into Windows UI Automation and not
 
 <details>
 <summary><strong>Release Notes</strong></summary>
+
+### Release v1.1.10.36
+- Fixed the Settings window so ordinary live setting changes no longer shove popup mode back to the centre of the primary monitor.
+- Restored remembered Settings-window placement across popup/window reopen and rebuild flows, and kept popup resizes on the current display instead of re-centering them.
+- Added focused placement regression coverage and reran the project-level build/test verification pass.
 
 ### Release v1.1.10.35
 - Hardened user-facing error handling so unexpected crash prompts, narration preview failures, notification-access recovery failures, and background-image copy failures no longer show raw exception text.

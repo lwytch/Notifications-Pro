@@ -201,7 +201,7 @@
   - HasShownWelcome tracking in AppSettings (UI state, not notification content)
   - Confirm before "Reset to Defaults" — MessageBox confirmation prevents accidental resets
   - "Saved" micro-feedback — brief "Saved" label appears next to auto-save text after each save
-- Window mode reopens centered, while Popup mode recalculates its shell bounds when opened or resized
+- Settings window now remembers and restores its last position in both Window and Popup modes, and popup-mode live saves/resizes stay on the current display instead of jumping back to the primary monitor
   - Ctrl+T keyboard shortcut to send test notification from settings
   - Checkmarks on tray menu toggle items (Pause, Always on Top, Click-Through)
   - Tray icon dimmed/monochrome when notifications are paused
@@ -231,7 +231,7 @@
   - Custom settings window color pickers (background, surface, surface light, surface hover, text, text secondary, text muted, accent, border)
 - Overlay scrollbar controls (show/hide, width, opacity, track/thumb colors, padding, corner radius) now apply to a fully themed custom scrollbar instead of the stock WPF look
   - Toast suppression — remove Windows toast popups after capture (WinRT only, safe on exit)
-- Settings popup display mode — Window or Popup (popup shell uses auto-close when enabled and recalculates centered bounds from the current work area, with a 55% work-area minimum-height floor)
+- Settings popup display mode — Window or Popup (popup shell uses auto-close when enabled, restores its last position when reopening/rebuilding, and still clamps itself to the visible work area with a 55% minimum-height floor)
   - Settings window rounded corners with adjustable radius slider (0–20px) in Settings Window — XAML clipping in popup mode, DWM corner preference in windowed mode
   - Per-app notification sounds — system sounds (Asterisk/Beep/Exclamation/Hand/Question) with per-app overrides + custom WAV upload
   - Test sound button to preview selected sound
@@ -434,7 +434,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] First-run tip bar appears in settings on first open and can be dismissed
 - [ ] "Reset to Defaults" shows a confirmation dialog before resetting
 - [ ] "Saved" label briefly appears next to "Changes are saved automatically" after each save
-- [ ] Window mode reopens centered and Popup mode recalculates its shell bounds when the settings window opens
+- [ ] Settings window remembers its last position, and popup mode no longer jumps back to the primary monitor during live saves, popup resizes, or reopen/rebuild flows
 - [ ] Ctrl+T sends a test notification from the settings window
 - [ ] Tray menu toggle items (Pause, Always on Top, Click-Through) show checkmarks
 - [ ] Tray icon dims when notifications are paused
@@ -448,7 +448,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Disabling Start with Windows disables the packaged Windows Startup Task
 - [ ] App launches at Windows startup when the toggle is on
 - [ ] Streaming tab appears in Settings between Sounds and Accessibility
-- [ ] In UI Popup mode, settings window opens at the Windows toast corner on the taskbar monitor
+- [ ] In UI Popup mode, the settings window reopens on its last-used display/position and stays there during live saves and popup resizes
 - [ ] In Window mode, settings title bar uses dark styling (no light-gray native caption clash)
 - [ ] Fullscreen overlay mode covers the full monitor area including taskbar region
 - [ ] Chroma Key toggle turns overlay background solid green
