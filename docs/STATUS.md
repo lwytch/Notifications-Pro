@@ -34,6 +34,7 @@
 - Startup settings now use a one-time schema migration instead of the welcome-tip flag to detect legacy defaults, so old `3`-visible / `300ms` / `480px` installs upgrade once without resetting current user choices on every launch
 - Startup defaults repair now follows schema version 5 and only fires for the real legacy-default signature, so installs that were already stamped during the earlier broken migration still self-correct from the old `3` visible notifications / `0-300ms` animation / `480px` height startup state on the next launch without overriding intentional later choices
 - Overlay scrollbars now receive real client hit-testing over the scrollbar/search areas, so dragging still works across the cards while the scrollbar itself remains clickable and draggable
+- Mouse-wheel scrolling now moves the retained notification stack while the pointer is over the overlay scroll region, including card content, instead of dropping that wheel input on the draggable overlay shell
 - Appearance now includes overlay scrollbar style controls for track color, thumb color, hover color, inset padding, card-to-scrollbar gap, and corner radius, and overlay themes carry those scrollbar settings with the rest of the visual palette
 - Overlay scrollbars now start enabled by default for fresh installs, stay hidden while the idle `Waiting for notifications...` placeholder is showing, and only appear when the currently retained cards really overflow the overlay height
 - Overflow wording now makes the privacy boundary explicit: scrollbars only apply to currently retained cards, while notifications beyond the retained limit are discarded immediately and represented only as `+N not shown`
@@ -328,6 +329,7 @@ dotnet test tests/NotificationsPro.Tests/NotificationsPro.Tests.csproj
 - [ ] Appearance > Background Image renders the selected local image inside live cards and in the settings preview
 - [ ] Overlay no longer shows a faint empty panel under cards
 - [ ] Very long stacked notifications can be scrolled when they exceed Max Overlay Height
+- [ ] Mouse wheel scrolls the retained notification stack while the pointer is over the overlay cards or scrollbar
 - [ ] At max font sizes, overlay scrollbar remains usable and no cards are clipped off-screen
 - [ ] Overlay can be resized from left/right edges when manual resize is enabled
 - [ ] While right-aligned, width changes keep right edge snapped to the monitor edge

@@ -436,6 +436,10 @@ While extensively tested, this software hooks into Windows UI Automation and not
 <details>
 <summary><strong>Release Notes</strong></summary>
 
+### Release v1.1.10.37
+- Fixed overlay mouse-wheel scrolling so overflowing notification stacks can now be scrolled while the pointer is over the cards themselves instead of only via scrollbar dragging.
+- Added focused wheel-scrolling regression coverage and reran the project-level build/test verification pass.
+
 ### Release v1.1.10.36
 - Fixed the Settings window so ordinary live setting changes no longer shove popup mode back to the centre of the primary monitor.
 - Restored remembered Settings-window placement across popup/window reopen and rebuild flows, and kept popup resizes on the current display instead of re-centering them.

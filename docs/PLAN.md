@@ -502,6 +502,7 @@ Post-redesign process guardrails:
 - [x] Create a local `settings-regression-checklist` skill after the new layout is finalized: require a focused pass over spacing, control heights, button widths, tooltip usage, moved-setting persistence, profile save/load coverage, and export/import coverage whenever a settings feature is added or reorganized.
 
 ## Current Focus
+- [x] Overlay mouse-wheel scrolling fix: routed wheel input into the overlay scroll viewer even when the card stack is still treated as draggable caption chrome, added focused wheel-delta regression coverage, and rebuilt plus reinstalled a local packaged review build for testing.
 - [x] Settings-window position retention fix: stopped live settings saves from re-centering the open Settings window on the primary monitor, restored saved popup/window coordinates on reopen and shell rebuilds, and added targeted placement regression coverage.
 - [x] Local error-surface hardening: sanitized user-facing exception dialogs so unexpected errors, narration preview failures, notification-access recovery failures, and background-image copy failures no longer show raw exception text, and aligned the public privacy docs to describe RAM-only handling as a persistence boundary rather than a process-isolation claim.
 - [x] README troubleshooting refresh: re-audit the troubleshooting table against the current shipped settings names, capture recovery flow, sound behavior, and practical user support cases so the public README points to accurate recovery steps instead of stale or over-broad advice.

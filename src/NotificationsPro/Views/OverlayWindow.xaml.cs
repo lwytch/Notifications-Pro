@@ -40,6 +40,7 @@ public partial class OverlayWindow : Window
     private const int WM_NCLBUTTONDBLCLK = 0x00A3;
     private const int WM_NCRBUTTONUP = 0x00A5;
     private const int WM_NCMOUSEMOVE = 0x00A0;
+    private const int WM_MOUSEWHEEL = 0x020A;
     private const int HTCLIENT = 1;
     private const int HTTRANSPARENT = -1;
     private const int HTCAPTION = 2;
@@ -71,6 +72,7 @@ public partial class OverlayWindow : Window
         LocationChanged += OnLocationChanged;
         SizeChanged += OnSizeChanged;
         PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+        PreviewMouseWheel += OnPreviewMouseWheel;
     }
 
     private void OnClosed(object? sender, EventArgs e)
@@ -178,6 +180,14 @@ public partial class OverlayWindow : Window
                 }
                 ResetHoverCheckTimer();
                 break;
+
+            case WM_MOUSEWHEEL:
+                if (TryHandleOverlayMouseWheel(PointFromScreen(GetScreenPointFromLParam(lParam)), GetWheelDeltaFromWParam(wParam)))
+                {
+                    handled = true;
+                    return IntPtr.Zero;
+                }
+                break;
         }
 
         return IntPtr.Zero;
@@ -282,6 +292,12 @@ public partial class OverlayWindow : Window
         {
             // DragMove can throw when mouse state changes mid-drag.
         }
+    }
+
+    private void OnPreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    {
+        if (TryHandleOverlayMouseWheel(e.GetPosition(this), e.Delta))
+            e.Handled = true;
     }
 
     private void OnSettingsChanged()
@@ -1068,6 +1084,51 @@ public partial class OverlayWindow : Window
         return false;
     }
 
+    private bool TryHandleOverlayMouseWheel(System.Windows.Point point, int wheelDelta)
+    {
+        if (wheelDelta == 0 || NotificationScrollViewer.ScrollableHeight <= 0.5)
+            return false;
+
+        if (!IsPointWithinElement(point, NotificationScrollViewer))
+            return false;
+
+        var offsetDelta = OverlayMouseWheelHelper.CalculateVerticalOffsetDelta(
+            wheelDelta,
+            SystemParameters.WheelScrollLines,
+            NotificationScrollViewer.ViewportHeight);
+        if (Math.Abs(offsetDelta) <= 0.01)
+            return false;
+
+        var targetOffset = Math.Clamp(
+            NotificationScrollViewer.VerticalOffset + offsetDelta,
+            0,
+            NotificationScrollViewer.ScrollableHeight);
+        if (Math.Abs(targetOffset - NotificationScrollViewer.VerticalOffset) <= 0.01)
+            return false;
+
+        NotificationScrollViewer.ScrollToVerticalOffset(targetOffset);
+        UpdateScrollbarOverflowState();
+        return true;
+    }
+
+    private bool IsPointWithinElement(System.Windows.Point point, DependencyObject targetElement)
+    {
+        var result = VisualTreeHelper.HitTest(this, point);
+        if (result?.VisualHit == null)
+            return false;
+
+        DependencyObject? current = result.VisualHit;
+        while (current != null)
+        {
+            if (ReferenceEquals(current, targetElement))
+                return true;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return false;
+    }
+
     private void ShowCardContextMenu(IntPtr lParam)
     {
         var item = FindNotificationAtScreenPoint(lParam);
@@ -1403,6 +1464,11 @@ public partial class OverlayWindow : Window
         var screenX = unchecked((short)(lParam.ToInt64() & 0xFFFF));
         var screenY = unchecked((short)((lParam.ToInt64() >> 16) & 0xFFFF));
         return new System.Windows.Point(screenX, screenY);
+    }
+
+    private static int GetWheelDeltaFromWParam(IntPtr wParam)
+    {
+        return unchecked((short)((wParam.ToInt64() >> 16) & 0xFFFF));
     }
 
     private void ApplyEffectiveMaxHeight(AppSettings settings)
