@@ -13,11 +13,15 @@
   [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg)](docs/STATUS.md)
 </div>
 
+<p align="center"><img src="docs/screenshots/00-hero-banner.webp" alt="Notifications Pro – a privacy-first, fully customisable notification overlay for Windows 10 and 11" width="100%"></p>
+
 ---
 
 A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay. It is especially useful on 4K, 5K, ultrawide, and multi-monitor setups where default Windows toasts are easy to miss. Filter noise, style cards per app, narrate only the alerts that matter, and keep notification text RAM-only by default. If you explicitly enable Session Archive, Notifications Pro also keeps a temporary in-memory archive for the current app session so you can review or copy recent captured notifications; it is never written to disk and is cleared when the app closes.
 
 > Still in active development. I use it every day. More updates coming.
+
+<p align="center"><img src="docs/screenshots/01-never-miss-what-matters.webp" alt="Always-on-top Notifications Pro overlay showing stacked notification cards over a Windows desktop" width="100%"></p>
 
 ## Quick Start
 
@@ -37,6 +41,8 @@ A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows 
 | Basic speech/accessibility control | Built-in narration, per-app read aloud, rule-gated speech, Voice Access labels, auto-duration, and accessibility-aware styling |
 | System decides when to dismiss toasts | Persistent cards, auto-duration, hover-to-pause, and explicit visible-card limits |
 | Overflow and history behavior are opaque | RAM-only visible cards, overflow count only, and no disk history of notification content by default |
+
+<p align="center"><img src="docs/screenshots/03-built-for-multi-monitor.webp" alt="Notifications Pro on a dedicated portrait monitor next to the main display" width="100%"></p>
 
 Notifications Pro is built for people who need more control than Windows offers out of the box: developers watching builds and reviews, social/community managers tracking mentions, streamers keeping alerts readable on a second screen, and anyone using a high-resolution desktop where standard toasts disappear too quickly or too far into the corner.
 
@@ -74,6 +80,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Fullscreen overlay mode** — expands the overlay to cover an entire monitor with a configurable semi-transparent backdrop (solid colour or local image, with opacity and fit controls). Useful as a dedicated notification monitor or for focus sessions.
 - **OBS fixed-window mode** — locks the overlay to a precise width/height for predictable window-capture in OBS/streaming tools.
 
+<p align="center"><img src="docs/screenshots/02-full-screen-alerts.webp" alt="Full-screen alert mode: a critical alert takes over the monitor with a dimmed backdrop" width="100%"></p>
+
 ### Layout Modes
 - **Stacked cards** — each notification is a separate card, and the optional scrollbar applies when the currently visible cards need more vertical space.
 - **Single-line banner mode** — a compact banner-style layout. Keep each notification to one line, or allow wrapping up to a configurable max-line count. Timestamps can render inline when enabled.
@@ -83,6 +91,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Retained notifications** — configurable 1–1000 retained cards, with new installs/reset defaults now starting at `40`. Extra notifications increment a `+N not shown` summary instead of being retained, and clicking that summary can raise the limit for future cards. The themed scrollbar is enabled by default for fresh installs but only appears when the retained cards overflow the overlay height; it does not resurrect discarded overflow items.
 - **Max overlay height** — the overlay expands vertically up to this limit, then shows a scrollbar. Clamped to the active monitor work area.
 - **Width / height presets** — quick buttons for 1080p / 2K / 4K / 8K display sizes.
+
+<p align="center"><img src="docs/screenshots/06-layouts-and-density.webp" alt="Single-line banner mode alongside Compact and Spacious density presets" width="100%"></p>
 
 ### Appearance & Theming
 - **Built-in theme presets** — select from a dropdown and apply in one click.
@@ -107,6 +117,10 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Chroma key** — solid-colour background (green / blue / magenta / custom) for OBS chroma-key filtering.
 - **Information density presets** — Compact / Comfortable / Spacious — adjusts typography, spacing, and line limits in one click from the `Appearance` tab.
 
+<p align="center"><img src="docs/screenshots/04-seven-built-in-themes.webp" alt="The same notification cards in all seven built-in themes" width="100%"></p>
+
+<p align="center"><img src="docs/screenshots/07-make-it-yours.webp" alt="Per-app icons, per-app tints, custom colours and corner radius on notification cards" width="100%"></p>
+
 ### Behaviour & Control
 - **Notification duration** — configurable display time in seconds; each card has its own timer.
 - **App grouping** — optional grouping by source app, with a separate appearance control so the grouping behaviour lives in `Behavior` and the styling lives in `Appearance`.
@@ -127,6 +141,8 @@ Notifications Pro is built for people who need more control than Windows offers 
 - **Local highlight preview** — `Settings > Filtering > Send Highlight Preview` injects a local highlighted test card so you can verify tint, border, and animation changes immediately.
 - **Focus mode** — a timed DND period (configurable minutes) accessible from the tray menu.
 - **Presentation mode** — auto-DND when a configured app (PowerPoint, Zoom, Teams, etc.) goes fullscreen.
+
+<p align="center"><img src="docs/screenshots/05-highlight-rules.webp" alt="Highlight rules settings with red, amber and green highlighted notification cards" width="100%"></p>
 
 ### Sounds
 - **Master toggle** for notification sounds.
@@ -347,6 +363,38 @@ Right-click the tray icon to access: show/hide overlay, pause (DND), always-on-t
 
 ### Settings
 Changes are debounced and auto-saved. Use **Send Test Notification** (Ctrl+T) to preview general styling without waiting for a real notification, and use **Settings > Filtering > Send Highlight Preview** when you want a local highlighted card for filter-specific styling checks. The header also exposes undo/redo, and **Reset to Defaults** asks for confirmation before replacing your current settings.
+
+<details>
+<summary>Settings tour</summary>
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/08-settings-appearance.webp" alt="Appearance tab: themes, custom themes, theme schedule and typography" width="100%"></td>
+<td width="50%"><img src="docs/screenshots/09-settings-behavior.webp" alt="Behaviour tab: click-through, always on top, persistent cards and timing" width="100%"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/10-settings-filtering.webp" alt="Filtering tab: highlight rules with colour, scope, app filter, animation and border mode" width="100%"></td>
+<td width="50%"><img src="docs/screenshots/11-settings-apps.webp" alt="Apps tab: per-app icon, sound, colour and card background overrides" width="100%"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/12-settings-layout.webp" alt="Layout tab: target monitor, quick position grid and overlay size" width="100%"></td>
+<td width="50%"><img src="docs/screenshots/13-settings-sounds.webp" alt="Sounds tab: notification sounds, default sound and custom sound files" width="100%"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/14-settings-streaming.webp" alt="Streaming tab: chroma key background, OBS fixed window and presentation mode" width="100%"></td>
+<td width="50%"><img src="docs/screenshots/15-settings-accessibility.webp" alt="Accessibility tab: reduce motion, high contrast, text scaling, read aloud and Voice Access" width="100%"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/16-settings-settings-window.webp" alt="Settings Window tab: popup or window mode, theme, opacity and corner radius" width="100%"></td>
+<td width="50%"><img src="docs/screenshots/17-settings-system.webp" alt="System tab: notification access, capture mode, toast suppression and session archive" width="100%"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/18-settings-profiles.webp" alt="Profiles tab: saved Work, Streaming and Focus profiles with import and export" width="100%"></td>
+<td width="50%"><img src="docs/screenshots/19-settings-help.webp" alt="Help tab: shortcuts, tips and built-in guides" width="100%"></td>
+</tr>
+</table>
+
+</details>
 
 ### Windows notification setup
 Notifications Pro mirrors the notifications Windows is already surfacing. If Windows notifications are off for an app, there is nothing for the overlay to capture.
