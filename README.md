@@ -1,5 +1,6 @@
+<p align="center"><img src="docs/screenshots/00-hero-banner.webp" alt="Notifications Pro – a privacy-first, fully customisable notification overlay for Windows 10 and 11" width="100%"></p>
+
 <div align="center">
-  <img src="src/NotificationsPro.Package/Images/Square150x150Logo.png" alt="Notifications Pro Logo" width="120" />
   
   # Notifications Pro
 
@@ -12,8 +13,6 @@
   [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
   [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg)](docs/STATUS.md)
 </div>
-
-<p align="center"><img src="docs/screenshots/00-hero-banner.webp" alt="Notifications Pro – a privacy-first, fully customisable notification overlay for Windows 10 and 11" width="100%"></p>
 
 ---
 
