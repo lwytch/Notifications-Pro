@@ -1,11 +1,7 @@
 <p align="center"><img src="docs/screenshots/00-hero-banner.webp" alt="Notifications Pro – a privacy-first, fully customisable notification overlay for Windows 10 and 11" width="100%"></p>
 
 <div align="center">
-  
-  # Notifications Pro
 
-  **A privacy-first, highly-customisable Windows notification overlay.**
-  
   [![Platform](https://img.shields.io/badge/Platform-Windows_10%20%7C%2011-blue.svg)](#requirements)
   [![Framework](https://img.shields.io/badge/Framework-.NET_8%20%7C%20WPF-purple.svg)](#build--run--test)
   [![Privacy](https://img.shields.io/badge/Privacy-RAM--only%20by%20default-2f855a.svg)](#privacy--data-model)
@@ -14,11 +10,7 @@
   [![Status](https://img.shields.io/badge/Status-Active_Development-orange.svg)](docs/STATUS.md)
 </div>
 
----
-
 A privacy-first Windows tray app (C# .NET 8 + WPF) that captures native Windows toast notifications and mirrors them into a fully customisable, always-on-top overlay. It is especially useful on 4K, 5K, ultrawide, and multi-monitor setups where default Windows toasts are easy to miss. Filter noise, style cards per app, narrate only the alerts that matter, and keep notification text RAM-only by default. If you explicitly enable Session Archive, Notifications Pro also keeps a temporary in-memory archive for the current app session so you can review or copy recent captured notifications; it is never written to disk and is cleared when the app closes.
-
-> Still in active development. I use it every day. More updates coming.
 
 <p align="center"><img src="docs/screenshots/01-never-miss-what-matters.webp" alt="Always-on-top Notifications Pro overlay showing stacked notification cards over a Windows desktop" width="100%"></p>
 
@@ -508,3 +500,5 @@ While extensively tested, this software hooks into Windows UI Automation and not
 - Reset the in-README release notes to a fresh baseline so this section reflects the current app cleanly instead of carrying a long stale history.
 
 </details>
+
+> Still in active development. I use it every day. More updates coming.
